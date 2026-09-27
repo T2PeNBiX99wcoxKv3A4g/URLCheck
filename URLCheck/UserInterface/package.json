@@ -11,20 +11,21 @@
   },
   "dependencies": {
     "next": "^16.3.6",
-    "npm-check-updates": "^23.1.0",
     "react": "^19",
     "react-dom": "^19",
-    "styled-components": "^6.5.3",
-    "@tailwindcss/postcss": "^4.3.3"
+    "styled-components": "^6.5.3"
   },
   "devDependencies": {
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@tailwindcss/postcss": "^4.3.3",
     "eslint": "^10",
     "eslint-config-next": "16.3.6",
     "postcss": "^8",
+    "sass": "^1.105.0",
     "tailwindcss": "^4.3.3",
-    "typescript": "^7"
+    "typescript": "^7",
+    "npm-check-updates": "^23.1.0"
   }
 }
