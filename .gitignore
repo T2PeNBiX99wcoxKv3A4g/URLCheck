@@ -1,0 +1,24 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+
+# Build outputs
+**/bin/
+**/obj/
+Build/
+publish/
+
+# IDE
+.idea/
+.vscode/
+.vs/
+*.DotSettings*
+.junie/
+
+# Runtime files
+*.log
+nul
+
+.temp/
