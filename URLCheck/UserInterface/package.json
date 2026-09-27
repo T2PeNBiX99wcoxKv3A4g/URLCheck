@@ -2,15 +2,14 @@
   "name": "urlcheck-ui",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build && node scripts/copy-build.mjs",
-    "start": "next start",
-    "lint": "eslint .",
+    "dev": "vite",
+    "build": "tsc -b && vite build && node scripts/copy-build.mjs",
+    "preview": "vite preview",
     "upgrade": "npm-check-updates -u"
   },
   "dependencies": {
-    "next": "^16.3.6",
     "react": "^19",
     "react-dom": "^19",
     "styled-components": "^6.5.3"
@@ -19,10 +18,10 @@
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^10",
-    "eslint-config-next": "16.3.6",
+    "@vitejs/plugin-react": "^4.3.4",
     "npm-check-updates": "^23.1.0",
     "sass": "^1.105.0",
-    "typescript": "^7"
+    "typescript": "^7",
+    "vite": "^6.2.0"
   }
 }

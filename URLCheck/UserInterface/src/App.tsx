@@ -1,5 +1,3 @@
-"use client";
-
 import styled from "styled-components";
 
 const MainContainer = styled.main`
@@ -45,7 +43,7 @@ const StyledHighlight = styled.span`
   border-radius: 4px;
 `;
 
-export default function Home() {
+export default function App() {
   return (
     <MainContainer>
       <ContentCard>
