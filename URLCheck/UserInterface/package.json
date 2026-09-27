@@ -1,5 +1,5 @@
 {
-  "name": "photino-hellophotino-react",
+  "name": "urlcheck-ui",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,15 +7,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "upgrade": "npx npm-check-updates -u"
+    "upgrade": "npm-check-updates -u"
   },
   "dependencies": {
     "next": "^16.3.6",
+    "npm-check-updates": "^23.1.0",
     "react": "^19",
-    "react-dom": "^19"
+    "react-dom": "^19",
+    "styled-components": "^6.5.3",
+    "@tailwindcss/postcss": "^4.3.3"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
