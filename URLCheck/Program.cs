@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
-using JetBrains.Annotations;
 using Photino.NET;
+#if !DEBUG
+using Photino.NET.Server;
+#endif
 
 namespace URLCheck;
 //NOTE: To hide the console window, go to the project properties and change the Output Type to Windows Application.
