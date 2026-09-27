@@ -26,10 +26,8 @@ internal static class Program
 
         Console.WriteLine($"Serving React app at {appUrl}");
 
-        var windowTitle = "Photino.React Demo App";
-
         var window = new PhotinoWindow()
-            .SetTitle(windowTitle)
+            .SetTitle(Constants.WindowTitle)
             .SetUseOsDefaultSize(false)
             .SetSize(new(2048, 1024))
             // Resize to a percentage of the main monitor work area

@@ -9,4 +9,6 @@ public static class Constants
 #else
     [PublicAPI] internal const bool IsDebugMode = false;
 #endif
+
+    public const string WindowTitle = "URLCheck";
 }
