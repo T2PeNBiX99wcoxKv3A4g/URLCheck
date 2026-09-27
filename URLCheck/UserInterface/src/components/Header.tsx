@@ -8,8 +8,9 @@ interface HeaderProps {
 
 const HeaderContainer = styled.header`
   height: 64px;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -25,13 +26,13 @@ const PageTitleGroup = styled.div`
 const PageTitle = styled.h1`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #f9fafb;
   letter-spacing: -0.01em;
 `;
 
 const PageSubtitle = styled.span`
   font-size: 0.8rem;
-  color: #64748b;
+  color: #9ca3af;
 `;
 
 const RightControls = styled.div`
@@ -44,12 +45,12 @@ const QuickBadge = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 0.8rem;
-  color: #475569;
+  color: #9ca3af;
   font-weight: 500;
 `;
 
@@ -58,6 +59,7 @@ const Dot = styled.span`
   height: 6px;
   border-radius: 50%;
   background: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
 `;
 
 const tabInfo: Record<TabType, { title: string; subtitle: string }> = {

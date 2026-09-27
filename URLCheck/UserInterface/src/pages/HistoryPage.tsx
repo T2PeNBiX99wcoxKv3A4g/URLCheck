@@ -16,11 +16,12 @@ const PageContainer = styled.div`
 `;
 
 const Card = styled.div`
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 `;
 
 const ControlsCard = styled(Card)`
@@ -41,33 +42,38 @@ const SearchWrapper = styled.div`
   svg {
     position: absolute;
     left: 14px;
-    stroke: #94a3b8;
+    stroke: #9ca3af;
   }
 `;
 
 const SearchInput = styled.input`
   width: 100%;
   padding: 10px 14px 10px 42px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  background: #f8fafc;
+  background: rgba(15, 23, 42, 0.75);
+  color: #f9fafb;
   font-size: 0.9rem;
   outline: none;
   font-family: inherit;
   transition: all 0.2s ease;
 
   &:focus {
-    background: #ffffff;
+    background: rgba(15, 23, 42, 0.95);
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  }
+
+  &::placeholder {
+    color: #6b7280;
   }
 `;
 
 const DangerButton = styled.button`
   padding: 10px 16px;
-  background: #fee2e2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 8px;
   font-weight: 500;
   font-size: 0.85rem;
@@ -78,8 +84,9 @@ const DangerButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #fecaca;
-    color: #991b1b;
+    background: rgba(239, 68, 68, 0.25);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.5);
   }
 `;
 
@@ -96,19 +103,19 @@ const Table = styled.table`
   th {
     text-align: left;
     padding: 12px 18px;
-    background: #f8fafc;
-    color: #64748b;
+    background: rgba(15, 23, 42, 0.7);
+    color: #9ca3af;
     font-weight: 600;
     font-size: 0.8rem;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     text-transform: uppercase;
     letter-spacing: 0.03em;
   }
 
   td {
     padding: 14px 18px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #1e293b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
   }
 
   tr:last-child td {
@@ -116,7 +123,7 @@ const Table = styled.table`
   }
 
   tr:hover td {
-    background: #fafafa;
+    background: rgba(255, 255, 255, 0.02);
   }
 `;
 
@@ -130,28 +137,29 @@ const StatusBadge = styled.span<{ $status: string }>`
   font-weight: 600;
   background: ${(props) =>
     props.$status === "success"
-      ? "#ecfdf5"
+      ? "rgba(16, 185, 129, 0.12)"
       : props.$status === "warning"
-      ? "#fffbeb"
-      : "#fef2f2"};
+      ? "rgba(245, 158, 11, 0.12)"
+      : "rgba(239, 68, 68, 0.12)"};
   color: ${(props) =>
     props.$status === "success"
-      ? "#059669"
+      ? "#34d399"
       : props.$status === "warning"
-      ? "#d97706"
-      : "#dc2626"};
+      ? "#fbbf24"
+      : "#f87171"};
   border: 1px solid
     ${(props) =>
       props.$status === "success"
-        ? "#a7f3d0"
+        ? "rgba(16, 185, 129, 0.3)"
         : props.$status === "warning"
-        ? "#fde68a"
-        : "#fecaca"};
+        ? "rgba(245, 158, 11, 0.3)"
+        : "rgba(239, 68, 68, 0.3)"};
 `;
 
 const TypeTag = styled.span`
-  background: #f1f5f9;
-  color: #475569;
+  background: rgba(15, 23, 42, 0.7);
+  color: #9ca3af;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.75rem;
   padding: 3px 8px;
   border-radius: 4px;
@@ -211,7 +219,7 @@ export const HistoryPage: React.FC = () => {
             {filteredHistory.length > 0 ? (
               filteredHistory.map((item) => (
                 <tr key={item.id}>
-                  <td style={{ color: "#64748b", fontSize: "0.85rem" }}>{item.timestamp}</td>
+                  <td style={{ color: "#9ca3af", fontSize: "0.85rem" }}>{item.timestamp}</td>
                   <td>
                     <TypeTag>{item.type === "single" ? "Single Check" : "Batch Scan"}</TypeTag>
                   </td>
@@ -228,7 +236,7 @@ export const HistoryPage: React.FC = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={4} style={{ textAlign: "center", padding: "36px", color: "#94a3b8" }}>
+                <td colSpan={4} style={{ textAlign: "center", padding: "36px", color: "#6b7280" }}>
                   No inspection history recorded yet
                 </td>
               </tr>

@@ -17,11 +17,12 @@ const PageContainer = styled.div`
 `;
 
 const Card = styled.div`
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 `;
 
 const InputSection = styled(Card)`
@@ -45,7 +46,7 @@ const InputWrapper = styled.div`
   svg {
     position: absolute;
     left: 16px;
-    stroke: #94a3b8;
+    stroke: #9ca3af;
   }
 `;
 
@@ -53,25 +54,29 @@ const StyledInput = styled.input`
   width: 100%;
   padding: 14px 16px 14px 48px;
   font-size: 0.95rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  background: #f8fafc;
-  color: #1e293b;
+  background: rgba(15, 23, 42, 0.75);
+  color: #f9fafb;
   outline: none;
   font-family: inherit;
   transition: all 0.2s ease;
 
   &:focus {
-    background: #ffffff;
+    background: rgba(15, 23, 42, 0.95);
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  }
+
+  &::placeholder {
+    color: #6b7280;
   }
 `;
 
 const PrimaryButton = styled.button`
   padding: 0 24px;
   height: 50px;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -83,11 +88,11 @@ const PrimaryButton = styled.button`
   gap: 8px;
   white-space: nowrap;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 
   &:hover {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+    box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
   }
 
   &:active {
@@ -104,23 +109,24 @@ const PresetsContainer = styled.div`
 
 const PresetLabel = styled.span`
   font-size: 0.8rem;
-  color: #64748b;
+  color: #9ca3af;
   font-weight: 500;
 `;
 
 const PresetChip = styled.button`
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
   padding: 4px 10px;
   font-size: 0.75rem;
-  color: #475569;
+  color: #9ca3af;
   cursor: pointer;
   transition: all 0.15s ease;
 
   &:hover {
-    background: #e2e8f0;
-    color: #1e293b;
+    background: rgba(31, 41, 55, 0.85);
+    color: #f9fafb;
+    border-color: rgba(99, 102, 241, 0.35);
   }
 `;
 
@@ -132,23 +138,23 @@ const StatusBanner = styled.div<{ $status: string }>`
   border-radius: 8px;
   background: ${(props) =>
     props.$status === "valid"
-      ? "#ecfdf5"
+      ? "rgba(16, 185, 129, 0.12)"
       : props.$status === "warning"
-      ? "#fffbeb"
-      : "#fef2f2"};
+      ? "rgba(245, 158, 11, 0.12)"
+      : "rgba(239, 68, 68, 0.12)"};
   border: 1px solid
     ${(props) =>
       props.$status === "valid"
-        ? "#a7f3d0"
+        ? "rgba(16, 185, 129, 0.3)"
         : props.$status === "warning"
-        ? "#fde68a"
-        : "#fecaca"};
+        ? "rgba(245, 158, 11, 0.3)"
+        : "rgba(239, 68, 68, 0.3)"};
   color: ${(props) =>
     props.$status === "valid"
-      ? "#065f46"
+      ? "#34d399"
       : props.$status === "warning"
-      ? "#92400e"
-      : "#991b1b"};
+      ? "#fbbf24"
+      : "#f87171"};
 `;
 
 const StatusLeft = styled.div`
@@ -166,10 +172,11 @@ const StatusMeta = styled.div`
 `;
 
 const MetaBadge = styled.span`
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.08);
   padding: 3px 8px;
   border-radius: 4px;
   font-weight: 500;
+  color: #e2e8f0;
 `;
 
 const Grid = styled.div`
@@ -187,14 +194,14 @@ const DetailItem = styled.div`
   flex-direction: column;
   gap: 4px;
   padding: 12px;
-  background: #f8fafc;
+  background: rgba(15, 23, 42, 0.6);
   border-radius: 8px;
-  border: 1px solid #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 `;
 
 const DetailLabel = styled.span`
   font-size: 0.75rem;
-  color: #64748b;
+  color: #9ca3af;
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -202,7 +209,7 @@ const DetailLabel = styled.span`
 
 const DetailValue = styled.span`
   font-size: 0.95rem;
-  color: #0f172a;
+  color: #f9fafb;
   font-family: monospace;
   word-break: break-all;
 `;
@@ -210,7 +217,7 @@ const DetailValue = styled.span`
 const CardTitle = styled.h3`
   font-size: 1rem;
   font-weight: 600;
-  color: #0f172a;
+  color: #f9fafb;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
@@ -225,16 +232,16 @@ const ParamsTable = styled.table`
   th {
     text-align: left;
     padding: 8px 12px;
-    background: #f8fafc;
-    color: #64748b;
+    background: rgba(15, 23, 42, 0.7);
+    color: #9ca3af;
     font-weight: 600;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   td {
     padding: 10px 12px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #1e293b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
     font-family: monospace;
   }
 
@@ -246,7 +253,7 @@ const ParamsTable = styled.table`
 const EmptyState = styled.div`
   text-align: center;
   padding: 32px;
-  color: #94a3b8;
+  color: #6b7280;
   font-size: 0.85rem;
 `;
 
@@ -254,7 +261,7 @@ const CopyBtn = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #64748b;
+  color: #9ca3af;
   display: inline-flex;
   align-items: center;
   margin-left: 8px;
@@ -262,8 +269,8 @@ const CopyBtn = styled.button`
   border-radius: 4px;
 
   &:hover {
-    color: #2563eb;
-    background: #e2e8f0;
+    color: #60a5fa;
+    background: rgba(255, 255, 255, 0.06);
   }
 `;
 

@@ -10,11 +10,12 @@ const PageContainer = styled.div`
 `;
 
 const Card = styled.div`
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -23,8 +24,8 @@ const Card = styled.div`
 const SectionTitle = styled.h3`
   font-size: 1.05rem;
   font-weight: 700;
-  color: #0f172a;
-  border-bottom: 1px solid #f1f5f9;
+  color: #f9fafb;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding-bottom: 12px;
   margin-bottom: 4px;
 `;
@@ -50,12 +51,12 @@ const SettingInfo = styled.div`
 const SettingLabel = styled.span`
   font-size: 0.925rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #f9fafb;
 `;
 
 const SettingDescription = styled.span`
   font-size: 0.8rem;
-  color: #64748b;
+  color: #9ca3af;
 `;
 
 const Switch = styled.label`
@@ -78,7 +79,7 @@ const Switch = styled.label`
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #cbd5e1;
+    background-color: rgba(255, 255, 255, 0.15);
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 24px;
   }
@@ -93,11 +94,12 @@ const Switch = styled.label`
     background-color: white;
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 
   input:checked + span {
-    background-color: #2563eb;
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
   }
 
   input:checked + span:before {
@@ -108,9 +110,9 @@ const Switch = styled.label`
 const StyledSelect = styled.select`
   padding: 8px 12px;
   border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.75);
+  color: #f9fafb;
   font-size: 0.875rem;
   outline: none;
   cursor: pointer;
@@ -118,6 +120,11 @@ const StyledSelect = styled.select`
 
   &:focus {
     border-color: #3b82f6;
+  }
+
+  option {
+    background: #111827;
+    color: #f9fafb;
   }
 `;
 
@@ -129,14 +136,14 @@ const StyledRange = styled.div`
 
   input {
     flex: 1;
-    accent-color: #2563eb;
+    accent-color: #6366f1;
     cursor: pointer;
   }
 
   span {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #2563eb;
+    color: #60a5fa;
     min-width: 50px;
     text-align: right;
     font-family: monospace;
@@ -146,7 +153,7 @@ const StyledRange = styled.div`
 const SaveButton = styled.button`
   align-self: flex-start;
   padding: 10px 24px;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -157,10 +164,11 @@ const SaveButton = styled.button`
   align-items: center;
   gap: 8px;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 
   &:hover {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+    box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
   }
 `;
 
@@ -168,7 +176,7 @@ const Toast = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #059669;
+  color: #34d399;
   font-size: 0.85rem;
   font-weight: 500;
   margin-left: 12px;

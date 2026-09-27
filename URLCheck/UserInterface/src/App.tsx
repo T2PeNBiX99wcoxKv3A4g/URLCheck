@@ -13,7 +13,9 @@ const AppContainer = styled.div`
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background-color: #f8fafc;
+  background-color: #0b0f19;
+  background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 70%);
+  color: #f9fafb;
 `;
 
 const MainLayout = styled.div`

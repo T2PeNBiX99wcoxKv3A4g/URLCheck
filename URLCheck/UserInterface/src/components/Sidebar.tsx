@@ -10,8 +10,9 @@ interface SidebarProps {
 
 const SidebarContainer = styled.aside`
   width: 260px;
-  background: #ffffff;
-  border-right: 1px solid #e2e8f0;
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -24,19 +25,19 @@ const LogoSection = styled.div`
   align-items: center;
   gap: 12px;
   padding: 24px 20px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 `;
 
 const LogoIconWrapper = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 `;
 
 const LogoText = styled.div`
@@ -47,13 +48,13 @@ const LogoText = styled.div`
 const LogoTitle = styled.span`
   font-size: 1.15rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #f9fafb;
   letter-spacing: -0.02em;
 `;
 
 const LogoBadge = styled.span`
   font-size: 0.7rem;
-  color: #64748b;
+  color: #9ca3af;
   font-weight: 500;
 `;
 
@@ -72,9 +73,9 @@ const NavItem = styled.button<{ $active: boolean }>`
   width: 100%;
   padding: 12px 14px;
   border-radius: 8px;
-  border: none;
-  background: ${(props) => (props.$active ? "#eff6ff" : "transparent")};
-  color: ${(props) => (props.$active ? "#2563eb" : "#64748b")};
+  border: 1px solid ${(props) => (props.$active ? "rgba(99, 102, 241, 0.35)" : "transparent")};
+  background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.15)" : "transparent")};
+  color: ${(props) => (props.$active ? "#60a5fa" : "#9ca3af")};
   font-weight: ${(props) => (props.$active ? "600" : "500")};
   font-size: 0.925rem;
   cursor: pointer;
@@ -82,23 +83,24 @@ const NavItem = styled.button<{ $active: boolean }>`
   text-align: left;
 
   &:hover {
-    background: ${(props) => (props.$active ? "#eff6ff" : "#f8fafc")};
-    color: ${(props) => (props.$active ? "#2563eb" : "#1e293b")};
+    background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.2)" : "rgba(255, 255, 255, 0.05)")};
+    color: ${(props) => (props.$active ? "#93c5fd" : "#f9fafb")};
+    border-color: ${(props) => (props.$active ? "rgba(99, 102, 241, 0.5)" : "rgba(255, 255, 255, 0.05)")};
   }
 
   svg {
-    stroke: ${(props) => (props.$active ? "#2563eb" : "#64748b")};
+    stroke: ${(props) => (props.$active ? "#60a5fa" : "#9ca3af")};
     transition: stroke 0.2s ease;
   }
 
   &:hover svg {
-    stroke: ${(props) => (props.$active ? "#2563eb" : "#1e293b")};
+    stroke: ${(props) => (props.$active ? "#93c5fd" : "#f9fafb")};
   }
 `;
 
 const FooterSection = styled.div`
   padding: 16px 20px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -109,7 +111,7 @@ const StatusIndicator = styled.div`
   align-items: center;
   gap: 8px;
   font-size: 0.8rem;
-  color: #64748b;
+  color: #9ca3af;
 `;
 
 const StatusDot = styled.span`
@@ -117,12 +119,12 @@ const StatusDot = styled.span`
   height: 8px;
   border-radius: 50%;
   background: #10b981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
 `;
 
 const VersionLabel = styled.span`
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #6b7280;
   font-family: monospace;
 `;
 

@@ -16,11 +16,12 @@ const PageContainer = styled.div`
 `;
 
 const Card = styled.div`
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 `;
 
 const StatsGrid = styled.div`
@@ -43,14 +44,14 @@ const StatCard = styled(Card)<{ $accent?: string }>`
 
 const StatLabel = styled.span`
   font-size: 0.8rem;
-  color: #64748b;
+  color: #9ca3af;
   font-weight: 600;
 `;
 
 const StatNumber = styled.span`
   font-size: 1.6rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #f9fafb;
 `;
 
 const InputSection = styled(Card)`
@@ -65,19 +66,23 @@ const StyledTextarea = styled.textarea`
   padding: 14px 16px;
   font-size: 0.9rem;
   font-family: monospace;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  background: #f8fafc;
-  color: #1e293b;
+  background: rgba(15, 23, 42, 0.75);
+  color: #f9fafb;
   outline: none;
   resize: vertical;
   line-height: 1.5;
   transition: all 0.2s ease;
 
   &:focus {
-    background: #ffffff;
+    background: rgba(15, 23, 42, 0.95);
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  }
+
+  &::placeholder {
+    color: #6b7280;
   }
 `;
 
@@ -97,7 +102,7 @@ const ButtonGroup = styled.div`
 
 const PrimaryButton = styled.button`
   padding: 10px 20px;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -108,18 +113,19 @@ const PrimaryButton = styled.button`
   align-items: center;
   gap: 8px;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 
   &:hover {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+    box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
   }
 `;
 
 const SecondaryButton = styled.button`
   padding: 10px 16px;
-  background: #f8fafc;
-  color: #64748b;
-  border: 1px solid #cbd5e1;
+  background: rgba(15, 23, 42, 0.7);
+  color: #9ca3af;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   font-weight: 500;
   font-size: 0.9rem;
@@ -130,9 +136,9 @@ const SecondaryButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f1f5f9;
-    color: #0f172a;
-    border-color: #94a3b8;
+    background: rgba(31, 41, 55, 0.85);
+    color: #f9fafb;
+    border-color: rgba(99, 102, 241, 0.35);
   }
 `;
 
@@ -144,16 +150,17 @@ const FilterTabs = styled.div`
 const FilterChip = styled.button<{ $active: boolean }>`
   padding: 6px 14px;
   border-radius: 20px;
-  border: 1px solid ${(props) => (props.$active ? "#2563eb" : "#e2e8f0")};
-  background: ${(props) => (props.$active ? "#eff6ff" : "#ffffff")};
-  color: ${(props) => (props.$active ? "#2563eb" : "#64748b")};
+  border: 1px solid ${(props) => (props.$active ? "rgba(99, 102, 241, 0.5)" : "rgba(255, 255, 255, 0.08)")};
+  background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.15)" : "rgba(15, 23, 42, 0.7)")};
+  color: ${(props) => (props.$active ? "#60a5fa" : "#9ca3af")};
   font-size: 0.8rem;
   font-weight: ${(props) => (props.$active ? "600" : "500")};
   cursor: pointer;
   transition: all 0.15s ease;
 
   &:hover {
-    background: ${(props) => (props.$active ? "#eff6ff" : "#f8fafc")};
+    background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.2)" : "rgba(31, 41, 55, 0.85)")};
+    color: ${(props) => (props.$active ? "#93c5fd" : "#f9fafb")};
   }
 `;
 
@@ -170,19 +177,19 @@ const Table = styled.table`
   th {
     text-align: left;
     padding: 12px 18px;
-    background: #f8fafc;
-    color: #64748b;
+    background: rgba(15, 23, 42, 0.7);
+    color: #9ca3af;
     font-weight: 600;
     font-size: 0.8rem;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     text-transform: uppercase;
     letter-spacing: 0.03em;
   }
 
   td {
     padding: 14px 18px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #1e293b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
   }
 
   tr:last-child td {
@@ -190,7 +197,7 @@ const Table = styled.table`
   }
 
   tr:hover td {
-    background: #fafafa;
+    background: rgba(255, 255, 255, 0.02);
   }
 `;
 
@@ -204,23 +211,23 @@ const StatusBadge = styled.span<{ $status: string }>`
   font-weight: 600;
   background: ${(props) =>
     props.$status === "success"
-      ? "#ecfdf5"
+      ? "rgba(16, 185, 129, 0.12)"
       : props.$status === "warning"
-      ? "#fffbeb"
-      : "#fef2f2"};
+      ? "rgba(245, 158, 11, 0.12)"
+      : "rgba(239, 68, 68, 0.12)"};
   color: ${(props) =>
     props.$status === "success"
-      ? "#059669"
+      ? "#34d399"
       : props.$status === "warning"
-      ? "#d97706"
-      : "#dc2626"};
+      ? "#fbbf24"
+      : "#f87171"};
   border: 1px solid
     ${(props) =>
       props.$status === "success"
-        ? "#a7f3d0"
+        ? "rgba(16, 185, 129, 0.3)"
         : props.$status === "warning"
-        ? "#fde68a"
-        : "#fecaca"};
+        ? "rgba(245, 158, 11, 0.3)"
+        : "rgba(239, 68, 68, 0.3)"};
 `;
 
 const defaultBatchInput = `https://www.google.com
@@ -324,24 +331,24 @@ export const BatchCheckPage: React.FC = () => {
         </StatCard>
         <StatCard $accent="#10b981">
           <StatLabel>Successful (2xx)</StatLabel>
-          <StatNumber style={{ color: "#059669" }}>{successCount}</StatNumber>
+          <StatNumber style={{ color: "#34d399" }}>{successCount}</StatNumber>
         </StatCard>
         <StatCard $accent="#f59e0b">
           <StatLabel>Warning / Redirect (3xx/4xx)</StatLabel>
-          <StatNumber style={{ color: "#d97706" }}>{warningCount}</StatNumber>
+          <StatNumber style={{ color: "#fbbf24" }}>{warningCount}</StatNumber>
         </StatCard>
         <StatCard $accent="#ef4444">
           <StatLabel>Error / Failure (5xx/Err)</StatLabel>
-          <StatNumber style={{ color: "#dc2626" }}>{errorCount}</StatNumber>
+          <StatNumber style={{ color: "#f87171" }}>{errorCount}</StatNumber>
         </StatCard>
       </StatsGrid>
 
       <InputSection>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#0f172a" }}>
+          <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#f9fafb" }}>
             Enter Batch URL List (One URL per line)
           </span>
-          <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
+          <span style={{ fontSize: "0.8rem", color: "#9ca3af" }}>
             {inputText.split("\n").filter((l) => l.trim()).length} URLs entered
           </span>
         </div>
@@ -396,7 +403,7 @@ export const BatchCheckPage: React.FC = () => {
             {filteredItems.length > 0 ? (
               filteredItems.map((item, idx) => (
                 <tr key={item.id || idx}>
-                  <td style={{ color: "#94a3b8", fontFamily: "monospace" }}>{idx + 1}</td>
+                  <td style={{ color: "#6b7280", fontFamily: "monospace" }}>{idx + 1}</td>
                   <td style={{ fontFamily: "monospace", wordBreak: "break-all" }}>{item.url}</td>
                   <td>
                     <StatusBadge $status={item.status}>
@@ -406,15 +413,15 @@ export const BatchCheckPage: React.FC = () => {
                       <span>{item.statusCode}</span>
                     </StatusBadge>
                   </td>
-                  <td style={{ color: "#64748b", fontFamily: "monospace" }}>
+                  <td style={{ color: "#9ca3af", fontFamily: "monospace" }}>
                     {item.latency > 0 ? `${item.latency} ms` : "-"}
                   </td>
-                  <td style={{ color: "#475569", fontSize: "0.85rem" }}>{item.message}</td>
+                  <td style={{ color: "#cbd5e1", fontSize: "0.85rem" }}>{item.message}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} style={{ textAlign: "center", padding: "36px", color: "#94a3b8" }}>
+                <td colSpan={5} style={{ textAlign: "center", padding: "36px", color: "#6b7280" }}>
                   No matching inspection results found
                 </td>
               </tr>
