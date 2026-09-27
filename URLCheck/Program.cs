@@ -5,12 +5,12 @@ namespace HelloPhotino.React;
 //NOTE: To hide the console window, go to the project properties and change the Output Type to Windows Application.
 // Or edit the .csproj file and change the <OutputType> tag from "WinExe" to "Exe".
 
-class Program
+internal class Program
 {
     public static bool IsDebugMode = false; //serve files from asp.net runtime
 
     [STAThread]
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         PhotinoServer
             .CreateStaticFileServer(args, out var baseUrl)
