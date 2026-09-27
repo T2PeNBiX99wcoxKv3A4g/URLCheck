@@ -23,5 +23,6 @@ nul
 
 .temp/
 **/.next/
+**/build/
 **/package-lock.json
 **/node_modules/
