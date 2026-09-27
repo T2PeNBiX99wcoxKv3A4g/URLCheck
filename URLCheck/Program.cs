@@ -22,7 +22,7 @@ internal static class Program
         PhotinoServer
             .CreateStaticFileServer(args, out var baseUrl)
             .RunAsync();
-        
+
         var appUrl = $"{baseUrl}/index.html";
 #else
         const string appUrl = "http://localhost:3000";
