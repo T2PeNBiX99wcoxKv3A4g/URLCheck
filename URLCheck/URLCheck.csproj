@@ -8,7 +8,7 @@
         <Nullable>enable</Nullable>
         <!-- Generate embedded file manifest when using the Photino.NET StaticFileServer -->
         <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
-        <RootNamespace>HelloPhotino.React</RootNamespace>
+        <RootNamespace>URLCheck</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
