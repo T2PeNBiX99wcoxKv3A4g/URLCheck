@@ -8,12 +8,6 @@ namespace URLCheck;
 
 internal static class Program
 {
-#if DEBUG
-    [PublicAPI] internal const bool IsDebugMode = true;
-#else
-    [PublicAPI] internal const bool IsDebugMode = false;
-#endif
-
     [STAThread]
     [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
     private static void Main(string[] args)
