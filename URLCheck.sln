@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloPhotino.React", "URLCheck\HelloPhotino.React.csproj", "{94440EB7-A6BF-44B3-BE43-F84950065C7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "URLCheck", "URLCheck\URLCheck.csproj", "{94440EB7-A6BF-44B3-BE43-F84950065C7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
