@@ -2,6 +2,10 @@
   "profiles": {
     "URLCheck": {
       "commandName": "Project"
+    },
+    "OpenURL": {
+      "commandName": "Project",
+      "commandLineArgs": "\"https://example.com/foo?tracking=123\""
     }
   }
 }

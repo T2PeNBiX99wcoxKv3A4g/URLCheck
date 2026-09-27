@@ -14,6 +14,8 @@ internal static class Program
     [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
     private static void Main(string[] args)
     {
+        foreach (var arg in args)
+            Console.WriteLine("arg: {0}", arg);
 #if !DEBUG
         PhotinoServer
             .CreateStaticFileServer(args, out var baseUrl)
