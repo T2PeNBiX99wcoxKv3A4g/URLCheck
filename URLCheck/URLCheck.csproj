@@ -12,6 +12,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" />
         <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.12" />
         <PackageReference Include="Photino.NET" Version="4.0.16" />
         <PackageReference Include="Photino.NET.Server" Version="4.0.12" />
