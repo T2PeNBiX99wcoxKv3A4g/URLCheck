@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import { TabType } from "../types";
-import { LinkIcon, LayersIcon, HistoryIcon, SettingsIcon, ShieldCheckIcon } from "./Icons";
+import {TabType} from "../types";
+import {HistoryIcon, LinkIcon, SettingsIcon, ShieldCheckIcon} from "./Icons";
 
 interface SidebarProps {
   currentTab: TabType;
@@ -148,14 +148,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
         >
           <LinkIcon size={18} />
           <span>Single URL Inspector</span>
-        </NavItem>
-
-        <NavItem
-          $active={currentTab === "batch"}
-          onClick={() => onSelectTab("batch")}
-        >
-          <LayersIcon size={18} />
-          <span>Batch URL Scanner</span>
         </NavItem>
 
         <NavItem

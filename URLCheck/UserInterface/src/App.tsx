@@ -1,12 +1,11 @@
-import { useState } from "react";
+import {useState} from "react";
 import styled from "styled-components";
-import { TabType } from "./types";
-import { Sidebar } from "./components/Sidebar";
-import { Header } from "./components/Header";
-import { SingleCheckPage } from "./pages/SingleCheckPage";
-import { BatchCheckPage } from "./pages/BatchCheckPage";
-import { HistoryPage } from "./pages/HistoryPage";
-import { SettingsPage } from "./pages/SettingsPage";
+import {TabType} from "./types";
+import {Sidebar} from "./components/Sidebar";
+import {Header} from "./components/Header";
+import {SingleCheckPage} from "./pages/SingleCheckPage";
+import {HistoryPage} from "./pages/HistoryPage";
+import {SettingsPage} from "./pages/SettingsPage";
 
 const AppContainer = styled.div`
   display: flex;
@@ -44,7 +43,6 @@ export default function App() {
         <Header currentTab={currentTab} />
         <ContentArea>
           {currentTab === "single" && <SingleCheckPage />}
-          {currentTab === "batch" && <BatchCheckPage />}
           {currentTab === "history" && <HistoryPage />}
           {currentTab === "settings" && <SettingsPage />}
         </ContentArea>
