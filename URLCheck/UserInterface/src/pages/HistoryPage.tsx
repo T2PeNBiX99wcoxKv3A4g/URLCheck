@@ -1,13 +1,7 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import styled from "styled-components";
-import { HistoryItem } from "../types";
-import {
-  TrashIcon,
-  SearchIcon,
-  CheckCircleIcon,
-  AlertTriangleIcon,
-  XCircleIcon,
-} from "../components/Icons";
+import {HistoryItem} from "../types";
+import {AlertTriangleIcon, CheckCircleIcon, SearchIcon, TrashIcon, XCircleIcon,} from "../components/Icons";
 
 const PageContainer = styled.div`
   display: flex;
@@ -210,7 +204,6 @@ export const HistoryPage: React.FC = () => {
           <thead>
             <tr>
               <th style={{ width: "180px" }}>Timestamp</th>
-              <th style={{ width: "120px" }}>Mode</th>
               <th>Target URL</th>
               <th style={{ width: "140px" }}>Status Response</th>
             </tr>
@@ -220,9 +213,6 @@ export const HistoryPage: React.FC = () => {
               filteredHistory.map((item) => (
                 <tr key={item.id}>
                   <td style={{ color: "#9ca3af", fontSize: "0.85rem" }}>{item.timestamp}</td>
-                  <td>
-                    <TypeTag>{item.type === "single" ? "Single Check" : "Batch Scan"}</TypeTag>
-                  </td>
                   <td style={{ fontFamily: "monospace", wordBreak: "break-all" }}>{item.url}</td>
                   <td>
                     <StatusBadge $status={item.status}>
