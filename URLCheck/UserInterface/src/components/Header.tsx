@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { TabType } from "../types";
+import {TabType} from "../types";
 
 interface HeaderProps {
   currentTab: TabType;
@@ -81,22 +81,22 @@ const tabInfo: Record<TabType, { title: string; subtitle: string }> = {
   },
 };
 
-export const Header: React.FC<HeaderProps> = ({ currentTab }) => {
+export const Header: React.FC<HeaderProps> = ({currentTab}) => {
   const current = tabInfo[currentTab];
 
   return (
-    <HeaderContainer>
-      <PageTitleGroup>
-        <PageTitle>{current.title}</PageTitle>
-        <PageSubtitle>{current.subtitle}</PageSubtitle>
-      </PageTitleGroup>
+      <HeaderContainer>
+        <PageTitleGroup>
+          <PageTitle>{current.title}</PageTitle>
+          <PageSubtitle>{current.subtitle}</PageSubtitle>
+        </PageTitleGroup>
 
-      <RightControls>
-        <QuickBadge>
-          <Dot />
-          <span>Desktop Engine</span>
-        </QuickBadge>
-      </RightControls>
-    </HeaderContainer>
+        <RightControls>
+          <QuickBadge>
+            <Dot/>
+            <span>Desktop Engine</span>
+          </QuickBadge>
+        </RightControls>
+      </HeaderContainer>
   );
 };

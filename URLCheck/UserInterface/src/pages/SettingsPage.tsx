@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import styled from "styled-components";
-import { CheckCircleIcon } from "../components/Icons";
+import {CheckCircleIcon} from "../components/Icons";
 
 const PageContainer = styled.div`
   display: flex;
@@ -196,107 +196,110 @@ export const SettingsPage: React.FC = () => {
   };
 
   return (
-    <PageContainer>
-      <Card>
-        <SectionTitle>Network & Request Settings</SectionTitle>
+      <PageContainer>
+        <Card>
+          <SectionTitle>Network & Request Settings</SectionTitle>
 
-        <SettingRow>
-          <SettingInfo>
-            <SettingLabel>Request Timeout</SettingLabel>
-            <SettingDescription>Maximum milliseconds to wait for a single URL response</SettingDescription>
-          </SettingInfo>
-          <StyledRange>
-            <input
-              type="range"
-              min="1000"
-              max="15000"
-              step="500"
-              value={timeout}
-              onChange={(e) => setTimeoutVal(Number(e.target.value))}
-            />
-            <span>{timeout / 1000}s</span>
-          </StyledRange>
-        </SettingRow>
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>Request Timeout</SettingLabel>
+              <SettingDescription>Maximum milliseconds to wait for a single URL response</SettingDescription>
+            </SettingInfo>
+            <StyledRange>
+              <input
+                  type="range"
+                  min="1000"
+                  max="15000"
+                  step="500"
+                  value={timeout}
+                  onChange={(e) => setTimeoutVal(Number(e.target.value))}
+              />
+              <span>{timeout / 1000}s</span>
+            </StyledRange>
+          </SettingRow>
 
-        <SettingRow>
-          <SettingInfo>
-            <SettingLabel>Follow Redirects</SettingLabel>
-            <SettingDescription>Automatically follow 301/302 HTTP redirects to destination</SettingDescription>
-          </SettingInfo>
-          <Switch>
-            <input
-              type="checkbox"
-              checked={followRedirects}
-              onChange={(e) => setFollowRedirects(e.target.checked)}
-            />
-            <span />
-          </Switch>
-        </SettingRow>
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>Follow Redirects</SettingLabel>
+              <SettingDescription>Automatically follow 301/302 HTTP redirects to
+                destination</SettingDescription>
+            </SettingInfo>
+            <Switch>
+              <input
+                  type="checkbox"
+                  checked={followRedirects}
+                  onChange={(e) => setFollowRedirects(e.target.checked)}
+              />
+              <span/>
+            </Switch>
+          </SettingRow>
 
-        <SettingRow>
-          <SettingInfo>
-            <SettingLabel>Verify SSL Certificate</SettingLabel>
-            <SettingDescription>Verify SSL/TLS certificate validity for target hostnames</SettingDescription>
-          </SettingInfo>
-          <Switch>
-            <input
-              type="checkbox"
-              checked={verifySsl}
-              onChange={(e) => setVerifySsl(e.target.checked)}
-            />
-            <span />
-          </Switch>
-        </SettingRow>
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>Verify SSL Certificate</SettingLabel>
+              <SettingDescription>Verify SSL/TLS certificate validity for target
+                hostnames</SettingDescription>
+            </SettingInfo>
+            <Switch>
+              <input
+                  type="checkbox"
+                  checked={verifySsl}
+                  onChange={(e) => setVerifySsl(e.target.checked)}
+              />
+              <span/>
+            </Switch>
+          </SettingRow>
 
-        <SettingRow>
-          <SettingInfo>
-            <SettingLabel>User-Agent Header</SettingLabel>
-            <SettingDescription>Custom user-agent header sent with outbound requests</SettingDescription>
-          </SettingInfo>
-          <StyledSelect
-            value={userAgent}
-            onChange={(e) => setUserAgent(e.target.value)}
-          >
-            <option value="default">Default (URLCheck Desktop Agent/1.0)</option>
-            <option value="chrome">Chrome Desktop (Windows 11)</option>
-            <option value="safari">Safari Desktop (macOS)</option>
-            <option value="curl">cURL CLI Client (curl/8.4.0)</option>
-            <option value="bot">Search Engine Bot (Googlebot/2.1)</option>
-          </StyledSelect>
-        </SettingRow>
-      </Card>
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>User-Agent Header</SettingLabel>
+              <SettingDescription>Custom user-agent header sent with outbound requests</SettingDescription>
+            </SettingInfo>
+            <StyledSelect
+                value={userAgent}
+                onChange={(e) => setUserAgent(e.target.value)}
+            >
+              <option value="default">Default (URLCheck Desktop Agent/1.0)</option>
+              <option value="chrome">Chrome Desktop (Windows 11)</option>
+              <option value="safari">Safari Desktop (macOS)</option>
+              <option value="curl">cURL CLI Client (curl/8.4.0)</option>
+              <option value="bot">Search Engine Bot (Googlebot/2.1)</option>
+            </StyledSelect>
+          </SettingRow>
+        </Card>
 
-      <Card>
-        <SectionTitle>Concurrency & Performance</SectionTitle>
+        <Card>
+          <SectionTitle>Concurrency & Performance</SectionTitle>
 
-        <SettingRow>
-          <SettingInfo>
-            <SettingLabel>Max Concurrent Requests</SettingLabel>
-            <SettingDescription>Maximum number of asynchronous requests executed simultaneously</SettingDescription>
-          </SettingInfo>
-          <StyledRange>
-            <input
-              type="range"
-              min="1"
-              max="20"
-              step="1"
-              value={maxConcurrency}
-              onChange={(e) => setMaxConcurrency(Number(e.target.value))}
-            />
-            <span>{maxConcurrency} reqs</span>
-          </StyledRange>
-        </SettingRow>
-      </Card>
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>Max Concurrent Requests</SettingLabel>
+              <SettingDescription>Maximum number of asynchronous requests executed
+                simultaneously</SettingDescription>
+            </SettingInfo>
+            <StyledRange>
+              <input
+                  type="range"
+                  min="1"
+                  max="20"
+                  step="1"
+                  value={maxConcurrency}
+                  onChange={(e) => setMaxConcurrency(Number(e.target.value))}
+              />
+              <span>{maxConcurrency} reqs</span>
+            </StyledRange>
+          </SettingRow>
+        </Card>
 
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <SaveButton onClick={handleSave}>Save Settings</SaveButton>
-        {saved && (
-          <Toast>
-            <CheckCircleIcon size={16} />
-            <span>Settings saved successfully</span>
-          </Toast>
-        )}
-      </div>
-    </PageContainer>
+        <div style={{display: "flex", alignItems: "center"}}>
+          <SaveButton onClick={handleSave}>Save Settings</SaveButton>
+          {saved && (
+              <Toast>
+                <CheckCircleIcon size={16}/>
+                <span>Settings saved successfully</span>
+              </Toast>
+          )}
+        </div>
+      </PageContainer>
   );
 };
