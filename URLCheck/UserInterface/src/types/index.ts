@@ -1,4 +1,4 @@
-export type TabType = "single" | "batch" | "history" | "settings";
+export type TabType = "single" | "history" | "settings";
 
 export interface UrlCheckResult {
   url: string;
@@ -27,7 +27,6 @@ export interface BatchItem {
 export interface HistoryItem {
   id: string;
   url: string;
-  type: "single" | "batch";
   status: "success" | "warning" | "error";
   statusCode: number;
   timestamp: string;

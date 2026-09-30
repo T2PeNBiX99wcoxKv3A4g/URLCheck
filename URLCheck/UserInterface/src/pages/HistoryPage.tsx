@@ -161,11 +161,35 @@ const TypeTag = styled.span`
 `;
 
 const initialHistory: HistoryItem[] = [
-  { id: "1", url: "https://api.github.com/repos/tryphotino/photino.NET", type: "single", status: "success", statusCode: 200, timestamp: "2026-09-28 02:10:15" },
-  { id: "2", url: "https://www.google.com/search?q=photino+net", type: "single", status: "success", statusCode: 200, timestamp: "2026-09-28 02:08:33" },
-  { id: "3", url: "https://httpbin.org/status/404", type: "batch", status: "warning", statusCode: 404, timestamp: "2026-09-28 02:05:12" },
-  { id: "4", url: "https://invalid-domain-test.local", type: "single", status: "error", statusCode: 400, timestamp: "2026-09-28 01:58:40" },
-  { id: "5", url: "https://example.org", type: "batch", status: "success", statusCode: 200, timestamp: "2026-09-28 01:45:21" },
+  {
+    id: "1",
+    url: "https://api.github.com/repos/tryphotino/photino.NET",
+    status: "success",
+    statusCode: 200,
+    timestamp: "2026-09-28 02:10:15"
+  },
+  {
+    id: "2",
+    url: "https://www.google.com/search?q=photino+net",
+    status: "success",
+    statusCode: 200,
+    timestamp: "2026-09-28 02:08:33"
+  },
+  {
+    id: "3",
+    url: "https://httpbin.org/status/404",
+    status: "warning",
+    statusCode: 404,
+    timestamp: "2026-09-28 02:05:12"
+  },
+  {
+    id: "4",
+    url: "https://invalid-domain-test.local",
+    status: "error",
+    statusCode: 400,
+    timestamp: "2026-09-28 01:58:40"
+  },
+  {id: "5", url: "https://example.org", status: "success", statusCode: 200, timestamp: "2026-09-28 01:45:21"},
 ];
 
 export const HistoryPage: React.FC = () => {
