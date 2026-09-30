@@ -328,7 +328,7 @@ export const SingleCheckPage: React.FC = () => {
   };
 
   const handleCopy = (text: string) => {
-    navigator.clipboard?.writeText(text);
+    navigator.clipboard?.writeText(text).catch(console.error);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
