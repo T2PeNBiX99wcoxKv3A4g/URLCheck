@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using Photino.NET;
 #if !DEBUG
 using Photino.NET.Server;
@@ -41,15 +42,19 @@ internal static class Program
             .RegisterCustomSchemeHandler("app", (sender, scheme, url, out contentType) =>
             {
                 contentType = "text/javascript";
-                return new MemoryStream([
-                    .. @"
-                        (() =>{
-                            window.setTimeout(() => {
-                                alert(`🎉 Dynamically inserted JavaScript.`);
-                            }, 1000);
-                        })();
-                    "u8
-                ]);
+
+                const string script = """
+                                      window.__URLCHECK__ = {
+                                          isPhotino: true
+                                      };
+                                      (() =>{
+                                          window.setTimeout(() => {
+                                              alert(`🎉 Dynamically inserted JavaScript.`);
+                                          }, 1000);
+                                      })();
+                                      """;
+
+                return new MemoryStream(Encoding.UTF8.GetBytes(script));
             })
             .RegisterWebMessageReceivedHandler((sender, message) =>
             {
