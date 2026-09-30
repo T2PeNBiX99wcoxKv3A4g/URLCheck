@@ -41,17 +41,16 @@ internal static class Program
             .SetResizable(true)
             .RegisterCustomSchemeHandler("app", (sender, scheme, url, out contentType) =>
             {
+                Console.WriteLine($"CUSTOM SCHEME: {scheme} {url}");
+
                 contentType = "text/javascript";
 
                 const string script = """
+                                      console.log("Photino bridge loaded!");
                                       window.__URLCHECK__ = {
                                           isPhotino: true
                                       };
-                                      (() =>{
-                                          window.setTimeout(() => {
-                                              alert(`🎉 Dynamically inserted JavaScript.`);
-                                          }, 1000);
-                                      })();
+                                      alert("bridge loaded");
                                       """;
 
                 return new MemoryStream(Encoding.UTF8.GetBytes(script));
@@ -60,6 +59,7 @@ internal static class Program
             {
                 var window = (PhotinoWindow?)sender;
                 var response = $"Received message: \"{message}\"";
+                Console.WriteLine($"ReceivedHandler: {sender} {message}");
                 window?.SendWebMessage(response);
             })
             .Load(appUrl);

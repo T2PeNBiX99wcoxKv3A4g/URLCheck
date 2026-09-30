@@ -36,21 +36,17 @@ export default function App() {
     const [currentTab, setCurrentTab] = useState<TabType>("single");
 
     return (
-        <>
-            <script src="app://bridge.js"/>
+        <AppContainer>
+            <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab}/>
 
-            <AppContainer>
-                <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab}/>
-
-                <MainLayout>
-                    <Header currentTab={currentTab}/>
-                    <ContentArea>
-                        {currentTab === "single" && <SingleCheckPage/>}
-                        {currentTab === "history" && <HistoryPage/>}
-                        {currentTab === "settings" && <SettingsPage/>}
-                    </ContentArea>
-                </MainLayout>
-            </AppContainer>
-        </>
+            <MainLayout>
+                <Header currentTab={currentTab}/>
+                <ContentArea>
+                    {currentTab === "single" && <SingleCheckPage/>}
+                    {currentTab === "history" && <HistoryPage/>}
+                    {currentTab === "settings" && <SettingsPage/>}
+                </ContentArea>
+            </MainLayout>
+        </AppContainer>
     );
 }

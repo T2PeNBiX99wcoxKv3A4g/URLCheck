@@ -9,6 +9,7 @@ import {
     ShieldCheckIcon,
     XCircleIcon,
 } from "../components/Icons";
+import {Native} from "../Native";
 
 const PageContainer = styled.div`
     display: flex;
@@ -324,6 +325,10 @@ export const SingleCheckPage: React.FC = () => {
     const handleInspect = (e?: React.SubmitEvent) => {
         if (e) e.preventDefault();
         setResult(parseUrl(inputUrl));
+        Native.send({
+            type: "inspect",
+            url: inputUrl,
+        })
     };
 
     const handleCopy = (text: string) => {
