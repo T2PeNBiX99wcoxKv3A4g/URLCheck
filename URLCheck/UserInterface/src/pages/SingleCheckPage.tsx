@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import styled from "styled-components";
-import { UrlCheckResult } from "../types";
+import {UrlCheckResult} from "../types";
 import {
-  SearchIcon,
-  CheckCircleIcon,
   AlertTriangleIcon,
-  XCircleIcon,
-  ShieldCheckIcon,
+  CheckCircleIcon,
   CopyIcon,
+  SearchIcon,
+  ShieldCheckIcon,
+  XCircleIcon,
 } from "../components/Icons";
 
 const PageContainer = styled.div`
@@ -322,7 +322,7 @@ export const SingleCheckPage: React.FC = () => {
 
   const [result, setResult] = useState<UrlCheckResult>(parseUrl(inputUrl));
 
-  const handleInspect = (e?: React.FormEvent) => {
+  const handleInspect = (e?: React.SubmitEvent) => {
     if (e) e.preventDefault();
     setResult(parseUrl(inputUrl));
   };
