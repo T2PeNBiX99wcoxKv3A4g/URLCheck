@@ -1,4 +1,5 @@
 using System.Text.Json;
+using JetBrains.Annotations;
 using URLCheck.Models;
 
 namespace URLCheck.Services;
@@ -18,9 +19,8 @@ internal sealed class SettingsService
 
     public SettingsService()
     {
-        var directory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "URLCheck");
+        var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            Constants.Name);
 
         Directory.CreateDirectory(directory);
         SettingsFilePath = Path.Combine(directory, "settings.json");
@@ -34,6 +34,7 @@ internal sealed class SettingsService
     /// <summary>The settings currently held in memory.</summary>
     public AppSettings Current { get; private set; }
 
+    [PublicAPI]
     public AppSettings Load()
     {
         lock (_sync)

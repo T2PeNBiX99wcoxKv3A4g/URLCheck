@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace URLCheck.Models;
 
 /// <summary>
@@ -5,6 +7,7 @@ namespace URLCheck.Models;
 /// React front-end through the native message bridge, so the property names map 1:1 to the
 /// TypeScript <c>AppSettings</c> interface.
 /// </summary>
+[SuppressMessage("ReSharper", "PropertyCanBeMadeInitOnly.Global")]
 internal sealed class AppSettings
 {
     public const int TimeoutMinMs = 1_000;

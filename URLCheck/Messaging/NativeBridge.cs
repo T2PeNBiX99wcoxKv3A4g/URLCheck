@@ -11,19 +11,12 @@ namespace URLCheck.Messaging;
 /// Incoming messages arrive through <see cref="PhotinoWindow.RegisterWebMessageReceivedHandler"/>;
 /// outgoing messages are pushed back with <see cref="PhotinoWindow.SendWebMessage"/>.
 /// </summary>
-internal sealed class NativeBridge
+internal sealed class NativeBridge(SettingsService settingsService)
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     };
-
-    private readonly SettingsService _settingsService;
-
-    public NativeBridge(SettingsService settingsService)
-    {
-        _settingsService = settingsService;
-    }
 
     public void HandleMessage(PhotinoWindow? window, string rawMessage)
     {
@@ -72,14 +65,14 @@ internal sealed class NativeBridge
                     return;
                 }
 
-                _settingsService.Save(incoming);
+                settingsService.Save(incoming);
                 Send(window, NativeResponse.Success(request.Id, "settings.save.result", CreateSettingsPayload()));
                 SendEvent(window, "settings.changed", CreateSettingsPayload());
                 break;
             }
 
             case "settings.reset":
-                _settingsService.Reset();
+                settingsService.Reset();
                 Send(window, NativeResponse.Success(request.Id, "settings.reset.result", CreateSettingsPayload()));
                 SendEvent(window, "settings.changed", CreateSettingsPayload());
                 break;
@@ -87,13 +80,15 @@ internal sealed class NativeBridge
             default:
                 Console.WriteLine($"[bridge] No handler registered for message type '{request.Type}'.");
                 if (!string.IsNullOrEmpty(request.Id))
-                    Send(window, NativeResponse.Failure(request.Id, $"{request.Type}.result", $"Unsupported message type '{request.Type}'."));
+                    Send(window,
+                        NativeResponse.Failure(request.Id, $"{request.Type}.result",
+                            $"Unsupported message type '{request.Type}'."));
                 break;
         }
     }
 
     private SettingsPayload CreateSettingsPayload() =>
-        new(_settingsService.Current, _settingsService.SettingsFilePath);
+        new(settingsService.Current, settingsService.SettingsFilePath);
 
     private static void Send(PhotinoWindow? window, NativeResponse response)
     {
@@ -104,7 +99,11 @@ internal sealed class NativeBridge
 
     private static void SendEvent(PhotinoWindow? window, string type, object? data)
     {
-        var json = JsonSerializer.Serialize(new NativeEvent { Type = type, Data = data }, SerializerOptions);
+        var json = JsonSerializer.Serialize(new NativeEvent
+        {
+            Type = type,
+            Data = data
+        }, SerializerOptions);
         Console.WriteLine($"[bridge] >> {json}");
         window?.SendWebMessage(json);
     }
