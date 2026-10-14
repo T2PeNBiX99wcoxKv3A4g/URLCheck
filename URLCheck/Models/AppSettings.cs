@@ -44,8 +44,6 @@ internal sealed class AppSettings
         if (string.IsNullOrWhiteSpace(UserAgent))
             UserAgent = "default";
 
-        Browsers ??= [];
-
         foreach (var browser in Browsers)
         {
             if (string.IsNullOrWhiteSpace(browser.Id))
