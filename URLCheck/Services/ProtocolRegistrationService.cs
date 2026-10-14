@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 using URLCheck.Messaging;
@@ -15,6 +16,7 @@ namespace URLCheck.Services;
 ///     "Default apps" list; the user still has to select it. <see cref="OpenDefaultAppsSettings" />
 ///     deep-links them to that page.
 /// </remarks>
+[SupportedOSPlatform("windows")]
 internal sealed class ProtocolRegistrationService
 {
     private const string AppKeyName = "URLCheck";

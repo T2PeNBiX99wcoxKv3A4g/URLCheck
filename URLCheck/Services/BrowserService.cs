@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Win32;
 using Serilog;
 using URLCheck.Messaging;
@@ -10,6 +11,7 @@ namespace URLCheck.Services;
 ///     Detects installed browsers from the Windows "StartMenuInternet" client registry and launches
 ///     them with a URL.
 /// </summary>
+[SupportedOSPlatform("windows")]
 internal static class BrowserService
 {
     private static readonly string[] ClientRoots =

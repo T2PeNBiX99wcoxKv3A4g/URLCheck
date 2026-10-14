@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Serilog;
 
 namespace URLCheck.Interop;
@@ -7,6 +8,7 @@ namespace URLCheck.Interop;
 ///     A notification-area (tray) icon hosted on its own STA thread with a private message loop,
 ///     independent of Photino's UI thread.
 /// </summary>
+[SupportedOSPlatform("windows")]
 internal sealed class TrayIcon(string tooltip, Action onOpen, Action onSettings, Action onExit)
     : IDisposable
 {

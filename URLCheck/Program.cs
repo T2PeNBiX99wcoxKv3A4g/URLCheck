@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Versioning;
 using Serilog;
 using URLCheck.Interop;
 using URLCheck.Services;
@@ -13,6 +14,7 @@ namespace URLCheck;
 internal static class Program
 {
     [STAThread]
+    [SupportedOSPlatform("windows")]
     [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
     private static void Main(string[] args)
     {
@@ -85,6 +87,7 @@ internal static class Program
         }
     }
 
+    [SupportedOSPlatform("windows")]
     private static void DispatchUrls(WindowManager manager, IReadOnlyList<string> args)
     {
         foreach (var url in ExtractUrls(args))

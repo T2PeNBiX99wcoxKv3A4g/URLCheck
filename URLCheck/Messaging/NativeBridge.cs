@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using System.Text.Json;
 using Photino.NET;
 using Serilog;
@@ -10,6 +11,7 @@ namespace URLCheck.Messaging;
 ///     It only parses, raises <see cref="MessageReceived" /> and serializes the reply — the actual
 ///     handling lives with the services that own each message type.
 /// </summary>
+[SupportedOSPlatform("windows")]
 internal static class NativeBridge
 {
     /// <summary>

@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using JetBrains.Annotations;
 using Photino.NET;
 using Serilog;
@@ -11,6 +12,7 @@ namespace URLCheck.Services;
 ///     Owns the Photino windows: a hidden "host" window that keeps the message loop alive while the
 ///     app sits in the tray, and an on-demand borderless popup used to inspect a URL.
 /// </summary>
+[SupportedOSPlatform("windows")]
 internal sealed class WindowManager
 {
     /// <summary>

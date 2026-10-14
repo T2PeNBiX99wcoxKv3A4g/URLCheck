@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using System.Text.Json;
 using JetBrains.Annotations;
 using Serilog;
@@ -10,6 +11,7 @@ namespace URLCheck.Services;
 ///     Loads and persists <see cref="AppSettings" /> as JSON under <c>%APPDATA%\URLCheck</c>.
 ///     The first read seeds the browser list so the popup works out of the box.
 /// </summary>
+[SupportedOSPlatform("windows")]
 internal sealed class SettingsService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)

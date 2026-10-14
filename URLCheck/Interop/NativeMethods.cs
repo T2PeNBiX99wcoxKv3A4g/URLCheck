@@ -1,10 +1,12 @@
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using JetBrains.Annotations;
 
 namespace URLCheck.Interop;
 
 /// <summary>Win32 helpers used for window show/hide and the tray icon.</summary>
 [PublicAPI]
+[SupportedOSPlatform("windows")]
 internal static partial class NativeMethods
 {
     // ---- Tray / window class ----
