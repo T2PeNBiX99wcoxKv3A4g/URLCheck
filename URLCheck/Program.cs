@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Photino.NET;
 using URLCheck.Interop;
 using URLCheck.Services;
 #if !DEBUG
@@ -61,15 +60,13 @@ internal static class Program
             // The message loop is about to start, so windows can now be created safely.
             singleInstance.StartServer(forwarded => DispatchUrls(manager, forwarded));
 
-            if (startupUrls.Count > 0)
+            if (startupUrls.Count <= 0) return;
+            var urls = startupUrls.ToList();
+            Task.Run(() =>
             {
-                var urls = startupUrls.ToList();
-                Task.Run(() =>
-                {
-                    foreach (var url in urls)
-                        manager.ShowPopup(url);
-                });
-            }
+                foreach (var url in urls)
+                    manager.ShowPopup(url);
+            });
         };
 
         manager.CreateMainWindow();
@@ -87,21 +84,12 @@ internal static class Program
     /// <summary>Pulls the http/https/urlcheck URLs out of a raw argument list.</summary>
     private static List<string> ExtractUrls(IEnumerable<string> args)
     {
-        var urls = new List<string>();
-
-        foreach (var arg in args)
-        {
-            if (string.IsNullOrWhiteSpace(arg) || arg.StartsWith('-'))
-                continue;
-
-            if (arg.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+        return
+        [
+            .. args.Where(arg => !string.IsNullOrWhiteSpace(arg) && !arg.StartsWith('-')).Where(arg =>
+                arg.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
                 arg.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
                 arg.StartsWith("urlcheck://", StringComparison.OrdinalIgnoreCase))
-            {
-                urls.Add(arg);
-            }
-        }
-
-        return urls;
+        ];
     }
 }

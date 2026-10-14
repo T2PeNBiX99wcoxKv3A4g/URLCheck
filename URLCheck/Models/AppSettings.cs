@@ -31,7 +31,7 @@ internal sealed class AppSettings
     public int MaxConcurrency { get; set; } = 5;
 
     /// <summary>Browsers offered in the popup. The first entry is used as the default.</summary>
-    public List<BrowserEntry> Browsers { get; set; } = new();
+    public List<BrowserEntry> Browsers { get; set; } = [];
 
     public AppSettings Clone() => (AppSettings)MemberwiseClone();
 
@@ -45,7 +45,7 @@ internal sealed class AppSettings
             UserAgent = "default";
 
         if (Browsers is null)
-            Browsers = new List<BrowserEntry>();
+            Browsers = [];
 
         foreach (var browser in Browsers)
         {

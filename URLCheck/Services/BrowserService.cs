@@ -11,17 +11,20 @@ namespace URLCheck.Services;
 internal static class BrowserService
 {
     private static readonly string[] ClientRoots =
-    {
+    [
         @"SOFTWARE\Clients\StartMenuInternet",
-        @"SOFTWARE\WOW6432Node\Clients\StartMenuInternet",
-    };
+        @"SOFTWARE\WOW6432Node\Clients\StartMenuInternet"
+    ];
 
     /// <summary>Enumerates installed browsers, de-duplicated by executable path.</summary>
     public static IReadOnlyList<BrowserEntry> DetectInstalledBrowsers()
     {
         var found = new Dictionary<string, BrowserEntry>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var hive in new[] { Registry.LocalMachine, Registry.CurrentUser })
+        foreach (var hive in new[]
+                 {
+                     Registry.LocalMachine, Registry.CurrentUser
+                 })
         {
             foreach (var root in ClientRoots)
             {
@@ -36,9 +39,11 @@ internal static class BrowserService
             }
         }
 
-        return found.Values
-            .OrderBy(browser => browser.Name, StringComparer.CurrentCultureIgnoreCase)
-            .ToList();
+        return
+        [
+            .. found.Values
+                .OrderBy(browser => browser.Name, StringComparer.CurrentCultureIgnoreCase)
+        ];
     }
 
     /// <summary>Starts <paramref name="executablePath"/> with <paramref name="url"/> as its argument.</summary>
