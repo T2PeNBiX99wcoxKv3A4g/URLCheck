@@ -8,8 +8,14 @@ export interface HistoryItem {
 
 export interface AppSettings {
     requestTimeoutMs: number;
-    userAgent: string;
+    userAgents: UserAgentEntry[];
     browsers: BrowserEntry[];
+}
+
+export interface UserAgentEntry {
+    id: string;
+    name: string;
+    value: string;
 }
 
 export interface BrowserEntry {

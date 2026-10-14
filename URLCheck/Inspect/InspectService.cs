@@ -13,15 +13,6 @@ internal sealed class InspectService
     /// <summary>Does not follow redirects, so the first hop's Location can be read.</summary>
     private static readonly HttpClient RedirectClient = new(new SocketsHttpHandler { AllowAutoRedirect = false });
 
-    private static readonly Dictionary<string, string> UserAgents = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["default"] = "URLCheck Desktop Agent/1.0",
-        ["chrome"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-        ["safari"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
-        ["curl"] = "curl/8.4.0",
-        ["bot"] = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-    };
-
     private readonly SettingsService _settings;
 
     public InspectService(SettingsService settings)
@@ -47,7 +38,10 @@ internal sealed class InspectService
         try
         {
             using var cts = new CancellationTokenSource(settings.RequestTimeoutMs);
-            using var response = await StatusClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cts.Token);
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.TryAddWithoutValidation("User-Agent", ResolveUserAgent(settings));
+
+            using var response = await StatusClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
             return context.Reply("inspect.status.result", new
             {
@@ -79,7 +73,7 @@ internal sealed class InspectService
         {
             using var cts = new CancellationTokenSource(settings.RequestTimeoutMs);
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.TryAddWithoutValidation("User-Agent", ResolveUserAgent(settings.UserAgent));
+            request.Headers.TryAddWithoutValidation("User-Agent", ResolveUserAgent(settings));
 
             using var response = await RedirectClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
@@ -94,6 +88,8 @@ internal sealed class InspectService
         }
     }
 
-    private static string ResolveUserAgent(string preset) =>
-        UserAgents.GetValueOrDefault(preset, UserAgents["default"]);
+    private static string ResolveUserAgent(AppSettings settings) =>
+        settings.UserAgents.FirstOrDefault()?.Value is { Length: > 0 } value
+            ? value
+            : "URLCheck Desktop Agent/1.0";
 }

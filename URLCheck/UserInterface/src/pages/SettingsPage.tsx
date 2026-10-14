@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
-import {AppSettings, BrowserEntry} from "../types";
+import {AppSettings, BrowserEntry, UserAgentEntry} from "../types";
 import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
@@ -35,32 +35,6 @@ const SettingLabel = styled.span`
 const SettingDescription = styled.span`
   font-size: 0.8rem;
   color: #9ca3af;
-`;
-
-const StyledSelect = styled.select`
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(15, 23, 42, 0.75);
-  color: #f9fafb;
-  font-size: 0.875rem;
-  outline: none;
-  cursor: pointer;
-  min-width: 200px;
-
-  &:focus {
-    border-color: #3b82f6;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  option {
-    background: #111827;
-    color: #f9fafb;
-  }
 `;
 
 const StyledRange = styled.div`
@@ -172,19 +146,19 @@ const FileInfo = styled.div`
   }
 `;
 
-const BrowserList = styled.div`
+const ListEditor = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
 `;
 
-const BrowserRow = styled.div`
+const ListRow = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
 `;
 
-const BrowserInput = styled.input`
+const ListInput = styled.input`
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -368,6 +342,22 @@ export const SettingsPage: React.FC = () => {
     setSettings((prev) => ({...prev, browsers: prev.browsers.filter((browser) => browser.id !== id)}));
   };
 
+  const updateUserAgent = (id: string, patch: Partial<UserAgentEntry>) => {
+    setSettings((prev) => ({
+      ...prev,
+      userAgents: prev.userAgents.map((agent) => (agent.id === id ? {...agent, ...patch} : agent)),
+    }));
+  };
+
+  const addUserAgent = () => {
+    const id = Math.random().toString(36).slice(2, 10);
+    setSettings((prev) => ({...prev, userAgents: [...prev.userAgents, {id, name: "Custom", value: ""}]}));
+  };
+
+  const removeUserAgent = (id: string) => {
+    setSettings((prev) => ({...prev, userAgents: prev.userAgents.filter((agent) => agent.id !== id)}));
+  };
+
   const handleDetectBrowsers = async () => {
     setDetecting(true);
     setError(null);
@@ -442,23 +432,50 @@ export const SettingsPage: React.FC = () => {
             </StyledRange>
           </SettingRow>
 
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>User-Agent Header</SettingLabel>
-              <SettingDescription>Custom user-agent header sent with outbound requests</SettingDescription>
-            </SettingInfo>
-            <StyledSelect
-                disabled={busy}
-                value={settings.userAgent}
-                onChange={(e) => update({userAgent: e.target.value})}
-            >
-              <option value="default">Default (URLCheck Desktop Agent/1.0)</option>
-              <option value="chrome">Chrome Desktop (Windows 11)</option>
-              <option value="safari">Safari Desktop (macOS)</option>
-              <option value="curl">cURL CLI Client (curl/8.4.0)</option>
-              <option value="bot">Search Engine Bot (Googlebot/2.1)</option>
-            </StyledSelect>
-          </SettingRow>
+        </StackCard>
+
+        <StackCard>
+          <SectionTitle>User-Agent</SectionTitle>
+
+          <SettingInfo>
+            <SettingDescription>
+              The first entry is used for outbound requests. Edit the display name and the header value.
+            </SettingDescription>
+          </SettingInfo>
+
+          <ListEditor>
+            {settings.userAgents.map((agent) => (
+                <ListRow key={agent.id}>
+                  <ListInput
+                      className="name"
+                      placeholder="Name"
+                      disabled={busy}
+                      value={agent.name}
+                      onChange={(e) => updateUserAgent(agent.id, {name: e.target.value})}
+                  />
+                  <ListInput
+                      className="path"
+                      placeholder="User-Agent header value"
+                      disabled={busy}
+                      value={agent.value}
+                      onChange={(e) => updateUserAgent(agent.id, {value: e.target.value})}
+                  />
+                  <IconOnlyButton
+                      type="button"
+                      title="Remove User-Agent"
+                      onClick={() => removeUserAgent(agent.id)}
+                  >
+                    <TrashIcon size={16}/>
+                  </IconOnlyButton>
+                </ListRow>
+            ))}
+          </ListEditor>
+
+          <ButtonRow>
+            <GhostButton type="button" onClick={addUserAgent} disabled={busy}>
+              Add User-Agent
+            </GhostButton>
+          </ButtonRow>
         </StackCard>
 
         <StackCard>
@@ -470,17 +487,17 @@ export const SettingsPage: React.FC = () => {
             </SettingDescription>
           </SettingInfo>
 
-          <BrowserList>
+          <ListEditor>
             {settings.browsers.map((browser) => (
-                <BrowserRow key={browser.id}>
-                  <BrowserInput
+                <ListRow key={browser.id}>
+                  <ListInput
                       className="name"
                       placeholder="Name"
                       disabled={busy}
                       value={browser.name}
                       onChange={(e) => updateBrowser(browser.id, {name: e.target.value})}
                   />
-                  <BrowserInput
+                  <ListInput
                       className="path"
                       placeholder="C:\\Path\\To\\browser.exe"
                       disabled={busy}
@@ -494,9 +511,9 @@ export const SettingsPage: React.FC = () => {
                   >
                     <TrashIcon size={16}/>
                   </IconOnlyButton>
-                </BrowserRow>
+                </ListRow>
             ))}
-          </BrowserList>
+          </ListEditor>
 
           <ButtonRow>
             <GhostButton type="button" onClick={addBrowser} disabled={busy}>
