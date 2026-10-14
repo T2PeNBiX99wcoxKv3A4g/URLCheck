@@ -10,7 +10,7 @@ export function createTranslator(strings: Record<string, string>): Translate {
         const template = strings[key] ?? key;
         if (!params) return template;
 
-        return template.replace(/\{(\w+)\}/g, (match, name: string) =>
+        return template.replace(/\{(\w+)}/g, (match, name: string) =>
             name in params ? String(params[name]) : match
         );
     };
