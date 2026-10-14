@@ -23,16 +23,15 @@ internal sealed class SingleInstance : IDisposable
     public bool IsFirstInstance { get; }
 
     /// <summary>Hands the arguments to the already-running instance. Returns false on failure.</summary>
-    public bool TryForwardToExistingInstance(IReadOnlyList<string> args)
+    public async Task<bool> ForwardAsync(IReadOnlyList<string> args)
     {
         try
         {
-            using var client = new NamedPipeClientStream(".", PipeName, PipeDirection.Out);
-            client.Connect(3000);
+            await using var client = new NamedPipeClientStream(".", PipeName, PipeDirection.Out);
+            await client.ConnectAsync(3000);
 
-            using var writer = new StreamWriter(client);
-            writer.Write(string.Join('\n', args));
-            writer.Flush();
+            await using var writer = new StreamWriter(client);
+            await writer.WriteAsync(string.Join('\n', args));
 
             return true;
         }
@@ -43,43 +42,44 @@ internal sealed class SingleInstance : IDisposable
         }
     }
 
-    /// <summary>Starts the pipe server. <paramref name="onArguments"/> runs on a background thread.</summary>
-    public void StartServer(Action<IReadOnlyList<string>> onArguments)
-    {
-        var thread = new Thread(() => ServerLoop(onArguments))
-        {
-            IsBackground = true,
-            Name = "URLCheck.IpcServer",
-        };
+    /// <summary>Starts the pipe server; <paramref name="onArguments"/> runs on a background thread.</summary>
+    public void StartServer(Action<IReadOnlyList<string>> onArguments) =>
+        _ = Task.Run(() => ServerLoopAsync(onArguments));
 
-        thread.Start();
-    }
-
-    private void ServerLoop(Action<IReadOnlyList<string>> onArguments)
+    private async Task ServerLoopAsync(Action<IReadOnlyList<string>> onArguments)
     {
         while (!_cts.IsCancellationRequested)
         {
             try
             {
-                using var server = new NamedPipeServerStream(
-                    PipeName, PipeDirection.In, 1, PipeTransmissionMode.Byte, PipeOptions.None);
+                await using var server = new NamedPipeServerStream(
+                    PipeName, PipeDirection.In, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
 
-                server.WaitForConnection();
+                await server.WaitForConnectionAsync(_cts.Token);
 
                 using var reader = new StreamReader(server);
-                var payload = reader.ReadToEnd();
+                var payload = await reader.ReadToEndAsync(_cts.Token);
 
                 var args = payload.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 if (args.Length > 0)
                     onArguments(args);
             }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
             catch (Exception ex)
             {
-                if (_cts.IsCancellationRequested)
-                    return;
-
                 Console.WriteLine($"[ipc] Server error: {ex.Message}");
-                Thread.Sleep(250);
+
+                try
+                {
+                    await Task.Delay(250, _cts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
             }
         }
     }

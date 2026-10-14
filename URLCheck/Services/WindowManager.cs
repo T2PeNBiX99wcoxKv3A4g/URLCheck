@@ -6,7 +6,7 @@ namespace URLCheck.Services;
 
 /// <summary>
 /// Owns the Photino windows: a hidden "host" window that keeps the message loop alive while the
-/// app sits in the tray, and an on-demand popup window used to inspect a URL.
+/// app sits in the tray, and an on-demand borderless popup used to inspect a URL.
 /// </summary>
 internal sealed class WindowManager
 {
@@ -24,7 +24,7 @@ internal sealed class WindowManager
     }
 
     /// <summary>When true the host window is shown at startup instead of hiding to the tray.</summary>
-    public bool ShowMainWindowOnStartup { get; set; }
+    public bool ShowMainWindowOnStartup { get; init; }
 
     /// <summary>Raised once the host window's native handle exists (message loop is about to start).</summary>
     public event Action? MainWindowCreated;
@@ -36,8 +36,8 @@ internal sealed class WindowManager
             .SetUseOsDefaultSize(false)
             .SetSize(new(1024, 720))
             .SetMinSize(720, 480)
-            .SetResizable(true)
-            .RegisterWebMessageReceivedHandler((sender, message) => _bridge.HandleMessage(sender as PhotinoWindow, message))
+            .RegisterWebMessageReceivedHandler((sender, message) =>
+                _ = _bridge.HandleMessageAsync(sender as PhotinoWindow, message))
             .RegisterWindowCreatedHandler((_, _) =>
             {
                 if (!ShowMainWindowOnStartup)
@@ -58,19 +58,9 @@ internal sealed class WindowManager
     }
 
     /// <summary>Starts the message loop; blocks until the host window is closed for real.</summary>
-    public void Run()
-    {
-        _mainWindow?.WaitForClose();
-    }
+    public void Run() => _mainWindow?.WaitForClose();
 
-    public void HideMainWindow()
-    {
-        var window = _mainWindow;
-        if (window is null)
-            return;
-
-        window.Invoke(() => HideHandle(window));
-    }
+    public void HideMainWindow() => Invoke(_mainWindow, window => HideHandle(window));
 
     public void ShowMainWindow(string? tab = null)
     {
@@ -87,11 +77,10 @@ internal sealed class WindowManager
     /// <summary>Opens a popup for <paramref name="url"/>, or navigates the existing popup to it.</summary>
     public void ShowPopup(string url)
     {
-        var main = _mainWindow;
-        if (main is null || string.IsNullOrWhiteSpace(url))
+        if (_mainWindow is null || string.IsNullOrWhiteSpace(url))
             return;
 
-        main.Invoke(() =>
+        Invoke(_mainWindow, main =>
         {
             if (_popupWindow is not null)
             {
@@ -110,12 +99,14 @@ internal sealed class WindowManager
             var popup = new PhotinoWindow(main)
                 .SetTitle(Constants.WindowTitle)
                 .SetUseOsDefaultSize(false)
-                .SetSize(new(560, 660))
-                .SetMinSize(420, 420)
-                .SetResizable(true)
+                .SetUseOsDefaultLocation(false)
+                .SetSize(new(560, 640))
+                .SetResizable(false)
+                .SetChromeless(true)
                 .SetTopMost(true)
                 .Center()
-                .RegisterWebMessageReceivedHandler((sender, message) => _bridge.HandleMessage(sender as PhotinoWindow, message))
+                .RegisterWebMessageReceivedHandler((sender, message) =>
+                    _ = _bridge.HandleMessageAsync(sender as PhotinoWindow, message))
                 .RegisterWindowClosingHandler((_, _) =>
                 {
                     _popupWindow = null;
@@ -124,9 +115,29 @@ internal sealed class WindowManager
                 .Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}");
 
             _popupWindow = popup;
-            popup.WaitForClose();
+
+            try
+            {
+                popup.WaitForClose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[windows] Failed to create popup: {ex.Message}");
+                _popupWindow = null;
+            }
         });
     }
+
+    /// <summary>Lets the OS move a borderless window when the user drags its header.</summary>
+    public void StartDrag(PhotinoWindow? window) => Invoke(window, target =>
+    {
+        var handle = target.WindowHandle;
+        if (handle == IntPtr.Zero)
+            return;
+
+        NativeMethods.ReleaseCapture();
+        NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, (IntPtr)NativeMethods.HtCaption, IntPtr.Zero);
+    });
 
     public void CloseWindow(PhotinoWindow? window)
     {
@@ -136,11 +147,11 @@ internal sealed class WindowManager
         if (ReferenceEquals(window, _popupWindow))
             _popupWindow = null;
 
-        window.Invoke(() =>
+        Invoke(window, target =>
         {
             try
             {
-                window.Close();
+                target.Close();
             }
             catch (Exception ex)
             {
@@ -159,23 +170,19 @@ internal sealed class WindowManager
 
     public void Exit()
     {
-        var main = _mainWindow;
-        if (main is null)
+        if (_mainWindow is null)
             return;
 
         _allowClose = true;
+        CloseWindow(_mainWindow);
+    }
 
-        main.Invoke(() =>
-        {
-            try
-            {
-                main.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[windows] Failed to exit: {ex.Message}");
-            }
-        });
+    private static void Invoke(PhotinoWindow? window, Action<PhotinoWindow> action)
+    {
+        if (window is null)
+            return;
+
+        window.Invoke(() => action(window));
     }
 
     private static void ShowHandle(PhotinoWindow window)
@@ -191,20 +198,15 @@ internal sealed class WindowManager
     private static void HideHandle(PhotinoWindow window)
     {
         var handle = window.WindowHandle;
-        if (handle == IntPtr.Zero)
-            return;
-
-        NativeMethods.ShowWindow(handle, NativeMethods.SwHide);
+        if (handle != IntPtr.Zero)
+            NativeMethods.ShowWindow(handle, NativeMethods.SwHide);
     }
 
     private static void TrySend(PhotinoWindow? window, string json)
     {
-        if (window is null)
-            return;
-
         try
         {
-            window.SendWebMessage(json);
+            window?.SendWebMessage(json);
         }
         catch (Exception ex)
         {

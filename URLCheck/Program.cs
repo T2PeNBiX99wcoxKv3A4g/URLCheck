@@ -13,7 +13,7 @@ internal static class Program
 {
     [STAThread]
     [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         foreach (var arg in args)
             Console.WriteLine("arg: {0}", arg);
@@ -25,13 +25,13 @@ internal static class Program
         using var singleInstance = new SingleInstance();
         if (!singleInstance.IsFirstInstance)
         {
-            singleInstance.TryForwardToExistingInstance(args);
+            await singleInstance.ForwardAsync(args);
             return;
         }
 
 #if !DEBUG
         PhotinoServer
-            .CreateStaticFileServer(Array.Empty<string>(), out var baseUrl)
+            .CreateStaticFileServer([], out var baseUrl)
             .RunAsync();
 
         var appUrl = $"{baseUrl}/index.html";
@@ -41,9 +41,7 @@ internal static class Program
 
         Console.WriteLine($"Serving React app at {appUrl}");
 
-        var settings = new SettingsService();
-        var protocols = new ProtocolRegistrationService();
-        var manager = new WindowManager(appUrl, settings, protocols)
+        var manager = new WindowManager(appUrl, new SettingsService(), new ProtocolRegistrationService())
         {
             ShowMainWindowOnStartup = showMainWindow,
         };
@@ -60,13 +58,8 @@ internal static class Program
             // The message loop is about to start, so windows can now be created safely.
             singleInstance.StartServer(forwarded => DispatchUrls(manager, forwarded));
 
-            if (startupUrls.Count <= 0) return;
-            var urls = startupUrls.ToList();
-            Task.Run(() =>
-            {
-                foreach (var url in urls)
-                    manager.ShowPopup(url);
-            });
+            if (startupUrls.Count > 0)
+                _ = Task.Run(() => startupUrls.ForEach(manager.ShowPopup));
         };
 
         manager.CreateMainWindow();
@@ -82,14 +75,8 @@ internal static class Program
     }
 
     /// <summary>Pulls the http/https/urlcheck URLs out of a raw argument list.</summary>
-    private static List<string> ExtractUrls(IEnumerable<string> args)
-    {
-        return
-        [
-            .. args.Where(arg => !string.IsNullOrWhiteSpace(arg) && !arg.StartsWith('-')).Where(arg =>
-                arg.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                arg.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
-                arg.StartsWith("urlcheck://", StringComparison.OrdinalIgnoreCase))
-        ];
-    }
+    private static List<string> ExtractUrls(IEnumerable<string> args) =>
+        [.. args.Where(arg =>
+            Uri.TryCreate(arg, UriKind.Absolute, out var uri) &&
+            uri.Scheme is "http" or "https" or "urlcheck")];
 }

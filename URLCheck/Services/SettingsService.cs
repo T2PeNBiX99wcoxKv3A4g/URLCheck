@@ -1,81 +1,85 @@
 using System.Text.Json;
-using JetBrains.Annotations;
 using URLCheck.Models;
 
 namespace URLCheck.Services;
 
 /// <summary>
-/// Loads and persists <see cref="AppSettings"/> as JSON under the user's roaming application data
-/// folder (e.g. <c>%APPDATA%\URLCheck\settings.json</c>).
+/// Loads and persists <see cref="AppSettings"/> as JSON under <c>%APPDATA%\URLCheck</c>.
+/// The first read seeds the browser list so the popup works out of the box.
 /// </summary>
 internal sealed class SettingsService
 {
-    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
-    {
-        WriteIndented = true,
-    };
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
 
-    private readonly Lock _sync = new();
+    private readonly SemaphoreSlim _gate = new(1, 1);
+    private AppSettings? _current;
 
     public SettingsService()
     {
-        var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            Constants.Name);
-
+        var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "URLCheck");
         Directory.CreateDirectory(directory);
         SettingsFilePath = Path.Combine(directory, "settings.json");
-
-        Current = Load();
     }
 
-    /// <summary>Absolute path of the JSON file the settings are stored in.</summary>
     public string SettingsFilePath { get; }
 
-    /// <summary>The settings currently held in memory.</summary>
-    public AppSettings Current { get; private set; }
-
-    [PublicAPI]
-    public AppSettings Load()
+    /// <summary>Returns the settings, loading them from disk on first use.</summary>
+    public async Task<AppSettings> GetAsync()
     {
-        lock (_sync)
-        {
-            try
-            {
-                if (File.Exists(SettingsFilePath))
-                {
-                    var json = File.ReadAllText(SettingsFilePath);
-                    var settings = JsonSerializer.Deserialize<AppSettings>(json, SerializerOptions);
-                    if (settings is not null)
-                    {
-                        settings.Normalize();
-                        return settings;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[settings] Failed to load '{SettingsFilePath}': {ex.Message}");
-            }
+        if (_current is not null)
+            return _current;
 
-            return new();
+        await _gate.WaitAsync();
+        try
+        {
+            if (_current is not null)
+                return _current;
+
+            _current = await ReadAsync();
+            _current.Normalize();
+            return _current;
+        }
+        finally
+        {
+            _gate.Release();
         }
     }
 
-    public AppSettings Save(AppSettings settings)
+    public async Task<AppSettings> SaveAsync(AppSettings settings)
     {
-        ArgumentNullException.ThrowIfNull(settings);
+        settings.Normalize();
 
-        lock (_sync)
+        await _gate.WaitAsync();
+        try
         {
-            settings.Normalize();
-
-            var json = JsonSerializer.Serialize(settings, SerializerOptions);
-            File.WriteAllText(SettingsFilePath, json);
-
-            Current = settings;
-            return Current;
+            await File.WriteAllTextAsync(SettingsFilePath, JsonSerializer.Serialize(settings, JsonOptions));
+            _current = settings;
+            return settings;
+        }
+        finally
+        {
+            _gate.Release();
         }
     }
 
-    public AppSettings Reset() => Save(new());
+    /// <summary>Restores defaults, re-detecting the installed browsers.</summary>
+    public Task<AppSettings> ResetAsync() =>
+        SaveAsync(new AppSettings { Browsers = [.. BrowserService.DetectInstalledBrowsers()] });
+
+    private async Task<AppSettings> ReadAsync()
+    {
+        if (!File.Exists(SettingsFilePath))
+            return new AppSettings { Browsers = [.. BrowserService.DetectInstalledBrowsers()] };
+
+        try
+        {
+            var json = await File.ReadAllTextAsync(SettingsFilePath);
+            return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[settings] Failed to load '{SettingsFilePath}': {ex.Message}");
+            return new AppSettings();
+        }
+    }
 }

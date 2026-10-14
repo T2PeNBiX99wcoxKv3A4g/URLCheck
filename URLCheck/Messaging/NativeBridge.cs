@@ -10,20 +10,9 @@ namespace URLCheck.Messaging;
 /// Incoming messages arrive through <see cref="PhotinoWindow.RegisterWebMessageReceivedHandler"/>;
 /// outgoing messages are pushed back with <see cref="PhotinoWindow.SendWebMessage"/>.
 /// </summary>
-internal sealed class NativeBridge
+internal sealed class NativeBridge(WindowManager windows, SettingsService settings, ProtocolRegistrationService protocols)
 {
-    private readonly WindowManager _windows;
-    private readonly SettingsService _settingsService;
-    private readonly ProtocolRegistrationService _protocols;
-
-    public NativeBridge(WindowManager windows, SettingsService settingsService, ProtocolRegistrationService protocols)
-    {
-        _windows = windows;
-        _settingsService = settingsService;
-        _protocols = protocols;
-    }
-
-    public void HandleMessage(PhotinoWindow? window, string rawMessage)
+    public async Task HandleMessageAsync(PhotinoWindow? window, string rawMessage)
     {
         Console.WriteLine($"[bridge] << {rawMessage}");
 
@@ -44,7 +33,7 @@ internal sealed class NativeBridge
 
         try
         {
-            Dispatch(window, request);
+            await DispatchAsync(window, request);
         }
         catch (Exception ex)
         {
@@ -53,12 +42,12 @@ internal sealed class NativeBridge
         }
     }
 
-    private void Dispatch(PhotinoWindow? window, NativeRequest request)
+    private async Task DispatchAsync(PhotinoWindow? window, NativeRequest request)
     {
         switch (request.Type)
         {
             case "settings.get":
-                Send(window, NativeResponse.Success(request.Id, "settings.get.result", CreateSettingsPayload()));
+                Send(window, NativeResponse.Success(request.Id, "settings.get.result", await PayloadAsync()));
                 break;
 
             case "settings.save":
@@ -70,16 +59,16 @@ internal sealed class NativeBridge
                     return;
                 }
 
-                _settingsService.Save(incoming);
-                Send(window, NativeResponse.Success(request.Id, "settings.save.result", CreateSettingsPayload()));
-                _windows.BroadcastEvent("settings.changed", CreateSettingsPayload());
+                await settings.SaveAsync(incoming);
+                Send(window, NativeResponse.Success(request.Id, "settings.save.result", await PayloadAsync()));
+                windows.BroadcastEvent("settings.changed", await PayloadAsync());
                 break;
             }
 
             case "settings.reset":
-                _settingsService.Reset();
-                Send(window, NativeResponse.Success(request.Id, "settings.reset.result", CreateSettingsPayload()));
-                _windows.BroadcastEvent("settings.changed", CreateSettingsPayload());
+                await settings.ResetAsync();
+                Send(window, NativeResponse.Success(request.Id, "settings.reset.result", await PayloadAsync()));
+                windows.BroadcastEvent("settings.changed", await PayloadAsync());
                 break;
 
             case "browsers.detect":
@@ -96,7 +85,7 @@ internal sealed class NativeBridge
                     return;
                 }
 
-                _windows.ShowPopup(payload.Url);
+                windows.ShowPopup(payload.Url);
                 Send(window, NativeResponse.Success(request.Id, "popup.show.result", new { Ok = true }));
                 break;
             }
@@ -110,7 +99,7 @@ internal sealed class NativeBridge
                     return;
                 }
 
-                var browser = ResolveBrowser(payload.BrowserId);
+                var browser = ResolveBrowser(await settings.GetAsync(), payload.BrowserId);
                 if (browser is null)
                 {
                     Send(window, NativeResponse.Failure(request.Id, "popup.open.result",
@@ -125,17 +114,21 @@ internal sealed class NativeBridge
             }
 
             case "popup.close":
-                _windows.CloseWindow(window);
+                windows.CloseWindow(window);
+                break;
+
+            case "window.drag":
+                windows.StartDrag(window);
                 break;
 
             case "app.registerProtocols":
-                _protocols.Register();
+                protocols.Register();
                 Send(window, NativeResponse.Success(request.Id, "app.registerProtocols.result",
-                    new { Ok = true, ExecutablePath = _protocols.ExecutablePath }));
+                    new { Ok = true, ExecutablePath = protocols.ExecutablePath }));
                 break;
 
             case "app.openDefaultApps":
-                _protocols.OpenDefaultAppsSettings();
+                protocols.OpenDefaultAppsSettings();
                 Send(window, NativeResponse.Success(request.Id, "app.openDefaultApps.result", new { Ok = true }));
                 break;
 
@@ -147,24 +140,13 @@ internal sealed class NativeBridge
         }
     }
 
-    private BrowserEntry? ResolveBrowser(string? browserId)
-    {
-        var browsers = _settingsService.Current.Browsers;
-        if (browsers.Count == 0)
-            return null;
+    private async Task<SettingsPayload> PayloadAsync() =>
+        new(await settings.GetAsync(), settings.SettingsFilePath);
 
-        if (!string.IsNullOrEmpty(browserId))
-        {
-            var match = browsers.FirstOrDefault(browser => browser.Id == browserId);
-            if (match is not null)
-                return match;
-        }
-
-        return browsers[0];
-    }
-
-    private SettingsPayload CreateSettingsPayload() =>
-        new(_settingsService.Current, _settingsService.SettingsFilePath);
+    private static BrowserEntry? ResolveBrowser(AppSettings current, string? browserId) =>
+        current.Browsers.Count == 0
+            ? null
+            : current.Browsers.FirstOrDefault(browser => browser.Id == browserId) ?? current.Browsers[0];
 
     private static void Send(PhotinoWindow? window, NativeResponse response)
     {

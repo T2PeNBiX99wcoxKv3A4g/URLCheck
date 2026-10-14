@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useRef, useState} from "react";
 import styled from "styled-components";
 import {BrowserEntry} from "../types";
 import {loadSettings} from "../api/settings";
-import {detectBrowsers, openWithBrowser} from "../api/browsers";
+import {openWithBrowser} from "../api/browsers";
 import {closePopup} from "../api/system";
 import {Native} from "../Native";
 import {AlertTriangleIcon, CheckCircleIcon, CopyIcon, ShieldCheckIcon, TrashIcon} from "../components/Icons";
@@ -339,14 +339,7 @@ export const PopupPage: React.FC = () => {
         (async () => {
             try {
                 const payload = await loadSettings();
-                let list = payload.settings.browsers;
-
-                // First run: fall back to auto-detection so the popup is usable immediately.
-                if (list.length === 0) {
-                    list = await detectBrowsers();
-                }
-
-                if (!cancelled) setBrowsers(list);
+                if (!cancelled) setBrowsers(payload.settings.browsers);
             } catch {
                 // Ignore: the popup still works without a browser list.
             }
@@ -435,9 +428,12 @@ export const PopupPage: React.FC = () => {
     const defaultBrowser = browsers[0];
     const canOpen = Boolean(parsed) && browsers.length > 0;
 
+    // The window is borderless, so the header doubles as the OS drag handle.
+    const startDrag = () => Native.send({type: "window.drag"});
+
     return (
         <PopupContainer>
-            <TopBar>
+            <TopBar onMouseDown={startDrag}>
                 <Brand>
                     <BrandMark>
                         <ShieldCheckIcon size={18}/>
@@ -447,7 +443,7 @@ export const PopupPage: React.FC = () => {
                         <BrandSubtitle>{parsed?.host || "Intercepted URL"}</BrandSubtitle>
                     </BrandText>
                 </Brand>
-                <IconButton onClick={closePopup} title="Close">
+                <IconButton onClick={closePopup} onMouseDown={(e) => e.stopPropagation()} title="Close">
                     ✕
                 </IconButton>
             </TopBar>
