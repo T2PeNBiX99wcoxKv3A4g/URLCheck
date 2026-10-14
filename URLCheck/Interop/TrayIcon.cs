@@ -85,7 +85,7 @@ internal sealed class TrayIcon : IDisposable
         NativeMethods.RegisterClassEx(ref windowClass);
 
         _hwnd = NativeMethods.CreateWindowEx(
-            0, _className, "URLCheck", 0, 0, 0, 0, 0,
+            0, _className, Constants.Name, 0, 0, 0, 0, 0,
             IntPtr.Zero, IntPtr.Zero, hInstance, IntPtr.Zero);
 
         AddIcon();

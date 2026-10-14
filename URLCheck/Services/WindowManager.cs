@@ -18,7 +18,7 @@ internal sealed class WindowManager
     ///     which breaks when another app holds it, so keep URLCheck's separate.
     /// </summary>
     private static readonly string WebViewDataPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "URLCheck", "webview");
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name, "webview");
 
     private readonly string _appUrl;
     private readonly SettingsService _settings;

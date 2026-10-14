@@ -9,7 +9,7 @@ internal static class Logging
     public static void Initialize()
     {
         var logDirectory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "URLCheck", "logs");
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.Name, "logs");
         Directory.CreateDirectory(logDirectory);
 
         Log.Logger = new LoggerConfiguration()
