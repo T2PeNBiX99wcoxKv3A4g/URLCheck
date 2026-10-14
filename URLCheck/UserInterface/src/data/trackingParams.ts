@@ -1,6 +1,11 @@
 /**
  * Common analytics/tracking query parameters removed by the "remove tracking" action.
  * Kept in sync with the usual ClearURLs-style basics.
+ *
+ * TODO(tracking): this is a deliberately simple allow-list of well-known keys. A full
+ * implementation should load provider-aware rules (ClearURLs' `data.min.json` style:
+ * per-provider parameter names, regex-redacted values, and exceptions) instead of the
+ * flat set below, and expose it as an opt-in setting. Until then this list is a stop-gap.
  */
 const TRACKING_PARAMS = new Set([
     "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "utm_id",
