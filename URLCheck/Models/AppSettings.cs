@@ -12,12 +12,16 @@ internal sealed class AppSettings
 {
     public const int TimeoutMinMs = 1_000;
     public const int TimeoutMaxMs = 15_000;
+    public const string DefaultLanguage = "en";
 
     /// <summary>Maximum milliseconds to wait for a single URL response.</summary>
     public int RequestTimeoutMs { get; set; } = 5_000;
 
     /// <summary>User-Agent headers offered in the settings. The first entry is the default.</summary>
     public List<UserAgentEntry> UserAgents { get; set; } = [];
+
+    /// <summary>UI language, e.g. <c>en</c>, <c>zh-TW</c>.</summary>
+    public string Language { get; set; } = DefaultLanguage;
 
     /// <summary>Browsers offered in the popup. The first entry is used as the default.</summary>
     public List<BrowserEntry> Browsers { get; set; } = [];
@@ -28,6 +32,9 @@ internal sealed class AppSettings
     public void Normalize()
     {
         RequestTimeoutMs = Math.Clamp(RequestTimeoutMs, TimeoutMinMs, TimeoutMaxMs);
+
+        if (string.IsNullOrWhiteSpace(Language))
+            Language = DefaultLanguage;
 
         UserAgents ??= [];
 

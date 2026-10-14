@@ -58,6 +58,9 @@ internal static class Program
 
             var browserLocator = new WindowsBrowserLocator();
             var settings = new SettingsService(browserLocator);
+            _ = settings.GetAsync().GetAwaiter().GetResult(); // know the language before the tray is built
+
+            var localization = new LocalizationService(settings);
             var history = new HistoryService();
             _ = new AppInfoService();
             _ = new BrowserService(browserLocator);
@@ -70,6 +73,7 @@ internal static class Program
 
             using var tray = new TrayIcon(
                 Constants.WindowTitle,
+                localization.Get,
                 () => manager.ShowMainWindow(),
                 () => manager.ShowMainWindow("settings"),
                 manager.Exit);

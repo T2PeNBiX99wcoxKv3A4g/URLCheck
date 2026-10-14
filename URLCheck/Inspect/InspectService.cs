@@ -31,7 +31,7 @@ internal sealed class InspectService
     private async Task<NativeResponse?> CheckStatusAsync(NativeContext context)
     {
         if (context.Payload<InspectRequest>() is not { Url: { Length: > 0 } url })
-            return context.Fail("inspect.status.result", "Missing URL.");
+            return context.Fail("inspect.status.result", "error.missingUrl");
 
         var settings = await _settings.GetAsync();
 
@@ -56,7 +56,7 @@ internal sealed class InspectService
             return context.Reply("inspect.status.result", new
             {
                 StatusCode = 0,
-                StatusText = ex is TaskCanceledException ? "Request timed out" : ex.Message,
+                StatusText = ex is TaskCanceledException ? "error.timeout" : ex.Message,
                 Ok = false
             });
         }
@@ -65,7 +65,7 @@ internal sealed class InspectService
     private async Task<NativeResponse?> FollowRedirectAsync(NativeContext context)
     {
         if (context.Payload<InspectRequest>() is not { Url: { Length: > 0 } url })
-            return context.Fail("inspect.redirect.result", "Missing URL.");
+            return context.Fail("inspect.redirect.result", "error.missingUrl");
 
         var settings = await _settings.GetAsync();
 

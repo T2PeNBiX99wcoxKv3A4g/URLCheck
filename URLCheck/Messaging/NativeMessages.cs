@@ -96,6 +96,9 @@ internal sealed record PopupResizeRequest(int Height);
 /// <summary>Payload for the <c>inspect.*</c> messages.</summary>
 internal sealed record InspectRequest(string Url);
 
+/// <summary>Payload for <c>i18n.get</c>.</summary>
+internal sealed record LocaleRequest(string? Locale);
+
 /// <summary>Shared JSON options and serialization helpers for the native bridge.</summary>
 internal static class NativeProtocol
 {

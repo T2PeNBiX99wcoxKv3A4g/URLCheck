@@ -55,7 +55,7 @@ internal sealed class WindowManager
             {
                 var payload = context.Payload<PopupShowRequest>();
                 if (string.IsNullOrWhiteSpace(payload?.Url))
-                    return context.Fail("popup.show.result", "Missing URL.");
+                    return context.Fail("popup.show.result", "error.missingUrl");
 
                 ShowPopup(payload.Url);
                 return context.Reply("popup.show.result", new
@@ -68,12 +68,12 @@ internal sealed class WindowManager
             {
                 var payload = context.Payload<PopupOpenRequest>();
                 if (string.IsNullOrWhiteSpace(payload?.Url))
-                    return context.Fail("popup.open.result", "Missing URL.");
+                    return context.Fail("popup.open.result", "error.missingUrl");
 
                 var settings = await _settings.GetAsync();
                 var browser = ResolveBrowser(settings, payload.BrowserId);
                 if (browser is null)
-                    return context.Fail("popup.open.result", "No browser configured. Add one in Settings.");
+                    return context.Fail("popup.open.result", "error.noBrowser");
 
                 // Track usage so the most-used browser becomes the default entry.
                 browser.UseCount++;

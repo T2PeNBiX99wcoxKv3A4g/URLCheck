@@ -9,7 +9,12 @@ namespace URLCheck.Interop;
 ///     independent of Photino's UI thread.
 /// </summary>
 [SupportedOSPlatform("windows")]
-internal sealed class TrayIcon(string tooltip, Action onOpen, Action onSettings, Action onExit)
+internal sealed class TrayIcon(
+    string tooltip,
+    Func<string, string> localize,
+    Action onOpen,
+    Action onSettings,
+    Action onExit)
     : IDisposable
 {
     private const uint WmApp = 0x8000;
@@ -179,10 +184,10 @@ internal sealed class TrayIcon(string tooltip, Action onOpen, Action onSettings,
     private void ShowContextMenu()
     {
         var menu = NativeMethods.CreatePopupMenu();
-        NativeMethods.AppendMenu(menu, MfString, MenuOpen, "Open URLCheck");
-        NativeMethods.AppendMenu(menu, MfString, MenuSettings, "Settings");
+        NativeMethods.AppendMenu(menu, MfString, MenuOpen, localize("tray.open"));
+        NativeMethods.AppendMenu(menu, MfString, MenuSettings, localize("tray.settings"));
         NativeMethods.AppendMenu(menu, MfSeparator, IntPtr.Zero, null);
-        NativeMethods.AppendMenu(menu, MfString, MenuExit, "Exit");
+        NativeMethods.AppendMenu(menu, MfString, MenuExit, localize("tray.exit"));
 
         NativeMethods.GetCursorPos(out var cursor);
         NativeMethods.SetForegroundWindow(_hwnd);

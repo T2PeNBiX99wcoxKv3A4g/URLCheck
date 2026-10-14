@@ -30,7 +30,7 @@ internal static class NativeBridge
         catch (JsonException ex)
         {
             Log.Warning(ex, "Invalid JSON received");
-            Send(window, NativeResponse.Failure(null, "error", "Invalid JSON payload."));
+            Send(window, NativeResponse.Failure(null, "error", "error.invalidJson"));
             return;
         }
 
@@ -46,7 +46,7 @@ internal static class NativeBridge
             if (response is not null)
                 Send(window, response);
             else if (context.WantsReply)
-                Send(window, context.Fail($"{request.Type}.result", $"Unsupported message type '{request.Type}'."));
+                Send(window, context.Fail($"{request.Type}.result", "error.unsupported"));
         }
         catch (Exception ex)
         {

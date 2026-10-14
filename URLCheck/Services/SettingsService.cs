@@ -35,6 +35,9 @@ internal sealed class SettingsService
 
     [PublicAPI] public string SettingsFilePath { get; }
 
+    /// <summary>The language from the cached settings (falls back before the first load).</summary>
+    public string Language => _current?.Language ?? AppSettings.DefaultLanguage;
+
     /// <summary>Raised after the settings are saved or reset.</summary>
     public static event Action<SettingsPayload>? Changed;
 
@@ -50,7 +53,7 @@ internal sealed class SettingsService
             {
                 var incoming = context.Payload<AppSettings>();
                 if (incoming is null)
-                    return context.Fail("settings.save.result", "Missing settings payload.");
+                    return context.Fail("settings.save.result", "error.missingSettings");
 
                 await SaveAsync(incoming);
                 return context.Reply("settings.save.result", await PublishAsync());
@@ -125,9 +128,10 @@ internal sealed class SettingsService
     private async Task<AppSettings> ReadAsync()
     {
         if (!File.Exists(SettingsFilePath))
-            return new()
+            return new AppSettings
             {
-                Browsers = [.. _browserLocator.Detect()]
+                Browsers = [.. _browserLocator.Detect()],
+                Language = LocalizationService.ResolveSystemLocale()
             };
 
         try
