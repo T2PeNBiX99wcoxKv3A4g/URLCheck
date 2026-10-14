@@ -9,6 +9,8 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("windows")]
 internal sealed class WindowsBrowserLocator : IBrowserLocator
 {
+    private const string OwnClientName = "URLCheck";
+
     private static readonly string[] ClientRoots =
     [
         @"SOFTWARE\Clients\StartMenuInternet",
@@ -55,6 +57,11 @@ internal sealed class WindowsBrowserLocator : IBrowserLocator
             using var commandKey = client.OpenSubKey(@"shell\open\command");
             var executable = ExtractExecutable(commandKey?.GetValue(null) as string);
             if (executable is null || !File.Exists(executable))
+                continue;
+
+            // Never offer URLCheck itself as a browser to open URLs with.
+            if (clientName.Equals(OwnClientName, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(executable, Environment.ProcessPath, StringComparison.OrdinalIgnoreCase))
                 continue;
 
             var displayName = client.GetValue(null) as string;

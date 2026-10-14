@@ -34,10 +34,7 @@ export interface HistoryItem {
 
 export interface AppSettings {
     requestTimeoutMs: number;
-    followRedirects: boolean;
-    verifySsl: boolean;
     userAgent: string;
-    maxConcurrency: number;
     browsers: BrowserEntry[];
 }
 

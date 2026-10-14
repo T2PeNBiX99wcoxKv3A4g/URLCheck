@@ -1,39 +1,12 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
+import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
 import {AppSettings, BrowserEntry} from "../types";
 import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
 import {openDefaultAppsSettings, registerProtocols} from "../api/system";
-
-const PageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  max-width: 800px;
-`;
-
-const Card = styled.div`
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #f9fafb;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 12px;
-  margin-bottom: 4px;
-`;
 
 const SettingRow = styled.div`
   display: flex;
@@ -62,59 +35,6 @@ const SettingLabel = styled.span`
 const SettingDescription = styled.span`
   font-size: 0.8rem;
   color: #9ca3af;
-`;
-
-const Switch = styled.label`
-  position: relative;
-  display: inline-block;
-  width: 46px;
-  height: 24px;
-  flex-shrink: 0;
-
-  input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  span {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.15);
-    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 24px;
-  }
-
-  span:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  }
-
-  input:checked + span {
-    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-    box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
-  }
-
-  input:checked + span:before {
-    transform: translateX(22px);
-  }
-
-  input:disabled + span {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
 `;
 
 const StyledSelect = styled.select`
@@ -492,7 +412,7 @@ export const SettingsPage: React.FC = () => {
   };
 
   return (
-      <PageContainer>
+      <PageContainer $maxWidth={800}>
         {error && (
             <ErrorBanner>
               <AlertTriangleIcon size={16}/>
@@ -500,7 +420,7 @@ export const SettingsPage: React.FC = () => {
             </ErrorBanner>
         )}
 
-        <Card>
+        <StackCard>
           <SectionTitle>Network & Request Settings</SectionTitle>
 
           <SettingRow>
@@ -524,40 +444,6 @@ export const SettingsPage: React.FC = () => {
 
           <SettingRow>
             <SettingInfo>
-              <SettingLabel>Follow Redirects</SettingLabel>
-              <SettingDescription>Automatically follow 301/302 HTTP redirects to
-                destination</SettingDescription>
-            </SettingInfo>
-            <Switch>
-              <input
-                  type="checkbox"
-                  disabled={busy}
-                  checked={settings.followRedirects}
-                  onChange={(e) => update({followRedirects: e.target.checked})}
-              />
-              <span/>
-            </Switch>
-          </SettingRow>
-
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>Verify SSL Certificate</SettingLabel>
-              <SettingDescription>Verify SSL/TLS certificate validity for target
-                hostnames</SettingDescription>
-            </SettingInfo>
-            <Switch>
-              <input
-                  type="checkbox"
-                  disabled={busy}
-                  checked={settings.verifySsl}
-                  onChange={(e) => update({verifySsl: e.target.checked})}
-              />
-              <span/>
-            </Switch>
-          </SettingRow>
-
-          <SettingRow>
-            <SettingInfo>
               <SettingLabel>User-Agent Header</SettingLabel>
               <SettingDescription>Custom user-agent header sent with outbound requests</SettingDescription>
             </SettingInfo>
@@ -573,33 +459,9 @@ export const SettingsPage: React.FC = () => {
               <option value="bot">Search Engine Bot (Googlebot/2.1)</option>
             </StyledSelect>
           </SettingRow>
-        </Card>
+        </StackCard>
 
-        <Card>
-          <SectionTitle>Concurrency & Performance</SectionTitle>
-
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>Max Concurrent Requests</SettingLabel>
-              <SettingDescription>Maximum number of asynchronous requests executed
-                simultaneously</SettingDescription>
-            </SettingInfo>
-            <StyledRange>
-              <input
-                  type="range"
-                  min="1"
-                  max="20"
-                  step="1"
-                  disabled={busy}
-                  value={settings.maxConcurrency}
-                  onChange={(e) => update({maxConcurrency: Number(e.target.value)})}
-              />
-              <span>{settings.maxConcurrency} reqs</span>
-            </StyledRange>
-          </SettingRow>
-        </Card>
-
-        <Card>
+        <StackCard>
           <SectionTitle>Browsers</SectionTitle>
 
           <SettingInfo>
@@ -644,9 +506,9 @@ export const SettingsPage: React.FC = () => {
               {detecting ? "Detecting..." : "Detect installed"}
             </GhostButton>
           </ButtonRow>
-        </Card>
+        </StackCard>
 
-        <Card>
+        <StackCard>
           <SectionTitle>System Integration</SectionTitle>
 
           <SettingInfo>
@@ -668,7 +530,7 @@ export const SettingsPage: React.FC = () => {
           </ButtonRow>
 
           {integrationMessage && <InfoText>{integrationMessage}</InfoText>}
-        </Card>
+        </StackCard>
 
         <ActionRow>
           <SaveButton onClick={handleSave} disabled={busy}>

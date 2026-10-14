@@ -143,8 +143,8 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
 
             <NavList>
                 <NavItem
-                    $active={currentTab === "single"}
-                    onClick={() => onSelectTab("single")}
+                    $active={currentTab === "home"}
+                    onClick={() => onSelectTab("home")}
                 >
                     <HomeIcon size={18}/>
                     <span>Home</span>

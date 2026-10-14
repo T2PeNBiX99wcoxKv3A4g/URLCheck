@@ -2,25 +2,7 @@ import React, {useState} from "react";
 import styled from "styled-components";
 import {showPopup} from "../api/system";
 import {LinkIcon, SearchIcon, ShieldCheckIcon} from "../components/Icons";
-
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    max-width: 820px;
-`;
-
-const Card = styled.div`
-    background: rgba(17, 24, 39, 0.75);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-`;
+import {PageContainer, StackCard} from "../components/Layout";
 
 const Title = styled.h3`
     font-size: 1.05rem;
@@ -157,8 +139,8 @@ export const HomePage: React.FC = () => {
     };
 
     return (
-        <PageContainer>
-            <Card>
+        <PageContainer $maxWidth={820}>
+            <StackCard>
                 <Title>
                     <LinkIcon size={18}/>
                     <span>Open a URL</span>
@@ -190,7 +172,7 @@ export const HomePage: React.FC = () => {
                         {SAMPLE_URL}
                     </PresetChip>
                 </Presets>
-            </Card>
+            </StackCard>
         </PageContainer>
     );
 };

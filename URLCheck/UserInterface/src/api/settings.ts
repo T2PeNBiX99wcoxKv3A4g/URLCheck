@@ -3,10 +3,7 @@ import type {AppSettings} from "../types";
 
 export const DEFAULT_SETTINGS: AppSettings = {
     requestTimeoutMs: 5000,
-    followRedirects: true,
-    verifySsl: true,
     userAgent: "default",
-    maxConcurrency: 5,
     browsers: [],
 };
 
@@ -25,7 +22,6 @@ function normalize(settings: AppSettings): AppSettings {
     return {
         ...settings,
         requestTimeoutMs: clamp(settings.requestTimeoutMs, 1000, 15000),
-        maxConcurrency: clamp(settings.maxConcurrency, 1, 20),
         userAgent: settings.userAgent || DEFAULT_SETTINGS.userAgent,
         browsers: Array.isArray(settings.browsers) ? settings.browsers : [],
     };

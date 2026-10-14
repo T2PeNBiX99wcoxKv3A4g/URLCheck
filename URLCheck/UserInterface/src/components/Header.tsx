@@ -73,7 +73,7 @@ const tabInfo: Record<TabType, { title: string; subtitle: string }> = {
   },
   settings: {
     title: "Preferences & Settings",
-    subtitle: "Configure request timeouts, User-Agent header, and concurrency limits",
+    subtitle: "Configure the request timeout, User-Agent header, and browsers",
   },
 };
 
