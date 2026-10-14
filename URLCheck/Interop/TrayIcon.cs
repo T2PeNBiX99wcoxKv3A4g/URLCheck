@@ -7,7 +7,8 @@ namespace URLCheck.Interop;
 ///     A notification-area (tray) icon hosted on its own STA thread with a private message loop,
 ///     independent of Photino's UI thread.
 /// </summary>
-internal sealed class TrayIcon : IDisposable
+internal sealed class TrayIcon(string tooltip, Action onOpen, Action onSettings, Action onExit)
+    : IDisposable
 {
     private const uint WmApp = 0x8000;
     private const uint WmTrayIcon = WmApp + 1;
@@ -33,24 +34,12 @@ internal sealed class TrayIcon : IDisposable
     private const int MenuExit = 3;
     private const int IdiApplication = 32512;
     private readonly string _className = $"URLCheck.TrayIcon.{Guid.NewGuid():N}";
-    private readonly Action _onExit;
-    private readonly Action _onOpen;
-    private readonly Action _onSettings;
 
-    private readonly string _tooltip;
     private IntPtr _hwnd = IntPtr.Zero;
     private uint _taskbarCreatedMessage;
 
     private Thread? _thread;
     private NativeMethods.WndProcDelegate? _wndProc;
-
-    public TrayIcon(string tooltip, Action onOpen, Action onSettings, Action onExit)
-    {
-        _tooltip = tooltip;
-        _onOpen = onOpen;
-        _onSettings = onSettings;
-        _onExit = onExit;
-    }
 
     public void Dispose()
     {
@@ -112,7 +101,7 @@ internal sealed class TrayIcon : IDisposable
             uFlags = NifMessage | NifIcon | NifTip,
             uCallbackMessage = (int)WmTrayIcon,
             hIcon = NativeMethods.LoadIcon(IntPtr.Zero, IdiApplication),
-            szTip = _tooltip,
+            szTip = tooltip,
             szInfo = string.Empty,
             szInfoTitle = string.Empty
         };
@@ -151,7 +140,7 @@ internal sealed class TrayIcon : IDisposable
                 {
                     case WmLButtonUp:
                     case WmLButtonDblClk:
-                        SafeInvoke(_onOpen);
+                        SafeInvoke(onOpen);
                         break;
                     case WmRButtonUp:
                         ShowContextMenu();
@@ -164,13 +153,13 @@ internal sealed class TrayIcon : IDisposable
                 switch ((int)wParam & 0xFFFF)
                 {
                     case MenuOpen:
-                        SafeInvoke(_onOpen);
+                        SafeInvoke(onOpen);
                         break;
                     case MenuSettings:
-                        SafeInvoke(_onSettings);
+                        SafeInvoke(onSettings);
                         break;
                     case MenuExit:
-                        SafeInvoke(_onExit);
+                        SafeInvoke(onExit);
                         break;
                 }
 
