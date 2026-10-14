@@ -30,7 +30,7 @@ internal static class Program
             using var singleInstance = new SingleInstance();
             if (!singleInstance.IsFirstInstance)
             {
-                await singleInstance.ForwardAsync(args);
+                await SingleInstance.ForwardAsync(args);
                 return;
             }
 
@@ -86,7 +86,9 @@ internal static class Program
 
     /// <summary>Pulls the http/https/urlcheck URLs out of a raw argument list.</summary>
     private static List<string> ExtractUrls(IEnumerable<string> args) =>
-        [.. args.Where(arg =>
+    [
+        .. args.Where(arg =>
             Uri.TryCreate(arg, UriKind.Absolute, out var uri) &&
-            uri.Scheme is "http" or "https" or "urlcheck")];
+            uri.Scheme is "http" or "https" or "urlcheck")
+    ];
 }

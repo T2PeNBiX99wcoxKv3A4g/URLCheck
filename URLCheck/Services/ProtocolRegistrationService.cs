@@ -17,9 +17,9 @@ internal sealed class ProtocolRegistrationService
 {
     private const string AppKeyName = "URLCheck";
     private const string CustomScheme = "urlcheck";
+    private readonly string _command;
 
     private readonly string _executablePath;
-    private readonly string _command;
 
     public ProtocolRegistrationService()
     {
@@ -60,7 +60,7 @@ internal sealed class ProtocolRegistrationService
     }
 
     /// <summary>Opens the Windows "Default apps" settings page so the user can pick URLCheck.</summary>
-    public void OpenDefaultAppsSettings()
+    public static void OpenDefaultAppsSettings()
     {
         Process.Start(new ProcessStartInfo("ms-settings:defaultapps")
         {

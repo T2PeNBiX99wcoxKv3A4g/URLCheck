@@ -11,9 +11,9 @@ internal sealed class SingleInstance : IDisposable
 {
     private const string MutexName = @"Local\URLCheck.SingleInstance";
     private const string PipeName = "URLCheck.Ipc";
+    private readonly CancellationTokenSource _cts = new();
 
     private readonly Mutex _mutex;
-    private readonly CancellationTokenSource _cts = new();
 
     public SingleInstance()
     {
@@ -23,8 +23,15 @@ internal sealed class SingleInstance : IDisposable
 
     public bool IsFirstInstance { get; }
 
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+        _mutex.Dispose();
+    }
+
     /// <summary>Hands the arguments to the already-running instance. Returns false on failure.</summary>
-    public async Task<bool> ForwardAsync(IReadOnlyList<string> args)
+    public static async Task<bool> ForwardAsync(IReadOnlyList<string> args)
     {
         try
         {
@@ -83,12 +90,5 @@ internal sealed class SingleInstance : IDisposable
                 }
             }
         }
-    }
-
-    public void Dispose()
-    {
-        _cts.Cancel();
-        _cts.Dispose();
-        _mutex.Dispose();
     }
 }

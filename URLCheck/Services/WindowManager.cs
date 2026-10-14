@@ -13,10 +13,10 @@ internal sealed class WindowManager
 {
     private readonly string _appUrl;
     private readonly NativeBridge _bridge;
+    private bool _allowClose;
 
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
-    private bool _allowClose;
 
     public WindowManager(string appUrl, SettingsService settings, ProtocolRegistrationService protocols)
     {
@@ -68,7 +68,10 @@ internal sealed class WindowManager
         Invoke(_mainWindow, ShowHandle);
 
         if (tab is { Length: > 0 })
-            _mainWindow?.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new { tab }));
+            _mainWindow?.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new
+            {
+                tab
+            }));
     }
 
     /// <summary>Opens a popup for <paramref name="url"/>, or navigates the existing popup to it.</summary>
@@ -83,7 +86,10 @@ internal sealed class WindowManager
             {
                 try
                 {
-                    _popupWindow.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate", new { url }));
+                    _popupWindow.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate", new
+                    {
+                        url
+                    }));
                     ShowHandle(_popupWindow);
                     return;
                 }
@@ -126,14 +132,14 @@ internal sealed class WindowManager
     }
 
     /// <summary>Lets the OS move a borderless window when the user drags its header.</summary>
-    public void StartDrag(PhotinoWindow? window) => Invoke(window, target =>
+    public static void StartDrag(PhotinoWindow? window) => Invoke(window, target =>
     {
         var handle = target.WindowHandle;
         if (handle == IntPtr.Zero)
             return;
 
         NativeMethods.ReleaseCapture();
-        NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, (IntPtr)NativeMethods.HtCaption, IntPtr.Zero);
+        NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, NativeMethods.HtCaption, IntPtr.Zero);
     });
 
     public void CloseWindow(PhotinoWindow? window)

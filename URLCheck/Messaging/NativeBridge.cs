@@ -75,7 +75,10 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
 
             case "browsers.detect":
                 Send(window, NativeResponse.Success(request.Id, "browsers.detect.result",
-                    new { Browsers = BrowserService.DetectInstalledBrowsers() }));
+                    new
+                    {
+                        Browsers = BrowserService.DetectInstalledBrowsers()
+                    }));
                 break;
 
             case "popup.show":
@@ -88,7 +91,10 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
                 }
 
                 windows.ShowPopup(payload.Url);
-                Send(window, NativeResponse.Success(request.Id, "popup.show.result", new { Ok = true }));
+                Send(window, NativeResponse.Success(request.Id, "popup.show.result", new
+                {
+                    Ok = true
+                }));
                 break;
             }
 
@@ -111,7 +117,11 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
 
                 BrowserService.Launch(browser.ExecutablePath, payload.Url);
                 Send(window, NativeResponse.Success(request.Id, "popup.open.result",
-                    new { Ok = true, Browser = browser.Name }));
+                    new
+                    {
+                        Ok = true,
+                        Browser = browser.Name
+                    }));
                 break;
             }
 
@@ -120,24 +130,32 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
                 break;
 
             case "window.drag":
-                windows.StartDrag(window);
+                WindowManager.StartDrag(window);
                 break;
 
             case "app.registerProtocols":
                 protocols.Register();
-                Send(window, NativeResponse.Success(request.Id, "app.registerProtocols.result",
-                    new { Ok = true, ExecutablePath = protocols.ExecutablePath }));
+                Send(window, NativeResponse.Success(request.Id, "app.registerProtocols.result", new
+                {
+                    Ok = true,
+                    protocols.ExecutablePath
+                }));
                 break;
 
             case "app.openDefaultApps":
-                protocols.OpenDefaultAppsSettings();
-                Send(window, NativeResponse.Success(request.Id, "app.openDefaultApps.result", new { Ok = true }));
+                ProtocolRegistrationService.OpenDefaultAppsSettings();
+                Send(window, NativeResponse.Success(request.Id, "app.openDefaultApps.result", new
+                {
+                    Ok = true
+                }));
                 break;
 
             default:
                 Log.Debug("No handler registered for message type {Type}", request.Type);
                 if (request.Id is { Length: > 0 })
-                    Send(window, NativeResponse.Failure(request.Id, $"{request.Type}.result", $"Unsupported message type '{request.Type}'."));
+                    Send(window,
+                        NativeResponse.Failure(request.Id, $"{request.Type}.result",
+                            $"Unsupported message type '{request.Type}'."));
                 break;
         }
     }
