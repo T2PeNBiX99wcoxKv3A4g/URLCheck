@@ -1,6 +1,7 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import styled from "styled-components";
 import {TabType} from "./types";
+import {Native} from "./Native";
 import {Sidebar} from "./components/Sidebar";
 import {Header} from "./components/Header";
 import {SingleCheckPage} from "./pages/SingleCheckPage";
@@ -34,6 +35,16 @@ const ContentArea = styled.main`
 
 export default function App() {
     const [currentTab, setCurrentTab] = useState<TabType>("single");
+
+    // The tray menu can request a specific tab (e.g. "Settings").
+    useEffect(() => {
+        return Native.on((message) => {
+            const event = message as { type?: string; data?: { tab?: TabType } };
+            if (event.type === "app.navigate" && event.data?.tab) {
+                setCurrentTab(event.data.tab);
+            }
+        });
+    }, []);
 
     return (
         <AppContainer>

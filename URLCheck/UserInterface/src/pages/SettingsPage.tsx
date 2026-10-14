@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {AlertTriangleIcon, CheckCircleIcon} from "../components/Icons";
-import {AppSettings} from "../types";
+import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
+import {AppSettings, BrowserEntry} from "../types";
 import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
+import {detectBrowsers} from "../api/browsers";
+import {openDefaultAppsSettings, registerProtocols} from "../api/system";
 
 const PageContainer = styled.div`
   display: flex;
@@ -250,6 +252,95 @@ const FileInfo = styled.div`
   }
 `;
 
+const BrowserList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const BrowserRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const BrowserInput = styled.input`
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.75);
+  color: #f9fafb;
+  font-size: 0.82rem;
+  outline: none;
+
+  &:focus {
+    border-color: #3b82f6;
+  }
+
+  &.name {
+    width: 150px;
+    flex-shrink: 0;
+  }
+
+  &.path {
+    flex: 1;
+    font-family: monospace;
+  }
+`;
+
+const GhostButton = styled.button`
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #d1d5db;
+  font-weight: 500;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+    color: #f9fafb;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+`;
+
+const IconOnlyButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  border-radius: 6px;
+  flex-shrink: 0;
+
+  &:hover {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.12);
+  }
+`;
+
+const ButtonRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+`;
+
+const InfoText = styled.span`
+  font-size: 0.78rem;
+  color: #9ca3af;
+`;
+
 export const SettingsPage: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [settingsFilePath, setSettingsFilePath] = useState("");
@@ -257,6 +348,9 @@ export const SettingsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [detecting, setDetecting] = useState(false);
+  const [integrationBusy, setIntegrationBusy] = useState(false);
+  const [integrationMessage, setIntegrationMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -334,6 +428,68 @@ export const SettingsPage: React.FC = () => {
   };
 
   const busy = loading || saving;
+
+  const updateBrowser = (id: string, patch: Partial<BrowserEntry>) => {
+    setSettings((prev) => ({
+      ...prev,
+      browsers: prev.browsers.map((browser) => (browser.id === id ? {...browser, ...patch} : browser)),
+    }));
+  };
+
+  const addBrowser = () => {
+    const id = Math.random().toString(36).slice(2, 10);
+    setSettings((prev) => ({
+      ...prev,
+      browsers: [...prev.browsers, {id, name: "", executablePath: ""}],
+    }));
+  };
+
+  const removeBrowser = (id: string) => {
+    setSettings((prev) => ({...prev, browsers: prev.browsers.filter((browser) => browser.id !== id)}));
+  };
+
+  const handleDetectBrowsers = async () => {
+    setDetecting(true);
+    setError(null);
+    try {
+      const detected = await detectBrowsers();
+      setSettings((prev) => {
+        const existing = new Set(prev.browsers.map((browser) => browser.executablePath.toLowerCase()));
+        const additions = detected.filter((browser) => !existing.has(browser.executablePath.toLowerCase()));
+        return {...prev, browsers: [...prev.browsers, ...additions]};
+      });
+      if (detected.length === 0) setIntegrationMessage("No installed browsers were detected.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setDetecting(false);
+    }
+  };
+
+  const handleRegisterProtocols = async () => {
+    setIntegrationBusy(true);
+    setIntegrationMessage(null);
+    try {
+      const result = await registerProtocols();
+      setIntegrationMessage(`Registered. Executable: ${result.executablePath}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIntegrationBusy(false);
+    }
+  };
+
+  const handleOpenDefaultApps = async () => {
+    setIntegrationBusy(true);
+    try {
+      await openDefaultAppsSettings();
+      setIntegrationMessage("Opened Windows Default apps. Select URLCheck for http/https.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIntegrationBusy(false);
+    }
+  };
 
   return (
       <PageContainer>
@@ -441,6 +597,76 @@ export const SettingsPage: React.FC = () => {
               <span>{settings.maxConcurrency} reqs</span>
             </StyledRange>
           </SettingRow>
+        </Card>
+
+        <Card>
+          <SectionTitle>Browsers</SectionTitle>
+
+          <SettingInfo>
+            <SettingDescription>
+              The first browser is used by the popup's main "Open" button; the dropdown lists the rest.
+            </SettingDescription>
+          </SettingInfo>
+
+          <BrowserList>
+            {settings.browsers.map((browser) => (
+                <BrowserRow key={browser.id}>
+                  <BrowserInput
+                      className="name"
+                      placeholder="Name"
+                      disabled={busy}
+                      value={browser.name}
+                      onChange={(e) => updateBrowser(browser.id, {name: e.target.value})}
+                  />
+                  <BrowserInput
+                      className="path"
+                      placeholder="C:\\Path\\To\\browser.exe"
+                      disabled={busy}
+                      value={browser.executablePath}
+                      onChange={(e) => updateBrowser(browser.id, {executablePath: e.target.value})}
+                  />
+                  <IconOnlyButton
+                      type="button"
+                      title="Remove browser"
+                      onClick={() => removeBrowser(browser.id)}
+                  >
+                    <TrashIcon size={16}/>
+                  </IconOnlyButton>
+                </BrowserRow>
+            ))}
+          </BrowserList>
+
+          <ButtonRow>
+            <GhostButton type="button" onClick={addBrowser} disabled={busy}>
+              Add browser
+            </GhostButton>
+            <GhostButton type="button" onClick={handleDetectBrowsers} disabled={busy || detecting}>
+              {detecting ? "Detecting..." : "Detect installed"}
+            </GhostButton>
+          </ButtonRow>
+        </Card>
+
+        <Card>
+          <SectionTitle>System Integration</SectionTitle>
+
+          <SettingInfo>
+            <SettingDescription>
+              Register URLCheck as a candidate browser for http/https and as the urlcheck:// handler. Windows still
+              requires you to confirm URLCheck in Default apps.
+            </SettingDescription>
+          </SettingInfo>
+
+          <ButtonRow>
+            <GhostButton type="button" onClick={handleRegisterProtocols} disabled={integrationBusy}>
+              <LinkIcon size={15}/>
+              Register protocol handlers
+            </GhostButton>
+            <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
+              Open Default apps
+            </GhostButton>
+          </ButtonRow>
+
+          {integrationMessage && <InfoText>{integrationMessage}</InfoText>}
         </Card>
 
         <ActionRow>

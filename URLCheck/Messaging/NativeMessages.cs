@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using URLCheck.Models;
 
 namespace URLCheck.Messaging;
@@ -47,3 +48,24 @@ internal sealed class NativeEvent
 
 /// <summary>Body returned for every settings message.</summary>
 internal sealed record SettingsPayload(AppSettings Settings, string SettingsFilePath);
+
+/// <summary>Payload for <c>popup.show</c>.</summary>
+internal sealed record PopupShowRequest(string Url);
+
+/// <summary>Payload for <c>popup.open</c>.</summary>
+internal sealed record PopupOpenRequest(string Url, string? BrowserId);
+
+/// <summary>Shared JSON options and serialization helpers for the native bridge.</summary>
+internal static class NativeProtocol
+{
+    public static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    };
+
+    public static string SerializeResponse(NativeResponse response) =>
+        JsonSerializer.Serialize(response, SerializerOptions);
+
+    public static string SerializeEvent(string type, object? data = null) =>
+        JsonSerializer.Serialize(new NativeEvent { Type = type, Data = data }, SerializerOptions);
+}

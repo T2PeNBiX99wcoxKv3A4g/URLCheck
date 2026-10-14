@@ -1,20 +1,13 @@
 import React, {useState} from "react";
 import styled from "styled-components";
-import {UrlCheckResult} from "../types";
-import {
-    AlertTriangleIcon,
-    CheckCircleIcon,
-    CopyIcon,
-    SearchIcon,
-    ShieldCheckIcon,
-    XCircleIcon,
-} from "../components/Icons";
-import {Native} from "../Native";
+import {showPopup} from "../api/system";
+import {LinkIcon, SearchIcon, ShieldCheckIcon} from "../components/Icons";
 
 const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 24px;
+    max-width: 820px;
 `;
 
 const Card = styled.div`
@@ -24,18 +17,29 @@ const Card = styled.div`
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-`;
-
-const InputSection = styled(Card)`
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
+`;
+
+const Title = styled.h3`
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #f9fafb;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`;
+
+const Description = styled.p`
+    font-size: 0.85rem;
+    color: #9ca3af;
+    line-height: 1.6;
 `;
 
 const InputForm = styled.form`
     display: flex;
     gap: 12px;
-    width: 100%;
 `;
 
 const InputWrapper = styled.div`
@@ -91,17 +95,18 @@ const PrimaryButton = styled.button`
     transition: all 0.2s ease;
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 
-    &:hover {
+    &:hover:not(:disabled) {
         background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
-        box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
     }
 
-    &:active {
-        transform: translateY(1px);
+    &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        box-shadow: none;
     }
 `;
 
-const PresetsContainer = styled.div`
+const Presets = styled.div`
     display: flex;
     align-items: center;
     gap: 8px;
@@ -131,341 +136,61 @@ const PresetChip = styled.button`
     }
 `;
 
-const StatusBanner = styled.div<{ $status: string }>`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-radius: 8px;
-    background: ${(props) =>
-            props.$status === "valid"
-                    ? "rgba(16, 185, 129, 0.12)"
-                    : props.$status === "warning"
-                            ? "rgba(245, 158, 11, 0.12)"
-                            : "rgba(239, 68, 68, 0.12)"};
-    border: 1px solid ${(props) =>
-            props.$status === "valid"
-                    ? "rgba(16, 185, 129, 0.3)"
-                    : props.$status === "warning"
-                            ? "rgba(245, 158, 11, 0.3)"
-                            : "rgba(239, 68, 68, 0.3)"};
-    color: ${(props) =>
-            props.$status === "valid"
-                    ? "#34d399"
-                    : props.$status === "warning"
-                            ? "#fbbf24"
-                            : "#f87171"};
-`;
-
-const StatusLeft = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 600;
-`;
-
-const StatusMeta = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    font-size: 0.85rem;
-`;
-
-const MetaBadge = styled.span`
-    background: rgba(255, 255, 255, 0.08);
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: 500;
-    color: #e2e8f0;
-`;
-
-const Grid = styled.div`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-
-    @media (max-width: 860px) {
-        grid-template-columns: 1fr;
-    }
-`;
-
-const DetailItem = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 12px;
-    background: rgba(15, 23, 42, 0.6);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-`;
-
-const DetailLabel = styled.span`
-    font-size: 0.75rem;
-    color: #9ca3af;
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-`;
-
-const DetailValue = styled.span`
-    font-size: 0.95rem;
-    color: #f9fafb;
-    font-family: monospace;
-    word-break: break-all;
-`;
-
-const CardTitle = styled.h3`
-    font-size: 1rem;
-    font-weight: 600;
-    color: #f9fafb;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-`;
-
-const ParamsTable = styled.table`
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-
-    th {
-        text-align: left;
-        padding: 8px 12px;
-        background: rgba(15, 23, 42, 0.7);
-        color: #9ca3af;
-        font-weight: 600;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    td {
-        padding: 10px 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        color: #e2e8f0;
-        font-family: monospace;
-    }
-
-    tr:last-child td {
-        border-bottom: none;
-    }
-`;
-
-const EmptyState = styled.div`
-    text-align: center;
-    padding: 32px;
-    color: #6b7280;
-    font-size: 0.85rem;
-`;
-
-const CopyBtn = styled.button`
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #9ca3af;
-    display: inline-flex;
-    align-items: center;
-    margin-left: 8px;
-    padding: 2px;
-    border-radius: 4px;
-
-    &:hover {
-        color: #60a5fa;
-        background: rgba(255, 255, 255, 0.06);
-    }
-`;
+const SAMPLE_URL = "https://www.google.com/search?q=photino+net&hl=en&utm_source=test";
 
 export const SingleCheckPage: React.FC = () => {
-    const [inputUrl, setInputUrl] = useState(
-        "https://api.github.com/repos/tryphotino/photino.NET/releases?page=1&per_page=10#latest"
-    );
-    const [copied, setCopied] = useState(false);
+    const [url, setUrl] = useState(SAMPLE_URL);
+    const [busy, setBusy] = useState(false);
 
-    const parseUrl = (urlString: string): UrlCheckResult => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const target = url.trim();
+        if (!target) return;
+
+        setBusy(true);
         try {
-            const parsed = new URL(urlString);
-            const searchParams: { key: string; value: string }[] = [];
-            parsed.searchParams.forEach((value, key) => {
-                searchParams.push({key, value});
-            });
-
-            return {
-                url: urlString,
-                protocol: parsed.protocol,
-                hostname: parsed.hostname,
-                port: parsed.port || (parsed.protocol === "https:" ? "443" : "80"),
-                pathname: parsed.pathname,
-                searchParams,
-                hash: parsed.hash || "(none)",
-                status: "valid",
-                statusCode: 200,
-                statusText: "OK",
-                responseTimeMs: 42,
-                checkedAt: new Date().toLocaleTimeString(),
-            };
-        } catch {
-            return {
-                url: urlString,
-                protocol: "invalid",
-                hostname: "invalid",
-                port: "none",
-                pathname: "",
-                searchParams: [],
-                hash: "",
-                status: "invalid",
-                statusCode: 400,
-                statusText: "Invalid URL Format",
-                responseTimeMs: 0,
-                checkedAt: new Date().toLocaleTimeString(),
-            };
+            await showPopup(target);
+        } finally {
+            setBusy(false);
         }
     };
 
-    const [result, setResult] = useState<UrlCheckResult>(parseUrl(inputUrl));
-
-    const handleInspect = (e?: React.SubmitEvent) => {
-        if (e) e.preventDefault();
-        setResult(parseUrl(inputUrl));
-        Native.send({
-            type: "inspect",
-            url: inputUrl,
-        })
-    };
-
-    const handleCopy = (text: string) => {
-        navigator.clipboard?.writeText(text).catch(console.error);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
-
-    const sampleUrls = [
-        "https://api.github.com/users/photino",
-        "https://www.google.com/search?q=photino+net&hl=en",
-        "http://localhost:5000/api/health",
-    ];
-
     return (
         <PageContainer>
-            <InputSection>
-                <InputForm onSubmit={handleInspect}>
+            <Card>
+                <Title>
+                    <LinkIcon size={18}/>
+                    <span>Open a URL</span>
+                </Title>
+                <Description>
+                    Simulate clicking a link. URLCheck intercepts the URL, opens the inspection popup, and lets you
+                    strip query parameters before opening it in a browser.
+                </Description>
+
+                <InputForm onSubmit={handleSubmit}>
                     <InputWrapper>
                         <SearchIcon size={20}/>
                         <StyledInput
                             type="text"
-                            placeholder="Enter URL to inspect (e.g. https://example.com/path?key=val)"
-                            value={inputUrl}
-                            onChange={(e) => setInputUrl(e.target.value)}
+                            placeholder="https://example.com/path?key=value"
+                            value={url}
+                            onChange={(e) => setUrl(e.target.value)}
                         />
                     </InputWrapper>
-                    <PrimaryButton type="submit">
+                    <PrimaryButton type="submit" disabled={busy}>
                         <ShieldCheckIcon size={18}/>
-                        <span>Inspect URL</span>
+                        <span>Open</span>
                     </PrimaryButton>
                 </InputForm>
 
-                <PresetsContainer>
-                    <PresetLabel>Sample URLs:</PresetLabel>
-                    {sampleUrls.map((u) => (
-                        <PresetChip
-                            key={u}
-                            type="button"
-                            onClick={() => {
-                                setInputUrl(u);
-                                setResult(parseUrl(u));
-                            }}
-                        >
-                            {u}
-                        </PresetChip>
-                    ))}
-                </PresetsContainer>
-            </InputSection>
-
-            <StatusBanner $status={result.status}>
-                <StatusLeft>
-                    {result.status === "valid" ? (
-                        <CheckCircleIcon size={22}/>
-                    ) : result.status === "warning" ? (
-                        <AlertTriangleIcon size={22}/>
-                    ) : (
-                        <XCircleIcon size={22}/>
-                    )}
-                    <span>
-            {result.status === "valid"
-                ? "Valid URL structure and reachable"
-                : result.status === "warning"
-                    ? "URL warning detected"
-                    : "Invalid URL format or unreachable"}
-          </span>
-                </StatusLeft>
-                <StatusMeta>
-                    <MetaBadge>Status: {result.statusCode} {result.statusText}</MetaBadge>
-                    <MetaBadge>Latency: {result.responseTimeMs} ms</MetaBadge>
-                    <MetaBadge>Checked At: {result.checkedAt}</MetaBadge>
-                </StatusMeta>
-            </StatusBanner>
-
-            <Grid>
-                <Card>
-                    <CardTitle>
-                        <ShieldCheckIcon size={18}/>
-                        <span>Structure Details</span>
-                        <CopyBtn onClick={() => handleCopy(result.url)} title="Copy full URL">
-                            <CopyIcon size={16}/>
-                            {copied && <span style={{fontSize: "0.7rem", marginLeft: 4}}>Copied!</span>}
-                        </CopyBtn>
-                    </CardTitle>
-                    <div style={{display: "flex", flexDirection: "column", gap: 12}}>
-                        <DetailItem>
-                            <DetailLabel>Protocol</DetailLabel>
-                            <DetailValue>{result.protocol}</DetailValue>
-                        </DetailItem>
-                        <DetailItem>
-                            <DetailLabel>Hostname</DetailLabel>
-                            <DetailValue>{result.hostname}</DetailValue>
-                        </DetailItem>
-                        <DetailItem>
-                            <DetailLabel>Port</DetailLabel>
-                            <DetailValue>{result.port}</DetailValue>
-                        </DetailItem>
-                        <DetailItem>
-                            <DetailLabel>Pathname</DetailLabel>
-                            <DetailValue>{result.pathname || "/"}</DetailValue>
-                        </DetailItem>
-                        <DetailItem>
-                            <DetailLabel>Hash (Anchor)</DetailLabel>
-                            <DetailValue>{result.hash}</DetailValue>
-                        </DetailItem>
-                    </div>
-                </Card>
-
-                <Card>
-                    <CardTitle>
-                        <span>Query Parameters</span>
-                        <MetaBadge style={{marginLeft: "auto"}}>
-                            {result.searchParams.length} parameters
-                        </MetaBadge>
-                    </CardTitle>
-                    {result.searchParams.length > 0 ? (
-                        <ParamsTable>
-                            <thead>
-                            <tr>
-                                <th>Parameter Key</th>
-                                <th>Parameter Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {result.searchParams.map((param, index) => (
-                                <tr key={index}>
-                                    <td style={{color: "#2563eb", fontWeight: 600}}>{param.key}</td>
-                                    <td>{param.value}</td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </ParamsTable>
-                    ) : (
-                        <EmptyState>No query parameters found in this URL</EmptyState>
-                    )}
-                </Card>
-            </Grid>
+                <Presets>
+                    <PresetLabel>Sample URL:</PresetLabel>
+                    <PresetChip type="button" onClick={() => setUrl(SAMPLE_URL)}>
+                        {SAMPLE_URL}
+                    </PresetChip>
+                </Presets>
+            </Card>
         </PageContainer>
     );
 };

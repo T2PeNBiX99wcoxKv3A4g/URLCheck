@@ -30,6 +30,9 @@ internal sealed class AppSettings
     /// <summary>Maximum number of requests executed simultaneously.</summary>
     public int MaxConcurrency { get; set; } = 5;
 
+    /// <summary>Browsers offered in the popup. The first entry is used as the default.</summary>
+    public List<BrowserEntry> Browsers { get; set; } = new();
+
     public AppSettings Clone() => (AppSettings)MemberwiseClone();
 
     /// <summary>Clamps values into their supported ranges so invalid input can never be persisted.</summary>
@@ -40,5 +43,17 @@ internal sealed class AppSettings
 
         if (string.IsNullOrWhiteSpace(UserAgent))
             UserAgent = "default";
+
+        if (Browsers is null)
+            Browsers = new List<BrowserEntry>();
+
+        foreach (var browser in Browsers)
+        {
+            if (string.IsNullOrWhiteSpace(browser.Id))
+                browser.Id = Guid.NewGuid().ToString("N");
+
+            if (string.IsNullOrWhiteSpace(browser.Name))
+                browser.Name = Path.GetFileNameWithoutExtension(browser.ExecutablePath);
+        }
     }
 }

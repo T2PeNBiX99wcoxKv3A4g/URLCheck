@@ -38,4 +38,11 @@ export interface AppSettings {
     verifySsl: boolean;
     userAgent: string;
     maxConcurrency: number;
+    browsers: BrowserEntry[];
+}
+
+export interface BrowserEntry {
+    id: string;
+    name: string;
+    executablePath: string;
 }

@@ -7,6 +7,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     verifySsl: true,
     userAgent: "default",
     maxConcurrency: 5,
+    browsers: [],
 };
 
 export interface SettingsPayload {
@@ -26,6 +27,7 @@ function normalize(settings: AppSettings): AppSettings {
         requestTimeoutMs: clamp(settings.requestTimeoutMs, 1000, 15000),
         maxConcurrency: clamp(settings.maxConcurrency, 1, 20),
         userAgent: settings.userAgent || DEFAULT_SETTINGS.userAgent,
+        browsers: Array.isArray(settings.browsers) ? settings.browsers : [],
     };
 }
 
