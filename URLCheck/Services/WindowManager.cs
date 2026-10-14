@@ -61,24 +61,20 @@ internal sealed class WindowManager
     /// <summary>Starts the message loop; blocks until the host window is closed for real.</summary>
     public void Run() => _mainWindow?.WaitForClose();
 
-    public void HideMainWindow() => Invoke(_mainWindow, window => HideHandle(window));
+    public void HideMainWindow() => Invoke(_mainWindow, HideHandle);
 
     public void ShowMainWindow(string? tab = null)
     {
-        var window = _mainWindow;
-        if (window is null)
-            return;
+        Invoke(_mainWindow, ShowHandle);
 
-        window.Invoke(() => ShowHandle(window));
-
-        if (!string.IsNullOrEmpty(tab))
-            window.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new { tab }));
+        if (tab is { Length: > 0 })
+            _mainWindow?.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new { tab }));
     }
 
     /// <summary>Opens a popup for <paramref name="url"/>, or navigates the existing popup to it.</summary>
     public void ShowPopup(string url)
     {
-        if (_mainWindow is null || string.IsNullOrWhiteSpace(url))
+        if (string.IsNullOrWhiteSpace(url))
             return;
 
         Invoke(_mainWindow, main =>
@@ -171,9 +167,6 @@ internal sealed class WindowManager
 
     public void Exit()
     {
-        if (_mainWindow is null)
-            return;
-
         _allowClose = true;
         CloseWindow(_mainWindow);
     }

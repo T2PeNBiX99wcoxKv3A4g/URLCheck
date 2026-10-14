@@ -30,7 +30,7 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
             return;
         }
 
-        if (string.IsNullOrEmpty(request?.Type))
+        if (request?.Type is null or "")
             return;
 
         try
@@ -81,7 +81,7 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
             case "popup.show":
             {
                 var payload = request.Payload?.Deserialize<PopupShowRequest>(NativeProtocol.SerializerOptions);
-                if (payload is null || string.IsNullOrWhiteSpace(payload.Url))
+                if (string.IsNullOrWhiteSpace(payload?.Url))
                 {
                     Send(window, NativeResponse.Failure(request.Id, "popup.show.result", "Missing URL."));
                     return;
@@ -95,7 +95,7 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
             case "popup.open":
             {
                 var payload = request.Payload?.Deserialize<PopupOpenRequest>(NativeProtocol.SerializerOptions);
-                if (payload is null || string.IsNullOrWhiteSpace(payload.Url))
+                if (string.IsNullOrWhiteSpace(payload?.Url))
                 {
                     Send(window, NativeResponse.Failure(request.Id, "popup.open.result", "Missing URL."));
                     return;
@@ -136,7 +136,7 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
 
             default:
                 Log.Debug("No handler registered for message type {Type}", request.Type);
-                if (!string.IsNullOrEmpty(request.Id))
+                if (request.Id is { Length: > 0 })
                     Send(window, NativeResponse.Failure(request.Id, $"{request.Type}.result", $"Unsupported message type '{request.Type}'."));
                 break;
         }
