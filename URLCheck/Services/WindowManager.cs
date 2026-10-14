@@ -70,9 +70,14 @@ internal sealed class WindowManager
                 if (string.IsNullOrWhiteSpace(payload?.Url))
                     return context.Fail("popup.open.result", "Missing URL.");
 
-                var browser = ResolveBrowser(await _settings.GetAsync(), payload.BrowserId);
+                var settings = await _settings.GetAsync();
+                var browser = ResolveBrowser(settings, payload.BrowserId);
                 if (browser is null)
                     return context.Fail("popup.open.result", "No browser configured. Add one in Settings.");
+
+                // Track usage so the most-used browser becomes the default entry.
+                browser.UseCount++;
+                await _settings.SaveAsync(settings);
 
                 BrowserService.Launch(browser, payload.Url, payload.Private);
                 return context.Reply("popup.open.result", new

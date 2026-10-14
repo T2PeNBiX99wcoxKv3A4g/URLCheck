@@ -12,6 +12,7 @@ import ShieldCheckSvg from "./icons/shield-check.svg?react";
 import LockSvg from "./icons/lock.svg?react";
 import CopySvg from "./icons/copy.svg?react";
 import RedirectSvg from "./icons/redirect.svg?react";
+import PlusSvg from "./icons/plus.svg?react";
 import TrashSvg from "./icons/trash.svg?react";
 import PlaySvg from "./icons/play.svg?react";
 
@@ -41,5 +42,6 @@ export const ShieldCheckIcon = sized(ShieldCheckSvg);
 export const LockIcon = sized(LockSvg);
 export const CopyIcon = sized(CopySvg);
 export const RedirectIcon = sized(RedirectSvg);
+export const PlusIcon = sized(PlusSvg);
 export const TrashIcon = sized(TrashSvg);
 export const PlayIcon = sized(PlaySvg);

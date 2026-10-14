@@ -44,6 +44,7 @@ internal sealed class ProtocolRegistrationService
         {
             "app.registerProtocols" => RegisterBrowserReply(context),
             "app.registerCustomScheme" => RegisterCustomSchemeReply(context),
+            "app.unregisterProtocols" => UnregisterReply(context),
             "app.protocolStatus" => StatusReply(context),
             "app.openDefaultApps" => OpenDefaultAppsReply(context),
             _ => null
@@ -84,6 +85,21 @@ internal sealed class ProtocolRegistrationService
         EnsureExecutable();
         RegisterProgId(CustomScheme, "URL:URLCheck Protocol");
     }
+
+    /// <summary>Removes every registry key this app created, so nothing is left behind after uninstalling.</summary>
+    public static void Unregister()
+    {
+        DeleteKey($@"Software\Classes\{HttpProgId}");
+        DeleteKey($@"Software\Classes\{HttpsProgId}");
+        DeleteKey($@"Software\Classes\{CustomScheme}");
+        DeleteKey($@"Software\Clients\StartMenuInternet\{AppKeyName}");
+
+        using var registered = Registry.CurrentUser.OpenSubKey(@"Software\RegisteredApplications", true);
+        registered?.DeleteValue(AppKeyName, false);
+    }
+
+    private static void DeleteKey(string path) =>
+        Registry.CurrentUser.DeleteSubKeyTree(path, false);
 
     /// <summary>Opens the Windows "Default apps" settings page so the user can pick URLCheck.</summary>
     public static void OpenDefaultAppsSettings()
@@ -146,6 +162,12 @@ internal sealed class ProtocolRegistrationService
             Ok = true,
             ExecutablePath
         });
+    }
+
+    private static NativeResponse UnregisterReply(NativeContext context)
+    {
+        Unregister();
+        return context.Reply("app.unregisterProtocols.result", new { Ok = true });
     }
 
     private static NativeResponse StatusReply(NativeContext context) =>

@@ -14,4 +14,7 @@ internal sealed class BrowserEntry
 
     /// <summary>Extra command-line arguments appended after the URL when launching this browser.</summary>
     public string Arguments { get; set; } = string.Empty;
+
+    /// <summary>How often this browser was opened with; the most-used one becomes the default.</summary>
+    public int UseCount { get; set; }
 }

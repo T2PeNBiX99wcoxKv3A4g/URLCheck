@@ -6,7 +6,7 @@ import {AppSettings, BrowserEntry, UserAgentEntry} from "../types";
 import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
-import {openDefaultAppsSettings, protocolStatus, registerCustomScheme, registerProtocols, type ProtocolStatus} from "../api/system";
+import {openDefaultAppsSettings, protocolStatus, registerCustomScheme, registerProtocols, unregisterProtocols, type ProtocolStatus} from "../api/system";
 
 const SettingRow = styled.div`
   display: flex;
@@ -199,6 +199,7 @@ const GhostButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
   &:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.12);
@@ -208,6 +209,17 @@ const GhostButton = styled.button`
   &:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+  }
+`;
+
+const DangerGhostButton = styled(GhostButton)`
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.24);
+    color: #fca5a5;
   }
 `;
 
@@ -344,7 +356,7 @@ export const SettingsPage: React.FC = () => {
     const id = Math.random().toString(36).slice(2, 10);
     setSettings((prev) => ({
       ...prev,
-      browsers: [...prev.browsers, {id, name: "", executablePath: "", arguments: ""}],
+      browsers: [...prev.browsers, {id, name: "", executablePath: "", arguments: "", useCount: 0}],
     }));
   };
 
@@ -406,6 +418,20 @@ export const SettingsPage: React.FC = () => {
     try {
       const result = await registerCustomScheme();
       setIntegrationMessage(`Registered urlcheck://. Executable: ${result.executablePath}`);
+      setProtocols(await protocolStatus());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIntegrationBusy(false);
+    }
+  };
+
+  const handleUnregisterProtocols = async () => {
+    setIntegrationBusy(true);
+    setIntegrationMessage(null);
+    try {
+      await unregisterProtocols();
+      setIntegrationMessage("Removed every URLCheck registry entry.");
       setProtocols(await protocolStatus());
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -580,6 +606,10 @@ export const SettingsPage: React.FC = () => {
             <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
               Open Default apps
             </GhostButton>
+            <DangerGhostButton type="button" onClick={handleUnregisterProtocols} disabled={integrationBusy}>
+              <TrashIcon size={15}/>
+              Unregister
+            </DangerGhostButton>
           </ButtonRow>
 
           {protocols && (

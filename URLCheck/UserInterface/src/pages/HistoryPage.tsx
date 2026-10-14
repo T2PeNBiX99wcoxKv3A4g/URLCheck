@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {HistoryItem} from "../types";
-import {AlertTriangleIcon, CopyIcon, SearchIcon, TrashIcon} from "../components/Icons";
+import {AlertTriangleIcon, SearchIcon, TrashIcon} from "../components/Icons";
 import {Card, PageContainer} from "../components/Layout";
 import {clearHistory, listHistory} from "../api/history";
+import {showPopup} from "../api/system";
 
 const ControlsCard = styled(Card)`
     display: flex;
@@ -114,22 +115,25 @@ const Table = styled.table`
 `;
 
 const UrlCell = styled.td`
-    font-family: monospace;
     word-break: break-all;
 `;
 
-const CopyButton = styled.button`
+const UrlLink = styled.button`
     background: none;
     border: none;
-    color: #6b7280;
+    padding: 0;
+    font: inherit;
+    font-family: monospace;
+    color: #60a5fa;
+    text-align: left;
+    word-break: break-all;
     cursor: pointer;
-    padding: 2px 4px;
-    border-radius: 4px;
-    vertical-align: middle;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s ease;
 
     &:hover {
-        color: #60a5fa;
-        background: rgba(255, 255, 255, 0.06);
+        color: #93c5fd;
     }
 `;
 
@@ -176,6 +180,15 @@ export const HistoryPage: React.FC = () => {
     }, []);
 
     const filteredHistory = history.filter((item) => item.url.toLowerCase().includes(keyword.toLowerCase()));
+
+    const handleOpen = async (target: string) => {
+        setError(null);
+        try {
+            await showPopup(target);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : String(err));
+        }
+    };
 
     const handleClearHistory = async () => {
         setError(null);
@@ -229,13 +242,12 @@ export const HistoryPage: React.FC = () => {
                                     {formatTimestamp(item.timestamp)}
                                 </td>
                                 <UrlCell>
-                                    {item.url}
-                                    <CopyButton
-                                        title="Copy URL"
-                                        onClick={() => navigator.clipboard?.writeText(item.url).catch(console.error)}
+                                    <UrlLink
+                                        onClick={() => handleOpen(item.url)}
+                                        title="Open in the inspection popup"
                                     >
-                                        <CopyIcon size={14}/>
-                                    </CopyButton>
+                                        {item.url}
+                                    </UrlLink>
                                 </UrlCell>
                             </tr>
                         ))

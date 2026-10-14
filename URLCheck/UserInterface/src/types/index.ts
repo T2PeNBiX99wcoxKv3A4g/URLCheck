@@ -21,4 +21,5 @@ export interface BrowserEntry {
     name: string;
     executablePath: string;
     arguments: string;
+    useCount: number;
 }

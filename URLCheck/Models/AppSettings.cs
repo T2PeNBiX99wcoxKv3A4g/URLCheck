@@ -43,6 +43,9 @@ internal sealed class AppSettings
                 agent.Name = "Custom";
         }
 
+        // Most-used browser first, so the popup's main button follows your habits.
+        Browsers = [.. Browsers.OrderByDescending(browser => browser.UseCount)];
+
         foreach (var browser in Browsers)
         {
             if (string.IsNullOrWhiteSpace(browser.Id))

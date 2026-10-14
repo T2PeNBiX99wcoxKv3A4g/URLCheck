@@ -12,6 +12,7 @@ import {
     CheckCircleIcon,
     CopyIcon,
     LockIcon,
+    PlusIcon,
     RedirectIcon,
     ShieldCheckIcon,
     TrashIcon,
@@ -330,22 +331,61 @@ const Section = styled.div`
     background: rgba(15, 23, 42, 0.5);
 `;
 
-const SectionHeader = styled.button`
+const SectionHeader = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px 4px 10px;
+`;
+
+const SectionToggle = styled.button`
     display: flex;
     align-items: center;
     gap: 7px;
-    width: 100%;
-    padding: 6px 10px;
+    flex: 1;
+    min-width: 0;
+    padding: 2px 0;
     border: none;
     background: transparent;
     color: #9ca3af;
     font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
+    text-align: left;
     transition: color 0.15s ease;
 
     &:hover {
         color: #f9fafb;
+    }
+`;
+
+const HeaderAction = styled.button`
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 3px;
+    border: none;
+    border-radius: 5px;
+    background: none;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease;
+
+    &:hover:not(:disabled) {
+        color: #60a5fa;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+`;
+
+const ClearAction = styled(HeaderAction)`
+    &:hover:not(:disabled) {
+        color: #f87171;
+        background: rgba(239, 68, 68, 0.12);
     }
 `;
 
@@ -357,13 +397,19 @@ const Chevron = styled.span<{ $open: boolean }>`
 `;
 
 const CountBadge = styled.span`
-    margin-left: auto;
     background: rgba(255, 255, 255, 0.08);
     color: #cbd5e1;
     border-radius: 9999px;
     padding: 0 7px;
     font-size: 0.68rem;
     font-weight: 600;
+    flex-shrink: 0;
+`;
+
+const EmptyHint = styled.span`
+    padding: 6px 2px;
+    color: #6b7280;
+    font-size: 0.76rem;
 `;
 
 const SectionBody = styled.div`
@@ -721,6 +767,22 @@ export const PopupPage: React.FC = () => {
         applyEdit(next.toString());
     };
 
+    const addParam = () => {
+        if (!parsed) return;
+
+        const next = new URL(url);
+        next.searchParams.append("", "");
+        commit(next.toString());
+    };
+
+    const clearFragment = () => {
+        if (!parsed) return;
+
+        const next = new URL(url);
+        next.hash = "";
+        commit(next.toString());
+    };
+
     const useOrigin = () => {
         if (!parsed) return;
         commit(`${parsed.origin}/`);
@@ -898,11 +960,6 @@ export const PopupPage: React.FC = () => {
                         Tracking{trackingCount > 0 ? ` (${trackingCount})` : ""}
                     </ActionButton>
 
-                    <ActionButton onClick={handleClearParams} disabled={!parsed || params.length === 0}>
-                        <TrashIcon size={13}/>
-                        Params{params.length > 0 ? ` (${params.length})` : ""}
-                    </ActionButton>
-
                     {isHttp && (
                         <ActionButton $accent onClick={handleUseHttps}>
                             Use https
@@ -911,9 +968,11 @@ export const PopupPage: React.FC = () => {
                 </Actions>
 
                 <Section>
-                    <SectionHeader onClick={() => toggleSection("domain")}>
-                        <Chevron $open={open.domain}>▶</Chevron>
-                        <span>Domain</span>
+                    <SectionHeader>
+                        <SectionToggle onClick={() => toggleSection("domain")}>
+                            <Chevron $open={open.domain}>▶</Chevron>
+                            <span>Domain</span>
+                        </SectionToggle>
                     </SectionHeader>
                     {open.domain && (
                         <SectionBody>
@@ -937,64 +996,83 @@ export const PopupPage: React.FC = () => {
                     )}
                 </Section>
 
-                {params.length > 0 && (
-                    <Section>
-                        <SectionHeader onClick={() => toggleSection("parameters")}>
+                <Section>
+                    <SectionHeader>
+                        <SectionToggle onClick={() => toggleSection("parameters")}>
                             <Chevron $open={open.parameters}>▶</Chevron>
                             <span>Parameters</span>
-                            <CountBadge>{params.length}</CountBadge>
-                        </SectionHeader>
-                        {open.parameters && (
-                            <SectionBody>
-                                {params.map((param, index) => (
-                                    <Row key={index}>
-                                        <ParamInput
-                                            className="key"
-                                            title="Parameter name"
-                                            value={param.key}
-                                            onChange={(e) => updateParamAt(index, {key: e.target.value})}
-                                        />
-                                        <ParamInput
-                                            className="value"
-                                            title="Parameter value (decoded)"
-                                            placeholder="(empty)"
-                                            value={param.value}
-                                            onChange={(e) => updateParamAt(index, {value: e.target.value})}
-                                        />
-                                        <RemoveParam
-                                            title="Remove parameter"
-                                            onClick={() => handleRemoveParam(param.key, param.value)}
-                                        >
-                                            <TrashIcon size={12}/>
-                                        </RemoveParam>
-                                    </Row>
-                                ))}
-                            </SectionBody>
-                        )}
-                    </Section>
-                )}
-
-                {fragment && (
-                    <Section>
-                        <SectionHeader onClick={() => toggleSection("fragment")}>
-                            <Chevron $open={open.fragment}>▶</Chevron>
-                            <span>Fragment</span>
-                        </SectionHeader>
-                        {open.fragment && (
-                            <SectionBody>
-                                <Row>
-                                    <RowKey>#</RowKey>
+                        </SectionToggle>
+                        <CountBadge>{params.length}</CountBadge>
+                        <HeaderAction title="Add parameter" onClick={addParam} disabled={!parsed}>
+                            <PlusIcon size={14}/>
+                        </HeaderAction>
+                        <ClearAction
+                            title="Remove all parameters"
+                            onClick={handleClearParams}
+                            disabled={!parsed || params.length === 0}
+                        >
+                            <TrashIcon size={13}/>
+                        </ClearAction>
+                    </SectionHeader>
+                    {open.parameters && (
+                        <SectionBody>
+                            {params.length === 0 && <EmptyHint>No parameters</EmptyHint>}
+                            {params.map((param, index) => (
+                                <Row key={index}>
+                                    <ParamInput
+                                        className="key"
+                                        title="Parameter name"
+                                        value={param.key}
+                                        onChange={(e) => updateParamAt(index, {key: e.target.value})}
+                                    />
                                     <ParamInput
                                         className="value"
-                                        title="Fragment (decoded)"
-                                        value={fragment}
-                                        onChange={(e) => updateFragment(e.target.value)}
+                                        title="Parameter value (decoded)"
+                                        placeholder="(empty)"
+                                        value={param.value}
+                                        onChange={(e) => updateParamAt(index, {value: e.target.value})}
                                     />
+                                    <RemoveParam
+                                        title="Remove parameter"
+                                        onClick={() => handleRemoveParam(param.key, param.value)}
+                                    >
+                                        <TrashIcon size={12}/>
+                                    </RemoveParam>
                                 </Row>
-                            </SectionBody>
-                        )}
-                    </Section>
-                )}
+                            ))}
+                        </SectionBody>
+                    )}
+                </Section>
+
+                <Section>
+                    <SectionHeader>
+                        <SectionToggle onClick={() => toggleSection("fragment")}>
+                            <Chevron $open={open.fragment}>▶</Chevron>
+                            <span>Fragment</span>
+                        </SectionToggle>
+                        <ClearAction
+                            title="Remove fragment"
+                            onClick={clearFragment}
+                            disabled={!parsed || fragment.length === 0}
+                        >
+                            <TrashIcon size={13}/>
+                        </ClearAction>
+                    </SectionHeader>
+                    {open.fragment && (
+                        <SectionBody>
+                            <Row>
+                                <RowKey>#</RowKey>
+                                <ParamInput
+                                    className="value"
+                                    title="Fragment (decoded)"
+                                    placeholder="(empty)"
+                                    value={fragment}
+                                    onChange={(e) => updateFragment(e.target.value)}
+                                />
+                            </Row>
+                        </SectionBody>
+                    )}
+                </Section>
 
                 {error && (
                     <Message $tone="error">

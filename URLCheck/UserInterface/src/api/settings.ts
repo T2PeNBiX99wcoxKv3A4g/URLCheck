@@ -47,6 +47,7 @@ function normalize(settings: AppSettings): AppSettings {
         browsers: (Array.isArray(settings.browsers) ? settings.browsers : []).map((browser) => ({
             ...browser,
             arguments: browser.arguments ?? "",
+            useCount: browser.useCount ?? 0,
         })),
     };
 }

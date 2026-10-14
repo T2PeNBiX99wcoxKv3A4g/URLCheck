@@ -30,6 +30,11 @@ export async function registerCustomScheme(): Promise<{ executablePath: string }
     return await Native.request<{ executablePath: string }>("app.registerCustomScheme");
 }
 
+/** Removes every registry entry URLCheck created (for a clean uninstall). */
+export async function unregisterProtocols(): Promise<void> {
+    await Native.request("app.unregisterProtocols");
+}
+
 export interface ProtocolStatus {
     isDefault: boolean;
     customSchemeRegistered: boolean;
