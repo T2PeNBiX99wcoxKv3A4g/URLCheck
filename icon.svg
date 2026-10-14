@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="URLCheck">
+  <title>URLCheck</title>
+
+  <defs>
+    <!-- Same 135° blue -> indigo -> violet ramp the app uses for its primary action. -->
+    <linearGradient id="urlcheck-tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset=".5" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="256" height="256" rx="58" fill="url(#urlcheck-tile)"/>
+
+  <!-- Chain link: the URL being inspected. -->
+  <g transform="translate(109 109) scale(6.8) translate(-12 -12)"
+     fill="none" stroke="#ffffff" stroke-width="2.05"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+  </g>
+
+  <!-- Checked badge. -->
+  <circle cx="181" cy="181" r="33" fill="#ffffff"/>
+  <path d="M165 181l10 10 21-22" fill="none" stroke="url(#urlcheck-tile)" stroke-width="10"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
