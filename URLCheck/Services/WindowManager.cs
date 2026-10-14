@@ -1,4 +1,5 @@
 using Photino.NET;
+using Serilog;
 using URLCheck.Interop;
 using URLCheck.Messaging;
 
@@ -122,7 +123,7 @@ internal sealed class WindowManager
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[windows] Failed to create popup: {ex.Message}");
+                Log.Warning(ex, "Failed to create popup");
                 _popupWindow = null;
             }
         });
@@ -155,7 +156,7 @@ internal sealed class WindowManager
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[windows] Failed to close window: {ex.Message}");
+                Log.Warning(ex, "Failed to close window");
             }
         });
     }
@@ -210,7 +211,7 @@ internal sealed class WindowManager
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[windows] Failed to send event: {ex.Message}");
+            Log.Warning(ex, "Failed to send event");
         }
     }
 }

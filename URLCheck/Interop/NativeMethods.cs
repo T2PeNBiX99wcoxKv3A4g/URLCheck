@@ -1,32 +1,34 @@
 using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 
 namespace URLCheck.Interop;
 
 /// <summary>Win32 helpers used for window show/hide and the tray icon.</summary>
-internal static class NativeMethods
+[PublicAPI]
+internal static partial class NativeMethods
 {
     // ShowWindow commands
     public const int SwHide = 0;
     public const int SwShow = 5;
     public const int SwRestore = 9;
 
-    [DllImport("user32.dll")]
+    [LibraryImport("user32.dll", EntryPoint = "ShowWindow")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    public static partial bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-    [DllImport("user32.dll")]
+    [LibraryImport("user32.dll", EntryPoint = "SetForegroundWindow")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool SetForegroundWindow(IntPtr hWnd);
+    public static partial bool SetForegroundWindow(IntPtr hWnd);
 
     public const uint WmNcLButtonDown = 0x00A1;
     public const int HtCaption = 0x0002;
 
-    [DllImport("user32.dll")]
+    [LibraryImport("user32.dll", EntryPoint = "ReleaseCapture")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool ReleaseCapture();
+    public static partial bool ReleaseCapture();
 
-    [DllImport("user32.dll")]
-    public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+    [LibraryImport("user32.dll", EntryPoint = "SendMessageW")]
+    public static partial IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
     // ---- Tray / window class ----
 
@@ -88,62 +90,64 @@ internal static class NativeMethods
         public IntPtr hBalloonIcon;
     }
 
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-    public static extern IntPtr GetModuleHandle(string? lpModuleName);
+    [LibraryImport("kernel32.dll", EntryPoint = "GetModuleHandleW", StringMarshalling = StringMarshalling.Utf16)]
+    public static partial IntPtr GetModuleHandle(string? lpModuleName);
 
+    // RegisterClassEx and Shell_NotifyIcon take structs with inline string buffers, which the
+    // source generator cannot marshal; keep them as DllImport.
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     public static extern ushort RegisterClassEx(ref WndClassEx lpwcx);
 
-    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    public static extern IntPtr CreateWindowEx(
+    [LibraryImport("user32.dll", EntryPoint = "CreateWindowExW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    public static partial IntPtr CreateWindowEx(
         int dwExStyle, string lpClassName, string lpWindowName, int dwStyle,
         int x, int y, int nWidth, int nHeight,
         IntPtr hWndParent, IntPtr hMenu, IntPtr hInstance, IntPtr lpParam);
 
-    [DllImport("user32.dll")]
-    public static extern IntPtr DefWindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+    [LibraryImport("user32.dll", EntryPoint = "DefWindowProcW")]
+    public static partial IntPtr DefWindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
-    [DllImport("user32.dll")]
-    public static extern int GetMessage(out Msg lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
+    [LibraryImport("user32.dll", EntryPoint = "GetMessageW")]
+    public static partial int GetMessage(out Msg lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
 
-    [DllImport("user32.dll")]
+    [LibraryImport("user32.dll", EntryPoint = "TranslateMessage")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool TranslateMessage(ref Msg lpMsg);
+    public static partial bool TranslateMessage(ref Msg lpMsg);
 
-    [DllImport("user32.dll")]
-    public static extern IntPtr DispatchMessage(ref Msg lpMsg);
+    [LibraryImport("user32.dll", EntryPoint = "DispatchMessageW")]
+    public static partial IntPtr DispatchMessage(ref Msg lpMsg);
 
-    [DllImport("user32.dll")]
-    public static extern void PostQuitMessage(int nExitCode);
+    [LibraryImport("user32.dll", EntryPoint = "PostQuitMessage")]
+    public static partial void PostQuitMessage(int nExitCode);
 
-    [DllImport("user32.dll")]
+    [LibraryImport("user32.dll", EntryPoint = "PostMessageW")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+    public static partial bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
-    [DllImport("user32.dll")]
-    public static extern IntPtr CreatePopupMenu();
+    [LibraryImport("user32.dll", EntryPoint = "CreatePopupMenu")]
+    public static partial IntPtr CreatePopupMenu();
 
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    [LibraryImport("user32.dll", EntryPoint = "AppendMenuW", StringMarshalling = StringMarshalling.Utf16)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool AppendMenu(IntPtr hMenu, uint uFlags, IntPtr uIDNewItem, string? lpNewItem);
+    public static partial bool AppendMenu(IntPtr hMenu, uint uFlags, IntPtr uIDNewItem, string? lpNewItem);
 
-    [DllImport("user32.dll")]
+    [LibraryImport("user32.dll", EntryPoint = "DestroyMenu")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool DestroyMenu(IntPtr hMenu);
+    public static partial bool DestroyMenu(IntPtr hMenu);
 
-    [DllImport("user32.dll")]
-    public static extern int TrackPopupMenu(
+    [LibraryImport("user32.dll", EntryPoint = "TrackPopupMenu")]
+    public static partial int TrackPopupMenu(
         IntPtr hMenu, uint uFlags, int x, int y, int nReserved, IntPtr hWnd, IntPtr prcRect);
 
-    [DllImport("user32.dll")]
+    [LibraryImport("user32.dll", EntryPoint = "GetCursorPos")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool GetCursorPos(out Point lpPoint);
+    public static partial bool GetCursorPos(out Point lpPoint);
 
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    public static extern IntPtr LoadIcon(IntPtr hInstance, IntPtr lpIconName);
+    [LibraryImport("user32.dll", EntryPoint = "LoadIconW")]
+    public static partial IntPtr LoadIcon(IntPtr hInstance, IntPtr lpIconName);
 
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    public static extern uint RegisterWindowMessage(string lpString);
+    [LibraryImport("user32.dll", EntryPoint = "RegisterWindowMessageW", StringMarshalling = StringMarshalling.Utf16)]
+    public static partial uint RegisterWindowMessage(string lpString);
 
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.Win32;
+using Serilog;
 using URLCheck.Models;
 
 namespace URLCheck.Services;
@@ -34,7 +35,7 @@ internal static class BrowserService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[browsers] Failed to scan {root}: {ex.Message}");
+                    Log.Warning(ex, "Failed to scan {Root}", root);
                 }
             }
         }

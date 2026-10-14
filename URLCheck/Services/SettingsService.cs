@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Serilog;
 using URLCheck.Models;
 
 namespace URLCheck.Services;
@@ -78,7 +79,7 @@ internal sealed class SettingsService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[settings] Failed to load '{SettingsFilePath}': {ex.Message}");
+            Log.Warning(ex, "Failed to load settings from {Path}", SettingsFilePath);
             return new AppSettings();
         }
     }

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Serilog;
 using URLCheck.Interop;
 using URLCheck.Services;
 #if !DEBUG
@@ -15,57 +16,66 @@ internal static class Program
     [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
     private static async Task Main(string[] args)
     {
-        foreach (var arg in args)
-            Console.WriteLine("arg: {0}", arg);
+        Logging.Initialize();
 
-        var startupUrls = ExtractUrls(args);
-        var showMainWindow = args.Any(arg => arg is "--show" or "-s");
-
-        // Only one instance may run; later launches hand their URLs to it and exit.
-        using var singleInstance = new SingleInstance();
-        if (!singleInstance.IsFirstInstance)
+        try
         {
-            await singleInstance.ForwardAsync(args);
-            return;
-        }
+            foreach (var arg in args)
+                Log.Information("arg: {Arg}", arg);
+
+            var startupUrls = ExtractUrls(args);
+            var showMainWindow = args.Any(arg => arg is "--show" or "-s");
+
+            // Only one instance may run; later launches hand their URLs to it and exit.
+            using var singleInstance = new SingleInstance();
+            if (!singleInstance.IsFirstInstance)
+            {
+                await singleInstance.ForwardAsync(args);
+                return;
+            }
 
 #if !DEBUG
-        PhotinoServer
-            .CreateStaticFileServer([], out var baseUrl)
-            .RunAsync();
+            _ = PhotinoServer
+                .CreateStaticFileServer([], out var baseUrl)
+                .RunAsync();
 
-        var appUrl = $"{baseUrl}/index.html";
+            var appUrl = $"{baseUrl}/index.html";
 #else
-        const string appUrl = "http://localhost:3000";
+            const string appUrl = "http://localhost:3000";
 #endif
 
-        Console.WriteLine($"Serving React app at {appUrl}");
+            Log.Information("Serving React app at {AppUrl}", appUrl);
 
-        var manager = new WindowManager(appUrl, new SettingsService(), new ProtocolRegistrationService())
+            var manager = new WindowManager(appUrl, new SettingsService(), new ProtocolRegistrationService())
+            {
+                ShowMainWindowOnStartup = showMainWindow,
+            };
+
+            using var tray = new TrayIcon(
+                tooltip: Constants.WindowTitle,
+                onOpen: () => manager.ShowMainWindow(),
+                onSettings: () => manager.ShowMainWindow("settings"),
+                onExit: manager.Exit);
+            tray.Start();
+
+            manager.MainWindowCreated += () =>
+            {
+                // The message loop is about to start, so windows can now be created safely.
+                singleInstance.StartServer(forwarded => DispatchUrls(manager, forwarded));
+
+                if (startupUrls.Count > 0)
+                    _ = Task.Run(() => startupUrls.ForEach(manager.ShowPopup));
+            };
+
+            manager.CreateMainWindow();
+            manager.Run();
+
+            Log.Information("Exiting");
+        }
+        finally
         {
-            ShowMainWindowOnStartup = showMainWindow,
-        };
-
-        using var tray = new TrayIcon(
-            tooltip: Constants.WindowTitle,
-            onOpen: () => manager.ShowMainWindow(),
-            onSettings: () => manager.ShowMainWindow("settings"),
-            onExit: manager.Exit);
-        tray.Start();
-
-        manager.MainWindowCreated += () =>
-        {
-            // The message loop is about to start, so windows can now be created safely.
-            singleInstance.StartServer(forwarded => DispatchUrls(manager, forwarded));
-
-            if (startupUrls.Count > 0)
-                _ = Task.Run(() => startupUrls.ForEach(manager.ShowPopup));
-        };
-
-        manager.CreateMainWindow();
-        manager.Run();
-
-        Console.WriteLine("[app] Exiting.");
+            Logging.Shutdown();
+        }
     }
 
     private static void DispatchUrls(WindowManager manager, IReadOnlyList<string> args)

@@ -1,4 +1,5 @@
 using System.IO.Pipes;
+using Serilog;
 
 namespace URLCheck.Services;
 
@@ -37,7 +38,7 @@ internal sealed class SingleInstance : IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ipc] Failed to forward arguments: {ex.Message}");
+            Log.Warning(ex, "Failed to forward arguments");
             return false;
         }
     }
@@ -70,7 +71,7 @@ internal sealed class SingleInstance : IDisposable
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ipc] Server error: {ex.Message}");
+                Log.Warning(ex, "IPC server error");
 
                 try
                 {

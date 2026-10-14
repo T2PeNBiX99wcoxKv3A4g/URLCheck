@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Serilog;
 
 namespace URLCheck.Interop;
 
@@ -207,7 +208,7 @@ internal sealed class TrayIcon : IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[tray] Callback failed: {ex.Message}");
+            Log.Warning(ex, "Tray callback failed");
         }
     }
 

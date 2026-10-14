@@ -1,5 +1,7 @@
 using System.Text.Json;
 using Photino.NET;
+using Serilog;
+using Swan;
 using URLCheck.Models;
 using URLCheck.Services;
 
@@ -14,7 +16,7 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
 {
     public async Task HandleMessageAsync(PhotinoWindow? window, string rawMessage)
     {
-        Console.WriteLine($"[bridge] << {rawMessage}");
+        Log.Debug("<< {Message}", rawMessage.RemoveControlChars().Truncate(600));
 
         NativeRequest? request;
         try
@@ -23,7 +25,7 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
         }
         catch (JsonException ex)
         {
-            Console.WriteLine($"[bridge] Invalid JSON received: {ex.Message}");
+            Log.Warning(ex, "Invalid JSON received");
             Send(window, NativeResponse.Failure(null, "error", "Invalid JSON payload."));
             return;
         }
@@ -37,7 +39,7 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[bridge] Handler for '{request.Type}' failed: {ex}");
+            Log.Error(ex, "Handler for {Type} failed", request.Type);
             Send(window, NativeResponse.Failure(request.Id, $"{request.Type}.result", ex.Message));
         }
     }
@@ -133,7 +135,7 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
                 break;
 
             default:
-                Console.WriteLine($"[bridge] No handler registered for message type '{request.Type}'.");
+                Log.Debug("No handler registered for message type {Type}", request.Type);
                 if (!string.IsNullOrEmpty(request.Id))
                     Send(window, NativeResponse.Failure(request.Id, $"{request.Type}.result", $"Unsupported message type '{request.Type}'."));
                 break;
@@ -151,7 +153,7 @@ internal sealed class NativeBridge(WindowManager windows, SettingsService settin
     private static void Send(PhotinoWindow? window, NativeResponse response)
     {
         var json = NativeProtocol.SerializeResponse(response);
-        Console.WriteLine($"[bridge] >> {json}");
+        Log.Debug(">> {Message}", json.RemoveControlChars().Truncate(600));
         window?.SendWebMessage(json);
     }
 }
