@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 
 namespace URLCheck;
 
+[PublicAPI]
 public static class Constants
 {
 #if DEBUG
