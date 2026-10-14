@@ -2,6 +2,7 @@ using Photino.NET;
 using Serilog;
 using URLCheck.Interop;
 using URLCheck.Messaging;
+using URLCheck.Models;
 
 namespace URLCheck.Services;
 
@@ -13,15 +14,19 @@ internal sealed class WindowManager
 {
     private readonly string _appUrl;
     private readonly NativeBridge _bridge;
-    private bool _allowClose;
+    private readonly SettingsService _settings;
 
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
+    private bool _allowClose;
 
-    public WindowManager(string appUrl, SettingsService settings, ProtocolRegistrationService protocols)
+    public WindowManager(string appUrl, NativeBridge bridge, SettingsService settings)
     {
         _appUrl = appUrl;
-        _bridge = new NativeBridge(this, settings, protocols);
+        _bridge = bridge;
+        _settings = settings;
+
+        _settings.Changed += payload => BroadcastEvent("settings.changed", payload);
     }
 
     /// <summary>When true the host window is shown at startup instead of hiding to the tray.</summary>
@@ -29,6 +34,48 @@ internal sealed class WindowManager
 
     /// <summary>Raised once the host window's native handle exists (message loop is about to start).</summary>
     public event Action? MainWindowCreated;
+
+    /// <summary>Handles the <c>popup.*</c> and <c>window.*</c> messages.</summary>
+    public async Task<NativeResponse?> HandleMessageAsync(NativeContext context)
+    {
+        switch (context.Request.Type)
+        {
+            case "popup.show":
+            {
+                var payload = context.Payload<PopupShowRequest>();
+                if (string.IsNullOrWhiteSpace(payload?.Url))
+                    return context.Fail("popup.show.result", "Missing URL.");
+
+                ShowPopup(payload.Url);
+                return context.Reply("popup.show.result", new { Ok = true });
+            }
+
+            case "popup.open":
+            {
+                var payload = context.Payload<PopupOpenRequest>();
+                if (string.IsNullOrWhiteSpace(payload?.Url))
+                    return context.Fail("popup.open.result", "Missing URL.");
+
+                var browser = ResolveBrowser(await _settings.GetAsync(), payload.BrowserId);
+                if (browser is null)
+                    return context.Fail("popup.open.result", "No browser configured. Add one in Settings.");
+
+                BrowserService.Launch(browser.ExecutablePath, payload.Url);
+                return context.Reply("popup.open.result", new { Ok = true, Browser = browser.Name });
+            }
+
+            case "popup.close":
+                CloseWindow(context.Window);
+                return null;
+
+            case "window.drag":
+                StartDrag(context.Window);
+                return null;
+
+            default:
+                return null;
+        }
+    }
 
     public void CreateMainWindow()
     {
@@ -68,10 +115,7 @@ internal sealed class WindowManager
         Invoke(_mainWindow, ShowHandle);
 
         if (tab is { Length: > 0 })
-            _mainWindow?.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new
-            {
-                tab
-            }));
+            _mainWindow?.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new { tab }));
     }
 
     /// <summary>Opens a popup for <paramref name="url"/>, or navigates the existing popup to it.</summary>
@@ -86,10 +130,7 @@ internal sealed class WindowManager
             {
                 try
                 {
-                    _popupWindow.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate", new
-                    {
-                        url
-                    }));
+                    _popupWindow.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate", new { url }));
                     ShowHandle(_popupWindow);
                     return;
                 }
@@ -132,14 +173,14 @@ internal sealed class WindowManager
     }
 
     /// <summary>Lets the OS move a borderless window when the user drags its header.</summary>
-    public static void StartDrag(PhotinoWindow? window) => Invoke(window, target =>
+    public void StartDrag(PhotinoWindow? window) => Invoke(window, target =>
     {
         var handle = target.WindowHandle;
         if (handle == IntPtr.Zero)
             return;
 
         NativeMethods.ReleaseCapture();
-        NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, NativeMethods.HtCaption, IntPtr.Zero);
+        NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, (IntPtr)NativeMethods.HtCaption, IntPtr.Zero);
     });
 
     public void CloseWindow(PhotinoWindow? window)
@@ -176,6 +217,11 @@ internal sealed class WindowManager
         _allowClose = true;
         CloseWindow(_mainWindow);
     }
+
+    private static BrowserEntry? ResolveBrowser(AppSettings current, string? browserId) =>
+        current.Browsers.Count == 0
+            ? null
+            : current.Browsers.FirstOrDefault(browser => browser.Id == browserId) ?? current.Browsers[0];
 
     private static void Invoke(PhotinoWindow? window, Action<PhotinoWindow> action)
     {

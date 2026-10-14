@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.Win32;
+using URLCheck.Messaging;
 
 namespace URLCheck.Services;
 
@@ -30,6 +31,19 @@ internal sealed class ProtocolRegistrationService
     }
 
     public string ExecutablePath => _executablePath;
+
+    /// <summary>Handles the <c>app.*</c> messages.</summary>
+    public Task<NativeResponse?> HandleMessageAsync(NativeContext context)
+    {
+        var response = context.Request.Type switch
+        {
+            "app.registerProtocols" => RegisterReply(context),
+            "app.openDefaultApps" => OpenDefaultAppsReply(context),
+            _ => null,
+        };
+
+        return Task.FromResult(response);
+    }
 
     /// <summary>Writes all required registry keys for the current user.</summary>
     public void Register()
@@ -79,5 +93,17 @@ internal sealed class ProtocolRegistrationService
 
         using var openCommand = key.CreateSubKey(@"shell\open\command");
         openCommand.SetValue(null, command);
+    }
+
+    private NativeResponse RegisterReply(NativeContext context)
+    {
+        Register();
+        return context.Reply("app.registerProtocols.result", new { Ok = true, ExecutablePath = _executablePath });
+    }
+
+    private static NativeResponse OpenDefaultAppsReply(NativeContext context)
+    {
+        OpenDefaultAppsSettings();
+        return context.Reply("app.openDefaultApps.result", new { Ok = true });
     }
 }

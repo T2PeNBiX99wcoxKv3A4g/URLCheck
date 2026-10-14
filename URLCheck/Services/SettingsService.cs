@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Serilog;
+using URLCheck.Messaging;
 using URLCheck.Models;
 
 namespace URLCheck.Services;
@@ -23,6 +24,36 @@ internal sealed class SettingsService
     }
 
     public string SettingsFilePath { get; }
+
+    /// <summary>Raised after the settings are saved or reset.</summary>
+    public event Action<SettingsPayload>? Changed;
+
+    /// <summary>Handles the <c>settings.*</c> messages.</summary>
+    public async Task<NativeResponse?> HandleMessageAsync(NativeContext context)
+    {
+        switch (context.Request.Type)
+        {
+            case "settings.get":
+                return context.Reply("settings.get.result", await PayloadAsync());
+
+            case "settings.save":
+            {
+                var incoming = context.Payload<AppSettings>();
+                if (incoming is null)
+                    return context.Fail("settings.save.result", "Missing settings payload.");
+
+                await SaveAsync(incoming);
+                return context.Reply("settings.save.result", await PublishAsync());
+            }
+
+            case "settings.reset":
+                await ResetAsync();
+                return context.Reply("settings.reset.result", await PublishAsync());
+
+            default:
+                return null;
+        }
+    }
 
     /// <summary>Returns the settings, loading them from disk on first use.</summary>
     public async Task<AppSettings> GetAsync()
@@ -66,6 +97,15 @@ internal sealed class SettingsService
     /// <summary>Restores defaults, re-detecting the installed browsers.</summary>
     public Task<AppSettings> ResetAsync() =>
         SaveAsync(new AppSettings { Browsers = [.. BrowserService.DetectInstalledBrowsers()] });
+
+    private async Task<SettingsPayload> PayloadAsync() => new(await GetAsync(), SettingsFilePath);
+
+    private async Task<SettingsPayload> PublishAsync()
+    {
+        var payload = await PayloadAsync();
+        Changed?.Invoke(payload);
+        return payload;
+    }
 
     private async Task<AppSettings> ReadAsync()
     {
