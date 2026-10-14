@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import styled from "styled-components";
 import {DEFAULT_TAB, findTab, type TabType} from "./tabs";
 import {Native} from "./Native";
+import {NavigationContext} from "./navigation";
 import {Sidebar} from "./components/Sidebar";
 import {Header} from "./components/Header";
 
@@ -52,7 +53,9 @@ export default function App() {
             <MainLayout>
                 <Header currentTab={currentTab}/>
                 <ContentArea>
-                    <CurrentPage/>
+                    <NavigationContext.Provider value={setCurrentTab}>
+                        <CurrentPage/>
+                    </NavigationContext.Provider>
                 </ContentArea>
             </MainLayout>
         </AppContainer>

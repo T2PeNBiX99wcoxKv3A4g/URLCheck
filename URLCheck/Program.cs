@@ -58,6 +58,7 @@ internal static class Program
 
             var browserLocator = new WindowsBrowserLocator();
             var settings = new SettingsService(browserLocator);
+            _ = new AppInfoService();
             _ = new BrowserService(browserLocator);
             _ = new ProtocolRegistrationService();
             _ = new InspectService(settings);

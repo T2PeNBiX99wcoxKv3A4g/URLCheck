@@ -11,6 +11,7 @@
         <!-- Generate embedded file manifest when using the Photino.NET StaticFileServer -->
         <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
         <RootNamespace>URLCheck</RootNamespace>
+        <Version>0.1.0</Version>
     </PropertyGroup>
 
     <ItemGroup>

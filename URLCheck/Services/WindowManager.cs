@@ -189,6 +189,7 @@ internal sealed class WindowManager
             {
                 popup.WaitForClose();
                 _platform.KeepOnTop(popup);
+                _platform.RoundCorners(popup);
 
                 // The native show/center runs after the created callback and clears the style,
                 // so re-assert it once the window has settled.

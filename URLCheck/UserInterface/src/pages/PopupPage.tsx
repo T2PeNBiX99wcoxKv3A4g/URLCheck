@@ -74,6 +74,9 @@ const Root = styled.div`
     background-color: #0b0f19;
     background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 70%);
     color: #f9fafb;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    overflow: hidden;
 `;
 
 const TopBar = styled.div`

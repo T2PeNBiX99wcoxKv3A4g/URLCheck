@@ -36,6 +36,14 @@ internal static partial class NativeMethods
     public static partial bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy,
         uint uFlags);
 
+    // ---- DWM (rounded corners) ----
+
+    public const int DwmwaWindowCornerPreference = 33;
+    public const int DwmwcpRound = 2;
+
+    [LibraryImport("dwmapi.dll")]
+    public static partial int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
+
     [LibraryImport("kernel32.dll", EntryPoint = "GetModuleHandleW", StringMarshalling = StringMarshalling.Utf16)]
     public static partial IntPtr GetModuleHandle(string? lpModuleName);
 

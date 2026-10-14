@@ -1,8 +1,9 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {showPopup} from "../api/system";
-import {LinkIcon, SearchIcon, ShieldCheckIcon} from "../components/Icons";
+import {isDefaultBrowser, showPopup} from "../api/system";
+import {AlertTriangleIcon, LinkIcon, SearchIcon, ShieldCheckIcon} from "../components/Icons";
 import {PageContainer, StackCard} from "../components/Layout";
+import {useNavigate} from "../navigation";
 
 const Title = styled.h3`
     font-size: 1.05rem;
@@ -118,11 +119,71 @@ const PresetChip = styled.button`
     }
 `;
 
+const Banner = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    background: rgba(245, 158, 11, 0.12);
+    color: #fbbf24;
+
+    @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+`;
+
+const BannerText = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+`;
+
+const BannerTitle = styled.span`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+`;
+
+const BannerBody = styled.span`
+    font-size: 0.82rem;
+    color: #d1d5db;
+    line-height: 1.55;
+`;
+
+const BannerButton = styled.button`
+    flex-shrink: 0;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    color: #1f2937;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+        filter: brightness(1.1);
+    }
+`;
+
 const SAMPLE_URL = "https://www.google.com/search?q=photino+net&hl=en&utm_source=test";
 
 export const HomePage: React.FC = () => {
+    const navigate = useNavigate();
     const [url, setUrl] = useState(SAMPLE_URL);
     const [busy, setBusy] = useState(false);
+    const [isDefault, setIsDefault] = useState(true);
+
+    useEffect(() => {
+        isDefaultBrowser().then(setIsDefault).catch(() => setIsDefault(true));
+    }, []);
 
     const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -140,6 +201,22 @@ export const HomePage: React.FC = () => {
 
     return (
         <PageContainer $maxWidth={820}>
+            {!isDefault && (
+                <Banner>
+                    <BannerText>
+                        <BannerTitle>
+                            <AlertTriangleIcon size={16}/>
+                            <span>URLCheck is not your default browser</span>
+                        </BannerTitle>
+                        <BannerBody>
+                            It only works when it handles http/https links. Set URLCheck as the default browser so
+                            clicking a link opens this popup.
+                        </BannerBody>
+                    </BannerText>
+                    <BannerButton onClick={() => navigate("settings")}>Open Settings</BannerButton>
+                </Banner>
+            )}
+
             <StackCard>
                 <Title>
                     <LinkIcon size={18}/>

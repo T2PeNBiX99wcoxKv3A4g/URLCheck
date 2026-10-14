@@ -1,6 +1,7 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {TABS, type TabType} from "../tabs";
+import {getAppInfo} from "../api/system";
 import {ShieldCheckIcon} from "./Icons";
 
 interface SidebarProps {
@@ -103,23 +104,6 @@ const FooterSection = styled.div`
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-`;
-
-const StatusIndicator = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.8rem;
-    color: #9ca3af;
-`;
-
-const StatusDot = styled.span`
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #10b981;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
 `;
 
 const VersionLabel = styled.span`
@@ -129,6 +113,12 @@ const VersionLabel = styled.span`
 `;
 
 export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
+    const [version, setVersion] = useState<string | null>(null);
+
+    useEffect(() => {
+        getAppInfo().then((info) => setVersion(info.version)).catch(() => setVersion(null));
+    }, []);
+
     return (
         <SidebarContainer>
             <LogoSection>
@@ -137,7 +127,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
                 </LogoIconWrapper>
                 <LogoText>
                     <LogoTitle>URLCheck</LogoTitle>
-                    <LogoBadge>Photino Inspector</LogoBadge>
+                    <LogoBadge>Link intermediary</LogoBadge>
                 </LogoText>
             </LogoSection>
 
@@ -158,11 +148,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
             </NavList>
 
             <FooterSection>
-                <StatusIndicator>
-                    <StatusDot/>
-                    <span>Photino Ready</span>
-                </StatusIndicator>
-                <VersionLabel>v1.0.0</VersionLabel>
+                <VersionLabel>{version ? `v${version}` : "…"}</VersionLabel>
             </FooterSection>
         </SidebarContainer>
     );

@@ -30,6 +30,13 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         window.Center();
     }
 
+    public void RoundCorners(PhotinoWindow window) => UseHandle(window, handle =>
+    {
+        var preference = NativeMethods.DwmwcpRound;
+        NativeMethods.DwmSetWindowAttribute(handle, NativeMethods.DwmwaWindowCornerPreference, ref preference,
+            sizeof(int));
+    });
+
     private static void UseHandle(PhotinoWindow window, Action<IntPtr> action)
     {
         var handle = window.WindowHandle;

@@ -34,3 +34,18 @@ export async function openDefaultAppsSettings(): Promise<void> {
 export function resizePopup(height: number): void {
     Native.send({type: "popup.resize", payload: {height: Math.round(height)}});
 }
+
+/** Reads the app version declared in the csproj. */
+export async function getAppInfo(): Promise<{ version: string }> {
+    if (!Native.available) return {version: "dev"};
+
+    return await Native.request<{ version: string }>("app.info");
+}
+
+/** True when Windows currently routes http links to URLCheck. */
+export async function isDefaultBrowser(): Promise<boolean> {
+    if (!Native.available) return false;
+
+    const result = await Native.request<{ isDefault: boolean }>("app.isDefaultBrowser");
+    return result.isDefault;
+}

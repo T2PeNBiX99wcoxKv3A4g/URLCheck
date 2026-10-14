@@ -41,10 +41,20 @@ internal sealed class ProtocolRegistrationService
         {
             "app.registerProtocols" => RegisterReply(context),
             "app.openDefaultApps" => OpenDefaultAppsReply(context),
+            "app.isDefaultBrowser" => context.Reply("app.isDefaultBrowser.result", new { IsDefault = IsDefaultBrowser() }),
             _ => null
         };
 
         return Task.FromResult(response);
+    }
+
+    /// <summary>True when Windows currently routes http links to URLCheck.</summary>
+    private static bool IsDefaultBrowser()
+    {
+        using var key = Registry.CurrentUser.OpenSubKey(
+            @"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice");
+
+        return key?.GetValue("ProgId") as string == "URLCheck.HTTP";
     }
 
     /// <summary>Writes all required registry keys for the current user.</summary>
