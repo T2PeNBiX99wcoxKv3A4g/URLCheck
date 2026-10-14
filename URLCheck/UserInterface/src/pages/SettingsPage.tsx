@@ -6,7 +6,7 @@ import {AppSettings, BrowserEntry, UserAgentEntry} from "../types";
 import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
-import {openDefaultAppsSettings, registerProtocols} from "../api/system";
+import {openDefaultAppsSettings, protocolStatus, registerCustomScheme, registerProtocols, type ProtocolStatus} from "../api/system";
 
 const SettingRow = styled.div`
   display: flex;
@@ -180,6 +180,11 @@ const ListInput = styled.input`
     flex: 1;
     font-family: monospace;
   }
+
+  &.args {
+    flex: 0 0 160px;
+    font-family: monospace;
+  }
 `;
 
 const GhostButton = styled.button`
@@ -245,6 +250,11 @@ export const SettingsPage: React.FC = () => {
   const [detecting, setDetecting] = useState(false);
   const [integrationBusy, setIntegrationBusy] = useState(false);
   const [integrationMessage, setIntegrationMessage] = useState<string | null>(null);
+  const [protocols, setProtocols] = useState<ProtocolStatus | null>(null);
+
+  useEffect(() => {
+    protocolStatus().then(setProtocols).catch(() => setProtocols(null));
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -334,7 +344,7 @@ export const SettingsPage: React.FC = () => {
     const id = Math.random().toString(36).slice(2, 10);
     setSettings((prev) => ({
       ...prev,
-      browsers: [...prev.browsers, {id, name: "", executablePath: ""}],
+      browsers: [...prev.browsers, {id, name: "", executablePath: "", arguments: ""}],
     }));
   };
 
@@ -381,7 +391,22 @@ export const SettingsPage: React.FC = () => {
     setIntegrationMessage(null);
     try {
       const result = await registerProtocols();
-      setIntegrationMessage(`Registered. Executable: ${result.executablePath}`);
+      setIntegrationMessage(`Registered http/https. Executable: ${result.executablePath}`);
+      setProtocols(await protocolStatus());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIntegrationBusy(false);
+    }
+  };
+
+  const handleRegisterCustomScheme = async () => {
+    setIntegrationBusy(true);
+    setIntegrationMessage(null);
+    try {
+      const result = await registerCustomScheme();
+      setIntegrationMessage(`Registered urlcheck://. Executable: ${result.executablePath}`);
+      setProtocols(await protocolStatus());
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -504,6 +529,14 @@ export const SettingsPage: React.FC = () => {
                       value={browser.executablePath}
                       onChange={(e) => updateBrowser(browser.id, {executablePath: e.target.value})}
                   />
+                  <ListInput
+                      className="args"
+                      placeholder="Extra args"
+                      title="Extra command-line arguments appended after the URL"
+                      disabled={busy}
+                      value={browser.arguments}
+                      onChange={(e) => updateBrowser(browser.id, {arguments: e.target.value})}
+                  />
                   <IconOnlyButton
                       type="button"
                       title="Remove browser"
@@ -530,21 +563,31 @@ export const SettingsPage: React.FC = () => {
 
           <SettingInfo>
             <SettingDescription>
-              Register URLCheck as a candidate browser for http/https and as the urlcheck:// handler. Windows
-              still
-              requires you to confirm URLCheck in Default apps.
+              URLCheck must be registered as a candidate browser and confirmed in Windows "Default apps" to
+              handle http/https links. The urlcheck:// scheme is registered separately for future features.
             </SettingDescription>
           </SettingInfo>
 
           <ButtonRow>
             <GhostButton type="button" onClick={handleRegisterProtocols} disabled={integrationBusy}>
               <LinkIcon size={15}/>
-              Register protocol handlers
+              Register http/https
+            </GhostButton>
+            <GhostButton type="button" onClick={handleRegisterCustomScheme} disabled={integrationBusy}>
+              <LinkIcon size={15}/>
+              Register urlcheck://
             </GhostButton>
             <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
               Open Default apps
             </GhostButton>
           </ButtonRow>
+
+          {protocols && (
+              <InfoText>
+                Default browser: {protocols.isDefault ? "yes" : "no"} · urlcheck:// registered:{" "}
+                {protocols.customSchemeRegistered ? "yes" : "no"}
+              </InfoText>
+          )}
 
           {integrationMessage && <InfoText>{integrationMessage}</InfoText>}
         </StackCard>

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using URLCheck.Messaging;
+using URLCheck.Models;
 using URLCheck.Platform;
 
 namespace URLCheck.Services;
@@ -15,18 +16,19 @@ internal sealed class BrowserService
         NativeBridge.MessageReceived += HandleMessageAsync;
     }
 
-    /// <summary>Starts <paramref name="executablePath" /> with <paramref name="url" /> as its argument.</summary>
-    public static void Launch(string executablePath, string url, bool privateMode = false)
+    /// <summary>Starts <paramref name="browser" /> with <paramref name="url" />, honouring its extra arguments.</summary>
+    public static void Launch(BrowserEntry browser, string url, bool privateMode = false)
     {
-        if (string.IsNullOrWhiteSpace(executablePath))
-            throw new ArgumentException("A browser executable path is required.", nameof(executablePath));
+        if (string.IsNullOrWhiteSpace(browser.ExecutablePath))
+            throw new ArgumentException("A browser executable path is required.", nameof(browser));
 
-        var flag = privateMode ? PrivateModeFlag(executablePath) : null;
-        var arguments = flag is null ? $"\"{url}\"" : $"{flag} \"{url}\"";
+        var flag = privateMode ? PrivateModeFlag(browser.ExecutablePath) : null;
+        var arguments = string.Join(' ',
+            new[] { flag, $"\"{url}\"", browser.Arguments }.Where(part => !string.IsNullOrWhiteSpace(part)));
 
         Process.Start(new ProcessStartInfo
         {
-            FileName = executablePath,
+            FileName = browser.ExecutablePath,
             Arguments = arguments,
             UseShellExecute = false
         });

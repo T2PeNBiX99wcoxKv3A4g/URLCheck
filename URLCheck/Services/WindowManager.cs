@@ -74,7 +74,7 @@ internal sealed class WindowManager
                 if (browser is null)
                     return context.Fail("popup.open.result", "No browser configured. Add one in Settings.");
 
-                BrowserService.Launch(browser.ExecutablePath, payload.Url, payload.Private);
+                BrowserService.Launch(browser, payload.Url, payload.Private);
                 return context.Reply("popup.open.result", new
                 {
                     Ok = true,

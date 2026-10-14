@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useReducer, useRef, useState} from "react";
-import styled from "styled-components";
+import styled, {keyframes} from "styled-components";
 import {BrowserEntry} from "../types";
 import {loadSettings} from "../api/settings";
 import {openWithBrowser} from "../api/browsers";
@@ -67,7 +67,27 @@ function readInitialUrl(): string {
     return new URLSearchParams(hash.slice(queryIndex + 1)).get("url") ?? "";
 }
 
+/** Percent-decodes a value, leaving it untouched when it is not valid encoding. */
+function decode(value: string): string {
+    try {
+        return decodeURIComponent(value);
+    } catch {
+        return value;
+    }
+}
+
 /* ------------------------------------------------------------------- styled */
+
+const fadeIn = keyframes`
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+`;
 
 const Root = styled.div`
     min-height: 100vh;
@@ -97,6 +117,7 @@ const CloseButton = styled.button`
     cursor: pointer;
     font-size: 0.85rem;
     line-height: 1;
+    transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
         background: rgba(239, 68, 68, 0.15);
@@ -111,22 +132,33 @@ const Content = styled.div`
     padding: 0 12px 12px;
 `;
 
-const UrlInput = styled.input`
+const UrlInput = styled.input<{ $warn?: boolean }>`
     width: 100%;
     height: 34px;
     padding: 0 11px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid ${(p) => (p.$warn ? "rgba(245, 158, 11, 0.6)" : "rgba(255, 255, 255, 0.12)")};
+    background: ${(p) => (p.$warn ? "rgba(245, 158, 11, 0.1)" : "rgba(15, 23, 42, 0.8)")};
     color: #f9fafb;
     font-family: monospace;
     font-size: 0.8rem;
     outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 
     &:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        border-color: ${(p) => (p.$warn ? "#f59e0b" : "#3b82f6")};
+        box-shadow: 0 0 0 3px ${(p) => (p.$warn ? "rgba(245, 158, 11, 0.25)" : "rgba(59, 130, 246, 0.25)")};
     }
+`;
+
+const HttpWarning = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: -4px;
+    color: #fbbf24;
+    font-size: 0.74rem;
+    animation: ${fadeIn} 0.15s ease;
 `;
 
 const Toolbar = styled.div`
@@ -147,10 +179,16 @@ const SmallButton = styled.button`
     color: #cbd5e1;
     font-size: 0.72rem;
     cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 
     &:hover:not(:disabled) {
         background: rgba(255, 255, 255, 0.12);
         color: #f9fafb;
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
     }
 
     &:disabled {
@@ -189,6 +227,7 @@ const HistoryItem = styled.button<{ $active: boolean }>`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
         background: rgba(59, 130, 246, 0.15);
@@ -208,6 +247,16 @@ const StatusPill = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
     font-size: 0.76rem;
     font-weight: 500;
     white-space: nowrap;
+    transition: filter 0.15s ease, transform 0.1s ease;
+
+    &:hover:not(:disabled) {
+        filter: brightness(1.35);
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
     border: 1px solid
         ${(p) =>
                 p.$tone === "ok"
@@ -250,16 +299,22 @@ const ActionButton = styled.button<{ $accent?: boolean }>`
     padding: 7px 11px;
     border-radius: 7px;
     border: 1px solid
-        ${(p) => (p.$accent ? "rgba(99, 102, 241, 0.35)" : "rgba(255, 255, 255, 0.1)")};
-    background: ${(p) => (p.$accent ? "rgba(99, 102, 241, 0.14)" : "rgba(255, 255, 255, 0.05)")};
-    color: ${(p) => (p.$accent ? "#a5b4fc" : "#d1d5db")};
+        ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.4)" : "rgba(255, 255, 255, 0.1)")};
+    background: ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.14)" : "rgba(255, 255, 255, 0.05)")};
+    color: ${(p) => (p.$accent ? "#fbbf24" : "#d1d5db")};
     font-size: 0.76rem;
     font-weight: 500;
     cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 
     &:hover:not(:disabled) {
-        background: ${(p) => (p.$accent ? "rgba(99, 102, 241, 0.24)" : "rgba(255, 255, 255, 0.12)")};
+        background: ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.26)" : "rgba(255, 255, 255, 0.12)")};
         color: #f9fafb;
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
     }
 
     &:disabled {
@@ -284,11 +339,10 @@ const SectionHeader = styled.button`
     border: none;
     background: transparent;
     color: #9ca3af;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 0.82rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: color 0.15s ease;
 
     &:hover {
         color: #f9fafb;
@@ -316,6 +370,7 @@ const SectionBody = styled.div`
     display: flex;
     flex-direction: column;
     padding: 0 10px 7px;
+    animation: ${fadeIn} 0.15s ease;
 `;
 
 const Row = styled.div`
@@ -342,6 +397,55 @@ const RowValue = styled.span`
     word-break: break-all;
 `;
 
+const HostLink = styled.button`
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: #60a5fa;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    word-break: break-all;
+    transition: color 0.15s ease;
+
+    &:hover {
+        color: #93c5fd;
+    }
+`;
+
+const ParamInput = styled.input`
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 2px 5px;
+    font-family: inherit;
+    font-size: inherit;
+    outline: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+
+    &.key {
+        color: #60a5fa;
+        flex: 0 0 40%;
+        min-width: 0;
+    }
+
+    &.value {
+        color: #cbd5e1;
+        flex: 1;
+        min-width: 0;
+    }
+
+    &:hover {
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    &:focus {
+        border-color: #3b82f6;
+        background: rgba(15, 23, 42, 0.9);
+    }
+`;
+
 const RemoveParam = styled.button`
     background: none;
     border: none;
@@ -349,6 +453,7 @@ const RemoveParam = styled.button`
     cursor: pointer;
     padding: 0 2px;
     flex-shrink: 0;
+    transition: color 0.15s ease, background 0.15s ease;
 
     &:hover {
         color: #f87171;
@@ -382,9 +487,15 @@ const OpenButton = styled.button`
     font-size: 0.82rem;
     cursor: pointer;
     box-shadow: 0 0 16px rgba(99, 102, 241, 0.3);
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
 
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
     }
 
     &:disabled {
@@ -402,6 +513,11 @@ const ArrowButton = styled.button`
     background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     color: #ffffff;
     cursor: pointer;
+    transition: filter 0.15s ease;
+
+    &:hover:not(:disabled) {
+        filter: brightness(1.15);
+    }
 
     &:disabled {
         opacity: 0.55;
@@ -506,8 +622,8 @@ export const PopupPage: React.FC = () => {
         [parsed]
     );
 
-    const fragment = parsed?.hash.replace(/^#/, "") ?? "";
-    const isHttps = parsed?.protocol === "https:";
+    const fragment = decode(parsed?.hash.replace(/^#/, "") ?? "");
+    const isHttp = parsed?.protocol === "http:";
     const defaultBrowser = browsers[0];
     const canOpen = Boolean(parsed) && browsers.length > 0;
     const trackingCount = trackingParamKeys(url).length;
@@ -575,6 +691,39 @@ export const PopupPage: React.FC = () => {
     const commit = (value: string) => {
         dispatch({type: "commit", value});
         setStatus(null);
+    };
+
+    /* typing edits collapse into a single history entry */
+    const applyEdit = (value: string) => {
+        dispatch({type: "edit", value});
+        setStatus(null);
+    };
+
+    const updateParamAt = (index: number, patch: { key?: string; value?: string }) => {
+        if (!parsed) return;
+
+        const entries = [...parsed.searchParams.entries()].map(([key, value], i) =>
+            i === index ? {key: patch.key ?? key, value: patch.value ?? value} : {key, value}
+        );
+
+        const next = new URL(url);
+        next.search = "";
+        for (const entry of entries) next.searchParams.append(entry.key, entry.value);
+
+        applyEdit(next.toString());
+    };
+
+    const updateFragment = (value: string) => {
+        if (!parsed) return;
+
+        const next = new URL(url);
+        next.hash = value;
+        applyEdit(next.toString());
+    };
+
+    const useOrigin = () => {
+        if (!parsed) return;
+        commit(`${parsed.origin}/`);
     };
 
     const handleFollowRedirect = async () => {
@@ -685,11 +834,20 @@ export const PopupPage: React.FC = () => {
                     type="text"
                     value={url}
                     spellCheck={false}
-                    onChange={(e) => dispatch({type: "edit", value: e.target.value})}
+                    $warn={isHttp}
+                    onChange={(e) => applyEdit(e.target.value)}
                     onBlur={() => dispatch({type: "commit", value: url})}
                     placeholder="https://example.com/path?key=value"
                 />
 
+                {isHttp && (
+                    <HttpWarning>
+                        <AlertTriangleIcon size={13}/>
+                        <span>Insecure http:// — switch to https</span>
+                    </HttpWarning>
+                )}
+
+                {history.entries.length > 1 && (
                 <Toolbar>
                     <SmallButton onClick={() => dispatch({type: "jump", index: 0})} disabled={history.index === 0}
                                  title="First">|◀
@@ -722,6 +880,7 @@ export const PopupPage: React.FC = () => {
                         </HistoryMenu>
                     )}
                 </Toolbar>
+                )}
 
                 <Actions>
                     <StatusPill $tone={tone} onClick={handleCheckStatus} disabled={statusBusy} title="Check status">
@@ -744,7 +903,7 @@ export const PopupPage: React.FC = () => {
                         Params{params.length > 0 ? ` (${params.length})` : ""}
                     </ActionButton>
 
-                    {parsed && !isHttps && (
+                    {isHttp && (
                         <ActionButton $accent onClick={handleUseHttps}>
                             Use https
                         </ActionButton>
@@ -764,7 +923,15 @@ export const PopupPage: React.FC = () => {
                             </Row>
                             <Row>
                                 <RowKey>host</RowKey>
-                                <RowValue>{parsed?.host ?? "(none)"}</RowValue>
+                                <RowValue>
+                                    {parsed ? (
+                                        <HostLink onClick={useOrigin} title="Replace the URL with just this host">
+                                            {parsed.host}
+                                        </HostLink>
+                                    ) : (
+                                        "(none)"
+                                    )}
+                                </RowValue>
                             </Row>
                         </SectionBody>
                     )}
@@ -780,9 +947,20 @@ export const PopupPage: React.FC = () => {
                         {open.parameters && (
                             <SectionBody>
                                 {params.map((param, index) => (
-                                    <Row key={`${param.key}-${param.value}-${index}`}>
-                                        <RowKey title={param.key}>{param.key}</RowKey>
-                                        <RowValue>{param.value || "(empty)"}</RowValue>
+                                    <Row key={index}>
+                                        <ParamInput
+                                            className="key"
+                                            title="Parameter name"
+                                            value={param.key}
+                                            onChange={(e) => updateParamAt(index, {key: e.target.value})}
+                                        />
+                                        <ParamInput
+                                            className="value"
+                                            title="Parameter value (decoded)"
+                                            placeholder="(empty)"
+                                            value={param.value}
+                                            onChange={(e) => updateParamAt(index, {value: e.target.value})}
+                                        />
                                         <RemoveParam
                                             title="Remove parameter"
                                             onClick={() => handleRemoveParam(param.key, param.value)}
@@ -806,7 +984,12 @@ export const PopupPage: React.FC = () => {
                             <SectionBody>
                                 <Row>
                                     <RowKey>#</RowKey>
-                                    <RowValue>{fragment}</RowValue>
+                                    <ParamInput
+                                        className="value"
+                                        title="Fragment (decoded)"
+                                        value={fragment}
+                                        onChange={(e) => updateFragment(e.target.value)}
+                                    />
                                 </Row>
                             </SectionBody>
                         )}

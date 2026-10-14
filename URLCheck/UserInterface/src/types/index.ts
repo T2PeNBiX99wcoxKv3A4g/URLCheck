@@ -20,4 +20,5 @@ export interface BrowserEntry {
     id: string;
     name: string;
     executablePath: string;
+    arguments: string;
 }

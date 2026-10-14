@@ -44,7 +44,10 @@ function normalize(settings: AppSettings): AppSettings {
             Array.isArray(settings.userAgents) && settings.userAgents.length > 0
                 ? settings.userAgents
                 : DEFAULT_SETTINGS.userAgents,
-        browsers: Array.isArray(settings.browsers) ? settings.browsers : [],
+        browsers: (Array.isArray(settings.browsers) ? settings.browsers : []).map((browser) => ({
+            ...browser,
+            arguments: browser.arguments ?? "",
+        })),
     };
 }
 

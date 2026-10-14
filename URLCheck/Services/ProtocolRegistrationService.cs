@@ -21,6 +21,9 @@ internal sealed class ProtocolRegistrationService
 {
     private const string AppKeyName = "URLCheck";
     private const string CustomScheme = "urlcheck";
+    private const string HttpProgId = "URLCheck.HTTP";
+    private const string HttpsProgId = "URLCheck.HTTPS";
+
     private readonly string _command;
 
     public ProtocolRegistrationService()
@@ -39,33 +42,23 @@ internal sealed class ProtocolRegistrationService
     {
         var response = context.Request.Type switch
         {
-            "app.registerProtocols" => RegisterReply(context),
+            "app.registerProtocols" => RegisterBrowserReply(context),
+            "app.registerCustomScheme" => RegisterCustomSchemeReply(context),
+            "app.protocolStatus" => StatusReply(context),
             "app.openDefaultApps" => OpenDefaultAppsReply(context),
-            "app.isDefaultBrowser" => context.Reply("app.isDefaultBrowser.result", new { IsDefault = IsDefaultBrowser() }),
             _ => null
         };
 
         return Task.FromResult(response);
     }
 
-    /// <summary>True when Windows currently routes http links to URLCheck.</summary>
-    private static bool IsDefaultBrowser()
+    /// <summary>Registers URLCheck as an http/https candidate browser.</summary>
+    public void RegisterBrowser()
     {
-        using var key = Registry.CurrentUser.OpenSubKey(
-            @"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice");
+        EnsureExecutable();
 
-        return key?.GetValue("ProgId") as string == "URLCheck.HTTP";
-    }
-
-    /// <summary>Writes all required registry keys for the current user.</summary>
-    public void Register()
-    {
-        if (string.IsNullOrWhiteSpace(ExecutablePath))
-            throw new InvalidOperationException("Unable to determine the URLCheck executable path.");
-
-        RegisterProgId("URLCheck.HTTP", "URLCheck HTTP handler", _command);
-        RegisterProgId("URLCheck.HTTPS", "URLCheck HTTPS handler", _command);
-        RegisterProgId(CustomScheme, "URL:URLCheck Protocol", _command);
+        RegisterProgId(HttpProgId, "URLCheck HTTP handler");
+        RegisterProgId(HttpsProgId, "URLCheck HTTPS handler");
 
         using var capabilities = Registry.CurrentUser.CreateSubKey(
             $@"Software\Clients\StartMenuInternet\{AppKeyName}\Capabilities");
@@ -74,8 +67,8 @@ internal sealed class ProtocolRegistrationService
         capabilities.SetValue("ApplicationDescription", "URLCheck URL intermediary");
 
         using var associations = capabilities.CreateSubKey("URLAssociations");
-        associations.SetValue("http", "URLCheck.HTTP");
-        associations.SetValue("https", "URLCheck.HTTPS");
+        associations.SetValue("http", HttpProgId);
+        associations.SetValue("https", HttpsProgId);
 
         using var startMenuCommand = Registry.CurrentUser.CreateSubKey(
             $@"Software\Clients\StartMenuInternet\{AppKeyName}\shell\open\command");
@@ -83,6 +76,13 @@ internal sealed class ProtocolRegistrationService
 
         using var registered = Registry.CurrentUser.CreateSubKey(@"Software\RegisteredApplications");
         registered.SetValue(AppKeyName, $@"Software\Clients\StartMenuInternet\{AppKeyName}\Capabilities");
+    }
+
+    /// <summary>Registers the custom <c>urlcheck://</c> scheme handler.</summary>
+    public void RegisterCustomScheme()
+    {
+        EnsureExecutable();
+        RegisterProgId(CustomScheme, "URL:URLCheck Protocol");
     }
 
     /// <summary>Opens the Windows "Default apps" settings page so the user can pick URLCheck.</summary>
@@ -94,7 +94,13 @@ internal sealed class ProtocolRegistrationService
         });
     }
 
-    private void RegisterProgId(string progId, string description, string command)
+    private void EnsureExecutable()
+    {
+        if (string.IsNullOrWhiteSpace(ExecutablePath))
+            throw new InvalidOperationException("Unable to determine the URLCheck executable path.");
+    }
+
+    private void RegisterProgId(string progId, string description)
     {
         using var key = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{progId}");
         key.SetValue(null, description);
@@ -104,18 +110,50 @@ internal sealed class ProtocolRegistrationService
         icon.SetValue(null, $"\"{ExecutablePath}\",0");
 
         using var openCommand = key.CreateSubKey(@"shell\open\command");
-        openCommand.SetValue(null, command);
+        openCommand.SetValue(null, _command);
     }
 
-    private NativeResponse RegisterReply(NativeContext context)
+    /// <summary>True when Windows currently routes http links to URLCheck.</summary>
+    private static bool IsDefaultBrowser()
     {
-        Register();
+        using var key = Registry.CurrentUser.OpenSubKey(
+            @"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice");
+
+        return key?.GetValue("ProgId") as string == HttpProgId;
+    }
+
+    private static bool IsCustomSchemeRegistered()
+    {
+        using var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{CustomScheme}\shell\open\command");
+        return key?.GetValue(null) is string command && command.Length > 0;
+    }
+
+    private NativeResponse RegisterBrowserReply(NativeContext context)
+    {
+        RegisterBrowser();
         return context.Reply("app.registerProtocols.result", new
         {
             Ok = true,
             ExecutablePath
         });
     }
+
+    private NativeResponse RegisterCustomSchemeReply(NativeContext context)
+    {
+        RegisterCustomScheme();
+        return context.Reply("app.registerCustomScheme.result", new
+        {
+            Ok = true,
+            ExecutablePath
+        });
+    }
+
+    private static NativeResponse StatusReply(NativeContext context) =>
+        context.Reply("app.protocolStatus.result", new
+        {
+            IsDefault = IsDefaultBrowser(),
+            CustomSchemeRegistered = IsCustomSchemeRegistered()
+        });
 
     private static NativeResponse OpenDefaultAppsReply(NativeContext context)
     {

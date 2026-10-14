@@ -20,9 +20,26 @@ export function closePopup(): void {
     Native.send({type: "popup.close"});
 }
 
-/** Registers URLCheck as a candidate browser and as the `urlcheck://` handler. */
+/** Registers URLCheck as a candidate browser for http/https. */
 export async function registerProtocols(): Promise<{ executablePath: string }> {
     return await Native.request<{ executablePath: string }>("app.registerProtocols");
+}
+
+/** Registers URLCheck as the handler for the custom `urlcheck://` scheme. */
+export async function registerCustomScheme(): Promise<{ executablePath: string }> {
+    return await Native.request<{ executablePath: string }>("app.registerCustomScheme");
+}
+
+export interface ProtocolStatus {
+    isDefault: boolean;
+    customSchemeRegistered: boolean;
+}
+
+/** Reports whether URLCheck is the default browser and whether urlcheck:// is registered. */
+export async function protocolStatus(): Promise<ProtocolStatus> {
+    if (!Native.available) return {isDefault: false, customSchemeRegistered: false};
+
+    return await Native.request<ProtocolStatus>("app.protocolStatus");
 }
 
 /** Opens the Windows "Default apps" settings page. */
@@ -46,6 +63,6 @@ export async function getAppInfo(): Promise<{ version: string }> {
 export async function isDefaultBrowser(): Promise<boolean> {
     if (!Native.available) return false;
 
-    const result = await Native.request<{ isDefault: boolean }>("app.isDefaultBrowser");
-    return result.isDefault;
+    const status = await Native.request<ProtocolStatus>("app.protocolStatus");
+    return status.isDefault;
 }

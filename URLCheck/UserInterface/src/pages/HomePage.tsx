@@ -173,7 +173,13 @@ const BannerButton = styled.button`
     }
 `;
 
-const SAMPLE_URL = "https://www.google.com/search?q=photino+net&hl=en&utm_source=test";
+const SAMPLE_URLS = [
+    "http://www.google.com/?ref=referrer&foo=bar#tag",
+    "https://www.google.com/search?q=photino+net&utm_source=test&utm_medium=email",
+    "https://example.com/path/to/page?key=value&lang=en#section",
+];
+
+const SAMPLE_URL = SAMPLE_URLS[0];
 
 export const HomePage: React.FC = () => {
     const navigate = useNavigate();
@@ -244,10 +250,16 @@ export const HomePage: React.FC = () => {
                 </InputForm>
 
                 <Presets>
-                    <PresetLabel>Sample URL:</PresetLabel>
-                    <PresetChip type="button" onClick={() => setUrl(SAMPLE_URL)}>
-                        {SAMPLE_URL}
-                    </PresetChip>
+                    <PresetLabel>Sample URLs:</PresetLabel>
+                    {SAMPLE_URLS.map((sample) => (
+                        <PresetChip
+                            key={sample}
+                            type="button"
+                            onClick={() => setUrl(sample)}
+                        >
+                            {sample}
+                        </PresetChip>
+                    ))}
                 </Presets>
             </StackCard>
         </PageContainer>
