@@ -6,19 +6,19 @@ using Swan;
 namespace URLCheck.Messaging;
 
 /// <summary>
-/// The transport for JSON messages exchanged with the React front-end.
-/// It only parses, raises <see cref="MessageReceived"/> and serializes the reply — the actual
-/// handling lives with the services that own each message type.
+///     The transport for JSON messages exchanged with the React front-end.
+///     It only parses, raises <see cref="MessageReceived" /> and serializes the reply — the actual
+///     handling lives with the services that own each message type.
 /// </summary>
-internal sealed class NativeBridge
+internal static class NativeBridge
 {
     /// <summary>
-    /// Raised for every incoming message. Handlers are awaited in subscription order and the first
-    /// non-null response wins.
+    ///     Raised for every incoming message. Handlers are awaited in subscription order and the first
+    ///     non-null response wins.
     /// </summary>
-    public event NativeMessageHandler? MessageReceived;
+    public static event NativeMessageHandler? MessageReceived;
 
-    public async Task HandleMessageAsync(PhotinoWindow? window, string rawMessage)
+    public static async Task HandleMessageAsync(PhotinoWindow? window, string rawMessage)
     {
         Log.Debug("<< {Message}", rawMessage.RemoveControlChars().Truncate(600));
 
@@ -57,16 +57,14 @@ internal sealed class NativeBridge
         }
     }
 
-    private async Task<NativeResponse?> RaiseAsync(NativeContext context)
+    private static async Task<NativeResponse?> RaiseAsync(NativeContext context)
     {
         if (MessageReceived is not { } handlers)
             return null;
 
         foreach (var handler in handlers.GetInvocationList().Cast<NativeMessageHandler>())
-        {
             if (await handler(context) is { } response)
                 return response;
-        }
 
         return null;
     }

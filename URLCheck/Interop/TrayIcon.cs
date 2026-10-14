@@ -4,8 +4,8 @@ using Serilog;
 namespace URLCheck.Interop;
 
 /// <summary>
-/// A notification-area (tray) icon hosted on its own STA thread with a private message loop,
-/// independent of Photino's UI thread.
+///     A notification-area (tray) icon hosted on its own STA thread with a private message loop,
+///     independent of Photino's UI thread.
 /// </summary>
 internal sealed class TrayIcon : IDisposable
 {
@@ -32,17 +32,17 @@ internal sealed class TrayIcon : IDisposable
     private const int MenuSettings = 2;
     private const int MenuExit = 3;
     private const int IdiApplication = 32512;
-
-    private readonly string _tooltip;
+    private readonly string _className = $"URLCheck.TrayIcon.{Guid.NewGuid():N}";
+    private readonly Action _onExit;
     private readonly Action _onOpen;
     private readonly Action _onSettings;
-    private readonly Action _onExit;
+
+    private readonly string _tooltip;
+    private IntPtr _hwnd = IntPtr.Zero;
+    private uint _taskbarCreatedMessage;
 
     private Thread? _thread;
-    private IntPtr _hwnd = IntPtr.Zero;
     private NativeMethods.WndProcDelegate? _wndProc;
-    private uint _taskbarCreatedMessage;
-    private readonly string _className = $"URLCheck.TrayIcon.{Guid.NewGuid():N}";
 
     public TrayIcon(string tooltip, Action onOpen, Action onSettings, Action onExit)
     {
@@ -52,12 +52,18 @@ internal sealed class TrayIcon : IDisposable
         _onExit = onExit;
     }
 
+    public void Dispose()
+    {
+        if (_hwnd != IntPtr.Zero)
+            NativeMethods.PostMessage(_hwnd, WmDestroy, IntPtr.Zero, IntPtr.Zero);
+    }
+
     public void Start()
     {
-        _thread = new Thread(ThreadProc)
+        _thread = new(ThreadProc)
         {
             IsBackground = true,
-            Name = "URLCheck.Tray",
+            Name = "URLCheck.Tray"
         };
         _thread.SetApartmentState(ApartmentState.STA);
         _thread.Start();
@@ -74,7 +80,7 @@ internal sealed class TrayIcon : IDisposable
             cbSize = (uint)Marshal.SizeOf<NativeMethods.WndClassEx>(),
             lpfnWndProc = Marshal.GetFunctionPointerForDelegate(_wndProc),
             hInstance = hInstance,
-            lpszClassName = _className,
+            lpszClassName = _className
         };
         NativeMethods.RegisterClassEx(ref windowClass);
 
@@ -108,7 +114,7 @@ internal sealed class TrayIcon : IDisposable
             hIcon = NativeMethods.LoadIcon(IntPtr.Zero, IdiApplication),
             szTip = _tooltip,
             szInfo = string.Empty,
-            szInfoTitle = string.Empty,
+            szInfoTitle = string.Empty
         };
 
         NativeMethods.Shell_NotifyIcon(NimAdd, ref data);
@@ -123,7 +129,7 @@ internal sealed class TrayIcon : IDisposable
         {
             cbSize = Marshal.SizeOf<NativeMethods.NotifyIconData>(),
             hWnd = _hwnd,
-            uID = 1,
+            uID = 1
         };
 
         NativeMethods.Shell_NotifyIcon(NimDelete, ref data);
@@ -210,11 +216,5 @@ internal sealed class TrayIcon : IDisposable
         {
             Log.Warning(ex, "Tray callback failed");
         }
-    }
-
-    public void Dispose()
-    {
-        if (_hwnd != IntPtr.Zero)
-            NativeMethods.PostMessage(_hwnd, WmDestroy, IntPtr.Zero, IntPtr.Zero);
     }
 }

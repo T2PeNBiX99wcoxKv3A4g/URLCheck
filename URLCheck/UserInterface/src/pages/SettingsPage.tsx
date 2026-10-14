@@ -651,7 +651,8 @@ export const SettingsPage: React.FC = () => {
 
           <SettingInfo>
             <SettingDescription>
-              Register URLCheck as a candidate browser for http/https and as the urlcheck:// handler. Windows still
+              Register URLCheck as a candidate browser for http/https and as the urlcheck:// handler. Windows
+              still
               requires you to confirm URLCheck in Default apps.
             </SettingDescription>
           </SettingInfo>

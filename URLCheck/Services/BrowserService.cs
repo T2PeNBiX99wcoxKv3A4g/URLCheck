@@ -7,8 +7,8 @@ using URLCheck.Models;
 namespace URLCheck.Services;
 
 /// <summary>
-/// Detects installed browsers from the Windows "StartMenuInternet" client registry and launches
-/// them with a URL.
+///     Detects installed browsers from the Windows "StartMenuInternet" client registry and launches
+///     them with a URL.
 /// </summary>
 internal static class BrowserService
 {
@@ -18,10 +18,15 @@ internal static class BrowserService
         @"SOFTWARE\WOW6432Node\Clients\StartMenuInternet"
     ];
 
+    static BrowserService() => NativeBridge.MessageReceived += HandleMessageAsync;
+
     /// <summary>Handles the <c>browsers.*</c> messages.</summary>
-    public static Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
+    private static Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
         context.Request.Type == "browsers.detect"
-            ? Task.FromResult<NativeResponse?>(context.Reply("browsers.detect.result", new { Browsers = DetectInstalledBrowsers() }))
+            ? Task.FromResult<NativeResponse?>(context.Reply("browsers.detect.result", new
+            {
+                Browsers = DetectInstalledBrowsers()
+            }))
             : Task.FromResult<NativeResponse?>(null);
 
     /// <summary>Enumerates installed browsers, de-duplicated by executable path.</summary>
@@ -33,19 +38,15 @@ internal static class BrowserService
                  {
                      Registry.LocalMachine, Registry.CurrentUser
                  })
-        {
-            foreach (var root in ClientRoots)
+        foreach (var root in ClientRoots)
+            try
             {
-                try
-                {
-                    ScanRoot(hive, root, found);
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning(ex, "Failed to scan {Root}", root);
-                }
+                ScanRoot(hive, root, found);
             }
-        }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to scan {Root}", root);
+            }
 
         return
         [
@@ -54,7 +55,7 @@ internal static class BrowserService
         ];
     }
 
-    /// <summary>Starts <paramref name="executablePath"/> with <paramref name="url"/> as its argument.</summary>
+    /// <summary>Starts <paramref name="executablePath" /> with <paramref name="url" /> as its argument.</summary>
     public static void Launch(string executablePath, string url)
     {
         if (string.IsNullOrWhiteSpace(executablePath))
@@ -64,7 +65,7 @@ internal static class BrowserService
         {
             FileName = executablePath,
             Arguments = $"\"{url}\"",
-            UseShellExecute = false,
+            UseShellExecute = false
         });
     }
 
@@ -89,10 +90,10 @@ internal static class BrowserService
             if (string.IsNullOrWhiteSpace(displayName))
                 displayName = clientName;
 
-            found[executable] = new BrowserEntry
+            found[executable] = new()
             {
                 Name = displayName,
-                ExecutablePath = executable,
+                ExecutablePath = executable
             };
         }
     }

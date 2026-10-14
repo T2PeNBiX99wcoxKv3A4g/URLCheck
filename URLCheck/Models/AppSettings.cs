@@ -3,9 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 namespace URLCheck.Models;
 
 /// <summary>
-/// User-configurable settings. Instances are serialized to JSON on disk and exchanged with the
-/// React front-end through the native message bridge, so the property names map 1:1 to the
-/// TypeScript <c>AppSettings</c> interface.
+///     User-configurable settings. Instances are serialized to JSON on disk and exchanged with the
+///     React front-end through the native message bridge, so the property names map 1:1 to the
+///     TypeScript <c>AppSettings</c> interface.
 /// </summary>
 [SuppressMessage("ReSharper", "PropertyCanBeMadeInitOnly.Global")]
 internal sealed class AppSettings

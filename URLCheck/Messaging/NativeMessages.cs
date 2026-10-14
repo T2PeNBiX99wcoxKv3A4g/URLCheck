@@ -6,7 +6,7 @@ using URLCheck.Models;
 namespace URLCheck.Messaging;
 
 /// <summary>
-/// A message sent from the React front-end through <c>window.external.sendMessage(...)</c>.
+///     A message sent from the React front-end through <c>window.external.sendMessage(...)</c>.
 /// </summary>
 internal sealed class NativeRequest
 {
@@ -21,7 +21,7 @@ internal sealed class NativeRequest
 }
 
 /// <summary>
-/// A reply sent back to the front-end through <c>window.external.receiveMessage(...)</c>.
+///     A reply sent back to the front-end through <c>window.external.receiveMessage(...)</c>.
 /// </summary>
 internal sealed class NativeResponse
 {
@@ -32,14 +32,26 @@ internal sealed class NativeResponse
     public string? Error { get; init; }
 
     public static NativeResponse Success(string? id, string type, object? data = null) =>
-        new() { Id = id, Type = type, Ok = true, Data = data };
+        new()
+        {
+            Id = id,
+            Type = type,
+            Ok = true,
+            Data = data
+        };
 
     public static NativeResponse Failure(string? id, string type, string error) =>
-        new() { Id = id, Type = type, Ok = false, Error = error };
+        new()
+        {
+            Id = id,
+            Type = type,
+            Ok = false,
+            Error = error
+        };
 }
 
 /// <summary>
-/// An unsolicited push from C# to the front-end (no request id, no reply expected).
+///     An unsolicited push from C# to the front-end (no request id, no reply expected).
 /// </summary>
 internal sealed class NativeEvent
 {
@@ -64,8 +76,8 @@ internal sealed record NativeContext(PhotinoWindow? Window, NativeRequest Reques
 }
 
 /// <summary>
-/// Handles a subset of message types. Returns a response, or <c>null</c> to decline the message
-/// (either it belongs to another handler, or it needs no reply).
+///     Handles a subset of message types. Returns a response, or <c>null</c> to decline the message
+///     (either it belongs to another handler, or it needs no reply).
 /// </summary>
 internal delegate Task<NativeResponse?> NativeMessageHandler(NativeContext context);
 
@@ -83,12 +95,16 @@ internal static class NativeProtocol
 {
     public static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
     {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
     public static string SerializeResponse(NativeResponse response) =>
         JsonSerializer.Serialize(response, SerializerOptions);
 
     public static string SerializeEvent(string type, object? data = null) =>
-        JsonSerializer.Serialize(new NativeEvent { Type = type, Data = data }, SerializerOptions);
+        JsonSerializer.Serialize(new NativeEvent
+        {
+            Type = type,
+            Data = data
+        }, SerializerOptions);
 }

@@ -1,18 +1,19 @@
 using System.Diagnostics;
+using JetBrains.Annotations;
 using Microsoft.Win32;
 using URLCheck.Messaging;
 
 namespace URLCheck.Services;
 
 /// <summary>
-/// Registers URLCheck as a candidate browser for <c>http</c>/<c>https</c> and as a handler for the
-/// custom <c>urlcheck://</c> scheme.
+///     Registers URLCheck as a candidate browser for <c>http</c>/<c>https</c> and as a handler for the
+///     custom <c>urlcheck://</c> scheme.
 /// </summary>
 /// <remarks>
-/// Windows 10/11 protect the default-handler choice with a hash (UserChoice), so an app can never
-/// silently become the default browser. Registering here only makes URLCheck appear in the
-/// "Default apps" list; the user still has to select it. <see cref="OpenDefaultAppsSettings"/>
-/// deep-links them to that page.
+///     Windows 10/11 protect the default-handler choice with a hash (UserChoice), so an app can never
+///     silently become the default browser. Registering here only makes URLCheck appear in the
+///     "Default apps" list; the user still has to select it. <see cref="OpenDefaultAppsSettings" />
+///     deep-links them to that page.
 /// </remarks>
 internal sealed class ProtocolRegistrationService
 {
@@ -20,26 +21,25 @@ internal sealed class ProtocolRegistrationService
     private const string CustomScheme = "urlcheck";
     private readonly string _command;
 
-    private readonly string _executablePath;
-
     public ProtocolRegistrationService()
     {
-        _executablePath = Environment.ProcessPath
-                          ?? Process.GetCurrentProcess().MainModule?.FileName
-                          ?? string.Empty;
-        _command = $"\"{_executablePath}\" \"%1\"";
+        ExecutablePath = Environment.ProcessPath
+                         ?? Process.GetCurrentProcess().MainModule?.FileName
+                         ?? string.Empty;
+        _command = $"\"{ExecutablePath}\" \"%1\"";
+        NativeBridge.MessageReceived += HandleMessageAsync;
     }
 
-    public string ExecutablePath => _executablePath;
+    [PublicAPI] public string ExecutablePath { get; }
 
     /// <summary>Handles the <c>app.*</c> messages.</summary>
-    public Task<NativeResponse?> HandleMessageAsync(NativeContext context)
+    private Task<NativeResponse?> HandleMessageAsync(NativeContext context)
     {
         var response = context.Request.Type switch
         {
             "app.registerProtocols" => RegisterReply(context),
             "app.openDefaultApps" => OpenDefaultAppsReply(context),
-            _ => null,
+            _ => null
         };
 
         return Task.FromResult(response);
@@ -48,7 +48,7 @@ internal sealed class ProtocolRegistrationService
     /// <summary>Writes all required registry keys for the current user.</summary>
     public void Register()
     {
-        if (string.IsNullOrWhiteSpace(_executablePath))
+        if (string.IsNullOrWhiteSpace(ExecutablePath))
             throw new InvalidOperationException("Unable to determine the URLCheck executable path.");
 
         RegisterProgId("URLCheck.HTTP", "URLCheck HTTP handler", _command);
@@ -78,7 +78,7 @@ internal sealed class ProtocolRegistrationService
     {
         Process.Start(new ProcessStartInfo("ms-settings:defaultapps")
         {
-            UseShellExecute = true,
+            UseShellExecute = true
         });
     }
 
@@ -89,7 +89,7 @@ internal sealed class ProtocolRegistrationService
         key.SetValue("URL Protocol", string.Empty);
 
         using var icon = key.CreateSubKey("DefaultIcon");
-        icon.SetValue(null, $"\"{_executablePath}\",0");
+        icon.SetValue(null, $"\"{ExecutablePath}\",0");
 
         using var openCommand = key.CreateSubKey(@"shell\open\command");
         openCommand.SetValue(null, command);
@@ -98,12 +98,19 @@ internal sealed class ProtocolRegistrationService
     private NativeResponse RegisterReply(NativeContext context)
     {
         Register();
-        return context.Reply("app.registerProtocols.result", new { Ok = true, ExecutablePath = _executablePath });
+        return context.Reply("app.registerProtocols.result", new
+        {
+            Ok = true,
+            ExecutablePath
+        });
     }
 
     private static NativeResponse OpenDefaultAppsReply(NativeContext context)
     {
         OpenDefaultAppsSettings();
-        return context.Reply("app.openDefaultApps.result", new { Ok = true });
+        return context.Reply("app.openDefaultApps.result", new
+        {
+            Ok = true
+        });
     }
 }

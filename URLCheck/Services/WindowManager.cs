@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Photino.NET;
 using Serilog;
 using URLCheck.Interop;
@@ -7,33 +8,32 @@ using URLCheck.Models;
 namespace URLCheck.Services;
 
 /// <summary>
-/// Owns the Photino windows: a hidden "host" window that keeps the message loop alive while the
-/// app sits in the tray, and an on-demand borderless popup used to inspect a URL.
+///     Owns the Photino windows: a hidden "host" window that keeps the message loop alive while the
+///     app sits in the tray, and an on-demand borderless popup used to inspect a URL.
 /// </summary>
 internal sealed class WindowManager
 {
+    /// <summary>
+    ///     Per-app WebView2 data folder. Photino defaults to a folder shared by every Photino app,
+    ///     which breaks when another app holds it, so keep URLCheck's separate.
+    /// </summary>
+    private static readonly string WebViewDataPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "URLCheck", "webview");
+
     private readonly string _appUrl;
-    private readonly NativeBridge _bridge;
     private readonly SettingsService _settings;
     private bool _allowClose;
 
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
 
-    /// <summary>
-    /// Per-app WebView2 data folder. Photino defaults to a folder shared by every Photino app,
-    /// which breaks when another app holds it, so keep URLCheck's separate.
-    /// </summary>
-    private static readonly string WebViewDataPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "URLCheck", "webview");
-
-    public WindowManager(string appUrl, NativeBridge bridge, SettingsService settings)
+    public WindowManager(string appUrl, SettingsService settings)
     {
         _appUrl = appUrl;
-        _bridge = bridge;
         _settings = settings;
 
         _settings.Changed += payload => BroadcastEvent("settings.changed", payload);
+        NativeBridge.MessageReceived += HandleMessageAsync;
     }
 
     /// <summary>When true the host window is shown at startup instead of hiding to the tray.</summary>
@@ -43,7 +43,7 @@ internal sealed class WindowManager
     public event Action? MainWindowCreated;
 
     /// <summary>Handles the <c>popup.*</c> and <c>window.*</c> messages.</summary>
-    public async Task<NativeResponse?> HandleMessageAsync(NativeContext context)
+    private async Task<NativeResponse?> HandleMessageAsync(NativeContext context)
     {
         switch (context.Request.Type)
         {
@@ -101,7 +101,7 @@ internal sealed class WindowManager
             .SetMinSize(720, 480)
             .SetMinimized(!ShowMainWindowOnStartup)
             .RegisterWebMessageReceivedHandler((sender, message) =>
-                _ = _bridge.HandleMessageAsync(sender as PhotinoWindow, message))
+                _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message))
             .RegisterWindowCreatedHandler((_, _) => MainWindowCreated?.Invoke())
             .RegisterWindowClosingHandler((_, _) =>
             {
@@ -118,6 +118,7 @@ internal sealed class WindowManager
     /// <summary>Starts the message loop; blocks until the host window is closed for real.</summary>
     public void Run() => _mainWindow?.WaitForClose();
 
+    [PublicAPI]
     public void HideMainWindow() => Invoke(_mainWindow, HideHandle);
 
     public void ShowMainWindow(string? tab = null)
@@ -131,7 +132,7 @@ internal sealed class WindowManager
             }));
     }
 
-    /// <summary>Opens a popup for <paramref name="url"/>, or navigates the existing popup to it.</summary>
+    /// <summary>Opens a popup for <paramref name="url" />, or navigates the existing popup to it.</summary>
     public void ShowPopup(string url)
     {
         if (string.IsNullOrWhiteSpace(url))
@@ -140,7 +141,6 @@ internal sealed class WindowManager
         _mainWindow?.Invoke(() =>
         {
             if (_popupWindow is not null)
-            {
                 try
                 {
                     _popupWindow.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate", new
@@ -155,7 +155,6 @@ internal sealed class WindowManager
                 {
                     _popupWindow = null;
                 }
-            }
 
             // Top-level (not owned): an owned window would be hidden together with the hidden host.
             var popup = new PhotinoWindow()
@@ -169,7 +168,7 @@ internal sealed class WindowManager
                 .SetTopMost(true)
                 .Center()
                 .RegisterWebMessageReceivedHandler((sender, message) =>
-                    _ = _bridge.HandleMessageAsync(sender as PhotinoWindow, message))
+                    _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message))
                 .RegisterWindowClosingHandler((_, _) =>
                 {
                     _popupWindow = null;
@@ -204,7 +203,7 @@ internal sealed class WindowManager
             return;
 
         NativeMethods.ReleaseCapture();
-        NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, (IntPtr)NativeMethods.HtCaption, IntPtr.Zero);
+        NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, NativeMethods.HtCaption, IntPtr.Zero);
     });
 
     public void CloseWindow(PhotinoWindow? window)

@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Serilog;
 using URLCheck.Interop;
-using URLCheck.Messaging;
 using URLCheck.Services;
 #if !DEBUG
 using Photino.NET.Server;
@@ -52,25 +51,18 @@ internal static class Program
 
             Log.Information("Serving React app at {AppUrl}", appUrl);
 
-            var bridge = new NativeBridge();
             var settings = new SettingsService();
             var protocols = new ProtocolRegistrationService();
-            var manager = new WindowManager(appUrl, bridge, settings)
+            var manager = new WindowManager(appUrl, settings)
             {
-                ShowMainWindowOnStartup = showMainWindow,
+                ShowMainWindowOnStartup = showMainWindow
             };
 
-            // Each service handles the message types it owns.
-            bridge.MessageReceived += settings.HandleMessageAsync;
-            bridge.MessageReceived += manager.HandleMessageAsync;
-            bridge.MessageReceived += protocols.HandleMessageAsync;
-            bridge.MessageReceived += BrowserService.HandleMessageAsync;
-
             using var tray = new TrayIcon(
-                tooltip: Constants.WindowTitle,
-                onOpen: () => manager.ShowMainWindow(),
-                onSettings: () => manager.ShowMainWindow("settings"),
-                onExit: manager.Exit);
+                Constants.WindowTitle,
+                () => manager.ShowMainWindow(),
+                () => manager.ShowMainWindow("settings"),
+                manager.Exit);
             tray.Start();
 
             manager.MainWindowCreated += () =>

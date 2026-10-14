@@ -5,8 +5,8 @@ using Serilog;
 namespace URLCheck.Services;
 
 /// <summary>
-/// Ensures a single running instance. Later launches forward their command-line arguments to the
-/// first instance over a named pipe and then exit.
+///     Ensures a single running instance. Later launches forward their command-line arguments to the
+///     first instance over a named pipe and then exit.
 /// </summary>
 internal sealed class SingleInstance : IDisposable
 {
@@ -18,7 +18,7 @@ internal sealed class SingleInstance : IDisposable
 
     public SingleInstance()
     {
-        _mutex = new Mutex(initiallyOwned: true, MutexName, out var createdNew);
+        _mutex = new(true, MutexName, out var createdNew);
         IsFirstInstance = createdNew;
     }
 
@@ -52,14 +52,13 @@ internal sealed class SingleInstance : IDisposable
         }
     }
 
-    /// <summary>Starts the pipe server; <paramref name="onArguments"/> runs on a background thread.</summary>
+    /// <summary>Starts the pipe server; <paramref name="onArguments" /> runs on a background thread.</summary>
     public void StartServer(Action<IReadOnlyList<string>> onArguments) =>
         _ = Task.Run(() => ServerLoopAsync(onArguments));
 
     private async Task ServerLoopAsync(Action<IReadOnlyList<string>> onArguments)
     {
         while (!_cts.IsCancellationRequested)
-        {
             try
             {
                 await using var server = new NamedPipeServerStream(
@@ -91,6 +90,5 @@ internal sealed class SingleInstance : IDisposable
                     return;
                 }
             }
-        }
     }
 }

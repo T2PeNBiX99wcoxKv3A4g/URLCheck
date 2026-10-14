@@ -6,12 +6,15 @@ using URLCheck.Models;
 namespace URLCheck.Services;
 
 /// <summary>
-/// Loads and persists <see cref="AppSettings"/> as JSON under <c>%APPDATA%\URLCheck</c>.
-/// The first read seeds the browser list so the popup works out of the box.
+///     Loads and persists <see cref="AppSettings" /> as JSON under <c>%APPDATA%\URLCheck</c>.
+///     The first read seeds the browser list so the popup works out of the box.
 /// </summary>
 internal sealed class SettingsService
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        WriteIndented = true
+    };
 
     private readonly SemaphoreSlim _gate = new(1, 1);
     private AppSettings? _current;
@@ -21,6 +24,7 @@ internal sealed class SettingsService
         var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "URLCheck");
         Directory.CreateDirectory(directory);
         SettingsFilePath = Path.Combine(directory, "settings.json");
+        NativeBridge.MessageReceived += HandleMessageAsync;
     }
 
     public string SettingsFilePath { get; }
@@ -29,7 +33,7 @@ internal sealed class SettingsService
     public event Action<SettingsPayload>? Changed;
 
     /// <summary>Handles the <c>settings.*</c> messages.</summary>
-    public async Task<NativeResponse?> HandleMessageAsync(NativeContext context)
+    private async Task<NativeResponse?> HandleMessageAsync(NativeContext context)
     {
         switch (context.Request.Type)
         {
@@ -96,7 +100,10 @@ internal sealed class SettingsService
 
     /// <summary>Restores defaults, re-detecting the installed browsers.</summary>
     public Task<AppSettings> ResetAsync() =>
-        SaveAsync(new AppSettings { Browsers = [.. BrowserService.DetectInstalledBrowsers()] });
+        SaveAsync(new()
+        {
+            Browsers = [.. BrowserService.DetectInstalledBrowsers()]
+        });
 
     private async Task<SettingsPayload> PayloadAsync() => new(await GetAsync(), SettingsFilePath);
 
@@ -110,7 +117,10 @@ internal sealed class SettingsService
     private async Task<AppSettings> ReadAsync()
     {
         if (!File.Exists(SettingsFilePath))
-            return new AppSettings { Browsers = [.. BrowserService.DetectInstalledBrowsers()] };
+            return new()
+            {
+                Browsers = [.. BrowserService.DetectInstalledBrowsers()]
+            };
 
         try
         {
@@ -120,7 +130,7 @@ internal sealed class SettingsService
         catch (Exception ex)
         {
             Log.Warning(ex, "Failed to load settings from {Path}", SettingsFilePath);
-            return new AppSettings();
+            return new();
         }
     }
 }
