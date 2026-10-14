@@ -64,6 +64,7 @@ internal static class Program
             bridge.MessageReceived += settings.HandleMessageAsync;
             bridge.MessageReceived += manager.HandleMessageAsync;
             bridge.MessageReceived += protocols.HandleMessageAsync;
+            bridge.MessageReceived += BrowserService.HandleMessageAsync;
 
             using var tray = new TrayIcon(
                 tooltip: Constants.WindowTitle,

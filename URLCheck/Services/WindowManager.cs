@@ -148,6 +148,7 @@ internal sealed class WindowManager
                         url
                     }));
                     ShowHandle(_popupWindow);
+                    KeepOnTop(_popupWindow);
                     return;
                 }
                 catch
@@ -181,6 +182,11 @@ internal sealed class WindowManager
             try
             {
                 popup.WaitForClose();
+                KeepOnTop(popup);
+
+                // The native show/center runs after the created callback and clears the style,
+                // so re-assert it once the window has settled.
+                _ = Task.Delay(700).ContinueWith(_ => ReassertTopMost(popup));
             }
             catch (Exception ex)
             {
@@ -261,6 +267,30 @@ internal sealed class WindowManager
         var handle = window.WindowHandle;
         if (handle != IntPtr.Zero)
             NativeMethods.ShowWindow(handle, NativeMethods.SwHide);
+    }
+
+    /// <summary>Re-asserts the always-on-top style (e.g. after the popup is navigated).</summary>
+    private static void KeepOnTop(PhotinoWindow window)
+    {
+        var handle = window.WindowHandle;
+        if (handle == IntPtr.Zero)
+            return;
+
+        NativeMethods.SetWindowPos(handle, NativeMethods.HwndTopMost, 0, 0, 0, 0,
+            NativeMethods.SwpNoMove | NativeMethods.SwpNoSize | NativeMethods.SwpNoActivate);
+    }
+
+    private void ReassertTopMost(PhotinoWindow popup)
+    {
+        try
+        {
+            if (ReferenceEquals(_popupWindow, popup))
+                popup.Invoke(() => KeepOnTop(popup));
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to re-assert topmost");
+        }
     }
 
     private static void TrySend(PhotinoWindow? window, string json)

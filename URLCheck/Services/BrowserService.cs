@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Win32;
 using Serilog;
+using URLCheck.Messaging;
 using URLCheck.Models;
 
 namespace URLCheck.Services;
@@ -16,6 +17,12 @@ internal static class BrowserService
         @"SOFTWARE\Clients\StartMenuInternet",
         @"SOFTWARE\WOW6432Node\Clients\StartMenuInternet"
     ];
+
+    /// <summary>Handles the <c>browsers.*</c> messages.</summary>
+    public static Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
+        context.Request.Type == "browsers.detect"
+            ? Task.FromResult<NativeResponse?>(context.Reply("browsers.detect.result", new { Browsers = DetectInstalledBrowsers() }))
+            : Task.FromResult<NativeResponse?>(null);
 
     /// <summary>Enumerates installed browsers, de-duplicated by executable path.</summary>
     public static IReadOnlyList<BrowserEntry> DetectInstalledBrowsers()

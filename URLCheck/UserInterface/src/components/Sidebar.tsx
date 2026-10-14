@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import {TabType} from "../types";
-import {HistoryIcon, LinkIcon, SettingsIcon, ShieldCheckIcon} from "./Icons";
+import {HistoryIcon, HomeIcon, SettingsIcon, ShieldCheckIcon} from "./Icons";
 
 interface SidebarProps {
     currentTab: TabType;
@@ -146,8 +146,8 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
                     $active={currentTab === "single"}
                     onClick={() => onSelectTab("single")}
                 >
-                    <LinkIcon size={18}/>
-                    <span>Single URL Inspector</span>
+                    <HomeIcon size={18}/>
+                    <span>Home</span>
                 </NavItem>
 
                 <NavItem

@@ -64,8 +64,8 @@ const Dot = styled.span`
 
 const tabInfo: Record<TabType, { title: string; subtitle: string }> = {
   single: {
-    title: "Single URL Inspector",
-    subtitle: "Inspect URL structure, protocol, hostname, query parameters, and status in real time",
+    title: "Home",
+    subtitle: "Open a URL to inspect and clean it before opening",
   },
   history: {
     title: "Inspection History",
