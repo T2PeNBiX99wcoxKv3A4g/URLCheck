@@ -56,7 +56,7 @@ internal sealed class SettingsService
                 Console.WriteLine($"[settings] Failed to load '{SettingsFilePath}': {ex.Message}");
             }
 
-            return new AppSettings();
+            return new();
         }
     }
 
@@ -76,5 +76,5 @@ internal sealed class SettingsService
         }
     }
 
-    public AppSettings Reset() => Save(new AppSettings());
+    public AppSettings Reset() => Save(new());
 }

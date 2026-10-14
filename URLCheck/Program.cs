@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Photino.NET;
 using URLCheck.Messaging;
-using URLCheck.Services;
 #if !DEBUG
 using Photino.NET.Server;
 #endif
@@ -31,7 +30,7 @@ internal static class Program
         Console.WriteLine($"Serving React app at {appUrl}");
 
         // The bridge owns the settings and translates JSON messages to/from the React front-end.
-        var bridge = new NativeBridge(new SettingsService());
+        var bridge = new NativeBridge(new());
 
         var window = new PhotinoWindow()
             .SetTitle(Constants.WindowTitle)
