@@ -4,7 +4,7 @@ import {TabType} from "./types";
 import {Native} from "./Native";
 import {Sidebar} from "./components/Sidebar";
 import {Header} from "./components/Header";
-import {SingleCheckPage} from "./pages/SingleCheckPage";
+import {HomePage} from "./pages/HomePage";
 import {HistoryPage} from "./pages/HistoryPage";
 import {SettingsPage} from "./pages/SettingsPage";
 
@@ -34,7 +34,7 @@ const ContentArea = styled.main`
 `;
 
 export default function App() {
-    const [currentTab, setCurrentTab] = useState<TabType>("single");
+    const [currentTab, setCurrentTab] = useState<TabType>("home");
 
     // The tray menu can request a specific tab (e.g. "Settings").
     useEffect(() => {
@@ -53,7 +53,7 @@ export default function App() {
             <MainLayout>
                 <Header currentTab={currentTab}/>
                 <ContentArea>
-                    {currentTab === "single" && <SingleCheckPage/>}
+                    {currentTab === "home" && <HomePage/>}
                     {currentTab === "history" && <HistoryPage/>}
                     {currentTab === "settings" && <SettingsPage/>}
                 </ContentArea>

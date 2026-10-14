@@ -1,4 +1,4 @@
-export type TabType = "single" | "history" | "settings";
+export type TabType = "home" | "history" | "settings";
 
 export interface UrlCheckResult {
     url: string;

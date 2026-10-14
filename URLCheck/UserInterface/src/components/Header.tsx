@@ -63,7 +63,7 @@ const Dot = styled.span`
 `;
 
 const tabInfo: Record<TabType, { title: string; subtitle: string }> = {
-  single: {
+  home: {
     title: "Home",
     subtitle: "Open a URL to inspect and clean it before opening",
   },

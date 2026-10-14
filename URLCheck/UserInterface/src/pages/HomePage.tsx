@@ -138,7 +138,7 @@ const PresetChip = styled.button`
 
 const SAMPLE_URL = "https://www.google.com/search?q=photino+net&hl=en&utm_source=test";
 
-export const SingleCheckPage: React.FC = () => {
+export const HomePage: React.FC = () => {
     const [url, setUrl] = useState(SAMPLE_URL);
     const [busy, setBusy] = useState(false);
 
