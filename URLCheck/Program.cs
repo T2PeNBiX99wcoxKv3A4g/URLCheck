@@ -25,7 +25,9 @@ internal static class Program
                 Log.Information("arg: {Arg}", arg);
 
             var startupUrls = ExtractUrls(args);
-            var showMainWindow = args.Any(arg => arg is "--show" or "-s");
+
+            // Show the management window unless we were launched to handle a link, or asked to stay in the tray.
+            var showMainWindow = !args.Contains("--tray") && startupUrls.Count == 0;
 
             // Only one instance may run; later launches hand their URLs to it and exit.
             using var singleInstance = new SingleInstance();
@@ -42,7 +44,7 @@ internal static class Program
 
             var appUrl = $"{baseUrl}/index.html";
 #else
-            const string appUrl = "http://localhost:3000";
+            const string appUrl = "http://127.0.0.1:3000";
 #endif
 
             Log.Information("Serving React app at {AppUrl}", appUrl);

@@ -20,6 +20,13 @@ internal sealed class WindowManager
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
 
+    /// <summary>
+    /// Per-app WebView2 data folder. Photino defaults to a folder shared by every Photino app,
+    /// which breaks when another app holds it, so keep URLCheck's separate.
+    /// </summary>
+    private static readonly string WebViewDataPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "URLCheck", "webview");
+
     public WindowManager(string appUrl, NativeBridge bridge, SettingsService settings)
     {
         _appUrl = appUrl;
@@ -88,18 +95,14 @@ internal sealed class WindowManager
     {
         _mainWindow = new PhotinoWindow()
             .SetTitle(Constants.WindowTitle)
+            .SetTemporaryFilesPath(WebViewDataPath)
             .SetUseOsDefaultSize(false)
             .SetSize(new(1024, 720))
             .SetMinSize(720, 480)
+            .SetMinimized(!ShowMainWindowOnStartup)
             .RegisterWebMessageReceivedHandler((sender, message) =>
                 _ = _bridge.HandleMessageAsync(sender as PhotinoWindow, message))
-            .RegisterWindowCreatedHandler((_, _) =>
-            {
-                if (!ShowMainWindowOnStartup)
-                    HideMainWindow();
-
-                MainWindowCreated?.Invoke();
-            })
+            .RegisterWindowCreatedHandler((_, _) => MainWindowCreated?.Invoke())
             .RegisterWindowClosingHandler((_, _) =>
             {
                 // Stay resident: closing the host window hides it instead of shutting down.
@@ -134,7 +137,7 @@ internal sealed class WindowManager
         if (string.IsNullOrWhiteSpace(url))
             return;
 
-        Invoke(_mainWindow, main =>
+        _mainWindow?.Invoke(() =>
         {
             if (_popupWindow is not null)
             {
@@ -153,8 +156,10 @@ internal sealed class WindowManager
                 }
             }
 
-            var popup = new PhotinoWindow(main)
+            // Top-level (not owned): an owned window would be hidden together with the hidden host.
+            var popup = new PhotinoWindow()
                 .SetTitle(Constants.WindowTitle)
+                .SetTemporaryFilesPath(WebViewDataPath)
                 .SetUseOsDefaultSize(false)
                 .SetUseOsDefaultLocation(false)
                 .SetSize(new(560, 640))
