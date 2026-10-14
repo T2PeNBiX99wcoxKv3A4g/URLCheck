@@ -1,4 +1,5 @@
 using System.IO.Pipes;
+using JetBrains.Annotations;
 using Serilog;
 
 namespace URLCheck.Services;
@@ -31,6 +32,7 @@ internal sealed class SingleInstance : IDisposable
     }
 
     /// <summary>Hands the arguments to the already-running instance. Returns false on failure.</summary>
+    [PublicAPI]
     public static async Task<bool> ForwardAsync(IReadOnlyList<string> args)
     {
         try
