@@ -67,10 +67,6 @@ const tabInfo: Record<TabType, { title: string; subtitle: string }> = {
     title: "Single URL Inspector",
     subtitle: "Inspect URL structure, protocol, hostname, query parameters, and status in real time",
   },
-  batch: {
-    title: "Batch URL Scanner",
-    subtitle: "Quickly scan multiple URLs and examine response status codes and latencies",
-  },
   history: {
     title: "Inspection History",
     subtitle: "Review recently executed URL checks and summary logs",

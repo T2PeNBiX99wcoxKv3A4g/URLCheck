@@ -1,6 +1,9 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {CheckCircleIcon} from "../components/Icons";
+import {AlertTriangleIcon, CheckCircleIcon} from "../components/Icons";
+import {AppSettings} from "../types";
+import {Native} from "../Native";
+import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 
 const PageContainer = styled.div`
   display: flex;
@@ -105,6 +108,11 @@ const Switch = styled.label`
   input:checked + span:before {
     transform: translateX(22px);
   }
+
+  input:disabled + span {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 const StyledSelect = styled.select`
@@ -120,6 +128,11 @@ const StyledSelect = styled.select`
 
   &:focus {
     border-color: #3b82f6;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   option {
@@ -140,6 +153,11 @@ const StyledRange = styled.div`
     cursor: pointer;
   }
 
+  input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   span {
     font-size: 0.85rem;
     font-weight: 600;
@@ -150,11 +168,14 @@ const StyledRange = styled.div`
   }
 `;
 
-const SaveButton = styled.button`
-  align-self: flex-start;
+const ActionRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const BaseButton = styled.button`
   padding: 10px 24px;
-  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
-  color: #ffffff;
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -164,11 +185,33 @@ const SaveButton = styled.button`
   align-items: center;
   gap: 8px;
   transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+`;
+
+const SaveButton = styled(BaseButton)`
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+  color: #ffffff;
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
     box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
+  }
+`;
+
+const ResetButton = styled(BaseButton)`
+  background: rgba(255, 255, 255, 0.06);
+  color: #d1d5db;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+    color: #f9fafb;
   }
 `;
 
@@ -179,24 +222,128 @@ const Toast = styled.div`
   color: #34d399;
   font-size: 0.85rem;
   font-weight: 500;
-  margin-left: 12px;
+`;
+
+const ErrorBanner = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  font-size: 0.85rem;
+`;
+
+const FileInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: #6b7280;
+
+  code {
+    color: #9ca3af;
+    font-family: monospace;
+    word-break: break-all;
+  }
 `;
 
 export const SettingsPage: React.FC = () => {
-  const [timeout, setTimeoutVal] = useState(5000);
-  const [followRedirects, setFollowRedirects] = useState(true);
-  const [verifySsl, setVerifySsl] = useState(true);
-  const [userAgent, setUserAgent] = useState("default");
-  const [maxConcurrency, setMaxConcurrency] = useState(5);
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [settingsFilePath, setSettingsFilePath] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSave = () => {
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const payload = await loadSettings();
+        if (cancelled) return;
+
+        setSettings(payload.settings);
+        setSettingsFilePath(payload.settingsFilePath);
+        setError(null);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : String(err));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // C# pushes `settings.changed` after any save/reset. Listening keeps the view in sync when the
+  // change originates outside this component (e.g. a future "settings" command or a second window).
+  useEffect(() => {
+    return Native.on((message) => {
+      const event = message as { type?: string; data?: SettingsPayload };
+      if (event.type === "settings.changed" && event.data) {
+        setSettings(event.data.settings);
+        setSettingsFilePath(event.data.settingsFilePath);
+      }
+    });
+  }, []);
+
+  const update = (patch: Partial<AppSettings>) => {
+    setSettings((prev) => ({...prev, ...patch}));
+  };
+
+  const flashSaved = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
 
+  const handleSave = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      const payload = await saveSettings(settings);
+      setSettings(payload.settings);
+      setSettingsFilePath(payload.settingsFilePath);
+      flashSaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleReset = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      const payload = await resetSettings();
+      setSettings(payload.settings);
+      setSettingsFilePath(payload.settingsFilePath);
+      flashSaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const busy = loading || saving;
+
   return (
       <PageContainer>
+        {error && (
+            <ErrorBanner>
+              <AlertTriangleIcon size={16}/>
+              <span>{error}</span>
+            </ErrorBanner>
+        )}
+
         <Card>
           <SectionTitle>Network & Request Settings</SectionTitle>
 
@@ -211,10 +358,11 @@ export const SettingsPage: React.FC = () => {
                   min="1000"
                   max="15000"
                   step="500"
-                  value={timeout}
-                  onChange={(e) => setTimeoutVal(Number(e.target.value))}
+                  disabled={busy}
+                  value={settings.requestTimeoutMs}
+                  onChange={(e) => update({requestTimeoutMs: Number(e.target.value)})}
               />
-              <span>{timeout / 1000}s</span>
+              <span>{settings.requestTimeoutMs / 1000}s</span>
             </StyledRange>
           </SettingRow>
 
@@ -227,8 +375,9 @@ export const SettingsPage: React.FC = () => {
             <Switch>
               <input
                   type="checkbox"
-                  checked={followRedirects}
-                  onChange={(e) => setFollowRedirects(e.target.checked)}
+                  disabled={busy}
+                  checked={settings.followRedirects}
+                  onChange={(e) => update({followRedirects: e.target.checked})}
               />
               <span/>
             </Switch>
@@ -243,8 +392,9 @@ export const SettingsPage: React.FC = () => {
             <Switch>
               <input
                   type="checkbox"
-                  checked={verifySsl}
-                  onChange={(e) => setVerifySsl(e.target.checked)}
+                  disabled={busy}
+                  checked={settings.verifySsl}
+                  onChange={(e) => update({verifySsl: e.target.checked})}
               />
               <span/>
             </Switch>
@@ -256,8 +406,9 @@ export const SettingsPage: React.FC = () => {
               <SettingDescription>Custom user-agent header sent with outbound requests</SettingDescription>
             </SettingInfo>
             <StyledSelect
-                value={userAgent}
-                onChange={(e) => setUserAgent(e.target.value)}
+                disabled={busy}
+                value={settings.userAgent}
+                onChange={(e) => update({userAgent: e.target.value})}
             >
               <option value="default">Default (URLCheck Desktop Agent/1.0)</option>
               <option value="chrome">Chrome Desktop (Windows 11)</option>
@@ -283,23 +434,34 @@ export const SettingsPage: React.FC = () => {
                   min="1"
                   max="20"
                   step="1"
-                  value={maxConcurrency}
-                  onChange={(e) => setMaxConcurrency(Number(e.target.value))}
+                  disabled={busy}
+                  value={settings.maxConcurrency}
+                  onChange={(e) => update({maxConcurrency: Number(e.target.value)})}
               />
-              <span>{maxConcurrency} reqs</span>
+              <span>{settings.maxConcurrency} reqs</span>
             </StyledRange>
           </SettingRow>
         </Card>
 
-        <div style={{display: "flex", alignItems: "center"}}>
-          <SaveButton onClick={handleSave}>Save Settings</SaveButton>
+        <ActionRow>
+          <SaveButton onClick={handleSave} disabled={busy}>
+            {loading ? "Loading..." : saving ? "Saving..." : "Save Settings"}
+          </SaveButton>
+          <ResetButton onClick={handleReset} disabled={busy}>
+            Reset to Defaults
+          </ResetButton>
           {saved && (
               <Toast>
                 <CheckCircleIcon size={16}/>
                 <span>Settings saved successfully</span>
               </Toast>
           )}
-        </div>
+        </ActionRow>
+
+        <FileInfo>
+          <span>Settings are persisted by the C# backend at:</span>
+          <code>{settingsFilePath || "..."}</code>
+        </FileInfo>
       </PageContainer>
   );
 };

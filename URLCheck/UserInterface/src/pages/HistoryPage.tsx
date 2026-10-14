@@ -149,16 +149,6 @@ const StatusBadge = styled.span<{ $status: string }>`
                             : "rgba(239, 68, 68, 0.3)"};
 `;
 
-const TypeTag = styled.span`
-    background: rgba(15, 23, 42, 0.7);
-    color: #9ca3af;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 0.75rem;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: 500;
-`;
-
 const initialHistory: HistoryItem[] = [
     {
         id: "1",

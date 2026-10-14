@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using Photino.NET;
+using URLCheck.Messaging;
+using URLCheck.Services;
 #if !DEBUG
 using Photino.NET.Server;
 #endif
@@ -29,39 +30,17 @@ internal static class Program
 
         Console.WriteLine($"Serving React app at {appUrl}");
 
+        // The bridge owns the settings and translates JSON messages to/from the React front-end.
+        var bridge = new NativeBridge(new SettingsService());
+
         var window = new PhotinoWindow()
             .SetTitle(Constants.WindowTitle)
-            .SetUseOsDefaultSize(false)
-            .SetSize(new(2048, 1024))
-            // Resize to a percentage of the main monitor work area
-            //.Resize(50, 50, "%")
             .SetUseOsDefaultSize(false)
             .SetSize(new(800, 600))
             .Center()
             .SetResizable(true)
-            .RegisterCustomSchemeHandler("app", (sender, scheme, url, out contentType) =>
-            {
-                Console.WriteLine($"CUSTOM SCHEME: {scheme} {url}");
-
-                contentType = "text/javascript";
-
-                const string script = """
-                                      console.log("Photino bridge loaded!");
-                                      window.__URLCHECK__ = {
-                                          isPhotino: true
-                                      };
-                                      alert("bridge loaded");
-                                      """;
-
-                return new MemoryStream(Encoding.UTF8.GetBytes(script));
-            })
             .RegisterWebMessageReceivedHandler((sender, message) =>
-            {
-                var window = (PhotinoWindow?)sender;
-                var response = $"Received message: \"{message}\"";
-                Console.WriteLine($"ReceivedHandler: {sender} {message}");
-                window?.SendWebMessage(response);
-            })
+                bridge.HandleMessage(sender as PhotinoWindow, message))
             .Load(appUrl);
 
         window.WaitForClose();
