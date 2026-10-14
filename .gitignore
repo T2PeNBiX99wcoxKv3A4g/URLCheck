@@ -27,3 +27,6 @@ nul
 *.tsbuildinfo
 **/package-lock.json
 **/node_modules/
+
+opencode.json
+.opencode/
