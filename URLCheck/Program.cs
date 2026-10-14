@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Versioning;
 using Serilog;
 using URLCheck.Interop;
+using URLCheck.Platform;
 using URLCheck.Services;
 #if !DEBUG
 using Photino.NET.Server;
@@ -14,10 +14,12 @@ namespace URLCheck;
 internal static class Program
 {
     [STAThread]
-    [SupportedOSPlatform("windows")]
     [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
     private static void Main(string[] args)
     {
+        if (!OperatingSystem.IsWindows())
+            throw new PlatformNotSupportedException("URLCheck currently supports Windows only.");
+
         // Main must stay synchronous: [STAThread] is ignored for an async entry point, and the
         // Photino message loop / WebView2 require an STA thread.
         Logging.Initialize();
@@ -53,9 +55,11 @@ internal static class Program
 
             Log.Information("Serving React app at {AppUrl}", appUrl);
 
-            var settings = new SettingsService();
-            var protocols = new ProtocolRegistrationService();
-            var manager = new WindowManager(appUrl, settings)
+            var browserLocator = new WindowsBrowserLocator();
+            var settings = new SettingsService(browserLocator);
+            _ = new BrowserService(browserLocator);
+            _ = new ProtocolRegistrationService();
+            var manager = new WindowManager(appUrl, new WindowsWindowPlatform(), settings)
             {
                 ShowMainWindowOnStartup = showMainWindow
             };
@@ -87,7 +91,6 @@ internal static class Program
         }
     }
 
-    [SupportedOSPlatform("windows")]
     private static void DispatchUrls(WindowManager manager, IReadOnlyList<string> args)
     {
         foreach (var url in ExtractUrls(args))

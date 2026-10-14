@@ -1,10 +1,9 @@
-using System.Runtime.Versioning;
 using JetBrains.Annotations;
 using Photino.NET;
 using Serilog;
-using URLCheck.Interop;
 using URLCheck.Messaging;
 using URLCheck.Models;
+using URLCheck.Platform;
 
 namespace URLCheck.Services;
 
@@ -12,7 +11,6 @@ namespace URLCheck.Services;
 ///     Owns the Photino windows: a hidden "host" window that keeps the message loop alive while the
 ///     app sits in the tray, and an on-demand borderless popup used to inspect a URL.
 /// </summary>
-[SupportedOSPlatform("windows")]
 internal sealed class WindowManager
 {
     /// <summary>
@@ -23,15 +21,17 @@ internal sealed class WindowManager
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name, "webview");
 
     private readonly string _appUrl;
+    private readonly IWindowPlatform _platform;
     private readonly SettingsService _settings;
     private bool _allowClose;
 
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
 
-    public WindowManager(string appUrl, SettingsService settings)
+    public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings)
     {
         _appUrl = appUrl;
+        _platform = platform;
         _settings = settings;
 
         SettingsService.Changed += payload => BroadcastEvent("settings.changed", payload);
@@ -121,11 +121,11 @@ internal sealed class WindowManager
     public void Run() => _mainWindow?.WaitForClose();
 
     [PublicAPI]
-    public void HideMainWindow() => Invoke(_mainWindow, HideHandle);
+    public void HideMainWindow() => Invoke(_mainWindow, _platform.Hide);
 
     public void ShowMainWindow(string? tab = null)
     {
-        Invoke(_mainWindow, ShowHandle);
+        Invoke(_mainWindow, _platform.Show);
 
         if (tab is { Length: > 0 })
             _mainWindow?.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new
@@ -149,8 +149,8 @@ internal sealed class WindowManager
                     {
                         url
                     }));
-                    ShowHandle(_popupWindow);
-                    KeepOnTop(_popupWindow);
+                    _platform.Show(_popupWindow);
+                    _platform.KeepOnTop(_popupWindow);
                     return;
                 }
                 catch
@@ -183,7 +183,7 @@ internal sealed class WindowManager
             try
             {
                 popup.WaitForClose();
-                KeepOnTop(popup);
+                _platform.KeepOnTop(popup);
 
                 // The native show/center runs after the created callback and clears the style,
                 // so re-assert it once the window has settled.
@@ -199,15 +199,7 @@ internal sealed class WindowManager
 
     /// <summary>Lets the OS move a borderless window when the user drags its header.</summary>
     [PublicAPI]
-    public static void StartDrag(PhotinoWindow? window) => Invoke(window, target =>
-    {
-        var handle = target.WindowHandle;
-        if (handle == IntPtr.Zero)
-            return;
-
-        NativeMethods.ReleaseCapture();
-        NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, NativeMethods.HtCaption, IntPtr.Zero);
-    });
+    public void StartDrag(PhotinoWindow? window) => Invoke(window, _platform.StartDrag);
 
     [PublicAPI]
     public void CloseWindow(PhotinoWindow? window)
@@ -256,40 +248,12 @@ internal sealed class WindowManager
         window?.Invoke(() => action(window));
     }
 
-    private static void ShowHandle(PhotinoWindow window)
-    {
-        var handle = window.WindowHandle;
-        if (handle == IntPtr.Zero)
-            return;
-
-        NativeMethods.ShowWindow(handle, NativeMethods.SwRestore);
-        NativeMethods.SetForegroundWindow(handle);
-    }
-
-    private static void HideHandle(PhotinoWindow window)
-    {
-        var handle = window.WindowHandle;
-        if (handle != IntPtr.Zero)
-            NativeMethods.ShowWindow(handle, NativeMethods.SwHide);
-    }
-
-    /// <summary>Re-asserts the always-on-top style (e.g. after the popup is navigated).</summary>
-    private static void KeepOnTop(PhotinoWindow window)
-    {
-        var handle = window.WindowHandle;
-        if (handle == IntPtr.Zero)
-            return;
-
-        NativeMethods.SetWindowPos(handle, NativeMethods.HwndTopMost, 0, 0, 0, 0,
-            NativeMethods.SwpNoMove | NativeMethods.SwpNoSize | NativeMethods.SwpNoActivate);
-    }
-
     private void ReassertTopMost(PhotinoWindow popup)
     {
         try
         {
             if (ReferenceEquals(_popupWindow, popup))
-                popup.Invoke(() => KeepOnTop(popup));
+                popup.Invoke(() => _platform.KeepOnTop(popup));
         }
         catch (Exception ex)
         {

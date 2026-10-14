@@ -1,9 +1,9 @@
-using System.Runtime.Versioning;
 using System.Text.Json;
 using JetBrains.Annotations;
 using Serilog;
 using URLCheck.Messaging;
 using URLCheck.Models;
+using URLCheck.Platform;
 
 namespace URLCheck.Services;
 
@@ -11,7 +11,6 @@ namespace URLCheck.Services;
 ///     Loads and persists <see cref="AppSettings" /> as JSON under <c>%APPDATA%\URLCheck</c>.
 ///     The first read seeds the browser list so the popup works out of the box.
 /// </summary>
-[SupportedOSPlatform("windows")]
 internal sealed class SettingsService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
@@ -19,11 +18,14 @@ internal sealed class SettingsService
         WriteIndented = true
     };
 
+    private readonly IBrowserLocator _browserLocator;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private AppSettings? _current;
 
-    public SettingsService()
+    public SettingsService(IBrowserLocator browserLocator)
     {
+        _browserLocator = browserLocator;
+
         var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             Constants.Name);
         Directory.CreateDirectory(directory);
@@ -108,7 +110,7 @@ internal sealed class SettingsService
     public Task<AppSettings> ResetAsync() =>
         SaveAsync(new()
         {
-            Browsers = [.. BrowserService.DetectInstalledBrowsers()]
+            Browsers = [.. _browserLocator.Detect()]
         });
 
     private async Task<SettingsPayload> PayloadAsync() => new(await GetAsync(), SettingsFilePath);
@@ -125,7 +127,7 @@ internal sealed class SettingsService
         if (!File.Exists(SettingsFilePath))
             return new()
             {
-                Browsers = [.. BrowserService.DetectInstalledBrowsers()]
+                Browsers = [.. _browserLocator.Detect()]
             };
 
         try
