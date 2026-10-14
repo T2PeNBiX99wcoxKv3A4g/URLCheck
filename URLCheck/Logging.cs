@@ -27,6 +27,16 @@ internal static class Logging
                 shared: true,
                 outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
+
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            Log.Fatal(args.ExceptionObject as Exception, "Unhandled exception (terminating: {Terminating})",
+                args.IsTerminating);
+
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            Log.Error(args.Exception, "Unobserved task exception");
+            args.SetObserved();
+        };
     }
 
     public static void Shutdown() => Log.CloseAndFlush();

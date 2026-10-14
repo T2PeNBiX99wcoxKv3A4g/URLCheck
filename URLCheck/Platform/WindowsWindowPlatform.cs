@@ -21,19 +21,13 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         NativeMethods.SetWindowPos(handle, NativeMethods.HwndTopMost, 0, 0, 0, 0,
             NativeMethods.SwpNoMove | NativeMethods.SwpNoSize | NativeMethods.SwpNoActivate));
 
-    public void StartDrag(PhotinoWindow window) => UseHandle(window, handle =>
-    {
-        NativeMethods.ReleaseCapture();
-        NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, NativeMethods.HtCaption, IntPtr.Zero);
-    });
-
-    public void Resize(PhotinoWindow window, int width, int height, bool center)
+    public void Resize(PhotinoWindow window, int width, int height)
     {
         UseHandle(window, handle => NativeMethods.SetWindowPos(handle, IntPtr.Zero, 0, 0, width, height,
             NativeMethods.SwpNoMove | NativeMethods.SwpNoZOrder | NativeMethods.SwpNoActivate));
 
-        if (center)
-            window.Center();
+        // Keep it centered on every fit.
+        window.Center();
     }
 
     private static void UseHandle(PhotinoWindow window, Action<IntPtr> action)

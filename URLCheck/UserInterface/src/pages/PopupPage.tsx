@@ -76,7 +76,7 @@ const Root = styled.div`
     color: #f9fafb;
 `;
 
-const DragBar = styled.div`
+const TopBar = styled.div`
     height: 24px;
     display: flex;
     align-items: center;
@@ -130,6 +130,7 @@ const Toolbar = styled.div`
     position: relative;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 5px;
 `;
 
@@ -234,6 +235,7 @@ const StatusPill = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
 const Actions = styled.div`
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 6px;
 `;
 
@@ -482,7 +484,7 @@ export const PopupPage: React.FC = () => {
     const [privateMode, setPrivateMode] = useState(false);
     const [copied, setCopied] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [open, setOpen] = useState<SectionState>({domain: true, parameters: true, fragment: true});
+    const [open, setOpen] = useState<SectionState>({domain: false, parameters: false, fragment: false});
 
     const contentRef = useRef<HTMLDivElement>(null);
     const lastHeight = useRef(0);
@@ -546,20 +548,24 @@ export const PopupPage: React.FC = () => {
         const el = contentRef.current;
         if (!el) return;
 
-        const observer = new ResizeObserver(() => {
+        const fit = () => {
             window.clearTimeout(resizeTimer.current);
             resizeTimer.current = window.setTimeout(() => {
-                const height = Math.ceil(el.offsetHeight) + 24; // + the drag bar
+                const height = Math.ceil(el.offsetHeight) + 24; // + the top bar
                 if (Math.abs(height - lastHeight.current) < 2) return;
                 lastHeight.current = height;
                 resizePopup(height);
             }, 60);
-        });
+        };
 
+        const observer = new ResizeObserver(fit);
         observer.observe(el);
+        window.addEventListener("resize", fit);
+
         return () => {
             window.clearTimeout(resizeTimer.current);
             observer.disconnect();
+            window.removeEventListener("resize", fit);
         };
     }, []);
 
@@ -665,11 +671,11 @@ export const PopupPage: React.FC = () => {
 
     return (
         <Root>
-            <DragBar onMouseDown={() => Native.send({type: "window.drag"})}>
-                <CloseButton onMouseDown={(e) => e.stopPropagation()} onClick={closePopup} title="Close">
+            <TopBar>
+                <CloseButton onClick={closePopup} title="Close">
                     ✕
                 </CloseButton>
-            </DragBar>
+            </TopBar>
 
             <Content ref={contentRef}>
                 <UrlInput

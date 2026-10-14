@@ -15,11 +15,7 @@ internal static partial class NativeMethods
 
     // ShowWindow commands
     public const int SwHide = 0;
-    public const int SwShow = 5;
     public const int SwRestore = 9;
-
-    public const uint WmNcLButtonDown = 0x00A1;
-    public const int HtCaption = 0x0002;
 
     public const uint SwpNoSize = 0x0001;
     public const uint SwpNoMove = 0x0002;
@@ -34,13 +30,6 @@ internal static partial class NativeMethods
     [LibraryImport("user32.dll", EntryPoint = "SetForegroundWindow")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool SetForegroundWindow(IntPtr hWnd);
-
-    [LibraryImport("user32.dll", EntryPoint = "ReleaseCapture")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool ReleaseCapture();
-
-    [LibraryImport("user32.dll", EntryPoint = "SendMessageW")]
-    public static partial IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
     [LibraryImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

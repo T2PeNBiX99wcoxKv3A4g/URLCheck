@@ -13,4 +13,5 @@ public static class Constants
 
     public const string Name = "URLCheck";
     public const string WindowTitle = Name;
+    public const string PopupTitle = "Popup";
 }

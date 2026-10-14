@@ -27,7 +27,6 @@ internal sealed class WindowManager
 
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
-    private bool _popupCentered;
 
     public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings)
     {
@@ -89,19 +88,10 @@ internal sealed class WindowManager
             {
                 var height = context.Payload<PopupResizeRequest>()?.Height ?? 0;
                 if (height > 0)
-                {
-                    // The first fit also re-centers; later fits keep wherever the user moved it.
-                    var center = !_popupCentered;
-                    _popupCentered = true;
-                    Invoke(context.Window, window => _platform.Resize(window, window.Width, height, center));
-                }
+                    Invoke(context.Window, window => _platform.Resize(window, window.Width, height));
 
                 return null;
             }
-
-            case "window.drag":
-                StartDrag(context.Window);
-                return null;
 
             default:
                 return null;
@@ -175,7 +165,7 @@ internal sealed class WindowManager
 
             // Top-level (not owned): an owned window would be hidden together with the hidden host.
             var popup = new PhotinoWindow()
-                .SetTitle(Constants.WindowTitle)
+                .SetTitle(Constants.PopupTitle)
                 .SetTemporaryFilesPath(WebViewDataPath)
                 .SetUseOsDefaultSize(false)
                 .SetUseOsDefaultLocation(false)
@@ -194,7 +184,6 @@ internal sealed class WindowManager
                 .Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}");
 
             _popupWindow = popup;
-            _popupCentered = false;
 
             try
             {
@@ -212,10 +201,6 @@ internal sealed class WindowManager
             }
         });
     }
-
-    /// <summary>Lets the OS move a borderless window when the user drags its header.</summary>
-    [PublicAPI]
-    public void StartDrag(PhotinoWindow? window) => Invoke(window, _platform.StartDrag);
 
     [PublicAPI]
     public void CloseWindow(PhotinoWindow? window)
