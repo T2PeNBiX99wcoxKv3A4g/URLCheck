@@ -1,4 +1,5 @@
 using System.Text.Json;
+using JetBrains.Annotations;
 using Serilog;
 using URLCheck.Messaging;
 using URLCheck.Models;
@@ -27,10 +28,10 @@ internal sealed class SettingsService
         NativeBridge.MessageReceived += HandleMessageAsync;
     }
 
-    public string SettingsFilePath { get; }
+    [PublicAPI] public string SettingsFilePath { get; }
 
     /// <summary>Raised after the settings are saved or reset.</summary>
-    public event Action<SettingsPayload>? Changed;
+    public static event Action<SettingsPayload>? Changed;
 
     /// <summary>Handles the <c>settings.*</c> messages.</summary>
     private async Task<NativeResponse?> HandleMessageAsync(NativeContext context)

@@ -32,7 +32,7 @@ internal sealed class WindowManager
         _appUrl = appUrl;
         _settings = settings;
 
-        _settings.Changed += payload => BroadcastEvent("settings.changed", payload);
+        SettingsService.Changed += payload => BroadcastEvent("settings.changed", payload);
         NativeBridge.MessageReceived += HandleMessageAsync;
     }
 
@@ -196,6 +196,7 @@ internal sealed class WindowManager
     }
 
     /// <summary>Lets the OS move a borderless window when the user drags its header.</summary>
+    [PublicAPI]
     public static void StartDrag(PhotinoWindow? window) => Invoke(window, target =>
     {
         var handle = target.WindowHandle;
@@ -206,6 +207,7 @@ internal sealed class WindowManager
         NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, NativeMethods.HtCaption, IntPtr.Zero);
     });
 
+    [PublicAPI]
     public void CloseWindow(PhotinoWindow? window)
     {
         if (window is null)
@@ -228,6 +230,7 @@ internal sealed class WindowManager
     }
 
     /// <summary>Pushes an event to every open window.</summary>
+    [PublicAPI]
     public void BroadcastEvent(string type, object? data)
     {
         var json = NativeProtocol.SerializeEvent(type, data);
