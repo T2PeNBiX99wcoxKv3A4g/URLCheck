@@ -11,6 +11,7 @@ namespace URLCheck.Interop;
 [SupportedOSPlatform("windows")]
 internal sealed class TrayIcon(
     string tooltip,
+    string? iconPath,
     Func<string, string> localize,
     Action onOpen,
     Action onSettings,
@@ -43,6 +44,7 @@ internal sealed class TrayIcon(
     private readonly string _className = $"URLCheck.TrayIcon.{Guid.NewGuid():N}";
 
     private IntPtr _hwnd = IntPtr.Zero;
+    private IntPtr _hIcon = IntPtr.Zero;
     private uint _taskbarCreatedMessage;
 
     private Thread? _thread;
@@ -93,6 +95,24 @@ internal sealed class TrayIcon(
         }
 
         RemoveIcon();
+
+        if (_hIcon != IntPtr.Zero)
+        {
+            NativeMethods.DestroyIcon(_hIcon);
+            _hIcon = IntPtr.Zero;
+        }
+    }
+
+    /// <summary>The app icon, falling back to the generic application icon when it cannot be loaded.</summary>
+    private IntPtr ResolveIcon()
+    {
+        if (_hIcon == IntPtr.Zero && iconPath is { Length: > 0 })
+            _hIcon = NativeMethods.LoadImage(IntPtr.Zero, iconPath, NativeMethods.ImageIcon,
+                NativeMethods.GetSystemMetrics(NativeMethods.SmCxSmIcon),
+                NativeMethods.GetSystemMetrics(NativeMethods.SmCySmIcon),
+                NativeMethods.LrLoadFromFile);
+
+        return _hIcon != IntPtr.Zero ? _hIcon : NativeMethods.LoadIcon(IntPtr.Zero, IdiApplication);
     }
 
     private void AddIcon()
@@ -107,7 +127,7 @@ internal sealed class TrayIcon(
             uID = 1,
             uFlags = NifMessage | NifIcon | NifTip,
             uCallbackMessage = (int)WmTrayIcon,
-            hIcon = NativeMethods.LoadIcon(IntPtr.Zero, IdiApplication),
+            hIcon = ResolveIcon(),
             szTip = tooltip,
             szInfo = string.Empty,
             szInfoTitle = string.Empty

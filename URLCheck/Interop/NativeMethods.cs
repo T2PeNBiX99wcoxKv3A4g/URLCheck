@@ -101,6 +101,23 @@ internal static partial class NativeMethods
     [LibraryImport("user32.dll", EntryPoint = "LoadIconW")]
     public static partial IntPtr LoadIcon(IntPtr hInstance, IntPtr lpIconName);
 
+    public const uint ImageIcon = 1;
+    public const uint LrLoadFromFile = 0x0010;
+    public const int SmCxSmIcon = 49;
+    public const int SmCySmIcon = 50;
+
+    [LibraryImport("user32.dll", EntryPoint = "LoadImageW", StringMarshalling = StringMarshalling.Utf16,
+        SetLastError = true)]
+    public static partial IntPtr LoadImage(IntPtr hInstance, string name, uint type, int cx, int cy, uint fuLoad);
+
+    /// <summary>Frees an icon returned by <see cref="LoadImage" /> (never a shared icon).</summary>
+    [LibraryImport("user32.dll", EntryPoint = "DestroyIcon")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool DestroyIcon(IntPtr hIcon);
+
+    [LibraryImport("user32.dll", EntryPoint = "GetSystemMetrics")]
+    public static partial int GetSystemMetrics(int nIndex);
+
     [LibraryImport("user32.dll", EntryPoint = "RegisterWindowMessageW", StringMarshalling = StringMarshalling.Utf16)]
     public static partial uint RegisterWindowMessage(string lpString);
 

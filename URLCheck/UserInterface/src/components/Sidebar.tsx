@@ -3,7 +3,7 @@ import styled from "styled-components";
 import {TABS, type TabType} from "../tabs";
 import {useTranslation} from "../i18n";
 import {getAppInfo} from "../api/system";
-import {ShieldCheckIcon} from "./Icons";
+import {LogoIcon} from "./Icons";
 
 interface SidebarProps {
     currentTab: TabType;
@@ -125,7 +125,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
         <SidebarContainer>
             <LogoSection>
                 <LogoIconWrapper>
-                    <ShieldCheckIcon size={22}/>
+                    <LogoIcon size={40}/>
                 </LogoIconWrapper>
                 <LogoText>
                     <LogoTitle>URLCheck</LogoTitle>

@@ -66,6 +66,7 @@ internal static class Program
 
             var localization = new LocalizationService(settings);
             var history = new HistoryService();
+            var iconPath = AppIcon.EnsureExtracted();
             _ = new AppInfoService();
             _ = new BrowserService(browserLocator);
             _ = new ProtocolRegistrationService(protocolRegistrar);
@@ -73,10 +74,11 @@ internal static class Program
             var manager = new WindowManager(appUrl, windowPlatform, settings, history)
             {
                 ShowMainWindowOnStartup = showMainWindow,
-                CloseToTray = hasTray
+                CloseToTray = hasTray,
+                IconPath = iconPath
             };
 
-            using var tray = CreateTray(localization, manager);
+            using var tray = CreateTray(localization, manager, iconPath);
             tray.Start();
 
             manager.MainWindowCreated += [SuppressMessage("ReSharper", "AccessToDisposedClosure")]() =>
@@ -119,13 +121,14 @@ internal static class Program
     }
 
     /// <summary>The tray icon, or a no-op stand-in on platforms that have none.</summary>
-    private static ITrayIcon CreateTray(LocalizationService localization, WindowManager manager)
+    private static ITrayIcon CreateTray(LocalizationService localization, WindowManager manager, string? iconPath)
     {
         if (!OperatingSystem.IsWindows())
             return new NullTrayIcon();
 
         return new TrayIcon(
             Constants.WindowTitle,
+            iconPath,
             localization.Get,
             () => manager.ShowMainWindow(),
             () => manager.ShowMainWindow("settings"),

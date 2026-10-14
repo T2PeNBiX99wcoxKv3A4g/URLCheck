@@ -1,5 +1,6 @@
 import type React from "react";
 import LinkSvg from "./icons/link.svg?react";
+import LogoSvg from "./icons/logo.svg?react";
 import HomeSvg from "./icons/home.svg?react";
 import LayersSvg from "./icons/layers.svg?react";
 import HistorySvg from "./icons/history.svg?react";
@@ -30,6 +31,7 @@ function sized(Svg: SvgComponent): React.FC<IconProps> {
 }
 
 export const LinkIcon = sized(LinkSvg);
+export const LogoIcon = sized(LogoSvg);
 export const HomeIcon = sized(HomeSvg);
 export const LayersIcon = sized(LayersSvg);
 export const HistoryIcon = sized(HistorySvg);

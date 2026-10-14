@@ -49,6 +49,9 @@ internal sealed class WindowManager
     /// </summary>
     public bool CloseToTray { get; init; } = true;
 
+    /// <summary>Path to the extracted <c>.ico</c> for the window icons, or null to keep the default.</summary>
+    public string? IconPath { get; init; }
+
     /// <summary>Raised once the host window's native handle exists (message loop is about to start).</summary>
     public event Action? MainWindowCreated;
 
@@ -106,7 +109,7 @@ internal sealed class WindowManager
 
     public void CreateMainWindow()
     {
-        _mainWindow = new PhotinoWindow()
+        var window = new PhotinoWindow()
             .SetTitle(Constants.WindowTitle)
             .SetTemporaryFilesPath(WebViewDataPath)
             .SetUseOsDefaultSize(false)
@@ -124,8 +127,11 @@ internal sealed class WindowManager
 
                 HideMainWindow();
                 return true;
-            })
-            .Load(_appUrl);
+            });
+
+        ApplyIcon(window);
+        window.Load(_appUrl);
+        _mainWindow = window;
     }
 
     /// <summary>Starts the message loop; blocks until the host window is closed for real.</summary>
@@ -184,9 +190,10 @@ internal sealed class WindowManager
                 {
                     _popupWindow = null;
                     return false;
-                })
-                .Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}");
+                });
 
+            ApplyIcon(popup);
+            popup.Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}");
             _popupWindow = popup;
 
             try
@@ -242,6 +249,13 @@ internal sealed class WindowManager
     {
         _allowClose = true;
         CloseWindow(_mainWindow);
+    }
+
+    /// <summary>Gives the window the app icon, when one was extracted.</summary>
+    private void ApplyIcon(PhotinoWindow window)
+    {
+        if (IconPath is { Length: > 0 })
+            window.SetIconFile(IconPath);
     }
 
     private static BrowserEntry? ResolveBrowser(AppSettings current, string? browserId) =>
