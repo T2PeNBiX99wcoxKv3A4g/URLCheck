@@ -58,11 +58,12 @@ internal static class Program
 
             var browserLocator = new WindowsBrowserLocator();
             var settings = new SettingsService(browserLocator);
+            var history = new HistoryService();
             _ = new AppInfoService();
             _ = new BrowserService(browserLocator);
             _ = new ProtocolRegistrationService();
             _ = new InspectService(settings);
-            var manager = new WindowManager(appUrl, new WindowsWindowPlatform(), settings)
+            var manager = new WindowManager(appUrl, new WindowsWindowPlatform(), settings, history)
             {
                 ShowMainWindowOnStartup = showMainWindow
             };

@@ -1,8 +1,6 @@
 export interface HistoryItem {
-    id: string;
+    id: number;
     url: string;
-    status: "success" | "warning" | "error";
-    statusCode: number;
     timestamp: string;
 }
 

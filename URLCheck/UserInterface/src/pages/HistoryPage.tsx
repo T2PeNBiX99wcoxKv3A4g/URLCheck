@@ -1,8 +1,9 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {HistoryItem} from "../types";
-import {AlertTriangleIcon, CheckCircleIcon, SearchIcon, TrashIcon, XCircleIcon,} from "../components/Icons";
+import {AlertTriangleIcon, CopyIcon, SearchIcon, TrashIcon} from "../components/Icons";
 import {Card, PageContainer} from "../components/Layout";
+import {clearHistory, listHistory} from "../api/history";
 
 const ControlsCard = styled(Card)`
     display: flex;
@@ -63,10 +64,15 @@ const DangerButton = styled.button`
     gap: 6px;
     transition: all 0.2s ease;
 
-    &:hover {
+    &:hover:not(:disabled) {
         background: rgba(239, 68, 68, 0.25);
         color: #fca5a5;
         border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 `;
 
@@ -107,80 +113,89 @@ const Table = styled.table`
     }
 `;
 
-const StatusBadge = styled.span<{ $status: string }>`
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: ${(props) =>
-            props.$status === "success"
-                    ? "rgba(16, 185, 129, 0.12)"
-                    : props.$status === "warning"
-                            ? "rgba(245, 158, 11, 0.12)"
-                            : "rgba(239, 68, 68, 0.12)"};
-    color: ${(props) =>
-            props.$status === "success"
-                    ? "#34d399"
-                    : props.$status === "warning"
-                            ? "#fbbf24"
-                            : "#f87171"};
-    border: 1px solid ${(props) =>
-            props.$status === "success"
-                    ? "rgba(16, 185, 129, 0.3)"
-                    : props.$status === "warning"
-                            ? "rgba(245, 158, 11, 0.3)"
-                            : "rgba(239, 68, 68, 0.3)"};
+const UrlCell = styled.td`
+    font-family: monospace;
+    word-break: break-all;
 `;
 
-const initialHistory: HistoryItem[] = [
-    {
-        id: "1",
-        url: "https://api.github.com/repos/tryphotino/photino.NET",
-        status: "success",
-        statusCode: 200,
-        timestamp: "2026-09-28 02:10:15"
-    },
-    {
-        id: "2",
-        url: "https://www.google.com/search?q=photino+net",
-        status: "success",
-        statusCode: 200,
-        timestamp: "2026-09-28 02:08:33"
-    },
-    {
-        id: "3",
-        url: "https://httpbin.org/status/404",
-        status: "warning",
-        statusCode: 404,
-        timestamp: "2026-09-28 02:05:12"
-    },
-    {
-        id: "4",
-        url: "https://invalid-domain-test.local",
-        status: "error",
-        statusCode: 400,
-        timestamp: "2026-09-28 01:58:40"
-    },
-    {id: "5", url: "https://example.org", status: "success", statusCode: 200, timestamp: "2026-09-28 01:45:21"},
-];
+const CopyButton = styled.button`
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    vertical-align: middle;
+
+    &:hover {
+        color: #60a5fa;
+        background: rgba(255, 255, 255, 0.06);
+    }
+`;
+
+const ErrorBanner = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    font-size: 0.85rem;
+`;
+
+function formatTimestamp(value: string): string {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+}
 
 export const HistoryPage: React.FC = () => {
-    const [history, setHistory] = useState<HistoryItem[]>(initialHistory);
+    const [history, setHistory] = useState<HistoryItem[]>([]);
     const [keyword, setKeyword] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const filteredHistory = history.filter((item) =>
-        item.url.toLowerCase().includes(keyword.toLowerCase())
-    );
+    useEffect(() => {
+        let cancelled = false;
 
-    const handleClearHistory = () => {
-        setHistory([]);
+        (async () => {
+            try {
+                const entries = await listHistory();
+                if (!cancelled) setHistory(entries);
+            } catch (err) {
+                if (!cancelled) setError(err instanceof Error ? err.message : String(err));
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    const filteredHistory = history.filter((item) => item.url.toLowerCase().includes(keyword.toLowerCase()));
+
+    const handleClearHistory = async () => {
+        setError(null);
+        try {
+            await clearHistory();
+            setHistory([]);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : String(err));
+        }
     };
 
     return (
         <PageContainer>
+            {error && (
+                <ErrorBanner>
+                    <AlertTriangleIcon size={16}/>
+                    <span>{error}</span>
+                </ErrorBanner>
+            )}
+
             <ControlsCard>
                 <SearchWrapper>
                     <SearchIcon size={18}/>
@@ -192,7 +207,7 @@ export const HistoryPage: React.FC = () => {
                     />
                 </SearchWrapper>
 
-                <DangerButton onClick={handleClearHistory}>
+                <DangerButton onClick={handleClearHistory} disabled={history.length === 0}>
                     <TrashIcon size={15}/>
                     <span>Clear All Logs</span>
                 </DangerButton>
@@ -202,31 +217,32 @@ export const HistoryPage: React.FC = () => {
                 <Table>
                     <thead>
                     <tr>
-                        <th style={{width: "180px"}}>Timestamp</th>
-                        <th>Target URL</th>
-                        <th style={{width: "140px"}}>Status Response</th>
+                        <th style={{width: "200px"}}>Timestamp</th>
+                        <th>URL</th>
                     </tr>
                     </thead>
                     <tbody>
                     {filteredHistory.length > 0 ? (
                         filteredHistory.map((item) => (
                             <tr key={item.id}>
-                                <td style={{color: "#9ca3af", fontSize: "0.85rem"}}>{item.timestamp}</td>
-                                <td style={{fontFamily: "monospace", wordBreak: "break-all"}}>{item.url}</td>
-                                <td>
-                                    <StatusBadge $status={item.status}>
-                                        {item.status === "success" && <CheckCircleIcon size={14}/>}
-                                        {item.status === "warning" && <AlertTriangleIcon size={14}/>}
-                                        {item.status === "error" && <XCircleIcon size={14}/>}
-                                        <span>{item.statusCode}</span>
-                                    </StatusBadge>
+                                <td style={{color: "#9ca3af", fontSize: "0.85rem"}}>
+                                    {formatTimestamp(item.timestamp)}
                                 </td>
+                                <UrlCell>
+                                    {item.url}
+                                    <CopyButton
+                                        title="Copy URL"
+                                        onClick={() => navigator.clipboard?.writeText(item.url).catch(console.error)}
+                                    >
+                                        <CopyIcon size={14}/>
+                                    </CopyButton>
+                                </UrlCell>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={4} style={{textAlign: "center", padding: "36px", color: "#6b7280"}}>
-                                No inspection history recorded yet
+                            <td colSpan={2} style={{textAlign: "center", padding: "36px", color: "#6b7280"}}>
+                                {loading ? "Loading history…" : "No history recorded yet"}
                             </td>
                         </tr>
                     )}

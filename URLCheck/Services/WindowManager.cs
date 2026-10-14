@@ -23,16 +23,18 @@ internal sealed class WindowManager
     private readonly string _appUrl;
     private readonly IWindowPlatform _platform;
     private readonly SettingsService _settings;
+    private readonly HistoryService _history;
     private bool _allowClose;
 
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
 
-    public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings)
+    public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings, HistoryService history)
     {
         _appUrl = appUrl;
         _platform = platform;
         _settings = settings;
+        _history = history;
 
         SettingsService.Changed += payload => BroadcastEvent("settings.changed", payload);
         NativeBridge.MessageReceived += HandleMessageAsync;
@@ -144,6 +146,9 @@ internal sealed class WindowManager
     {
         if (string.IsNullOrWhiteSpace(url))
             return;
+
+        // History keeps the URL that was clicked, not whatever the popup later edits it into.
+        _history.Record(url);
 
         _mainWindow?.Invoke(() =>
         {
