@@ -8,6 +8,7 @@ export interface AppSettings {
     requestTimeoutMs: number;
     userAgents: UserAgentEntry[];
     browsers: BrowserEntry[];
+    language: string;
 }
 
 export interface UserAgentEntry {

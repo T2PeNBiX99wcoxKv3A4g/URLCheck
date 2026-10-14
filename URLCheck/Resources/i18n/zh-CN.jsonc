@@ -33,6 +33,7 @@
   "settings.requestTimeoutDescription": "单个网址响应的最长等待毫秒数",
   "settings.userAgent": "User-Agent",
   "settings.userAgentDescription": "第一条会用于对外请求。可编辑显示名称与标头值。",
+  "settings.userAgentValuePlaceholder": "User-Agent 标头值",
   "settings.addUserAgent": "添加 User-Agent",
   "settings.browsers": "浏览器",
   "settings.browsersDescription": "最常用的浏览器会成为弹窗主要的“打开”按钮；下拉菜单列出其余的。",

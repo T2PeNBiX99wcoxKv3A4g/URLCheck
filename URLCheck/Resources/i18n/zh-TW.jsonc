@@ -33,6 +33,7 @@
   "settings.requestTimeoutDescription": "單一網址回應的最長等待毫秒數",
   "settings.userAgent": "User-Agent",
   "settings.userAgentDescription": "第一筆會用於對外請求。可編輯顯示名稱與標頭值。",
+  "settings.userAgentValuePlaceholder": "User-Agent 標頭值",
   "settings.addUserAgent": "新增 User-Agent",
   "settings.browsers": "瀏覽器",
   "settings.browsersDescription": "最常使用的瀏覽器會成為彈窗主要的「開啟」按鈕；下拉選單列出其餘的。",

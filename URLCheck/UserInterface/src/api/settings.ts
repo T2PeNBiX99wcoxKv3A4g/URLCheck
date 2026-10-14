@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
         },
     ],
     browsers: [],
+    language: "en",
 };
 
 export interface SettingsPayload {
@@ -49,6 +50,7 @@ function normalize(settings: AppSettings): AppSettings {
             arguments: browser.arguments ?? "",
             useCount: browser.useCount ?? 0,
         })),
+        language: settings.language || DEFAULT_SETTINGS.language,
     };
 }
 

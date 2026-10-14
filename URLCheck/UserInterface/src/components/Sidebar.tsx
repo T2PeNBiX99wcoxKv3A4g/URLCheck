@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {TABS, type TabType} from "../tabs";
+import {useTranslation} from "../i18n";
 import {getAppInfo} from "../api/system";
 import {ShieldCheckIcon} from "./Icons";
 
@@ -113,6 +114,7 @@ const VersionLabel = styled.span`
 `;
 
 export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
+    const t = useTranslation();
     const [version, setVersion] = useState<string | null>(null);
 
     useEffect(() => {
@@ -127,7 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
                 </LogoIconWrapper>
                 <LogoText>
                     <LogoTitle>URLCheck</LogoTitle>
-                    <LogoBadge>Link intermediary</LogoBadge>
+                    <LogoBadge>{t("app.tagline")}</LogoBadge>
                 </LogoText>
             </LogoSection>
 
@@ -141,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
                             onClick={() => onSelectTab(tab.id)}
                         >
                             <Icon size={18}/>
-                            <span>{tab.label}</span>
+                            <span>{t(tab.labelKey)}</span>
                         </NavItem>
                     );
                 })}

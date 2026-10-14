@@ -2,6 +2,8 @@ import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
+import {useTranslation} from "../i18n";
+import {loadStrings} from "../api/i18n";
 import {AppSettings, BrowserEntry, UserAgentEntry} from "../types";
 import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
@@ -252,20 +254,60 @@ const InfoText = styled.span`
   color: #9ca3af;
 `;
 
+const Select = styled.select`
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.75);
+  color: #f9fafb;
+  font-size: 0.875rem;
+  outline: none;
+  cursor: pointer;
+  min-width: 200px;
+
+  &:focus {
+    border-color: #3b82f6;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  option {
+    background: #111827;
+    color: #f9fafb;
+  }
+`;
+
+/** Language names are always shown in their own language. */
+const LOCALE_NAMES: Record<string, string> = {
+  en: "English",
+  "zh-TW": "繁體中文",
+  "zh-CN": "简体中文",
+  ja: "日本語",
+};
+
 export const SettingsPage: React.FC = () => {
+  const t = useTranslation();
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [settingsFilePath, setSettingsFilePath] = useState("");
+  const [locales, setLocales] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [detecting, setDetecting] = useState(false);
   const [integrationBusy, setIntegrationBusy] = useState(false);
-  const [integrationMessage, setIntegrationMessage] = useState<string | null>(null);
+  const [integrationMessage, setIntegrationMessage] = useState<{ key: string; params?: Record<string, string> } | null>(null);
   const [protocols, setProtocols] = useState<ProtocolStatus | null>(null);
 
   useEffect(() => {
     protocolStatus().then(setProtocols).catch(() => setProtocols(null));
+  }, []);
+
+  useEffect(() => {
+    loadStrings().then((payload) => setLocales(payload.available)).catch(() => setLocales([]));
   }, []);
 
   useEffect(() => {
@@ -390,7 +432,7 @@ export const SettingsPage: React.FC = () => {
         const additions = detected.filter((browser) => !existing.has(browser.executablePath.toLowerCase()));
         return {...prev, browsers: [...prev.browsers, ...additions]};
       });
-      if (detected.length === 0) setIntegrationMessage("No installed browsers were detected.");
+      if (detected.length === 0) setIntegrationMessage({key: "settings.noBrowsersDetected"});
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -403,7 +445,7 @@ export const SettingsPage: React.FC = () => {
     setIntegrationMessage(null);
     try {
       const result = await registerProtocols();
-      setIntegrationMessage(`Registered http/https. Executable: ${result.executablePath}`);
+      setIntegrationMessage({key: "settings.registeredHttp", params: {path: result.executablePath}});
       setProtocols(await protocolStatus());
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -417,7 +459,7 @@ export const SettingsPage: React.FC = () => {
     setIntegrationMessage(null);
     try {
       const result = await registerCustomScheme();
-      setIntegrationMessage(`Registered urlcheck://. Executable: ${result.executablePath}`);
+      setIntegrationMessage({key: "settings.registeredUrlcheck", params: {path: result.executablePath}});
       setProtocols(await protocolStatus());
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -431,7 +473,7 @@ export const SettingsPage: React.FC = () => {
     setIntegrationMessage(null);
     try {
       await unregisterProtocols();
-      setIntegrationMessage("Removed every URLCheck registry entry.");
+      setIntegrationMessage({key: "settings.unregistered"});
       setProtocols(await protocolStatus());
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -444,11 +486,24 @@ export const SettingsPage: React.FC = () => {
     setIntegrationBusy(true);
     try {
       await openDefaultAppsSettings();
-      setIntegrationMessage("Opened Windows Default apps. Select URLCheck for http/https.");
+      setIntegrationMessage({key: "settings.openedDefaultApps"});
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setIntegrationBusy(false);
+    }
+  };
+
+  const handleLanguageChange = async (language: string) => {
+    const next = {...settings, language};
+    setSettings(next);
+    setError(null);
+    try {
+      const payload = await saveSettings(next);
+      setSettings(payload.settings);
+      setSettingsFilePath(payload.settingsFilePath);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
     }
   };
 
@@ -457,17 +512,17 @@ export const SettingsPage: React.FC = () => {
         {error && (
             <ErrorBanner>
               <AlertTriangleIcon size={16}/>
-              <span>{error}</span>
+              <span>{t(error)}</span>
             </ErrorBanner>
         )}
 
         <StackCard>
-          <SectionTitle>Network & Request Settings</SectionTitle>
+          <SectionTitle>{t("settings.network")}</SectionTitle>
 
           <SettingRow>
             <SettingInfo>
-              <SettingLabel>Request Timeout</SettingLabel>
-              <SettingDescription>Maximum milliseconds to wait for a single URL response</SettingDescription>
+              <SettingLabel>{t("settings.requestTimeout")}</SettingLabel>
+              <SettingDescription>{t("settings.requestTimeoutDescription")}</SettingDescription>
             </SettingInfo>
             <StyledRange>
               <input
@@ -483,14 +538,29 @@ export const SettingsPage: React.FC = () => {
             </StyledRange>
           </SettingRow>
 
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>{t("settings.language")}</SettingLabel>
+              <SettingDescription>{t("settings.languageDescription")}</SettingDescription>
+            </SettingInfo>
+            <Select
+                disabled={busy || locales.length === 0}
+                value={settings.language}
+                onChange={(e) => handleLanguageChange(e.target.value)}
+            >
+              {locales.map((locale) => (
+                  <option key={locale} value={locale}>{LOCALE_NAMES[locale] ?? locale}</option>
+              ))}
+            </Select>
+          </SettingRow>
         </StackCard>
 
         <StackCard>
-          <SectionTitle>User-Agent</SectionTitle>
+          <SectionTitle>{t("settings.userAgent")}</SectionTitle>
 
           <SettingInfo>
             <SettingDescription>
-              The first entry is used for outbound requests. Edit the display name and the header value.
+              {t("settings.userAgentDescription")}
             </SettingDescription>
           </SettingInfo>
 
@@ -499,21 +569,21 @@ export const SettingsPage: React.FC = () => {
                 <ListRow key={agent.id}>
                   <ListInput
                       className="name"
-                      placeholder="Name"
+                      placeholder={t("settings.browserNamePlaceholder")}
                       disabled={busy}
                       value={agent.name}
                       onChange={(e) => updateUserAgent(agent.id, {name: e.target.value})}
                   />
                   <ListInput
                       className="path"
-                      placeholder="User-Agent header value"
+                      placeholder={t("settings.userAgentValuePlaceholder")}
                       disabled={busy}
                       value={agent.value}
                       onChange={(e) => updateUserAgent(agent.id, {value: e.target.value})}
                   />
                   <IconOnlyButton
                       type="button"
-                      title="Remove User-Agent"
+                      title={t("settings.removeUserAgent")}
                       onClick={() => removeUserAgent(agent.id)}
                   >
                     <TrashIcon size={16}/>
@@ -524,17 +594,17 @@ export const SettingsPage: React.FC = () => {
 
           <ButtonRow>
             <GhostButton type="button" onClick={addUserAgent} disabled={busy}>
-              Add User-Agent
+              {t("settings.addUserAgent")}
             </GhostButton>
           </ButtonRow>
         </StackCard>
 
         <StackCard>
-          <SectionTitle>Browsers</SectionTitle>
+          <SectionTitle>{t("settings.browsers")}</SectionTitle>
 
           <SettingInfo>
             <SettingDescription>
-              The first browser is used by the popup's main "Open" button; the dropdown lists the rest.
+              {t("settings.browsersDescription")}
             </SettingDescription>
           </SettingInfo>
 
@@ -543,29 +613,29 @@ export const SettingsPage: React.FC = () => {
                 <ListRow key={browser.id}>
                   <ListInput
                       className="name"
-                      placeholder="Name"
+                      placeholder={t("settings.browserNamePlaceholder")}
                       disabled={busy}
                       value={browser.name}
                       onChange={(e) => updateBrowser(browser.id, {name: e.target.value})}
                   />
                   <ListInput
                       className="path"
-                      placeholder="C:\\Path\\To\\browser.exe"
+                      placeholder={t("settings.browserPathPlaceholder")}
                       disabled={busy}
                       value={browser.executablePath}
                       onChange={(e) => updateBrowser(browser.id, {executablePath: e.target.value})}
                   />
                   <ListInput
                       className="args"
-                      placeholder="Extra args"
-                      title="Extra command-line arguments appended after the URL"
+                      placeholder={t("settings.browserArgsPlaceholder")}
+                      title={t("settings.browserArgsTitle")}
                       disabled={busy}
                       value={browser.arguments}
                       onChange={(e) => updateBrowser(browser.id, {arguments: e.target.value})}
                   />
                   <IconOnlyButton
                       type="button"
-                      title="Remove browser"
+                      title={t("settings.removeBrowser")}
                       onClick={() => removeBrowser(browser.id)}
                   >
                     <TrashIcon size={16}/>
@@ -576,69 +646,70 @@ export const SettingsPage: React.FC = () => {
 
           <ButtonRow>
             <GhostButton type="button" onClick={addBrowser} disabled={busy}>
-              Add browser
+              {t("settings.addBrowser")}
             </GhostButton>
             <GhostButton type="button" onClick={handleDetectBrowsers} disabled={busy || detecting}>
-              {detecting ? "Detecting..." : "Detect installed"}
+              {detecting ? t("settings.detecting") : t("settings.detectInstalled")}
             </GhostButton>
           </ButtonRow>
         </StackCard>
 
         <StackCard>
-          <SectionTitle>System Integration</SectionTitle>
+          <SectionTitle>{t("settings.systemIntegration")}</SectionTitle>
 
           <SettingInfo>
             <SettingDescription>
-              URLCheck must be registered as a candidate browser and confirmed in Windows "Default apps" to
-              handle http/https links. The urlcheck:// scheme is registered separately for future features.
+              {t("settings.systemIntegrationDescription")}
             </SettingDescription>
           </SettingInfo>
 
           <ButtonRow>
             <GhostButton type="button" onClick={handleRegisterProtocols} disabled={integrationBusy}>
               <LinkIcon size={15}/>
-              Register http/https
+              {t("settings.registerHttp")}
             </GhostButton>
             <GhostButton type="button" onClick={handleRegisterCustomScheme} disabled={integrationBusy}>
               <LinkIcon size={15}/>
-              Register urlcheck://
+              {t("settings.registerUrlcheck")}
             </GhostButton>
             <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
-              Open Default apps
+              {t("settings.openDefaultApps")}
             </GhostButton>
             <DangerGhostButton type="button" onClick={handleUnregisterProtocols} disabled={integrationBusy}>
               <TrashIcon size={15}/>
-              Unregister
+              {t("settings.unregister")}
             </DangerGhostButton>
           </ButtonRow>
 
           {protocols && (
               <InfoText>
-                Default browser: {protocols.isDefault ? "yes" : "no"} · urlcheck:// registered:{" "}
-                {protocols.customSchemeRegistered ? "yes" : "no"}
+                {t("settings.protocolStatus", {
+                  isDefault: protocols.isDefault ? t("settings.yes") : t("settings.no"),
+                  scheme: protocols.customSchemeRegistered ? t("settings.yes") : t("settings.no"),
+                })}
               </InfoText>
           )}
 
-          {integrationMessage && <InfoText>{integrationMessage}</InfoText>}
+          {integrationMessage && <InfoText>{t(integrationMessage.key, integrationMessage.params)}</InfoText>}
         </StackCard>
 
         <ActionRow>
           <SaveButton onClick={handleSave} disabled={busy}>
-            {loading ? "Loading..." : saving ? "Saving..." : "Save Settings"}
+            {loading ? t("settings.loading") : saving ? t("settings.saving") : t("settings.save")}
           </SaveButton>
           <ResetButton onClick={handleReset} disabled={busy}>
-            Reset to Defaults
+            {t("settings.reset")}
           </ResetButton>
           {saved && (
               <Toast>
                 <CheckCircleIcon size={16}/>
-                <span>Settings saved successfully</span>
+                <span>{t("settings.saved")}</span>
               </Toast>
           )}
         </ActionRow>
 
         <FileInfo>
-          <span>Settings are persisted by the C# backend at:</span>
+          <span>{t("settings.fileInfo")}</span>
           <code>{settingsFilePath || "..."}</code>
         </FileInfo>
       </PageContainer>

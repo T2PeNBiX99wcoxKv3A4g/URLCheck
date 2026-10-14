@@ -3,6 +3,7 @@ import styled from "styled-components";
 import {isDefaultBrowser, showPopup} from "../api/system";
 import {AlertTriangleIcon, LinkIcon, SearchIcon, ShieldCheckIcon} from "../components/Icons";
 import {PageContainer, StackCard} from "../components/Layout";
+import {useTranslation} from "../i18n";
 import {useNavigate} from "../navigation";
 
 const Title = styled.h3`
@@ -182,6 +183,7 @@ const SAMPLE_URLS = [
 const SAMPLE_URL = SAMPLE_URLS[0];
 
 export const HomePage: React.FC = () => {
+    const t = useTranslation();
     const navigate = useNavigate();
     const [url, setUrl] = useState(SAMPLE_URL);
     const [busy, setBusy] = useState(false);
@@ -212,25 +214,23 @@ export const HomePage: React.FC = () => {
                     <BannerText>
                         <BannerTitle>
                             <AlertTriangleIcon size={16}/>
-                            <span>URLCheck is not your default browser</span>
+                            <span>{t("home.bannerTitle")}</span>
                         </BannerTitle>
                         <BannerBody>
-                            It only works when it handles http/https links. Set URLCheck as the default browser so
-                            clicking a link opens this popup.
+                            {t("home.bannerBody")}
                         </BannerBody>
                     </BannerText>
-                    <BannerButton onClick={() => navigate("settings")}>Open Settings</BannerButton>
+                    <BannerButton onClick={() => navigate("settings")}>{t("home.openSettings")}</BannerButton>
                 </Banner>
             )}
 
             <StackCard>
                 <Title>
                     <LinkIcon size={18}/>
-                    <span>Open a URL</span>
+                    <span>{t("home.openTitle")}</span>
                 </Title>
                 <Description>
-                    Simulate clicking a link. URLCheck intercepts the URL, opens the inspection popup, and lets you
-                    strip query parameters before opening it in a browser.
+                    {t("home.openDescription")}
                 </Description>
 
                 <InputForm onSubmit={handleSubmit}>
@@ -245,12 +245,12 @@ export const HomePage: React.FC = () => {
                     </InputWrapper>
                     <PrimaryButton type="submit" disabled={busy}>
                         <ShieldCheckIcon size={18}/>
-                        <span>Open</span>
+                        <span>{t("home.open")}</span>
                     </PrimaryButton>
                 </InputForm>
 
                 <Presets>
-                    <PresetLabel>Sample URLs:</PresetLabel>
+                    <PresetLabel>{t("home.samples")}</PresetLabel>
                     {SAMPLE_URLS.map((sample) => (
                         <PresetChip
                             key={sample}

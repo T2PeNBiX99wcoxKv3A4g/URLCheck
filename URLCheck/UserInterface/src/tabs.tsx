@@ -8,12 +8,10 @@ import {SettingsPage} from "./pages/SettingsPage";
 /** A single entry in the app's tab registry. */
 export interface TabDefinition {
     id: string;
-    /** Sidebar label. */
-    label: string;
-    /** Header title. */
-    title: string;
-    /** Header subtitle. */
-    subtitle: string;
+    /** Translation keys, resolved by the sidebar and header. */
+    labelKey: string;
+    titleKey: string;
+    subtitleKey: string;
     icon: React.FC<IconProps>;
     page: React.FC;
 }
@@ -25,25 +23,25 @@ export interface TabDefinition {
 export const TABS = [
     {
         id: "home",
-        label: "Home",
-        title: "Home",
-        subtitle: "Open a URL to inspect and clean it before opening",
+        labelKey: "tabs.home.label",
+        titleKey: "tabs.home.title",
+        subtitleKey: "tabs.home.subtitle",
         icon: HomeIcon,
         page: HomePage,
     },
     {
         id: "history",
-        label: "Inspection History",
-        title: "Inspection History",
-        subtitle: "Review recently executed URL checks and summary logs",
+        labelKey: "tabs.history.label",
+        titleKey: "tabs.history.title",
+        subtitleKey: "tabs.history.subtitle",
         icon: HistoryIcon,
         page: HistoryPage,
     },
     {
         id: "settings",
-        label: "Settings",
-        title: "Preferences & Settings",
-        subtitle: "Configure the request timeout, User-Agent header, and browsers",
+        labelKey: "tabs.settings.label",
+        titleKey: "tabs.settings.title",
+        subtitleKey: "tabs.settings.subtitle",
         icon: SettingsIcon,
         page: SettingsPage,
     },

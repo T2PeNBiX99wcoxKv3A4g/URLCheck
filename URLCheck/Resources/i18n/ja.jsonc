@@ -33,6 +33,7 @@
   "settings.requestTimeoutDescription": "1 つの URL 応答を待つ最大ミリ秒",
   "settings.userAgent": "User-Agent",
   "settings.userAgentDescription": "先頭の項目が送信リクエストに使われます。表示名とヘッダー値を編集できます。",
+  "settings.userAgentValuePlaceholder": "User-Agent ヘッダー値",
   "settings.addUserAgent": "User-Agent を追加",
   "settings.browsers": "ブラウザ",
   "settings.browsersDescription": "最もよく使うブラウザがポップアップの「開く」ボタンになります。ドロップダウンに残りが並びます。",

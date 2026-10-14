@@ -38,6 +38,7 @@
   "settings.requestTimeoutDescription": "Maximum milliseconds to wait for a single URL response",
   "settings.userAgent": "User-Agent",
   "settings.userAgentDescription": "The first entry is used for outbound requests. Edit the display name and the header value.",
+  "settings.userAgentValuePlaceholder": "User-Agent header value",
   "settings.addUserAgent": "Add User-Agent",
   "settings.browsers": "Browsers",
   "settings.browsersDescription": "The most-used browser becomes the popup's main \"Open\" button; the dropdown lists the rest.",

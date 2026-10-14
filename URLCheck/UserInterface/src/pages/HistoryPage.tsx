@@ -3,6 +3,7 @@ import styled from "styled-components";
 import {HistoryItem} from "../types";
 import {AlertTriangleIcon, SearchIcon, TrashIcon} from "../components/Icons";
 import {Card, PageContainer} from "../components/Layout";
+import {useTranslation} from "../i18n";
 import {clearHistory, listHistory} from "../api/history";
 import {showPopup} from "../api/system";
 
@@ -155,6 +156,7 @@ function formatTimestamp(value: string): string {
 }
 
 export const HistoryPage: React.FC = () => {
+    const t = useTranslation();
     const [history, setHistory] = useState<HistoryItem[]>([]);
     const [keyword, setKeyword] = useState("");
     const [loading, setLoading] = useState(true);
@@ -205,7 +207,7 @@ export const HistoryPage: React.FC = () => {
             {error && (
                 <ErrorBanner>
                     <AlertTriangleIcon size={16}/>
-                    <span>{error}</span>
+                    <span>{t(error)}</span>
                 </ErrorBanner>
             )}
 
@@ -214,7 +216,7 @@ export const HistoryPage: React.FC = () => {
                     <SearchIcon size={18}/>
                     <SearchInput
                         type="text"
-                        placeholder="Search history by URL..."
+                        placeholder={t("history.searchPlaceholder")}
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
                     />
@@ -222,7 +224,7 @@ export const HistoryPage: React.FC = () => {
 
                 <DangerButton onClick={handleClearHistory} disabled={history.length === 0}>
                     <TrashIcon size={15}/>
-                    <span>Clear All Logs</span>
+                    <span>{t("history.clearAll")}</span>
                 </DangerButton>
             </ControlsCard>
 
@@ -230,8 +232,8 @@ export const HistoryPage: React.FC = () => {
                 <Table>
                     <thead>
                     <tr>
-                        <th style={{width: "200px"}}>Timestamp</th>
-                        <th>URL</th>
+                        <th style={{width: "200px"}}>{t("history.timestamp")}</th>
+                        <th>{t("history.url")}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -244,7 +246,7 @@ export const HistoryPage: React.FC = () => {
                                 <UrlCell>
                                     <UrlLink
                                         onClick={() => handleOpen(item.url)}
-                                        title="Open in the inspection popup"
+                                        title={t("history.openTooltip")}
                                     >
                                         {item.url}
                                     </UrlLink>
@@ -254,7 +256,7 @@ export const HistoryPage: React.FC = () => {
                     ) : (
                         <tr>
                             <td colSpan={2} style={{textAlign: "center", padding: "36px", color: "#6b7280"}}>
-                                {loading ? "Loading history…" : "No history recorded yet"}
+                                {loading ? t("history.loading") : t("history.empty")}
                             </td>
                         </tr>
                     )}

@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import {findTab, type TabType} from "../tabs";
+import {useTranslation} from "../i18n";
 
 interface HeaderProps {
   currentTab: TabType;
@@ -36,13 +37,14 @@ const PageSubtitle = styled.span`
 `;
 
 export const Header: React.FC<HeaderProps> = ({currentTab}) => {
+  const t = useTranslation();
   const current = findTab(currentTab);
 
   return (
       <HeaderContainer>
         <PageTitleGroup>
-          <PageTitle>{current.title}</PageTitle>
-          <PageSubtitle>{current.subtitle}</PageSubtitle>
+          <PageTitle>{t(current.titleKey)}</PageTitle>
+          <PageSubtitle>{t(current.subtitleKey)}</PageSubtitle>
         </PageTitleGroup>
       </HeaderContainer>
   );

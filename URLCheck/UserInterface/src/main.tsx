@@ -2,6 +2,7 @@ import {StrictMode} from "react";
 import {createRoot} from "react-dom/client";
 import "./globals.scss";
 import App from "./App";
+import {LocalizationProvider} from "./i18n";
 import {PopupPage} from "./pages/PopupPage";
 
 const rootElement = document.getElementById("root");
@@ -11,7 +12,9 @@ if (rootElement) {
 
     createRoot(rootElement).render(
         <StrictMode>
-            {isPopup ? <PopupPage/> : <App/>}
+            <LocalizationProvider>
+                {isPopup ? <PopupPage/> : <App/>}
+            </LocalizationProvider>
         </StrictMode>
     );
 }
