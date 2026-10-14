@@ -73,7 +73,7 @@ internal static class Program
                 manager.Exit);
             tray.Start();
 
-            manager.MainWindowCreated += () =>
+            manager.MainWindowCreated += [SuppressMessage("ReSharper", "AccessToDisposedClosure")]() =>
             {
                 // The message loop is about to start, so windows can now be created safely.
                 singleInstance.StartServer(forwarded => DispatchUrls(manager, forwarded));
