@@ -238,10 +238,7 @@ internal sealed class WindowManager
 
     private static void Invoke(PhotinoWindow? window, Action<PhotinoWindow> action)
     {
-        if (window is null)
-            return;
-
-        window.Invoke(() => action(window));
+        window?.Invoke(() => action(window));
     }
 
     private static void ShowHandle(PhotinoWindow window)
