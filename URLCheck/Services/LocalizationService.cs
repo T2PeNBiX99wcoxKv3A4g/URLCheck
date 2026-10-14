@@ -93,7 +93,7 @@ internal sealed class LocalizationService
             .GetManifestResourceStream($"URLCheck.Resources.i18n.{locale}.jsonc");
 
         if (stream is null)
-            return new Dictionary<string, string>();
+            return new();
 
         try
         {
@@ -103,7 +103,7 @@ internal sealed class LocalizationService
         catch (Exception ex)
         {
             Log.Warning(ex, "Failed to read the translation file for {Locale}", locale);
-            return new Dictionary<string, string>();
+            return new();
         }
     }
 

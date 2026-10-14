@@ -2,15 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using URLCheck.Data;
 using URLCheck.Messaging;
-using URLCheck.Models;
 
 namespace URLCheck.Services;
 
 /// <summary>Stores the URLs that were intercepted (clicked) in a local SQLite database.</summary>
 internal sealed class HistoryService
 {
-    private readonly DbContextOptions<HistoryContext> _options;
     private readonly SemaphoreSlim _gate = new(1, 1);
+    private readonly DbContextOptions<HistoryContext> _options;
 
     public HistoryService()
     {
@@ -45,7 +44,10 @@ internal sealed class HistoryService
             try
             {
                 await using var context = new HistoryContext(_options);
-                context.Entries.Add(new HistoryEntry { Url = url });
+                context.Entries.Add(new()
+                {
+                    Url = url
+                });
                 await context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -75,10 +77,18 @@ internal sealed class HistoryService
             var entries = await db.Entries
                 .OrderByDescending(entry => entry.Timestamp)
                 .Take(500)
-                .Select(entry => new { entry.Id, entry.Url, entry.Timestamp })
+                .Select(entry => new
+                {
+                    entry.Id,
+                    entry.Url,
+                    entry.Timestamp
+                })
                 .ToListAsync();
 
-            return context.Reply("history.list.result", new { Entries = entries });
+            return context.Reply("history.list.result", new
+            {
+                Entries = entries
+            });
         }
         finally
         {
@@ -94,7 +104,10 @@ internal sealed class HistoryService
             await using var db = new HistoryContext(_options);
             await db.Entries.ExecuteDeleteAsync();
 
-            return context.Reply("history.clear.result", new { Ok = true });
+            return context.Reply("history.clear.result", new
+            {
+                Ok = true
+            });
         }
         finally
         {

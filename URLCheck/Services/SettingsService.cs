@@ -128,7 +128,7 @@ internal sealed class SettingsService
     private async Task<AppSettings> ReadAsync()
     {
         if (!File.Exists(SettingsFilePath))
-            return new AppSettings
+            return new()
             {
                 Browsers = [.. _browserLocator.Detect()],
                 Language = LocalizationService.ResolveSystemLocale()
