@@ -10,7 +10,11 @@ namespace URLCheck.Services;
 /// </summary>
 internal sealed class SingleInstance : IDisposable
 {
-    private const string MutexName = @"Local\URLCheck.SingleInstance";
+    // The `Local\` prefix is a Windows-only "session-local" convention.
+    private static readonly string MutexName = OperatingSystem.IsWindows()
+        ? @"Local\URLCheck.SingleInstance"
+        : "URLCheck.SingleInstance";
+
     private const string PipeName = "URLCheck.Ipc";
     private readonly CancellationTokenSource _cts = new();
 

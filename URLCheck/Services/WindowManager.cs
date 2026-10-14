@@ -14,8 +14,8 @@ namespace URLCheck.Services;
 internal sealed class WindowManager
 {
     /// <summary>
-    ///     Per-app WebView2 data folder. Photino defaults to a folder shared by every Photino app,
-    ///     which breaks when another app holds it, so keep URLCheck's separate.
+    ///     Per-app web view data folder. On Windows, Photino defaults to a WebView2 folder shared by
+    ///     every Photino app, which breaks when another app holds it, so keep URLCheck's separate.
     /// </summary>
     private static readonly string WebViewDataPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name, "webview");
@@ -42,6 +42,12 @@ internal sealed class WindowManager
 
     /// <summary>When true the host window is shown at startup instead of hiding to the tray.</summary>
     public bool ShowMainWindowOnStartup { get; init; }
+
+    /// <summary>
+    ///     When true (a tray icon exists) closing the host window hides it; otherwise closing it exits
+    ///     the app, since there would be no way to bring it back.
+    /// </summary>
+    public bool CloseToTray { get; init; } = true;
 
     /// <summary>Raised once the host window's native handle exists (message loop is about to start).</summary>
     public event Action? MainWindowCreated;
@@ -120,7 +126,7 @@ internal sealed class WindowManager
             .RegisterWindowClosingHandler((_, _) =>
             {
                 // Stay resident: closing the host window hides it instead of shutting down.
-                if (_allowClose)
+                if (_allowClose || !CloseToTray)
                     return false;
 
                 HideMainWindow();

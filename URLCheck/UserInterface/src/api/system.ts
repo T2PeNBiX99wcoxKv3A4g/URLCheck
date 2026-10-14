@@ -57,11 +57,11 @@ export function resizePopup(height: number): void {
     Native.send({type: "popup.resize", payload: {height: Math.round(height)}});
 }
 
-/** Reads the app version declared in the csproj. */
-export async function getAppInfo(): Promise<{ version: string }> {
-    if (!Native.available) return {version: "dev"};
+/** Reads the app version declared in the csproj, plus the host platform id. */
+export async function getAppInfo(): Promise<{ version: string; platform: string }> {
+    if (!Native.available) return {version: "dev", platform: "windows"};
 
-    return await Native.request<{ version: string }>("app.info");
+    return await Native.request<{ version: string; platform: string }>("app.info");
 }
 
 /** True when Windows currently routes http links to URLCheck. */

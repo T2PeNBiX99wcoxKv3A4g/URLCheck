@@ -18,8 +18,8 @@ internal static class Program
     [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
     private static void Main(string[] args)
     {
-        if (!OperatingSystem.IsWindows())
-            throw new PlatformNotSupportedException("URLCheck currently supports Windows only.");
+        if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux())
+            throw new PlatformNotSupportedException("URLCheck supports Windows and Linux.");
 
         // Main must stay synchronous: [STAThread] is ignored for an async entry point, and the
         // Photino message loop / WebView2 require an STA thread.
@@ -32,8 +32,11 @@ internal static class Program
 
             var startupUrls = ExtractUrls(args);
 
+            // Without a tray the window is the only way back into the app, so always show it there.
+            var hasTray = OperatingSystem.IsWindows();
+
             // Show the management window unless we were launched to handle a link, or asked to stay in the tray.
-            var showMainWindow = !args.Contains("--tray") && startupUrls.Count == 0;
+            var showMainWindow = !hasTray || (!args.Contains("--tray") && startupUrls.Count == 0);
 
             // Only one instance may run; later launches hand their URLs to it and exit.
             using var singleInstance = new SingleInstance();
@@ -56,7 +59,8 @@ internal static class Program
 
             Log.Information("Serving React app at {AppUrl}", appUrl);
 
-            var browserLocator = new WindowsBrowserLocator();
+            var (browserLocator, windowPlatform, protocolRegistrar) = CreatePlatformServices();
+
             var settings = new SettingsService(browserLocator);
             _ = settings.GetAsync().GetAwaiter().GetResult(); // know the language before the tray is built
 
@@ -64,19 +68,15 @@ internal static class Program
             var history = new HistoryService();
             _ = new AppInfoService();
             _ = new BrowserService(browserLocator);
-            _ = new ProtocolRegistrationService();
+            _ = new ProtocolRegistrationService(protocolRegistrar);
             _ = new InspectService(settings);
-            var manager = new WindowManager(appUrl, new WindowsWindowPlatform(), settings, history)
+            var manager = new WindowManager(appUrl, windowPlatform, settings, history)
             {
-                ShowMainWindowOnStartup = showMainWindow
+                ShowMainWindowOnStartup = showMainWindow,
+                CloseToTray = hasTray
             };
 
-            using var tray = new TrayIcon(
-                Constants.WindowTitle,
-                localization.Get,
-                () => manager.ShowMainWindow(),
-                () => manager.ShowMainWindow("settings"),
-                manager.Exit);
+            using var tray = CreateTray(localization, manager);
             tray.Start();
 
             manager.MainWindowCreated += [SuppressMessage("ReSharper", "AccessToDisposedClosure")]() =>
@@ -103,6 +103,33 @@ internal static class Program
     {
         foreach (var url in ExtractUrls(args))
             manager.ShowPopup(url);
+    }
+
+    /// <summary>Creates the platform-specific services for the OS we are running on.</summary>
+    private static (IBrowserLocator Browsers, IWindowPlatform Window, IProtocolRegistrar Protocols)
+        CreatePlatformServices()
+    {
+        if (OperatingSystem.IsWindows())
+            return (new WindowsBrowserLocator(), new WindowsWindowPlatform(), new WindowsProtocolRegistrar());
+
+        if (OperatingSystem.IsLinux())
+            return (new LinuxBrowserLocator(), new LinuxWindowPlatform(), new LinuxProtocolRegistrar());
+
+        throw new PlatformNotSupportedException("URLCheck supports Windows and Linux.");
+    }
+
+    /// <summary>The tray icon, or a no-op stand-in on platforms that have none.</summary>
+    private static ITrayIcon CreateTray(LocalizationService localization, WindowManager manager)
+    {
+        if (!OperatingSystem.IsWindows())
+            return new NullTrayIcon();
+
+        return new TrayIcon(
+            Constants.WindowTitle,
+            localization.Get,
+            () => manager.ShowMainWindow(),
+            () => manager.ShowMainWindow("settings"),
+            manager.Exit);
     }
 
     /// <summary>Pulls the http/https/urlcheck URLs out of a raw argument list.</summary>

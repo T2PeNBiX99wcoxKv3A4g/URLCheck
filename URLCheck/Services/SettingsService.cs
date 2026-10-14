@@ -8,7 +8,8 @@ using URLCheck.Platform;
 namespace URLCheck.Services;
 
 /// <summary>
-///     Loads and persists <see cref="AppSettings" /> as JSON under <c>%APPDATA%\URLCheck</c>.
+///     Loads and persists <see cref="AppSettings" /> as JSON in the per-user config folder
+///     (<c>%APPDATA%\URLCheck</c> on Windows, <c>~/.config/URLCheck</c> on Linux).
 ///     The first read seeds the browser list so the popup works out of the box.
 /// </summary>
 internal sealed class SettingsService

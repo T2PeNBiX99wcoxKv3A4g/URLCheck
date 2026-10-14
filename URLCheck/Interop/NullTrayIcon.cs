@@ -1,0 +1,19 @@
+using Serilog;
+
+namespace URLCheck.Interop;
+
+/// <summary>
+///     Stand-in tray icon for platforms that have none. Linux needs a StatusNotifierItem over D-Bus
+///     (or libappindicator) to show a tray icon, which is not implemented yet, so there the app simply
+///     keeps its main window visible instead of hiding to the tray.
+/// </summary>
+/// TODO(tray): implement a StatusNotifierItem/AppIndicator host so Linux can stay resident in the tray.
+internal sealed class NullTrayIcon : ITrayIcon
+{
+    public void Start() =>
+        Log.Information("No tray icon on this platform; the main window stays visible");
+
+    public void Dispose()
+    {
+    }
+}

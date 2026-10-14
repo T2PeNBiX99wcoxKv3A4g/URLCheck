@@ -35,16 +35,22 @@ internal sealed class BrowserService
     }
 
     /// <summary>The private/incognito switch for a known browser, or null when it is unknown.</summary>
-    private static string? PrivateModeFlag(string executablePath) =>
-        Path.GetFileName(executablePath).ToLowerInvariant() switch
+    private static string? PrivateModeFlag(string executablePath)
+    {
+        var name = Path.GetFileName(executablePath).ToLowerInvariant();
+        if (name.EndsWith(".exe", StringComparison.Ordinal))
+            name = name[..^4];
+
+        return name switch
         {
-            "chrome.exe" or "msedge.exe" or "brave.exe" or "vivaldi.exe" or "chromium.exe" or "thorium.exe" =>
-                "--incognito",
-            "firefox.exe" or "waterfox.exe" or "librewolf.exe" => "-private-window",
-            "opera.exe" or "launcher.exe" => "--private",
-            "iexplore.exe" => "-private",
+            "chrome" or "google-chrome" or "google-chrome-stable" or "chromium" or "chromium-browser"
+                or "msedge" or "brave" or "brave-browser" or "vivaldi" or "thorium" => "--incognito",
+            "firefox" or "waterfox" or "librewolf" => "-private-window",
+            "opera" or "launcher" => "--private",
+            "iexplore" => "-private",
             _ => null
         };
+    }
 
     /// <summary>Handles the <c>browsers.*</c> messages.</summary>
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>

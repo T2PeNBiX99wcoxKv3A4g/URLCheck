@@ -8,7 +8,7 @@ import {AppSettings, BrowserEntry, UserAgentEntry} from "../types";
 import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
-import {openDefaultAppsSettings, protocolStatus, registerCustomScheme, registerProtocols, unregisterProtocols, type ProtocolStatus} from "../api/system";
+import {getAppInfo, openDefaultAppsSettings, protocolStatus, registerCustomScheme, registerProtocols, unregisterProtocols, type ProtocolStatus} from "../api/system";
 
 const SettingRow = styled.div`
   display: flex;
@@ -301,9 +301,14 @@ export const SettingsPage: React.FC = () => {
   const [integrationBusy, setIntegrationBusy] = useState(false);
   const [integrationMessage, setIntegrationMessage] = useState<{ key: string; params?: Record<string, string> } | null>(null);
   const [protocols, setProtocols] = useState<ProtocolStatus | null>(null);
+  const [platform, setPlatform] = useState("windows");
 
   useEffect(() => {
     protocolStatus().then(setProtocols).catch(() => setProtocols(null));
+  }, []);
+
+  useEffect(() => {
+    getAppInfo().then((info) => setPlatform(info.platform)).catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -659,7 +664,9 @@ export const SettingsPage: React.FC = () => {
 
           <SettingInfo>
             <SettingDescription>
-              {t("settings.systemIntegrationDescription")}
+              {t(platform === "windows"
+                  ? "settings.systemIntegrationDescription"
+                  : "settings.systemIntegrationDescriptionLinux")}
             </SettingDescription>
           </SettingInfo>
 
@@ -672,9 +679,11 @@ export const SettingsPage: React.FC = () => {
               <LinkIcon size={15}/>
               {t("settings.registerUrlcheck")}
             </GhostButton>
-            <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
-              {t("settings.openDefaultApps")}
-            </GhostButton>
+            {platform === "windows" && (
+                <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
+                  {t("settings.openDefaultApps")}
+                </GhostButton>
+            )}
             <DangerGhostButton type="button" onClick={handleUnregisterProtocols} disabled={integrationBusy}>
               <TrashIcon size={15}/>
               {t("settings.unregister")}

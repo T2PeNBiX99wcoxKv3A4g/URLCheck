@@ -15,7 +15,7 @@ internal sealed class TrayIcon(
     Action onOpen,
     Action onSettings,
     Action onExit)
-    : IDisposable
+    : ITrayIcon
 {
     private const uint WmApp = 0x8000;
     private const uint WmTrayIcon = WmApp + 1;

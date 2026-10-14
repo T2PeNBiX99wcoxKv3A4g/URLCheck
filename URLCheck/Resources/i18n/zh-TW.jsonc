@@ -48,6 +48,7 @@
   "settings.removeUserAgent": "移除 User-Agent",
   "settings.systemIntegration": "系統整合",
   "settings.systemIntegrationDescription": "URLCheck 必須註冊為候選瀏覽器並在 Windows「預設應用程式」中確認，才能處理 http/https 連結。urlcheck:// 協定則另外註冊，供之後的功能使用。",
+  "settings.systemIntegrationDescriptionLinux": "URLCheck 會透過 freedesktop 的 desktop-entry 機制把自己註冊為 http/https 連結的預設處理常式。部分桌面環境仍會請你在預設應用程式中確認。",
   "settings.registerHttp": "註冊 http/https",
   "settings.registerUrlcheck": "註冊 urlcheck://",
   "settings.openDefaultApps": "開啟預設應用程式",

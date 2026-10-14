@@ -53,6 +53,7 @@
   "settings.removeUserAgent": "Remove User-Agent",
   "settings.systemIntegration": "System Integration",
   "settings.systemIntegrationDescription": "URLCheck must be registered as a candidate browser and confirmed in Windows \"Default apps\" to handle http/https links. The urlcheck:// scheme is registered separately for future features.",
+  "settings.systemIntegrationDescriptionLinux": "URLCheck registers itself as the default handler for http/https links through the freedesktop desktop-entry mechanism. Some desktops still ask you to confirm it in their default applications.",
   "settings.registerHttp": "Register http/https",
   "settings.registerUrlcheck": "Register urlcheck://",
   "settings.openDefaultApps": "Open Default apps",

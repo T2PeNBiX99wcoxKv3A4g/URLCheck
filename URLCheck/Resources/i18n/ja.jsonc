@@ -48,6 +48,7 @@
   "settings.removeUserAgent": "User-Agent を削除",
   "settings.systemIntegration": "システム統合",
   "settings.systemIntegrationDescription": "http/https リンクを処理するには、URLCheck を候補ブラウザとして登録し、Windows の「既定のアプリ」で確認する必要があります。urlcheck:// スキームは将来の機能用に別途登録されます。",
+  "settings.systemIntegrationDescriptionLinux": "URLCheck は freedesktop の desktop-entry の仕組みで http/https リンクの既定のハンドラーとして登録します。デスクトップによっては、既定のアプリで確認を求められることがあります。",
   "settings.registerHttp": "http/https を登録",
   "settings.registerUrlcheck": "urlcheck:// を登録",
   "settings.openDefaultApps": "既定のアプリを開く",
