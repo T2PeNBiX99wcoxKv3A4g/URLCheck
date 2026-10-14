@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import {TabType} from "../types";
-import {HistoryIcon, HomeIcon, SettingsIcon, ShieldCheckIcon} from "./Icons";
+import {TABS, type TabType} from "../tabs";
+import {ShieldCheckIcon} from "./Icons";
 
 interface SidebarProps {
     currentTab: TabType;
@@ -142,29 +142,19 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
             </LogoSection>
 
             <NavList>
-                <NavItem
-                    $active={currentTab === "home"}
-                    onClick={() => onSelectTab("home")}
-                >
-                    <HomeIcon size={18}/>
-                    <span>Home</span>
-                </NavItem>
-
-                <NavItem
-                    $active={currentTab === "history"}
-                    onClick={() => onSelectTab("history")}
-                >
-                    <HistoryIcon size={18}/>
-                    <span>Inspection History</span>
-                </NavItem>
-
-                <NavItem
-                    $active={currentTab === "settings"}
-                    onClick={() => onSelectTab("settings")}
-                >
-                    <SettingsIcon size={18}/>
-                    <span>Settings</span>
-                </NavItem>
+                {TABS.map((tab) => {
+                    const Icon = tab.icon;
+                    return (
+                        <NavItem
+                            key={tab.id}
+                            $active={currentTab === tab.id}
+                            onClick={() => onSelectTab(tab.id)}
+                        >
+                            <Icon size={18}/>
+                            <span>{tab.label}</span>
+                        </NavItem>
+                    );
+                })}
             </NavList>
 
             <FooterSection>

@@ -124,7 +124,7 @@ export const HomePage: React.FC = () => {
     const [url, setUrl] = useState(SAMPLE_URL);
     const [busy, setBusy] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const target = url.trim();

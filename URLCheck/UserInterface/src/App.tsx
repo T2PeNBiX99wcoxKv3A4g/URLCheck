@@ -1,12 +1,9 @@
 import {useEffect, useState} from "react";
 import styled from "styled-components";
-import {TabType} from "./types";
+import {DEFAULT_TAB, findTab, type TabType} from "./tabs";
 import {Native} from "./Native";
 import {Sidebar} from "./components/Sidebar";
 import {Header} from "./components/Header";
-import {HomePage} from "./pages/HomePage";
-import {HistoryPage} from "./pages/HistoryPage";
-import {SettingsPage} from "./pages/SettingsPage";
 
 const AppContainer = styled.div`
     display: flex;
@@ -34,7 +31,7 @@ const ContentArea = styled.main`
 `;
 
 export default function App() {
-    const [currentTab, setCurrentTab] = useState<TabType>("home");
+    const [currentTab, setCurrentTab] = useState<TabType>(DEFAULT_TAB);
 
     // The tray menu can request a specific tab (e.g. "Settings").
     useEffect(() => {
@@ -46,6 +43,8 @@ export default function App() {
         });
     }, []);
 
+    const CurrentPage = findTab(currentTab).page;
+
     return (
         <AppContainer>
             <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab}/>
@@ -53,9 +52,7 @@ export default function App() {
             <MainLayout>
                 <Header currentTab={currentTab}/>
                 <ContentArea>
-                    {currentTab === "home" && <HomePage/>}
-                    {currentTab === "history" && <HistoryPage/>}
-                    {currentTab === "settings" && <SettingsPage/>}
+                    <CurrentPage/>
                 </ContentArea>
             </MainLayout>
         </AppContainer>

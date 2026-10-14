@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import {TabType} from "../types";
+import {findTab, type TabType} from "../tabs";
 
 interface HeaderProps {
   currentTab: TabType;
@@ -62,23 +62,8 @@ const Dot = styled.span`
   box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
 `;
 
-const tabInfo: Record<TabType, { title: string; subtitle: string }> = {
-  home: {
-    title: "Home",
-    subtitle: "Open a URL to inspect and clean it before opening",
-  },
-  history: {
-    title: "Inspection History",
-    subtitle: "Review recently executed URL checks and summary logs",
-  },
-  settings: {
-    title: "Preferences & Settings",
-    subtitle: "Configure the request timeout, User-Agent header, and browsers",
-  },
-};
-
 export const Header: React.FC<HeaderProps> = ({currentTab}) => {
-  const current = tabInfo[currentTab];
+  const current = findTab(currentTab);
 
   return (
       <HeaderContainer>

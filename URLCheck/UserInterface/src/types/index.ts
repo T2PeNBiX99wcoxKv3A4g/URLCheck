@@ -1,5 +1,3 @@
-export type TabType = "home" | "history" | "settings";
-
 export interface HistoryItem {
     id: string;
     url: string;
