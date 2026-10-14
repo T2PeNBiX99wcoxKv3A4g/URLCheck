@@ -13,7 +13,11 @@ internal static class Logging
         Directory.CreateDirectory(logDirectory);
 
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Is(Constants.IsDebugMode ? LogEventLevel.Debug : LogEventLevel.Information)
+#if DEBUG
+            .MinimumLevel.Is(LogEventLevel.Debug)
+#else
+            .MinimumLevel.Is(LogEventLevel.Information)
+#endif
             .Enrich.FromLogContext()
             .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .WriteTo.File(
