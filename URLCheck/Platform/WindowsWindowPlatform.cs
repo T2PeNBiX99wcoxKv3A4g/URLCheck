@@ -27,9 +27,14 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         NativeMethods.SendMessage(handle, NativeMethods.WmNcLButtonDown, NativeMethods.HtCaption, IntPtr.Zero);
     });
 
-    public void Resize(PhotinoWindow window, int width, int height) => UseHandle(window, handle =>
-        NativeMethods.SetWindowPos(handle, IntPtr.Zero, 0, 0, width, height,
+    public void Resize(PhotinoWindow window, int width, int height, bool center)
+    {
+        UseHandle(window, handle => NativeMethods.SetWindowPos(handle, IntPtr.Zero, 0, 0, width, height,
             NativeMethods.SwpNoMove | NativeMethods.SwpNoZOrder | NativeMethods.SwpNoActivate));
+
+        if (center)
+            window.Center();
+    }
 
     private static void UseHandle(PhotinoWindow window, Action<IntPtr> action)
     {

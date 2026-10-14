@@ -13,5 +13,5 @@ internal interface IWindowPlatform
 
     void StartDrag(PhotinoWindow window);
 
-    void Resize(PhotinoWindow window, int width, int height);
+    void Resize(PhotinoWindow window, int width, int height, bool center);
 }

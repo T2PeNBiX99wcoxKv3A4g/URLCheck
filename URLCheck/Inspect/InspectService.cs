@@ -4,7 +4,7 @@ using URLCheck.Services;
 
 namespace URLCheck.Inspect;
 
-/// <summary>Answers the <c>inspect.*</c> messages: HTTP status checks and redirect (unshort) lookups.</summary>
+/// <summary>Answers the <c>inspect.*</c> messages: HTTP status checks and redirect lookups.</summary>
 internal sealed class InspectService
 {
     /// <summary>Follows redirects, so a status check reports the final destination's status.</summary>
@@ -33,7 +33,7 @@ internal sealed class InspectService
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch
     {
         "inspect.status" => CheckStatusAsync(context),
-        "inspect.unshort" => UnshortenAsync(context),
+        "inspect.redirect" => FollowRedirectAsync(context),
         _ => Task.FromResult<NativeResponse?>(null)
     };
 
@@ -68,10 +68,10 @@ internal sealed class InspectService
         }
     }
 
-    private async Task<NativeResponse?> UnshortenAsync(NativeContext context)
+    private async Task<NativeResponse?> FollowRedirectAsync(NativeContext context)
     {
         if (context.Payload<InspectRequest>() is not { Url: { Length: > 0 } url })
-            return context.Fail("inspect.unshort.result", "Missing URL.");
+            return context.Fail("inspect.redirect.result", "Missing URL.");
 
         var settings = await _settings.GetAsync();
 
@@ -83,14 +83,14 @@ internal sealed class InspectService
 
             using var response = await RedirectClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
-            return context.Reply("inspect.unshort.result", new
+            return context.Reply("inspect.redirect.result", new
             {
                 Location = response.Headers.Location?.ToString()
             });
         }
         catch (Exception ex)
         {
-            return context.Fail("inspect.unshort.result", ex.Message);
+            return context.Fail("inspect.redirect.result", ex.Message);
         }
     }
 

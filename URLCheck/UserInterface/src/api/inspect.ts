@@ -6,7 +6,7 @@ export interface StatusResult {
     ok: boolean;
 }
 
-export interface UnshortenResult {
+export interface RedirectResult {
     location: string | null;
 }
 
@@ -16,7 +16,7 @@ export async function checkStatus(url: string): Promise<StatusResult> {
 }
 
 /** Asks the backend for the next redirect target (one hop), or null when there is none. */
-export async function unshorten(url: string): Promise<string | null> {
-    const result = await Native.request<UnshortenResult>("inspect.unshort", {url});
+export async function followRedirect(url: string): Promise<string | null> {
+    const result = await Native.request<RedirectResult>("inspect.redirect", {url});
     return result.location ?? null;
 }

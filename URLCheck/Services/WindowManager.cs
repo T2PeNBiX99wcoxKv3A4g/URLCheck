@@ -27,6 +27,7 @@ internal sealed class WindowManager
 
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
+    private bool _popupCentered;
 
     public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings)
     {
@@ -88,7 +89,12 @@ internal sealed class WindowManager
             {
                 var height = context.Payload<PopupResizeRequest>()?.Height ?? 0;
                 if (height > 0)
-                    Invoke(context.Window, window => _platform.Resize(window, window.Width, height));
+                {
+                    // The first fit also re-centers; later fits keep wherever the user moved it.
+                    var center = !_popupCentered;
+                    _popupCentered = true;
+                    Invoke(context.Window, window => _platform.Resize(window, window.Width, height, center));
+                }
 
                 return null;
             }
@@ -188,6 +194,7 @@ internal sealed class WindowManager
                 .Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}");
 
             _popupWindow = popup;
+            _popupCentered = false;
 
             try
             {

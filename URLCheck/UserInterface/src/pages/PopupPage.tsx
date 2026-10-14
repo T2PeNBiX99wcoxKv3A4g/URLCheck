@@ -3,7 +3,7 @@ import styled from "styled-components";
 import {BrowserEntry} from "../types";
 import {loadSettings} from "../api/settings";
 import {openWithBrowser} from "../api/browsers";
-import {checkStatus, unshorten, type StatusResult} from "../api/inspect";
+import {checkStatus, followRedirect, type StatusResult} from "../api/inspect";
 import {closePopup, resizePopup} from "../api/system";
 import {stripTrackingParams, trackingParamKeys} from "../data/trackingParams";
 import {Native} from "../Native";
@@ -12,6 +12,7 @@ import {
     CheckCircleIcon,
     CopyIcon,
     LockIcon,
+    RedirectIcon,
     ShieldCheckIcon,
     TrashIcon,
     XCircleIcon,
@@ -192,19 +193,16 @@ const HistoryItem = styled.button<{ $active: boolean }>`
 `;
 
 const StatusPill = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
-    flex: 1;
-    min-width: 0;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 6px;
-    height: 24px;
-    padding: 0 9px;
-    border-radius: 6px;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 7px;
     cursor: pointer;
-    font-size: 0.74rem;
+    font-size: 0.76rem;
     font-weight: 500;
-    overflow: hidden;
     white-space: nowrap;
     border: 1px solid
         ${(p) =>
@@ -478,7 +476,7 @@ export const PopupPage: React.FC = () => {
     const [browsers, setBrowsers] = useState<BrowserEntry[]>([]);
     const [status, setStatus] = useState<StatusResult | null>(null);
     const [statusBusy, setStatusBusy] = useState(false);
-    const [unshortBusy, setUnshortBusy] = useState(false);
+    const [redirectBusy, setRedirectBusy] = useState(false);
     const [browserMenuOpen, setBrowserMenuOpen] = useState(false);
     const [historyMenuOpen, setHistoryMenuOpen] = useState(false);
     const [privateMode, setPrivateMode] = useState(false);
@@ -570,16 +568,16 @@ export const PopupPage: React.FC = () => {
         setStatus(null);
     };
 
-    const handleUnshort = async () => {
-        setUnshortBusy(true);
+    const handleFollowRedirect = async () => {
+        setRedirectBusy(true);
         setError(null);
         try {
-            const target = await unshorten(url);
+            const target = await followRedirect(url);
             if (target) commit(target);
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
         } finally {
-            setUnshortBusy(false);
+            setRedirectBusy(false);
         }
     };
 
@@ -698,11 +696,6 @@ export const PopupPage: React.FC = () => {
                                  disabled={history.index >= history.entries.length - 1} title="Last">▶|
                     </SmallButton>
 
-                    <StatusPill $tone={tone} onClick={handleCheckStatus} disabled={statusBusy} title="Check status">
-                        <StatusIcon size={13}/>
-                        <span>{statusText}</span>
-                    </StatusPill>
-
                     {historyMenuOpen && (
                         <HistoryMenu>
                             {history.entries.map((entry, index) => (
@@ -722,8 +715,14 @@ export const PopupPage: React.FC = () => {
                 </Toolbar>
 
                 <Actions>
-                    <ActionButton onClick={handleUnshort} disabled={unshortBusy || !parsed}>
-                        {unshortBusy ? "Resolving…" : "Unshort"}
+                    <StatusPill $tone={tone} onClick={handleCheckStatus} disabled={statusBusy} title="Check status">
+                        <StatusIcon size={13}/>
+                        <span>{statusText}</span>
+                    </StatusPill>
+
+                    <ActionButton onClick={handleFollowRedirect} disabled={redirectBusy || !parsed} title="Follow the next redirect">
+                        <RedirectIcon size={13}/>
+                        {redirectBusy ? "Resolving…" : "Redirect"}
                     </ActionButton>
 
                     <ActionButton onClick={() => commit(stripTrackingParams(url))} disabled={!parsed}>
