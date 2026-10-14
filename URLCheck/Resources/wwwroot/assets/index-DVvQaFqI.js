@@ -1142,6 +1142,14 @@ Error generating stack: `+n.message+`
     border-color: ${i=>i.$active?"rgba(99, 102, 241, 0.5)":"rgba(255, 255, 255, 0.1)"};
     background: ${i=>i.$active?"rgba(99, 102, 241, 0.22)":"rgba(255, 255, 255, 0.05)"};
     color: ${i=>i.$active?"#c7d2fe":"#d1d5db"};
+
+    /* ActionButton's hover rule knows nothing about $active, so it would flatten the active
+       background back to the plain white wash. Keep the two states distinguishable. */
+    &:hover:not(:disabled) {
+        border-color: ${i=>i.$active?"rgba(99, 102, 241, 0.7)":"rgba(255, 255, 255, 0.1)"};
+        background: ${i=>i.$active?"rgba(99, 102, 241, 0.34)":"rgba(255, 255, 255, 0.12)"};
+        color: ${i=>i.$active?"#e0e7ff":"#f9fafb"};
+    }
 `,u3=w.div`
     display: flex;
     align-items: center;
