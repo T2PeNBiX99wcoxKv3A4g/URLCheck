@@ -84,6 +84,15 @@ internal sealed class WindowManager
                 CloseWindow(context.Window);
                 return null;
 
+            case "popup.resize":
+            {
+                var height = context.Payload<PopupResizeRequest>()?.Height ?? 0;
+                if (height > 0)
+                    Invoke(context.Window, window => window.SetHeight(height));
+
+                return null;
+            }
+
             case "window.drag":
                 StartDrag(context.Window);
                 return null;

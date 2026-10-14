@@ -29,3 +29,8 @@ export async function registerProtocols(): Promise<{ executablePath: string }> {
 export async function openDefaultAppsSettings(): Promise<void> {
     await Native.request("app.openDefaultApps");
 }
+
+/** Asks the backend to resize the popup window so it fits its content. */
+export function resizePopup(height: number): void {
+    Native.send({type: "popup.resize", height: Math.round(height)});
+}

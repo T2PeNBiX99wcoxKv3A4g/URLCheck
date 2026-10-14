@@ -90,6 +90,12 @@ internal sealed record PopupShowRequest(string Url);
 /// <summary>Payload for <c>popup.open</c>.</summary>
 internal sealed record PopupOpenRequest(string Url, string? BrowserId);
 
+/// <summary>Payload for <c>popup.resize</c>.</summary>
+internal sealed record PopupResizeRequest(int Height);
+
+/// <summary>Payload for the <c>inspect.*</c> messages.</summary>
+internal sealed record InspectRequest(string Url);
+
 /// <summary>Shared JSON options and serialization helpers for the native bridge.</summary>
 internal static class NativeProtocol
 {

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Serilog;
+using URLCheck.Inspect;
 using URLCheck.Interop;
 using URLCheck.Platform;
 using URLCheck.Services;
@@ -59,6 +60,7 @@ internal static class Program
             var settings = new SettingsService(browserLocator);
             _ = new BrowserService(browserLocator);
             _ = new ProtocolRegistrationService();
+            _ = new InspectService(settings);
             var manager = new WindowManager(appUrl, new WindowsWindowPlatform(), settings)
             {
                 ShowMainWindowOnStartup = showMainWindow
