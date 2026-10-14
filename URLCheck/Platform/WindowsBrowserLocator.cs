@@ -55,7 +55,7 @@ internal sealed class WindowsBrowserLocator : IBrowserLocator
                 continue;
 
             using var commandKey = client.OpenSubKey(@"shell\open\command");
-            var executable = ExtractExecutable(commandKey?.GetValue(null) as string);
+            var executable = WindowsCommandLine.ExtractExecutable(commandKey?.GetValue(null) as string);
             if (executable is null || !File.Exists(executable))
                 continue;
 
@@ -74,29 +74,5 @@ internal sealed class WindowsBrowserLocator : IBrowserLocator
                 ExecutablePath = executable
             };
         }
-    }
-
-    private static string? ExtractExecutable(string? command)
-    {
-        if (string.IsNullOrWhiteSpace(command))
-            return null;
-
-        command = command.Trim();
-
-        // Quoted: "C:\Program Files\...\chrome.exe" --flag
-        if (command.StartsWith('"'))
-        {
-            var end = command.IndexOf('"', 1);
-            if (end > 1)
-                return command[1..end];
-        }
-
-        // Unquoted: C:\...\browser.exe --flag
-        var exeIndex = command.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
-        if (exeIndex >= 0)
-            return command[..(exeIndex + 4)];
-
-        var space = command.IndexOf(' ');
-        return space > 0 ? command[..space] : command;
     }
 }

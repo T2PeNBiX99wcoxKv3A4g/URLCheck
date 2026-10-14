@@ -59,6 +59,7 @@
   "settings.openDefaultApps": "Open Default apps",
   "settings.unregister": "Unregister",
   "settings.protocolStatus": "Default browser: {isDefault} · urlcheck:// registered: {scheme}",
+  "settings.pathMismatch": "The registered handler points at a different copy of URLCheck: {path}. Register http/https again to point it at this one.",
   "settings.language": "Language",
   "settings.languageDescription": "Language used by both the interface and the desktop backend.",
   "settings.save": "Save Settings",

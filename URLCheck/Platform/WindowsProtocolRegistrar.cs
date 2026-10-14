@@ -34,6 +34,19 @@ internal sealed class WindowsProtocolRegistrar : IProtocolRegistrar
 
     public string ExecutablePath { get; }
 
+    /// <summary>
+    ///     The path stored for the http handler. Comparing it with <see cref="ExecutablePath" /> is how a
+    ///     stale registration (the app moved, or a debug build took over) is detected.
+    /// </summary>
+    public string? RegisteredExecutablePath
+    {
+        get
+        {
+            using var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{HttpProgId}\shell\open\command");
+            return WindowsCommandLine.ExtractExecutable(key?.GetValue(null) as string);
+        }
+    }
+
     /// <summary>Registers URLCheck as an http/https candidate browser.</summary>
     public void RegisterBrowser()
     {

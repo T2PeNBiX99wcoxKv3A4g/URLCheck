@@ -254,6 +254,15 @@ const InfoText = styled.span`
   color: #9ca3af;
 `;
 
+const WarnText = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #fbbf24;
+`;
+
 const Select = styled.select`
   padding: 8px 12px;
   border-radius: 8px;
@@ -693,10 +702,17 @@ export const SettingsPage: React.FC = () => {
           {protocols && (
               <InfoText>
                 {t("settings.protocolStatus", {
-                  isDefault: protocols.isDefault ? t("settings.yes") : t("settings.no"),
+                  isDefault: protocols.isDefault && protocols.pathMatches ? t("settings.yes") : t("settings.no"),
                   scheme: protocols.customSchemeRegistered ? t("settings.yes") : t("settings.no"),
                 })}
               </InfoText>
+          )}
+
+          {protocols?.isDefault && !protocols.pathMatches && (
+              <WarnText>
+                <AlertTriangleIcon size={14}/>
+                <span>{t("settings.pathMismatch", {path: protocols.registeredPath ?? "?"})}</span>
+              </WarnText>
           )}
 
           {integrationMessage && <InfoText>{t(integrationMessage.key, integrationMessage.params)}</InfoText>}

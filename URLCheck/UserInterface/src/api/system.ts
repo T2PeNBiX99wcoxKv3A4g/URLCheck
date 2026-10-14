@@ -38,11 +38,17 @@ export async function unregisterProtocols(): Promise<void> {
 export interface ProtocolStatus {
     isDefault: boolean;
     customSchemeRegistered: boolean;
+    /** True when the registered handler points at this exact executable. */
+    pathMatches: boolean;
+    /** The executable the OS currently has registered, or null when nothing is registered. */
+    registeredPath: string | null;
 }
 
 /** Reports whether URLCheck is the default browser and whether urlcheck:// is registered. */
 export async function protocolStatus(): Promise<ProtocolStatus> {
-    if (!Native.available) return {isDefault: false, customSchemeRegistered: false};
+    if (!Native.available) {
+        return {isDefault: false, customSchemeRegistered: false, pathMatches: false, registeredPath: null};
+    }
 
     return await Native.request<ProtocolStatus>("app.protocolStatus");
 }
@@ -64,10 +70,14 @@ export async function getAppInfo(): Promise<{ version: string; platform: string 
     return await Native.request<{ version: string; platform: string }>("app.info");
 }
 
-/** True when Windows currently routes http links to URLCheck. */
+/**
+ * True when the OS routes http links to *this* copy of URLCheck. A registration that points at a
+ * different executable (the app moved, or a debug build took over) counts as not being the default,
+ * so the UI keeps nagging until it is re-registered.
+ */
 export async function isDefaultBrowser(): Promise<boolean> {
     if (!Native.available) return false;
 
     const status = await Native.request<ProtocolStatus>("app.protocolStatus");
-    return status.isDefault;
+    return status.isDefault && status.pathMatches;
 }

@@ -15,7 +15,11 @@ internal sealed record BrowserOpenPayload(bool Ok, string Browser);
 internal sealed record RegisterPayload(bool Ok, string ExecutablePath);
 
 /// <summary>Body for <c>app.protocolStatus</c>.</summary>
-internal sealed record ProtocolStatusPayload(bool IsDefault, bool CustomSchemeRegistered);
+internal sealed record ProtocolStatusPayload(
+    bool IsDefault,
+    bool CustomSchemeRegistered,
+    bool PathMatches,
+    string? RegisteredPath);
 
 /// <summary>Body for <c>browsers.detect</c>.</summary>
 internal sealed record BrowsersPayload(IReadOnlyList<BrowserEntry> Browsers);

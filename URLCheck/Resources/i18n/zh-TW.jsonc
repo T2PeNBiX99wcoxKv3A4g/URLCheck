@@ -54,6 +54,7 @@
   "settings.openDefaultApps": "開啟預設應用程式",
   "settings.unregister": "取消註冊",
   "settings.protocolStatus": "預設瀏覽器：{isDefault} · urlcheck:// 已註冊：{scheme}",
+  "settings.pathMismatch": "已註冊的處理常式指向另一份 URLCheck：{path}。請重新註冊 http/https，讓它指向目前這一份。",
   "settings.language": "語言",
   "settings.languageDescription": "介面與桌面後端共用的語言。",
   "settings.save": "儲存設定",

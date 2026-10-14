@@ -54,9 +54,19 @@ internal sealed class ProtocolRegistrationService
         return context.Reply("app.unregisterProtocols.result", new OkPayload());
     }
 
-    private NativeResponse StatusReply(NativeContext context) =>
-        context.Reply("app.protocolStatus.result",
-            new ProtocolStatusPayload(_registrar.IsDefaultBrowser(), _registrar.IsCustomSchemeRegistered()));
+    private NativeResponse StatusReply(NativeContext context)
+    {
+        var registered = _registrar.RegisteredExecutablePath;
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return context.Reply("app.protocolStatus.result", new ProtocolStatusPayload(
+            _registrar.IsDefaultBrowser(),
+            _registrar.IsCustomSchemeRegistered(),
+            registered is { Length: > 0 } && registered.Equals(_registrar.ExecutablePath, comparison),
+            registered));
+    }
 
     private NativeResponse OpenDefaultAppsReply(NativeContext context)
     {

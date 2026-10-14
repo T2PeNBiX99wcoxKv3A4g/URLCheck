@@ -54,6 +54,7 @@
   "settings.openDefaultApps": "打开默认应用",
   "settings.unregister": "取消注册",
   "settings.protocolStatus": "默认浏览器：{isDefault} · urlcheck:// 已注册：{scheme}",
+  "settings.pathMismatch": "已注册的处理程序指向另一份 URLCheck：{path}。请重新注册 http/https，让它指向当前这一份。",
   "settings.language": "语言",
   "settings.languageDescription": "界面与桌面后端共用的语言。",
   "settings.save": "保存设置",

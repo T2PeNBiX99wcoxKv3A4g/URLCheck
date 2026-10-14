@@ -6,6 +6,9 @@ internal interface IProtocolRegistrar
     /// <summary>Full path of the running executable, used in the generated handler entries.</summary>
     string ExecutablePath { get; }
 
+    /// <summary>The executable the registered handlers currently point at, or null when unregistered.</summary>
+    string? RegisteredExecutablePath { get; }
+
     /// <summary>Makes URLCheck an http/https handler (and, where possible, the default one).</summary>
     void RegisterBrowser();
 

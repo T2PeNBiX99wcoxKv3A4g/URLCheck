@@ -29,6 +29,27 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
 
     public string ExecutablePath { get; }
 
+    /// <summary>
+    ///     The path stored in <c>urlcheck.desktop</c>. Comparing it with <see cref="ExecutablePath" /> is
+    ///     how a stale registration (the app moved) is detected.
+    /// </summary>
+    public string? RegisteredExecutablePath
+    {
+        get
+        {
+            var command = ReadExecCommand();
+            if (string.IsNullOrWhiteSpace(command))
+                return null;
+
+            // Exec lines look like: Exec="/path/to/URLCheck" %u
+            if (!command.StartsWith('"'))
+                return command.Split(' ')[0];
+
+            var end = command.IndexOf('"', 1);
+            return end > 1 ? command[1..end] : null;
+        }
+    }
+
     public void RegisterBrowser()
     {
         EnsureExecutable();
@@ -95,6 +116,26 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
         var (ok, _) = Run("xdg-mime", "default", DesktopFileName, mimeType);
         if (!ok)
             Log.Warning("xdg-mime could not set the default handler for {MimeType}", mimeType);
+    }
+
+    /// <summary>Reads the <c>Exec=</c> line of our desktop entry, if it exists.</summary>
+    private static string? ReadExecCommand()
+    {
+        try
+        {
+            if (!File.Exists(DesktopFilePath))
+                return null;
+
+            var line = File.ReadLines(DesktopFilePath)
+                .FirstOrDefault(candidate => candidate.StartsWith("Exec=", StringComparison.Ordinal));
+
+            return line is null ? null : line["Exec=".Length..].Trim();
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to read {File}", DesktopFilePath);
+            return null;
+        }
     }
 
     /// <summary>Refreshes the MIME cache so the new entry is picked up immediately (best effort).</summary>
