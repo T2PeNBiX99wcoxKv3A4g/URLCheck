@@ -64,10 +64,7 @@ internal sealed class WindowManager
                     return context.Fail("popup.show.result", "error.missingUrl");
 
                 ShowPopup(payload.Url);
-                return context.Reply("popup.show.result", new
-                {
-                    Ok = true
-                });
+                return context.Reply("popup.show.result", new OkPayload());
             }
 
             case "popup.open":
@@ -86,11 +83,7 @@ internal sealed class WindowManager
                 await _settings.SaveAsync(settings);
 
                 BrowserService.Launch(browser, payload.Url, payload.Private);
-                return context.Reply("popup.open.result", new
-                {
-                    Ok = true,
-                    Browser = browser.Name
-                });
+                return context.Reply("popup.open.result", new BrowserOpenPayload(true, browser.Name));
             }
 
             case "popup.close":
@@ -146,10 +139,7 @@ internal sealed class WindowManager
         Invoke(_mainWindow, _platform.Show);
 
         if (tab is { Length: > 0 })
-            _mainWindow?.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new
-            {
-                tab
-            }));
+            _mainWindow?.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new NavigatePayload(tab)));
     }
 
     /// <summary>Opens a popup for <paramref name="url" />, or navigates the existing popup to it.</summary>
@@ -166,10 +156,8 @@ internal sealed class WindowManager
             if (_popupWindow is not null)
                 try
                 {
-                    _popupWindow.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate", new
-                    {
-                        url
-                    }));
+                    _popupWindow.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate",
+                        new PopupNavigatePayload(url)));
                     _platform.Show(_popupWindow);
                     _platform.KeepOnTop(_popupWindow);
                     return;

@@ -43,22 +43,15 @@ internal sealed class InspectService
 
             using var response = await StatusClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
-            return context.Reply("inspect.status.result", new
-            {
-                StatusCode = (int)response.StatusCode,
-                StatusText = response.ReasonPhrase ?? string.Empty,
-                Ok = response.IsSuccessStatusCode
-            });
+            return context.Reply("inspect.status.result",
+                new InspectStatusPayload((int)response.StatusCode, response.ReasonPhrase ?? string.Empty,
+                    response.IsSuccessStatusCode));
         }
         catch (Exception ex)
         {
             // A failed request (DNS, TLS, timeout, ...) is reported as a non-OK status.
-            return context.Reply("inspect.status.result", new
-            {
-                StatusCode = 0,
-                StatusText = ex is TaskCanceledException ? "error.timeout" : ex.Message,
-                Ok = false
-            });
+            return context.Reply("inspect.status.result",
+                new InspectStatusPayload(0, ex is TaskCanceledException ? "error.timeout" : ex.Message, false));
         }
     }
 
@@ -77,10 +70,8 @@ internal sealed class InspectService
 
             using var response = await RedirectClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
-            return context.Reply("inspect.redirect.result", new
-            {
-                Location = response.Headers.Location?.ToString()
-            });
+            return context.Reply("inspect.redirect.result",
+                new RedirectPayload(response.Headers.Location?.ToString()));
         }
         catch (Exception ex)
         {

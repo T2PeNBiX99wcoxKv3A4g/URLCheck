@@ -25,7 +25,7 @@ internal static class NativeBridge
         NativeRequest? request;
         try
         {
-            request = JsonSerializer.Deserialize<NativeRequest>(rawMessage, NativeProtocol.SerializerOptions);
+            request = JsonSerializer.Deserialize(rawMessage, AppJsonContext.Default.NativeRequest);
         }
         catch (JsonException ex)
         {

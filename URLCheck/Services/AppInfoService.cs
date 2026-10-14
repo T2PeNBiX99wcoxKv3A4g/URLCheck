@@ -18,6 +18,7 @@ internal sealed class AppInfoService
 
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
         context.Request.Type == "app.info"
-            ? Task.FromResult<NativeResponse?>(context.Reply("app.info.result", new { Version, Platform }))
+            ? Task.FromResult<NativeResponse?>(context.Reply("app.info.result",
+                new AppInfoPayload(Version, Platform)))
             : Task.FromResult<NativeResponse?>(null);
 }

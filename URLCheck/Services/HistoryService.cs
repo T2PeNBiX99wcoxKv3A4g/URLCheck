@@ -75,20 +75,15 @@ internal sealed class HistoryService
         {
             await using var db = new HistoryContext(_options);
             var entries = await db.Entries
+                .AsNoTracking()
                 .OrderByDescending(entry => entry.Timestamp)
                 .Take(500)
-                .Select(entry => new
-                {
-                    entry.Id,
-                    entry.Url,
-                    entry.Timestamp
-                })
                 .ToListAsync();
 
-            return context.Reply("history.list.result", new
-            {
-                Entries = entries
-            });
+            return context.Reply("history.list.result", new HistoryListPayload(
+            [
+                .. entries.Select(entry => new HistoryItemPayload(entry.Id, entry.Url, entry.Timestamp))
+            ]));
         }
         finally
         {
@@ -104,10 +99,7 @@ internal sealed class HistoryService
             await using var db = new HistoryContext(_options);
             await db.Entries.ExecuteDeleteAsync();
 
-            return context.Reply("history.clear.result", new
-            {
-                Ok = true
-            });
+            return context.Reply("history.clear.result", new OkPayload());
         }
         finally
         {

@@ -55,9 +55,7 @@ internal sealed class BrowserService
     /// <summary>Handles the <c>browsers.*</c> messages.</summary>
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
         context.Request.Type == "browsers.detect"
-            ? Task.FromResult<NativeResponse?>(context.Reply("browsers.detect.result", new
-            {
-                Browsers = _locator.Detect()
-            }))
+            ? Task.FromResult<NativeResponse?>(context.Reply("browsers.detect.result",
+                new BrowsersPayload(_locator.Detect())))
             : Task.FromResult<NativeResponse?>(null);
 }

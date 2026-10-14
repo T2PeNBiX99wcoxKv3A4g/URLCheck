@@ -39,42 +39,28 @@ internal sealed class ProtocolRegistrationService
     private NativeResponse RegisterBrowserReply(NativeContext context)
     {
         _registrar.RegisterBrowser();
-        return context.Reply("app.registerProtocols.result", new
-        {
-            Ok = true,
-            ExecutablePath
-        });
+        return context.Reply("app.registerProtocols.result", new RegisterPayload(true, ExecutablePath));
     }
 
     private NativeResponse RegisterCustomSchemeReply(NativeContext context)
     {
         _registrar.RegisterCustomScheme();
-        return context.Reply("app.registerCustomScheme.result", new
-        {
-            Ok = true,
-            ExecutablePath
-        });
+        return context.Reply("app.registerCustomScheme.result", new RegisterPayload(true, ExecutablePath));
     }
 
     private NativeResponse UnregisterReply(NativeContext context)
     {
         _registrar.Unregister();
-        return context.Reply("app.unregisterProtocols.result", new { Ok = true });
+        return context.Reply("app.unregisterProtocols.result", new OkPayload());
     }
 
     private NativeResponse StatusReply(NativeContext context) =>
-        context.Reply("app.protocolStatus.result", new
-        {
-            IsDefault = _registrar.IsDefaultBrowser(),
-            CustomSchemeRegistered = _registrar.IsCustomSchemeRegistered()
-        });
+        context.Reply("app.protocolStatus.result",
+            new ProtocolStatusPayload(_registrar.IsDefaultBrowser(), _registrar.IsCustomSchemeRegistered()));
 
     private NativeResponse OpenDefaultAppsReply(NativeContext context)
     {
         _registrar.OpenDefaultAppsSettings();
-        return context.Reply("app.openDefaultApps.result", new
-        {
-            Ok = true
-        });
+        return context.Reply("app.openDefaultApps.result", new OkPayload());
     }
 }

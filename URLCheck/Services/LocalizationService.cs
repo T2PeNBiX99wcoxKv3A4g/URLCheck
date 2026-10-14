@@ -13,12 +13,6 @@ internal sealed class LocalizationService
 {
     public const string DefaultLocale = "en";
 
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
-    {
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        AllowTrailingCommas = true
-    };
-
     private readonly Dictionary<string, Dictionary<string, string>> _cache = new(StringComparer.OrdinalIgnoreCase);
     private readonly SettingsService _settings;
     private readonly Lock _sync = new();
@@ -62,12 +56,8 @@ internal sealed class LocalizationService
         if (string.IsNullOrWhiteSpace(locale))
             locale = DefaultLocale;
 
-        return Task.FromResult<NativeResponse?>(context.Reply("i18n.get.result", new
-        {
-            Locale = locale,
-            Strings = Load(locale),
-            Available = AvailableLocales
-        }));
+        return Task.FromResult<NativeResponse?>(
+            context.Reply("i18n.get.result", new LocalePayload(locale, Load(locale), AvailableLocales)));
     }
 
     private Dictionary<string, string> Load(string locale)
@@ -97,7 +87,7 @@ internal sealed class LocalizationService
 
         try
         {
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(stream, JsonOptions)
+            return JsonSerializer.Deserialize(stream, AppJsonContext.Default.DictionaryStringString)
                    ?? new Dictionary<string, string>();
         }
         catch (Exception ex)

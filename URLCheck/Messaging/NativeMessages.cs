@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Photino.NET;
 using URLCheck.Models;
 
@@ -28,7 +27,10 @@ internal sealed class NativeResponse
     public string? Id { get; init; }
     public string Type { get; init; } = string.Empty;
     public bool Ok { get; init; }
-    public object? Data { get; init; }
+
+    /// <summary>The already-serialized body, so the envelope stays free of reflection.</summary>
+    public JsonElement? Data { get; init; }
+
     public string? Error { get; init; }
 
     public static NativeResponse Success(string? id, string type, object? data = null) =>
@@ -37,7 +39,7 @@ internal sealed class NativeResponse
             Id = id,
             Type = type,
             Ok = true,
-            Data = data
+            Data = NativeJson.ToElement(data)
         };
 
     public static NativeResponse Failure(string? id, string type, string error) =>
@@ -56,7 +58,7 @@ internal sealed class NativeResponse
 internal sealed class NativeEvent
 {
     public string Type { get; init; } = string.Empty;
-    public object? Data { get; init; }
+    public JsonElement? Data { get; init; }
 }
 
 /// <summary>Everything a handler needs to answer one incoming message.</summary>
@@ -68,7 +70,7 @@ internal sealed record NativeContext(PhotinoWindow? Window, NativeRequest Reques
     public bool WantsReply => Request.Id is { Length: > 0 };
 
     public T? Payload<T>() =>
-        Request.Payload is { } payload ? payload.Deserialize<T>(NativeProtocol.SerializerOptions) : default;
+        Request.Payload is { } payload ? payload.Deserialize(NativeJson.TypeInfo<T>()) : default;
 
     public NativeResponse Reply(string type, object? data = null) => NativeResponse.Success(Id, type, data);
 
@@ -99,21 +101,18 @@ internal sealed record InspectRequest(string Url);
 /// <summary>Payload for <c>i18n.get</c>.</summary>
 internal sealed record LocaleRequest(string? Locale);
 
-/// <summary>Shared JSON options and serialization helpers for the native bridge.</summary>
+/// <summary>Shared serialization helpers for the native bridge.</summary>
 internal static class NativeProtocol
 {
-    public static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
-    {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
-
     public static string SerializeResponse(NativeResponse response) =>
-        JsonSerializer.Serialize(response, SerializerOptions);
+        JsonSerializer.Serialize(response, AppJsonContext.Default.NativeResponse);
 
     public static string SerializeEvent(string type, object? data = null) =>
-        JsonSerializer.Serialize(new NativeEvent
-        {
-            Type = type,
-            Data = data
-        }, SerializerOptions);
+        JsonSerializer.Serialize(
+            new NativeEvent
+            {
+                Type = type,
+                Data = NativeJson.ToElement(data)
+            },
+            AppJsonContext.Default.NativeEvent);
 }

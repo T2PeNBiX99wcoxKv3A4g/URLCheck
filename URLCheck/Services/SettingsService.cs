@@ -14,9 +14,10 @@ namespace URLCheck.Services;
 /// </summary>
 internal sealed class SettingsService
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    private static readonly JsonSerializerOptions SettingsFileOptions = new(JsonSerializerDefaults.Web)
     {
-        WriteIndented = true
+        WriteIndented = true,
+        TypeInfoResolver = AppJsonContext.Default
     };
 
     private readonly IBrowserLocator _browserLocator;
@@ -99,7 +100,8 @@ internal sealed class SettingsService
         await _gate.WaitAsync();
         try
         {
-            await File.WriteAllTextAsync(SettingsFilePath, JsonSerializer.Serialize(settings, JsonOptions));
+            await File.WriteAllTextAsync(SettingsFilePath,
+                JsonSerializer.Serialize(settings, SettingsFileOptions.GetTypeInfo(typeof(AppSettings))));
             _current = settings;
             return settings;
         }
@@ -138,7 +140,8 @@ internal sealed class SettingsService
         try
         {
             var json = await File.ReadAllTextAsync(SettingsFilePath);
-            return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
+            return JsonSerializer.Deserialize(json, SettingsFileOptions.GetTypeInfo(typeof(AppSettings)))
+                   as AppSettings ?? new AppSettings();
         }
         catch (Exception ex)
         {

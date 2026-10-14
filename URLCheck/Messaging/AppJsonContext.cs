@@ -1,0 +1,62 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+using URLCheck.Models;
+
+namespace URLCheck.Messaging;
+
+/// <summary>
+///     Source-generated serializer context. The Release build is trimmed, which turns off
+///     reflection-based serialization, so every shape that crosses the native bridge or lands on
+///     disk must be registered here.
+/// </summary>
+[JsonSourceGenerationOptions(
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    PropertyNameCaseInsensitive = true,
+    NumberHandling = JsonNumberHandling.AllowReadingFromString,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    ReadCommentHandling = JsonCommentHandling.Skip,
+    AllowTrailingCommas = true)]
+[JsonSerializable(typeof(NativeRequest))]
+[JsonSerializable(typeof(NativeResponse))]
+[JsonSerializable(typeof(NativeEvent))]
+[JsonSerializable(typeof(AppSettings))]
+[JsonSerializable(typeof(SettingsPayload))]
+[JsonSerializable(typeof(PopupShowRequest))]
+[JsonSerializable(typeof(PopupOpenRequest))]
+[JsonSerializable(typeof(PopupResizeRequest))]
+[JsonSerializable(typeof(InspectRequest))]
+[JsonSerializable(typeof(LocaleRequest))]
+[JsonSerializable(typeof(OkPayload))]
+[JsonSerializable(typeof(BrowserOpenPayload))]
+[JsonSerializable(typeof(RegisterPayload))]
+[JsonSerializable(typeof(ProtocolStatusPayload))]
+[JsonSerializable(typeof(BrowsersPayload))]
+[JsonSerializable(typeof(AppInfoPayload))]
+[JsonSerializable(typeof(LocalePayload))]
+[JsonSerializable(typeof(HistoryListPayload))]
+[JsonSerializable(typeof(InspectStatusPayload))]
+[JsonSerializable(typeof(RedirectPayload))]
+[JsonSerializable(typeof(NavigatePayload))]
+[JsonSerializable(typeof(PopupNavigatePayload))]
+[JsonSerializable(typeof(Dictionary<string, string>))]
+internal sealed partial class AppJsonContext : JsonSerializerContext;
+
+/// <summary>Bridges loosely-typed payloads to the source-generated serializer.</summary>
+internal static class NativeJson
+{
+    /// <summary>Converts a registered payload into the <see cref="JsonElement" /> the envelope embeds.</summary>
+    public static JsonElement? ToElement(object? value) =>
+        value is null ? null : JsonSerializer.SerializeToElement(value, TypeInfo(value.GetType()));
+
+    /// <summary>Resolves the type info for a registered type, or throws when it was never registered.</summary>
+    public static JsonTypeInfo TypeInfo(Type type) =>
+        AppJsonContext.Default.GetTypeInfo(type) ?? throw NotRegistered(type);
+
+    /// <summary>Typed overload of <see cref="TypeInfo(Type)" />, for deserializing a payload.</summary>
+    public static JsonTypeInfo<T> TypeInfo<T>() =>
+        AppJsonContext.Default.GetTypeInfo(typeof(T)) as JsonTypeInfo<T> ?? throw NotRegistered(typeof(T));
+
+    private static InvalidOperationException NotRegistered(Type type) =>
+        new($"JSON type '{type}' is not registered in {nameof(AppJsonContext)}.");
+}
