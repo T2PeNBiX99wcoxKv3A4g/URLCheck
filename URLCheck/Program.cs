@@ -15,8 +15,10 @@ internal static class Program
 {
     [STAThread]
     [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
-    private static async Task Main(string[] args)
+    private static void Main(string[] args)
     {
+        // Main must stay synchronous: [STAThread] is ignored for an async entry point, and the
+        // Photino message loop / WebView2 require an STA thread.
         Logging.Initialize();
 
         try
@@ -33,7 +35,8 @@ internal static class Program
             using var singleInstance = new SingleInstance();
             if (!singleInstance.IsFirstInstance)
             {
-                await SingleInstance.ForwardAsync(args);
+                // Blocking here is fine: this process only forwards its args and exits.
+                SingleInstance.ForwardAsync(args).GetAwaiter().GetResult();
                 return;
             }
 
