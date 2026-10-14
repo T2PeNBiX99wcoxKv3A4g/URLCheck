@@ -248,6 +248,7 @@ const StatusPill = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
     cursor: pointer;
     font-size: 0.76rem;
     font-weight: 500;
+    line-height: 1;
     white-space: nowrap;
     transition: filter 0.15s ease, transform 0.1s ease;
 
@@ -289,6 +290,7 @@ const StatusPill = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
 const Actions = styled.div`
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
     gap: 6px;
 `;
@@ -298,7 +300,10 @@ const ActionButton = styled.button<{ $accent?: boolean }>`
     align-items: center;
     justify-content: center;
     gap: 5px;
-    padding: 7px 11px;
+    /* Fixed height so every action keeps the same height as the status pill, whatever the language. */
+    height: 30px;
+    box-sizing: border-box;
+    padding: 0 11px;
     border-radius: 7px;
     border: 1px solid
         ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.4)" : "rgba(255, 255, 255, 0.1)")};
@@ -306,6 +311,7 @@ const ActionButton = styled.button<{ $accent?: boolean }>`
     color: ${(p) => (p.$accent ? "#fbbf24" : "#d1d5db")};
     font-size: 0.76rem;
     font-weight: 500;
+    line-height: 1;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 
@@ -525,7 +531,10 @@ const OpenButton = styled.button`
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 14px;
+    /* Fixed height keeps the primary button aligned with the ghost buttons in every language. */
+    height: 32px;
+    box-sizing: border-box;
+    padding: 0 14px;
     border: none;
     border-radius: 8px 0 0 8px;
     background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
@@ -607,6 +616,7 @@ const BrowserMenuItem = styled.button`
 `;
 
 const GhostButton = styled(ActionButton)<{ $active?: boolean }>`
+    height: 32px;
     border-color: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.5)" : "rgba(255, 255, 255, 0.1)")};
     background: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.22)" : "rgba(255, 255, 255, 0.05)")};
     color: ${(p) => (p.$active ? "#c7d2fe" : "#d1d5db")};
