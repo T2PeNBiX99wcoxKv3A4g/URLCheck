@@ -82,6 +82,7 @@ internal sealed class SettingsService
         }
     }
 
+    [PublicAPI]
     public async Task<AppSettings> SaveAsync(AppSettings settings)
     {
         settings.Normalize();
@@ -100,6 +101,7 @@ internal sealed class SettingsService
     }
 
     /// <summary>Restores defaults, re-detecting the installed browsers.</summary>
+    [PublicAPI]
     public Task<AppSettings> ResetAsync() =>
         SaveAsync(new()
         {
