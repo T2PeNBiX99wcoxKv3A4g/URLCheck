@@ -72,7 +72,7 @@ internal sealed class WindowManager
                 if (browser is null)
                     return context.Fail("popup.open.result", "No browser configured. Add one in Settings.");
 
-                BrowserService.Launch(browser.ExecutablePath, payload.Url);
+                BrowserService.Launch(browser.ExecutablePath, payload.Url, payload.Private);
                 return context.Reply("popup.open.result", new
                 {
                     Ok = true,
@@ -88,7 +88,7 @@ internal sealed class WindowManager
             {
                 var height = context.Payload<PopupResizeRequest>()?.Height ?? 0;
                 if (height > 0)
-                    Invoke(context.Window, window => window.SetHeight(height));
+                    Invoke(context.Window, window => _platform.Resize(window, window.Width, height));
 
                 return null;
             }

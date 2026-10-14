@@ -12,4 +12,6 @@ internal interface IWindowPlatform
     void KeepOnTop(PhotinoWindow window);
 
     void StartDrag(PhotinoWindow window);
+
+    void Resize(PhotinoWindow window, int width, int height);
 }

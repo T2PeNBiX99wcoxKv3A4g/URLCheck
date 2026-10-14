@@ -88,7 +88,7 @@ internal sealed record SettingsPayload(AppSettings Settings, string SettingsFile
 internal sealed record PopupShowRequest(string Url);
 
 /// <summary>Payload for <c>popup.open</c>.</summary>
-internal sealed record PopupOpenRequest(string Url, string? BrowserId);
+internal sealed record PopupOpenRequest(string Url, string? BrowserId, bool Private = false);
 
 /// <summary>Payload for <c>popup.resize</c>.</summary>
 internal sealed record PopupResizeRequest(int Height);

@@ -32,5 +32,5 @@ export async function openDefaultAppsSettings(): Promise<void> {
 
 /** Asks the backend to resize the popup window so it fits its content. */
 export function resizePopup(height: number): void {
-    Native.send({type: "popup.resize", height: Math.round(height)});
+    Native.send({type: "popup.resize", payload: {height: Math.round(height)}});
 }

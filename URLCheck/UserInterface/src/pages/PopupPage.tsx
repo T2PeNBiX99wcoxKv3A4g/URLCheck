@@ -7,7 +7,15 @@ import {checkStatus, unshorten, type StatusResult} from "../api/inspect";
 import {closePopup, resizePopup} from "../api/system";
 import {stripTrackingParams, trackingParamKeys} from "../data/trackingParams";
 import {Native} from "../Native";
-import {AlertTriangleIcon, CheckCircleIcon, CopyIcon, ShieldCheckIcon, TrashIcon, XCircleIcon} from "../components/Icons";
+import {
+    AlertTriangleIcon,
+    CheckCircleIcon,
+    CopyIcon,
+    LockIcon,
+    ShieldCheckIcon,
+    TrashIcon,
+    XCircleIcon,
+} from "../components/Icons";
 
 /* ------------------------------------------------------------------ history */
 
@@ -61,7 +69,6 @@ function readInitialUrl(): string {
 /* ------------------------------------------------------------------- styled */
 
 const Root = styled.div`
-    position: relative;
     min-height: 100vh;
     background-color: #0b0f19;
     background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 70%);
@@ -69,7 +76,7 @@ const Root = styled.div`
 `;
 
 const DragBar = styled.div`
-    height: 26px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -78,13 +85,13 @@ const DragBar = styled.div`
 
 const CloseButton = styled.button`
     width: 24px;
-    height: 22px;
+    height: 20px;
     border-radius: 6px;
     border: none;
     background: transparent;
     color: #6b7280;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     line-height: 1;
 
     &:hover {
@@ -96,24 +103,21 @@ const CloseButton = styled.button`
 const Content = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 0 14px 14px;
+    gap: 8px;
+    padding: 0 12px 12px;
 `;
 
-const UrlInput = styled.textarea`
+const UrlInput = styled.input`
     width: 100%;
-    min-height: 62px;
-    resize: vertical;
-    padding: 10px 12px;
-    border-radius: 9px;
+    height: 34px;
+    padding: 0 11px;
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(15, 23, 42, 0.8);
     color: #f9fafb;
     font-family: monospace;
-    font-size: 0.82rem;
-    line-height: 1.5;
+    font-size: 0.8rem;
     outline: none;
-    word-break: break-all;
 
     &:focus {
         border-color: #3b82f6;
@@ -121,22 +125,22 @@ const UrlInput = styled.textarea`
     }
 `;
 
-const HistoryBar = styled.div`
+const Toolbar = styled.div`
     position: relative;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
 `;
 
 const SmallButton = styled.button`
-    min-width: 30px;
-    height: 26px;
-    padding: 0 7px;
+    min-width: 28px;
+    height: 24px;
+    padding: 0 6px;
     border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.05);
     color: #cbd5e1;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     cursor: pointer;
 
     &:hover:not(:disabled) {
@@ -145,21 +149,21 @@ const SmallButton = styled.button`
     }
 
     &:disabled {
-        opacity: 0.4;
+        opacity: 0.35;
         cursor: not-allowed;
     }
 `;
 
 const HistoryMenu = styled.div`
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 5px);
     left: 0;
     right: 0;
-    max-height: 220px;
+    max-height: 200px;
     overflow-y: auto;
     background: #111827;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px;
+    border-radius: 9px;
     padding: 5px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
     z-index: 30;
@@ -169,13 +173,13 @@ const HistoryItem = styled.button<{ $active: boolean }>`
     display: block;
     width: 100%;
     text-align: left;
-    padding: 7px 9px;
+    padding: 6px 8px;
     border: none;
     border-radius: 6px;
     background: ${(p) => (p.$active ? "rgba(59, 130, 246, 0.2)" : "transparent")};
     color: ${(p) => (p.$active ? "#ffffff" : "#cbd5e1")};
     font-family: monospace;
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -187,17 +191,21 @@ const HistoryItem = styled.button<{ $active: boolean }>`
     }
 `;
 
-const StatusRow = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
+const StatusPill = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
+    flex: 1;
+    min-width: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 9px 12px;
-    border-radius: 8px;
+    justify-content: flex-end;
+    gap: 6px;
+    height: 24px;
+    padding: 0 9px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.82rem;
+    font-size: 0.74rem;
     font-weight: 500;
-    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
     border: 1px solid
         ${(p) =>
                 p.$tone === "ok"
@@ -225,48 +233,41 @@ const StatusRow = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
                                     : "#9ca3af"};
 `;
 
-const ActionRow = styled.div`
+const Actions = styled.div`
     display: flex;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
 `;
 
-const ActionButton = styled.button`
-    flex: 1;
+const ActionButton = styled.button<{ $accent?: boolean }>`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: #d1d5db;
-    font-size: 0.8rem;
+    gap: 5px;
+    padding: 7px 11px;
+    border-radius: 7px;
+    border: 1px solid
+        ${(p) => (p.$accent ? "rgba(99, 102, 241, 0.35)" : "rgba(255, 255, 255, 0.1)")};
+    background: ${(p) => (p.$accent ? "rgba(99, 102, 241, 0.14)" : "rgba(255, 255, 255, 0.05)")};
+    color: ${(p) => (p.$accent ? "#a5b4fc" : "#d1d5db")};
+    font-size: 0.76rem;
     font-weight: 500;
     cursor: pointer;
 
     &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.12);
+        background: ${(p) => (p.$accent ? "rgba(99, 102, 241, 0.24)" : "rgba(255, 255, 255, 0.12)")};
         color: #f9fafb;
     }
 
     &:disabled {
-        opacity: 0.45;
+        opacity: 0.4;
         cursor: not-allowed;
     }
 `;
 
-const HttpsButton = styled(ActionButton)`
-    flex: none;
-    width: 100%;
-    border-color: rgba(99, 102, 241, 0.35);
-    background: rgba(99, 102, 241, 0.14);
-    color: #a5b4fc;
-`;
-
 const Section = styled.div`
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 9px;
+    border-radius: 8px;
     overflow: hidden;
     background: rgba(15, 23, 42, 0.5);
 `;
@@ -274,13 +275,13 @@ const Section = styled.div`
 const SectionHeader = styled.button`
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     width: 100%;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border: none;
     background: transparent;
     color: #9ca3af;
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -295,7 +296,7 @@ const Chevron = styled.span<{ $open: boolean }>`
     display: inline-block;
     transition: transform 0.15s ease;
     transform: rotate(${(p) => (p.$open ? "90deg" : "0deg")});
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 `;
 
 const CountBadge = styled.span`
@@ -303,30 +304,30 @@ const CountBadge = styled.span`
     background: rgba(255, 255, 255, 0.08);
     color: #cbd5e1;
     border-radius: 9999px;
-    padding: 1px 8px;
-    font-size: 0.7rem;
+    padding: 0 7px;
+    font-size: 0.68rem;
     font-weight: 600;
 `;
 
 const SectionBody = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 0 12px 10px;
+    padding: 0 10px 7px;
 `;
 
 const Row = styled.div`
     display: flex;
     gap: 10px;
-    padding: 5px 0;
+    padding: 4px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     font-family: monospace;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
 `;
 
 const RowKey = styled.span`
     color: #60a5fa;
     flex-shrink: 0;
-    min-width: 84px;
+    min-width: 78px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -356,7 +357,7 @@ const Footer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 7px;
     margin-top: 2px;
 `;
 
@@ -369,13 +370,13 @@ const OpenButton = styled.button`
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 9px 16px;
+    padding: 8px 14px;
     border: none;
     border-radius: 8px 0 0 8px;
     background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
     color: #ffffff;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     cursor: pointer;
     box-shadow: 0 0 16px rgba(99, 102, 241, 0.3);
 
@@ -391,7 +392,7 @@ const OpenButton = styled.button`
 `;
 
 const ArrowButton = styled.button`
-    width: 32px;
+    width: 30px;
     border: none;
     border-left: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 0 8px 8px 0;
@@ -422,12 +423,12 @@ const BrowserMenuItem = styled.button`
     display: block;
     width: 100%;
     text-align: left;
-    padding: 8px 10px;
+    padding: 7px 9px;
     border: none;
     border-radius: 6px;
     background: none;
     color: #e2e8f0;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -439,17 +440,19 @@ const BrowserMenuItem = styled.button`
     }
 `;
 
-const GhostButton = styled(ActionButton)`
-    flex: none;
+const GhostButton = styled(ActionButton)<{ $active?: boolean }>`
+    border-color: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.5)" : "rgba(255, 255, 255, 0.1)")};
+    background: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.22)" : "rgba(255, 255, 255, 0.05)")};
+    color: ${(p) => (p.$active ? "#c7d2fe" : "#d1d5db")};
 `;
 
 const Message = styled.div<{ $tone: "error" | "ok" }>`
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 11px;
-    border-radius: 8px;
-    font-size: 0.78rem;
+    gap: 7px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 0.76rem;
     background: ${(p) => (p.$tone === "error" ? "rgba(239, 68, 68, 0.12)" : "rgba(16, 185, 129, 0.12)")};
     border: 1px solid ${(p) => (p.$tone === "error" ? "rgba(239, 68, 68, 0.3)" : "rgba(16, 185, 129, 0.3)")};
     color: ${(p) => (p.$tone === "error" ? "#f87171" : "#34d399")};
@@ -478,8 +481,8 @@ export const PopupPage: React.FC = () => {
     const [unshortBusy, setUnshortBusy] = useState(false);
     const [browserMenuOpen, setBrowserMenuOpen] = useState(false);
     const [historyMenuOpen, setHistoryMenuOpen] = useState(false);
+    const [privateMode, setPrivateMode] = useState(false);
     const [copied, setCopied] = useState(false);
-    const [openedIn, setOpenedIn] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [open, setOpen] = useState<SectionState>({domain: true, parameters: true, fragment: true});
 
@@ -504,6 +507,7 @@ export const PopupPage: React.FC = () => {
     const isHttps = parsed?.protocol === "https:";
     const defaultBrowser = browsers[0];
     const canOpen = Boolean(parsed) && browsers.length > 0;
+    const trackingCount = trackingParamKeys(url).length;
 
     /* load the browser list */
     useEffect(() => {
@@ -547,7 +551,7 @@ export const PopupPage: React.FC = () => {
         const observer = new ResizeObserver(() => {
             window.clearTimeout(resizeTimer.current);
             resizeTimer.current = window.setTimeout(() => {
-                const height = Math.ceil(el.offsetHeight);
+                const height = Math.ceil(el.offsetHeight) + 24; // + the drag bar
                 if (Math.abs(height - lastHeight.current) < 2) return;
                 lastHeight.current = height;
                 resizePopup(height);
@@ -564,7 +568,6 @@ export const PopupPage: React.FC = () => {
     const commit = (value: string) => {
         dispatch({type: "commit", value});
         setStatus(null);
-        setOpenedIn(null);
     };
 
     const handleUnshort = async () => {
@@ -595,10 +598,9 @@ export const PopupPage: React.FC = () => {
     const handleOpen = async (browserId?: string) => {
         setBrowserMenuOpen(false);
         setError(null);
-        setOpenedIn(null);
         try {
-            await openWithBrowser(url, browserId);
-            setOpenedIn(browsers.find((b) => b.id === browserId)?.name ?? defaultBrowser?.name ?? "browser");
+            await openWithBrowser(url, browserId, privateMode);
+            closePopup();
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
         }
@@ -637,8 +639,6 @@ export const PopupPage: React.FC = () => {
         commit(next.toString());
     };
 
-    const handleStripTracking = () => commit(stripTrackingParams(url));
-
     const handleUseHttps = () => {
         if (!parsed) return;
 
@@ -649,7 +649,6 @@ export const PopupPage: React.FC = () => {
 
     const toggleSection = (key: keyof SectionState) => setOpen((prev) => ({...prev, [key]: !prev[key]}));
 
-    const trackingCount = trackingParamKeys(url).length;
     const tone: "idle" | "ok" | "info" | "error" = !status
         ? "idle"
         : status.ok
@@ -662,7 +661,7 @@ export const PopupPage: React.FC = () => {
         ? "Checking…"
         : status
                 ? `${status.statusCode || "!"} ${status.statusText}`.trim()
-                : "Tap to check the status code";
+                : "Check status";
 
     const StatusIcon = tone === "ok" ? CheckCircleIcon : tone === "error" ? XCircleIcon : AlertTriangleIcon;
 
@@ -676,6 +675,7 @@ export const PopupPage: React.FC = () => {
 
             <Content ref={contentRef}>
                 <UrlInput
+                    type="text"
                     value={url}
                     spellCheck={false}
                     onChange={(e) => dispatch({type: "edit", value: e.target.value})}
@@ -683,22 +683,25 @@ export const PopupPage: React.FC = () => {
                     placeholder="https://example.com/path?key=value"
                 />
 
-                <HistoryBar>
+                <Toolbar>
                     <SmallButton onClick={() => dispatch({type: "jump", index: 0})} disabled={history.index === 0}
                                  title="First">|◀
                     </SmallButton>
                     <SmallButton onClick={() => dispatch({type: "jump", index: history.index - 1})}
                                  disabled={history.index === 0} title="Back">◀
                     </SmallButton>
-                    <SmallButton onClick={() => setHistoryMenuOpen((open) => !open)}
-                                 title="History">▾
-                    </SmallButton>
+                    <SmallButton onClick={() => setHistoryMenuOpen((open) => !open)} title="History">▾</SmallButton>
                     <SmallButton onClick={() => dispatch({type: "jump", index: history.index + 1})}
                                  disabled={history.index >= history.entries.length - 1} title="Forward">▶
                     </SmallButton>
                     <SmallButton onClick={() => dispatch({type: "jump", index: history.entries.length - 1})}
                                  disabled={history.index >= history.entries.length - 1} title="Last">▶|
                     </SmallButton>
+
+                    <StatusPill $tone={tone} onClick={handleCheckStatus} disabled={statusBusy} title="Check status">
+                        <StatusIcon size={13}/>
+                        <span>{statusText}</span>
+                    </StatusPill>
 
                     {historyMenuOpen && (
                         <HistoryMenu>
@@ -716,27 +719,29 @@ export const PopupPage: React.FC = () => {
                             ))}
                         </HistoryMenu>
                     )}
-                </HistoryBar>
+                </Toolbar>
 
-                <StatusRow $tone={tone} onClick={handleCheckStatus} disabled={statusBusy}>
-                    <StatusIcon size={15}/>
-                    <span>{statusText}</span>
-                </StatusRow>
-
-                <ActionRow>
+                <Actions>
                     <ActionButton onClick={handleUnshort} disabled={unshortBusy || !parsed}>
-                        <span>{unshortBusy ? "Resolving…" : "Unshort"}</span>
+                        {unshortBusy ? "Resolving…" : "Unshort"}
                     </ActionButton>
-                    <ActionButton onClick={handleStripTracking} disabled={!parsed}>
-                        <TrashIcon size={14}/>
-                        <span>{trackingCount > 0 ? `Remove tracking (${trackingCount})` : "Remove tracking"}</span>
-                    </ActionButton>
-                </ActionRow>
 
-                <ActionButton onClick={handleClearParams} disabled={!parsed || params.length === 0}>
-                    <TrashIcon size={14}/>
-                    <span>{params.length > 0 ? `Remove all parameters (${params.length})` : "Remove all parameters"}</span>
-                </ActionButton>
+                    <ActionButton onClick={() => commit(stripTrackingParams(url))} disabled={!parsed}>
+                        <TrashIcon size={13}/>
+                        Tracking{trackingCount > 0 ? ` (${trackingCount})` : ""}
+                    </ActionButton>
+
+                    <ActionButton onClick={handleClearParams} disabled={!parsed || params.length === 0}>
+                        <TrashIcon size={13}/>
+                        Params{params.length > 0 ? ` (${params.length})` : ""}
+                    </ActionButton>
+
+                    {parsed && !isHttps && (
+                        <ActionButton $accent onClick={handleUseHttps}>
+                            Use https
+                        </ActionButton>
+                    )}
+                </Actions>
 
                 <Section>
                     <SectionHeader onClick={() => toggleSection("domain")}>
@@ -774,7 +779,7 @@ export const PopupPage: React.FC = () => {
                                             title="Remove parameter"
                                             onClick={() => handleRemoveParam(param.key, param.value)}
                                         >
-                                            <TrashIcon size={13}/>
+                                            <TrashIcon size={12}/>
                                         </RemoveParam>
                                     </Row>
                                 ))}
@@ -800,30 +805,17 @@ export const PopupPage: React.FC = () => {
                     </Section>
                 )}
 
-                {parsed && !isHttps && (
-                    <HttpsButton onClick={handleUseHttps}>
-                        <span>Use https://</span>
-                    </HttpsButton>
-                )}
-
                 {error && (
                     <Message $tone="error">
-                        <AlertTriangleIcon size={14}/>
+                        <AlertTriangleIcon size={13}/>
                         <span>{error}</span>
-                    </Message>
-                )}
-
-                {openedIn && (
-                    <Message $tone="ok">
-                        <CheckCircleIcon size={14}/>
-                        <span>Opened in {openedIn}</span>
                     </Message>
                 )}
 
                 <Footer>
                     <SplitButton>
                         <OpenButton disabled={!canOpen} onClick={() => handleOpen()}>
-                            <ShieldCheckIcon size={15}/>
+                            <ShieldCheckIcon size={14}/>
                             <span>Open in {defaultBrowser?.name ?? "browser"}</span>
                         </OpenButton>
                         <ArrowButton
@@ -844,13 +836,15 @@ export const PopupPage: React.FC = () => {
                         )}
                     </SplitButton>
 
-                    <GhostButton onClick={handleCopy} disabled={!parsed}>
-                        <CopyIcon size={14}/>
-                        <span>{copied ? "Copied!" : "Copy"}</span>
+                    <GhostButton $active={privateMode} onClick={() => setPrivateMode((value) => !value)}
+                                 title="Open in a private/incognito window">
+                        <LockIcon size={13}/>
+                        Private
                     </GhostButton>
 
-                    <GhostButton disabled title="Sharing is not available on Windows yet">
-                        <span>Share</span>
+                    <GhostButton onClick={handleCopy} disabled={!parsed}>
+                        <CopyIcon size={13}/>
+                        {copied ? "Copied!" : "Copy"}
                     </GhostButton>
                 </Footer>
             </Content>

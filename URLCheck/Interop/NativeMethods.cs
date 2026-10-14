@@ -23,6 +23,7 @@ internal static partial class NativeMethods
 
     public const uint SwpNoSize = 0x0001;
     public const uint SwpNoMove = 0x0002;
+    public const uint SwpNoZOrder = 0x0004;
     public const uint SwpNoActivate = 0x0010;
     public static readonly IntPtr HwndTopMost = new(-1);
 

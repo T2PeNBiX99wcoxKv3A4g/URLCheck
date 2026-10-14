@@ -10,11 +10,11 @@ export async function detectBrowsers(): Promise<BrowserEntry[]> {
 }
 
 /** Opens a URL with a specific browser (or the default one when no id is given). */
-export async function openWithBrowser(url: string, browserId?: string): Promise<void> {
+export async function openWithBrowser(url: string, browserId?: string, privateMode = false): Promise<void> {
     if (!Native.available) {
         window.open(url, "_blank", "noopener,noreferrer");
         return;
     }
 
-    await Native.request("popup.open", {url, browserId});
+    await Native.request("popup.open", {url, browserId, private: privateMode});
 }

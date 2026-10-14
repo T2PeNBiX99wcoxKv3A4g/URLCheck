@@ -16,18 +16,33 @@ internal sealed class BrowserService
     }
 
     /// <summary>Starts <paramref name="executablePath" /> with <paramref name="url" /> as its argument.</summary>
-    public static void Launch(string executablePath, string url)
+    public static void Launch(string executablePath, string url, bool privateMode = false)
     {
         if (string.IsNullOrWhiteSpace(executablePath))
             throw new ArgumentException("A browser executable path is required.", nameof(executablePath));
 
+        var flag = privateMode ? PrivateModeFlag(executablePath) : null;
+        var arguments = flag is null ? $"\"{url}\"" : $"{flag} \"{url}\"";
+
         Process.Start(new ProcessStartInfo
         {
             FileName = executablePath,
-            Arguments = $"\"{url}\"",
+            Arguments = arguments,
             UseShellExecute = false
         });
     }
+
+    /// <summary>The private/incognito switch for a known browser, or null when it is unknown.</summary>
+    private static string? PrivateModeFlag(string executablePath) =>
+        Path.GetFileName(executablePath).ToLowerInvariant() switch
+        {
+            "chrome.exe" or "msedge.exe" or "brave.exe" or "vivaldi.exe" or "chromium.exe" or "thorium.exe" =>
+                "--incognito",
+            "firefox.exe" or "waterfox.exe" or "librewolf.exe" => "-private-window",
+            "opera.exe" or "launcher.exe" => "--private",
+            "iexplore.exe" => "-private",
+            _ => null
+        };
 
     /// <summary>Handles the <c>browsers.*</c> messages.</summary>
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
