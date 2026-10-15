@@ -7,6 +7,8 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("linux")]
 internal sealed class LinuxWindowPlatform : IWindowPlatform
 {
+    public bool WindowPerMessageLoop => false;
+
     public void Hide(PhotinoWindow window) => window.SetMinimized(true);
 
     public void Show(PhotinoWindow window)
@@ -32,4 +34,16 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
     public void RoundCorners(PhotinoWindow window)
     {
     }
+
+    /// <summary>
+    ///     Unlike Win32, GTK ignores <c>gtk_window_resize</c> on a window that is not resizable — which is
+    ///     exactly what the popup's auto-fit relies on — so the popup deliberately stays resizable here.
+    /// </summary>
+    public void ConfigurePopup(PhotinoWindow window) => window
+        .SetUseOsDefaultSize(false)
+        .SetUseOsDefaultLocation(false)
+        .SetSize(new(560, 640))
+        .SetChromeless(true)
+        .SetTopMost(true)
+        .Center();
 }

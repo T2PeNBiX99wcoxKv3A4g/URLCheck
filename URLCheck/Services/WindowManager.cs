@@ -90,7 +90,7 @@ internal sealed class WindowManager
             }
 
             case "popup.close":
-                CloseWindow(context.Window);
+                DismissPopup(context.Window);
                 return null;
 
             case "popup.resize":
@@ -177,24 +177,31 @@ internal sealed class WindowManager
             var popup = new PhotinoWindow()
                 .SetTitle(Constants.PopupTitle)
                 .SetTemporaryFilesPath(WebViewDataPath)
-                .SetUseOsDefaultSize(false)
-                .SetUseOsDefaultLocation(false)
-                .SetSize(new(560, 640))
-                .SetResizable(false)
-                .SetChromeless(true)
-                .SetTopMost(true)
-                .Center()
                 .RegisterWebMessageReceivedHandler((sender, message) =>
                     _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message))
                 .RegisterWindowClosingHandler((_, _) =>
                 {
-                    _popupWindow = null;
-                    return false;
+                    // Where one loop drives every window, closing the popup would take the app down with
+                    // it, so a close request is turned into a hide.
+                    if (_platform.WindowPerMessageLoop)
+                    {
+                        _popupWindow = null;
+                        return false;
+                    }
+
+                    if (_popupWindow is { } window)
+                        _platform.Hide(window);
+
+                    return true;
                 });
 
+            _platform.ConfigurePopup(popup);
             ApplyIcon(popup);
             popup.Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}");
             _popupWindow = popup;
+
+            if (!_platform.WindowPerMessageLoop)
+                return;
 
             try
             {
@@ -212,6 +219,24 @@ internal sealed class WindowManager
                 _popupWindow = null;
             }
         });
+    }
+
+    /// <summary>
+    ///     Dismisses the popup. Where windows are independent it is closed; where a single loop drives
+    ///     them all, closing would take the application down, so it is hidden and reused instead.
+    /// </summary>
+    private void DismissPopup(PhotinoWindow? window)
+    {
+        if (window is null)
+            return;
+
+        if (_platform.WindowPerMessageLoop)
+        {
+            CloseWindow(window);
+            return;
+        }
+
+        Invoke(window, _platform.Hide);
     }
 
     [PublicAPI]

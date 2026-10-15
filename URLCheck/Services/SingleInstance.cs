@@ -8,22 +8,36 @@ namespace URLCheck.Services;
 ///     Ensures a single running instance. Later launches forward their command-line arguments to the
 ///     first instance over a named pipe and then exit.
 /// </summary>
+/// <remarks>
+///     The first-instance check is an exclusively locked file, not a named mutex: file locks are
+///     enforced across processes by both platforms (share modes on Windows, <c>flock</c> on Unix),
+///     whereas a named <see cref="Mutex" /> is not a reliable cross-process primitive on Unix.
+/// </remarks>
 internal sealed class SingleInstance : IDisposable
 {
-    // The `Local\` prefix is a Windows-only "session-local" convention.
-    private static readonly string MutexName = OperatingSystem.IsWindows()
-        ? @"Local\URLCheck.SingleInstance"
-        : "URLCheck.SingleInstance";
-
     private const string PipeName = "URLCheck.Ipc";
     private readonly CancellationTokenSource _cts = new();
-
-    private readonly Mutex _mutex;
+    private readonly FileStream? _lockFile;
 
     public SingleInstance()
     {
-        _mutex = new(true, MutexName, out var createdNew);
-        IsFirstInstance = createdNew;
+        var path = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            Constants.Name, "instance.lock");
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+
+        try
+        {
+            _lockFile = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            IsFirstInstance = true;
+        }
+        catch (IOException)
+        {
+            // Another instance already holds the lock.
+            IsFirstInstance = false;
+        }
+
+        Log.Information("Single instance: {IsFirst} (lock {Path})", IsFirstInstance, path);
     }
 
     public bool IsFirstInstance { get; }
@@ -32,7 +46,7 @@ internal sealed class SingleInstance : IDisposable
     {
         _cts.Cancel();
         _cts.Dispose();
-        _mutex.Dispose();
+        _lockFile?.Dispose();
     }
 
     /// <summary>Hands the arguments to the already-running instance. Returns false on failure.</summary>
@@ -46,12 +60,14 @@ internal sealed class SingleInstance : IDisposable
 
             await using var writer = new StreamWriter(client);
             await writer.WriteAsync(string.Join('\n', args));
+            await writer.FlushAsync();
 
+            Log.Information("Forwarded {Count} argument(s) to the running instance", args.Count);
             return true;
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "Failed to forward arguments");
+            Log.Warning(ex, "Failed to forward arguments to the running instance");
             return false;
         }
     }

@@ -67,8 +67,10 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
     public void Unregister()
     {
         TryDelete(DesktopFilePath);
-        CleanMimeApps(Path.Combine(Home, ".config", "mimeapps.list"));
-        CleanMimeApps(Path.Combine(ApplicationsDirectory, "mimeapps.list"));
+
+        foreach (var file in MimeAppsFiles())
+            CleanMimeApps(file);
+
         UpdateDesktopDatabase();
     }
 
@@ -142,7 +144,64 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
     private static bool IsDefault(string mimeType)
     {
         var (ok, output) = Run("xdg-mime", "query", "default", mimeType);
-        return ok && output.Trim().Equals(DesktopFileName, StringComparison.OrdinalIgnoreCase);
+        var reported = output.Trim();
+
+        var isDefault = ok && reported.Equals(DesktopFileName, StringComparison.OrdinalIgnoreCase);
+
+        // xdg-mime is not always installed; the mimeapps.list files say the same thing directly.
+        var fallback = isDefault ? null : ReadMimeAppsDefault(mimeType);
+        if (!isDefault && fallback is not null)
+            isDefault = fallback.Equals(DesktopFileName, StringComparison.OrdinalIgnoreCase);
+
+        Log.Information(
+            "Default handler for {MimeType}: xdg-mime={Reported} (ran={Ran}), mimeapps.list={Fallback} -> {IsDefault}",
+            mimeType, reported.Length == 0 ? "<empty>" : reported, ok, fallback ?? "<none>", isDefault);
+
+        return isDefault;
+    }
+
+    /// <summary>The mimeapps.list files that can hold the default handler, most specific first.</summary>
+    private static IEnumerable<string> MimeAppsFiles()
+    {
+        yield return Path.Combine(Home, ".config", "mimeapps.list");
+        yield return Path.Combine(ApplicationsDirectory, "mimeapps.list");
+    }
+
+    /// <summary>Reads a <c>[Default Applications]</c> entry straight out of mimeapps.list.</summary>
+    private static string? ReadMimeAppsDefault(string mimeType)
+    {
+        foreach (var file in MimeAppsFiles())
+            try
+            {
+                if (!File.Exists(file))
+                    continue;
+
+                var inDefaults = false;
+                foreach (var raw in File.ReadLines(file))
+                {
+                    var line = raw.Trim();
+                    if (line.StartsWith('['))
+                    {
+                        inDefaults = line.Equals("[Default Applications]", StringComparison.OrdinalIgnoreCase);
+                        continue;
+                    }
+
+                    if (!inDefaults || !line.StartsWith(mimeType, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    var separator = line.IndexOf('=');
+                    if (separator > 0)
+                        return line[(separator + 1)..]
+                            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                            .FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to read {File}", file);
+            }
+
+        return null;
     }
 
     private static void CleanMimeApps(string file)

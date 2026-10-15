@@ -25,6 +25,9 @@ internal static class Program
         // Photino message loop / WebView2 require an STA thread.
         Logging.Initialize();
 
+        if (OperatingSystem.IsLinux())
+            LinuxDiagnostics.Write();
+
         try
         {
             foreach (var arg in args)

@@ -8,6 +8,8 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("windows")]
 internal sealed class WindowsWindowPlatform : IWindowPlatform
 {
+    public bool WindowPerMessageLoop => true;
+
     public void Hide(PhotinoWindow window) =>
         UseHandle(window, handle => NativeMethods.ShowWindow(handle, NativeMethods.SwHide));
 
@@ -36,6 +38,15 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         NativeMethods.DwmSetWindowAttribute(handle, NativeMethods.DwmwaWindowCornerPreference, ref preference,
             sizeof(int));
     });
+
+    public void ConfigurePopup(PhotinoWindow window) => window
+        .SetUseOsDefaultSize(false)
+        .SetUseOsDefaultLocation(false)
+        .SetSize(new(560, 640))
+        .SetResizable(false)
+        .SetChromeless(true)
+        .SetTopMost(true)
+        .Center();
 
     private static void UseHandle(PhotinoWindow window, Action<IntPtr> action)
     {
