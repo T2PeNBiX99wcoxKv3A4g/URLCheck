@@ -59,8 +59,11 @@ internal static class Program
             }
 
 #if !DEBUG
+            // The static server insists on a web root and creates it when missing, which would drop an
+            // empty wwwroot next to the executable on every start. Giving the host a content root we own
+            // keeps that out of the way — the front-end is served from the embedded manifest either way.
             _ = PhotinoServer
-                .CreateStaticFileServer([], out var baseUrl)
+                .CreateStaticFileServer(["--contentRoot", DataDirectory], out var baseUrl)
                 .RunAsync();
 
             var appUrl = $"{baseUrl}/index.html";
@@ -185,9 +188,23 @@ internal static class Program
         return new NullTrayIcon();
     }
 
+    /// <summary>
+    ///     A directory we own, used as the host's content root. The static server creates a <c>wwwroot</c>
+    ///     web root under it when missing, which without this would land next to the executable.
+    /// </summary>
+    private static string DataDirectory
+    {
+        get
+        {
+            var path = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name);
+            Directory.CreateDirectory(path);
+            return path;
+        }
+    }
+
     /// <summary>Pulls the http/https/urlcheck URLs out of a raw argument list.</summary>
-    private static List<string> ExtractUrls(IEnumerable<string> args) =>
-    [
+    private static List<string> ExtractUrls(IEnumerable<string> args) =>    [
         .. args.Where(arg =>
             Uri.TryCreate(arg, UriKind.Absolute, out var uri) &&
             uri.Scheme is "http" or "https" or "urlcheck")
