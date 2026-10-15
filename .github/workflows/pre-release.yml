@@ -1,0 +1,26 @@
+name: Pre Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "dev/**"
+    paths-ignore:
+      - "README.md"
+      - "LICENSE*"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    uses: T2PeNBiX99wcoxKv3A4g/Release-Workflows/.github/workflows/csharp_release.yml@main
+    with:
+      project_path: './URLCheck/URLCheck.csproj'
+      filename: 'URLCheck'
+      runtimes: '["win-x64", "linux-x64"]'
+      version_file_path: './URLCheck/URLCheck.csproj'
+      prerelease: true
+    secrets: inherit
