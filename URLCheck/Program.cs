@@ -36,7 +36,8 @@ internal static class Program
             var startupUrls = ExtractUrls(args);
 
             // Without a tray the window is the only way back into the app, so always show it there.
-            var hasTray = OperatingSystem.IsWindows();
+            var hasTray = OperatingSystem.IsWindows() ||
+                          (OperatingSystem.IsLinux() && LinuxDiagnostics.AppIndicatorLibrary is not null);
 
             // Show the management window unless we were launched to handle a link, or asked to stay in the tray.
             var showMainWindow = !hasTray || (!args.Contains("--tray") && startupUrls.Count == 0);
@@ -82,7 +83,6 @@ internal static class Program
             };
 
             using var tray = CreateTray(localization, manager, iconPath);
-            tray.Start();
 
             manager.MainWindowCreated += [SuppressMessage("ReSharper", "AccessToDisposedClosure")]() =>
             {
@@ -94,6 +94,10 @@ internal static class Program
             };
 
             manager.CreateMainWindow();
+
+            // The GTK tray has to be built on the GTK thread, so a window must exist first.
+            tray.Start();
+
             manager.Run();
 
             Log.Information("Exiting");
@@ -126,16 +130,25 @@ internal static class Program
     /// <summary>The tray icon, or a no-op stand-in on platforms that have none.</summary>
     private static ITrayIcon CreateTray(LocalizationService localization, WindowManager manager, string? iconPath)
     {
-        if (!OperatingSystem.IsWindows())
-            return new NullTrayIcon();
+        if (OperatingSystem.IsWindows())
+            return new TrayIcon(
+                Constants.WindowTitle,
+                iconPath,
+                localization.Get,
+                () => manager.ShowMainWindow(),
+                () => manager.ShowMainWindow("settings"),
+                manager.Exit);
 
-        return new TrayIcon(
-            Constants.WindowTitle,
-            iconPath,
-            localization.Get,
-            () => manager.ShowMainWindow(),
-            () => manager.ShowMainWindow("settings"),
-            manager.Exit);
+        if (OperatingSystem.IsLinux() && LinuxDiagnostics.AppIndicatorLibrary is not null)
+            return new LinuxTrayIcon(
+                Constants.WindowTitle,
+                iconPath,
+                localization.Get,
+                () => manager.ShowMainWindow(),
+                () => manager.ShowMainWindow("settings"),
+                manager.Exit);
+
+        return new NullTrayIcon();
     }
 
     /// <summary>Pulls the http/https/urlcheck URLs out of a raw argument list.</summary>

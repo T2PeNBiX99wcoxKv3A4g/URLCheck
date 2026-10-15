@@ -3,26 +3,28 @@ using Serilog;
 namespace URLCheck;
 
 /// <summary>
-///     The application icon. It is embedded as <c>Resources/icon.ico</c> (and set as the executable's
-///     icon), but Photino's <c>SetIconFile</c> and Win32's <c>LoadImage</c> both need a real path, so
-///     the embedded copy is written to disk on startup.
+///     The application icon. Both an <c>.ico</c> (Windows) and a <c>.png</c> (Linux, where GTK cannot
+///     read ICO) are embedded, but Photino's <c>SetIconFile</c>, Win32's <c>LoadImage</c> and
+///     libayatana-appindicator all want a real path, so the suitable one is written to disk on startup.
 /// </summary>
 internal static class AppIcon
 {
-    private const string ResourceName = "URLCheck.Resources.icon.ico";
-
     /// <summary>
-    ///     Extracts the embedded icon (rewriting it only when it changed) and returns its path, or
-    ///     <c>null</c> when the resource is unavailable.
+    ///     Extracts the icon this platform can read (rewriting it only when it changed) and returns its
+    ///     path, or <c>null</c> when the resource is unavailable.
     /// </summary>
-    public static string? EnsureExtracted()
+    public static string? EnsureExtracted() => OperatingSystem.IsWindows()
+        ? Extract("URLCheck.Resources.icon.ico", "icon.ico")
+        : Extract("URLCheck.Resources.icon.png", "icon.png");
+
+    private static string? Extract(string resourceName, string fileName)
     {
         try
         {
-            using var stream = typeof(AppIcon).Assembly.GetManifestResourceStream(ResourceName);
+            using var stream = typeof(AppIcon).Assembly.GetManifestResourceStream(resourceName);
             if (stream is null)
             {
-                Log.Warning("Embedded icon {Resource} was not found", ResourceName);
+                Log.Warning("Embedded icon {Resource} was not found", resourceName);
                 return null;
             }
 
@@ -34,7 +36,7 @@ internal static class AppIcon
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name);
             Directory.CreateDirectory(directory);
 
-            var path = Path.Combine(directory, "icon.ico");
+            var path = Path.Combine(directory, fileName);
             if (!File.Exists(path) || !File.ReadAllBytes(path).AsSpan().SequenceEqual(icon))
                 File.WriteAllBytes(path, icon);
 
