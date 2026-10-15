@@ -10,8 +10,11 @@ namespace URLCheck.Interop;
 /// TODO(tray): implement a StatusNotifierItem/AppIndicator host so Linux can stay resident in the tray.
 internal sealed class NullTrayIcon : ITrayIcon
 {
-    public void Start() =>
+    public bool Start()
+    {
         Log.Information("No tray icon on this platform; the main window stays visible");
+        return false;
+    }
 
     public void Dispose()
     {

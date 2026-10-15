@@ -44,10 +44,10 @@ internal sealed class WindowManager
     public bool ShowMainWindowOnStartup { get; init; }
 
     /// <summary>
-    ///     When true (a tray icon exists) closing the host window hides it; otherwise closing it exits
-    ///     the app, since there would be no way to bring it back.
+    ///     Whether closing the host window hides it. Set once the tray reports whether it was really
+    ///     created, so a missing tray can never leave the window hidden with no way back.
     /// </summary>
-    public bool CloseToTray { get; init; } = true;
+    public bool CloseToTray { get; set; }
 
     /// <summary>Path to the extracted <c>.ico</c> for the window icons, or null to keep the default.</summary>
     public string? IconPath { get; init; }
@@ -140,6 +140,9 @@ internal sealed class WindowManager
 
     /// <summary>Starts the message loop; blocks until the host window is closed for real.</summary>
     public void Run() => _mainWindow?.WaitForClose();
+
+    /// <summary>Runs an action on the UI thread, once the message loop is running.</summary>
+    public void RunOnMainWindow(Action action) => Invoke(_mainWindow, _ => action());
 
     [PublicAPI]
     public void HideMainWindow()

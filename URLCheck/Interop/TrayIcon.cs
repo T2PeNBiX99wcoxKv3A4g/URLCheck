@@ -56,7 +56,7 @@ internal sealed class TrayIcon(
             NativeMethods.PostMessage(_hwnd, WmDestroy, IntPtr.Zero, IntPtr.Zero);
     }
 
-    public void Start()
+    public bool Start()
     {
         _thread = new(ThreadProc)
         {
@@ -65,6 +65,7 @@ internal sealed class TrayIcon(
         };
         _thread.SetApartmentState(ApartmentState.STA);
         _thread.Start();
+        return true;
     }
 
     private void ThreadProc()

@@ -53,15 +53,41 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
         _actions = [onOpen, onSettings, onExit];
     }
 
-    public void Start()
+    /// <summary>
+    ///     True once GTK has a display connection. libayatana-appindicator does not fail gracefully
+    ///     without one — it aborts the process — so every call is guarded by this.
+    /// </summary>
+    public static bool IsToolkitReady
     {
+        get
+        {
+            try
+            {
+                return gdk_display_get_default() != IntPtr.Zero;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "GTK is not available");
+                return false;
+            }
+        }
+    }
+
+    public bool Start()
+    {
+        if (!IsToolkitReady)
+        {
+            Log.Warning("GTK has no display connection yet; skipping the tray icon");
+            return false;
+        }
+
         try
         {
             _indicator = app_indicator_new(Constants.Name, _iconPath ?? "web-browser", CategoryApplicationStatus);
             if (_indicator == IntPtr.Zero)
             {
                 Log.Warning("AppIndicator could not be created; continuing without a tray icon");
-                return;
+                return false;
             }
 
             app_indicator_set_title(_indicator, _tooltip);
@@ -73,11 +99,13 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
             app_indicator_set_status(_indicator, StatusActive);
 
             Log.Information("Tray icon created via {Library}", LinuxDiagnostics.AppIndicatorLibrary);
+            return true;
         }
         catch (Exception ex)
         {
             Log.Warning(ex, "Failed to create the tray icon");
             _indicator = IntPtr.Zero;
+            return false;
         }
     }
 
@@ -181,6 +209,9 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
     private static partial void app_indicator_set_title(IntPtr indicator, string title);
 
     // ---- libgtk-3 ----
+
+    [LibraryImport(GtkLibrary)]
+    private static partial IntPtr gdk_display_get_default();
 
     [LibraryImport(GtkLibrary)]
     private static partial IntPtr gtk_menu_new();

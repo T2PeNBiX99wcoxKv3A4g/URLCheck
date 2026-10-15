@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Versioning;
 using Serilog;
 using URLCheck.Inspect;
 using URLCheck.Interop;
@@ -78,7 +79,6 @@ internal static class Program
             var manager = new WindowManager(appUrl, windowPlatform, settings, history)
             {
                 ShowMainWindowOnStartup = showMainWindow,
-                CloseToTray = hasTray,
                 IconPath = iconPath
             };
 
@@ -94,9 +94,7 @@ internal static class Program
             };
 
             manager.CreateMainWindow();
-
-            // The GTK tray has to be built on the GTK thread, so a window must exist first.
-            tray.Start();
+            StartTray(tray, manager);
 
             manager.Run();
 
@@ -126,6 +124,36 @@ internal static class Program
 
         throw new PlatformNotSupportedException("URLCheck supports Windows and Linux.");
     }
+
+    /// <summary>
+    ///     Starts the tray icon and records whether it exists, so closing the window only hides it when
+    ///     there is really something to restore it from.
+    /// </summary>
+    private static void StartTray(ITrayIcon tray, WindowManager manager)
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            manager.CloseToTray = tray.Start();
+            return;
+        }
+
+        StartLinuxTrayWhenReady(tray, manager);
+    }
+
+    /// <summary>
+    ///     On GTK the tray can only be built on the UI thread and only once the toolkit has a display
+    ///     connection, which appears when the message loop starts. libayatana-appindicator aborts the
+    ///     process if it is asked any earlier, so it waits for the toolkit to report ready.
+    /// </summary>
+    [SupportedOSPlatform("linux")]
+    private static void StartLinuxTrayWhenReady(ITrayIcon tray, WindowManager manager) =>
+        _ = Task.Run(async () =>
+        {
+            for (var attempt = 0; attempt < 100 && !LinuxTrayIcon.IsToolkitReady; attempt++)
+                await Task.Delay(100);
+
+            manager.RunOnMainWindow(() => { manager.CloseToTray = tray.Start(); });
+        });
 
     /// <summary>The tray icon, or a no-op stand-in on platforms that have none.</summary>
     private static ITrayIcon CreateTray(LocalizationService localization, WindowManager manager, string? iconPath)
