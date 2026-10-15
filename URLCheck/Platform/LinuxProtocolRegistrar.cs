@@ -22,12 +22,9 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
 
     private static readonly string DesktopFilePath = Path.Combine(ApplicationsDirectory, DesktopFileName);
 
-    public LinuxProtocolRegistrar() =>
-        ExecutablePath = Environment.ProcessPath
-                         ?? Process.GetCurrentProcess().MainModule?.FileName
-                         ?? string.Empty;
-
-    public string ExecutablePath { get; }
+    public string ExecutablePath { get; } = Environment.ProcessPath
+                                            ?? Process.GetCurrentProcess().MainModule?.FileName
+                                            ?? string.Empty;
 
     /// <summary>
     ///     The path stored in <c>urlcheck.desktop</c>. Comparing it with <see cref="ExecutablePath" /> is
@@ -97,16 +94,16 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
         Directory.CreateDirectory(ApplicationsDirectory);
 
         var content = $"""
-            [Desktop Entry]
-            Type=Application
-            Name=URLCheck
-            Comment=URLCheck URL intermediary
-            Exec="{ExecutablePath}" %u
-            Icon=web-browser
-            Terminal=false
-            Categories=Network;WebBrowser;
-            MimeType=x-scheme-handler/http;x-scheme-handler/https;{CustomSchemeMime};text/html;
-            """;
+                       [Desktop Entry]
+                       Type=Application
+                       Name=URLCheck
+                       Comment=URLCheck URL intermediary
+                       Exec="{ExecutablePath}" %u
+                       Icon=web-browser
+                       Terminal=false
+                       Categories=Network;WebBrowser;
+                       MimeType=x-scheme-handler/http;x-scheme-handler/https;{CustomSchemeMime};text/html;
+                       """;
 
         File.WriteAllText(DesktopFilePath, content + Environment.NewLine);
     }

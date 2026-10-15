@@ -152,7 +152,7 @@ internal sealed class LinuxBrowserLocator : IBrowserLocator
                 }
             }
 
-            return new DesktopEntry
+            return new()
             {
                 Name = name,
                 Exec = exec,

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using JetBrains.Annotations;
 using Serilog;
 using URLCheck.Messaging;
 
@@ -9,6 +10,7 @@ namespace URLCheck.Services;
 ///     Loads UI strings from the embedded <c>Resources/i18n/*.jsonc</c> files, so the desktop backend
 ///     and the React front-end read the exact same text.
 /// </summary>
+[PublicAPI]
 internal sealed class LocalizationService
 {
     public const string DefaultLocale = "en";

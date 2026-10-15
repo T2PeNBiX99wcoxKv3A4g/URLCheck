@@ -1,4 +1,5 @@
 using System.Text.Json;
+using JetBrains.Annotations;
 using Photino.NET;
 using URLCheck.Models;
 
@@ -62,6 +63,7 @@ internal sealed class NativeEvent
 }
 
 /// <summary>Everything a handler needs to answer one incoming message.</summary>
+[PublicAPI]
 internal sealed record NativeContext(PhotinoWindow? Window, NativeRequest Request)
 {
     public string? Id => Request.Id;
@@ -109,7 +111,7 @@ internal static class NativeProtocol
 
     public static string SerializeEvent(string type, object? data = null) =>
         JsonSerializer.Serialize(
-            new NativeEvent
+            new()
             {
                 Type = type,
                 Data = NativeJson.ToElement(data)

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using URLCheck.Data;
@@ -6,6 +7,7 @@ using URLCheck.Messaging;
 namespace URLCheck.Services;
 
 /// <summary>Stores the URLs that were intercepted (clicked) in a local SQLite database.</summary>
+[PublicAPI]
 internal sealed class HistoryService
 {
     private readonly SemaphoreSlim _gate = new(1, 1);
