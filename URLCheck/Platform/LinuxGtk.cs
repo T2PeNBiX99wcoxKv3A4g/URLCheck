@@ -5,22 +5,26 @@ using Serilog;
 namespace URLCheck.Platform;
 
 /// <summary>
-///     Reaches the real GTK window behind a Photino one.
+///     Direct GTK access for the few things Photino cannot do on Linux: finding a window to hide or
+///     re-present it, making it RGBA-transparent, and setting the program name that becomes the Wayland
+///     app id.
 /// </summary>
 /// <remarks>
-///     Photino exposes no GTK widget handle and no "hide" call, and on Wayland minimising
-///     (<c>gtk_window_iconify</c>) leaves the window in the taskbar. Photino does not expose the handle,
-///     so the toplevel is looked up by its (unique, app-controlled) title. Every call is best-effort.
+///     Photino exposes no GTK widget handle and no hide call, and on Wayland minimising
+///     (<c>gtk_window_iconify</c>) leaves the window in the taskbar. The toplevel is therefore looked up
+///     by its unique, app-controlled title. Every call is best-effort and never throws.
 /// </remarks>
 [SupportedOSPlatform("linux")]
 internal static partial class LinuxGtk
 {
     private const string GtkLibrary = "libgtk-3.so.0";
     private const string GlibLibrary = "libglib-2.0.so.0";
+    private const string GObjectLibrary = "libgobject-2.0.so.0";
     private const string CairoLibrary = "libcairo.so.2";
 
     /// <summary>Hides a toplevel by title. Returns false when it could not be found.</summary>
     public static bool Hide(string title) => WithWindow(title, gtk_widget_hide);
+
     /// <summary>Un-hides and raises a toplevel by title. Returns false when it could not be found.</summary>
     public static bool Present(string title) => WithWindow(title, window =>
     {
@@ -170,7 +174,8 @@ internal static partial class LinuxGtk
     [LibraryImport(GlibLibrary, StringMarshalling = StringMarshalling.Utf8)]
     private static partial void g_set_prgname(string name);
 
-    [LibraryImport(GlibLibrary, StringMarshalling = StringMarshalling.Utf8)]
+    // g_signal_connect_data lives in GObject, not GLib.
+    [LibraryImport(GObjectLibrary, StringMarshalling = StringMarshalling.Utf8)]
     private static partial ulong g_signal_connect_data(IntPtr instance, string detailedSignal, IntPtr handler,
         IntPtr data, IntPtr destroyData, int flags);
 

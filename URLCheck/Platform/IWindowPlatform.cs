@@ -15,8 +15,8 @@ internal interface IWindowPlatform
 
     void RoundCorners(PhotinoWindow window);
 
-    /// <summary>Applies the popup's platform-specific flags (chromeless, top-most, centring, sizing).</summary>
-    void ConfigurePopup(PhotinoWindow window, bool transparentPopup);
+    /// <summary>Applies the popup's platform-specific flags (frame, top-most, centring, sizing).</summary>
+    void ConfigurePopup(PhotinoWindow window, bool borderless);
 
     /// <summary>
     ///     Creates the popup window, parented where the platform needs it: destroying a top-level GTK

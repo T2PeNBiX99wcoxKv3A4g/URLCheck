@@ -10,9 +10,6 @@ if (rootElement) {
     // The popup window is loaded with a `#popup?url=...` fragment; everything else is the shell.
     const isPopup = window.location.hash.startsWith("#popup");
 
-    // The popup window itself is transparent on Linux, so its background comes from the page root.
-    if (isPopup) document.documentElement.classList.add("popup");
-
     createRoot(rootElement).render(
         <StrictMode>
             <LocalizationProvider>

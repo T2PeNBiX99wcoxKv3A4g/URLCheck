@@ -198,7 +198,7 @@ internal sealed class WindowManager
                     return false;
                 });
 
-            _platform.ConfigurePopup(popup, _settings.Current?.TransparentPopup ?? true);
+            _platform.ConfigurePopup(popup, _settings.Current?.BorderlessPopup ?? true);
             ApplyIcon(popup);
             popup.Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}");
             _popupWindow = popup;

@@ -91,13 +91,13 @@ const fadeIn = keyframes`
     }
 `;
 
-const Root = styled.div`
+const Root = styled.div<{ $borderless: boolean }>`
     min-height: 100vh;
     background-color: #0b0f19;
     background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 70%);
     color: #f9fafb;
-    border-radius: 8px;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    border-radius: ${(p) => (p.$borderless ? "8px" : "0")};
+    box-shadow: ${(p) => (p.$borderless ? "inset 0 0 0 1px rgba(255, 255, 255, 0.12)" : "none")};
     overflow: hidden;
 `;
 
@@ -668,6 +668,7 @@ export const PopupPage: React.FC = () => {
     const [historyMenuOpen, setHistoryMenuOpen] = useState(false);
     const [privateMode, setPrivateMode] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [borderless, setBorderless] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [open, setOpen] = useState<SectionState>({domain: false, parameters: false, fragment: false});
 
@@ -700,7 +701,10 @@ export const PopupPage: React.FC = () => {
         (async () => {
             try {
                 const payload = await loadSettings();
-                if (!cancelled) setBrowsers(payload.settings.browsers);
+                if (cancelled) return;
+
+                setBrowsers(payload.settings.browsers);
+                setBorderless(payload.settings.borderlessPopup);
             } catch {
                 // The popup still works without a browser list.
             }
@@ -709,6 +713,12 @@ export const PopupPage: React.FC = () => {
             cancelled = true;
         };
     }, []);
+
+    /* A borderless window is transparent on Linux, so the page must not paint over it. */
+    useEffect(() => {
+        document.documentElement.classList.toggle("popup-transparent", borderless);
+        return () => document.documentElement.classList.remove("popup-transparent");
+    }, [borderless]);
 
     /* a new URL arriving while the popup is open replaces the current one */
     useEffect(() => {
@@ -904,7 +914,7 @@ export const PopupPage: React.FC = () => {
     const StatusIcon = tone === "ok" ? CheckCircleIcon : tone === "error" ? XCircleIcon : AlertTriangleIcon;
 
     return (
-        <Root>
+        <Root $borderless={borderless}>
             <TopBar>
                 <CloseButton onClick={closePopup} title={t("popup.close")}>
                     ✕

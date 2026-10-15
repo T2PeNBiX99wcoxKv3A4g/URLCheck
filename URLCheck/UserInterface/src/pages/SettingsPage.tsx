@@ -579,19 +579,17 @@ export const SettingsPage: React.FC = () => {
             </Select>
           </SettingRow>
 
-          {platform === "linux" && (
-              <SettingRow>
-                <SettingInfo>
-                  <SettingLabel>{t("settings.transparentPopup")}</SettingLabel>
-                  <SettingDescription>{t("settings.transparentPopupDescription")}</SettingDescription>
-                </SettingInfo>
-                <Checkbox
-                    disabled={busy}
-                    checked={settings.transparentPopup}
-                    onChange={(e) => update({transparentPopup: e.target.checked})}
-                />
-              </SettingRow>
-          )}
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>{t("settings.borderlessPopup")}</SettingLabel>
+              <SettingDescription>{t("settings.borderlessPopupDescription")}</SettingDescription>
+            </SettingInfo>
+            <Checkbox
+                disabled={busy}
+                checked={settings.borderlessPopup}
+                onChange={(e) => update({borderlessPopup: e.target.checked})}
+            />
+          </SettingRow>
         </StackCard>
 
         <StackCard>

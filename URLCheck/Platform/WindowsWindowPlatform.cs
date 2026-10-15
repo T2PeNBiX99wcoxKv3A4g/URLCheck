@@ -37,12 +37,12 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
             sizeof(int));
     });
 
-    public void ConfigurePopup(PhotinoWindow window, bool transparentPopup) => window
+    public void ConfigurePopup(PhotinoWindow window, bool borderless) => window
         .SetUseOsDefaultSize(false)
         .SetUseOsDefaultLocation(false)
         .SetSize(new(560, 640))
         .SetResizable(false)
-        .SetChromeless(true)
+        .SetChromeless(borderless)
         .SetTopMost(true)
         .Center();
 

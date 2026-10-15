@@ -10,8 +10,8 @@ export interface AppSettings {
     userAgents: UserAgentEntry[];
     browsers: BrowserEntry[];
     language: string;
-    /** Linux only: leave the popup's background transparent so its rounded corners show. */
-    transparentPopup: boolean;
+    /** Cross-platform: show the popup without window decorations, drawing our own rounded frame. */
+    borderlessPopup: boolean;
 }
 
 export interface UserAgentEntry {

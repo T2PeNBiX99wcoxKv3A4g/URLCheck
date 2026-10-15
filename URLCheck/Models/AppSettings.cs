@@ -27,10 +27,11 @@ internal sealed class AppSettings
     public List<BrowserEntry> Browsers { get; set; } = [];
 
     /// <summary>
-    ///     Give the inspection popup a transparent background so its rounded corners are not filled in.
-    ///     Linux only; the flag is accepted but ignored elsewhere.
+    ///     Show the inspection popup without window decorations, with the UI drawing its own rounded
+    ///     frame. On Linux the window is also made transparent so those corners are not filled in; when
+    ///     this is off the window keeps its normal frame and the UI draws no border of its own.
     /// </summary>
-    public bool TransparentPopup { get; set; } = true;
+    public bool BorderlessPopup { get; set; } = true;
 
     public AppSettings Clone() => (AppSettings)MemberwiseClone();
 
