@@ -42,8 +42,6 @@ internal sealed class AppSettings
         if (string.IsNullOrWhiteSpace(Language))
             Language = DefaultLanguage;
 
-        UserAgents ??= [];
-
         if (UserAgents.Count == 0)
             UserAgents = DefaultUserAgents();
 

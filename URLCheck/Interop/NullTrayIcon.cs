@@ -7,7 +7,6 @@ namespace URLCheck.Interop;
 ///     (or libappindicator) to show a tray icon, which is not implemented yet, so there the app simply
 ///     keeps its main window visible instead of hiding to the tray.
 /// </summary>
-/// TODO(tray): implement a StatusNotifierItem/AppIndicator host so Linux can stay resident in the tray.
 internal sealed class NullTrayIcon : ITrayIcon
 {
     public bool Start()

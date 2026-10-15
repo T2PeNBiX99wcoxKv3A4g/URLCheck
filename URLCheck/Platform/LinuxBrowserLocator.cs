@@ -107,7 +107,7 @@ internal sealed class LinuxBrowserLocator : IBrowserLocator
             (MimeType.Contains("x-scheme-handler/http", StringComparison.OrdinalIgnoreCase) ||
              MimeType.Contains("x-scheme-handler/https", StringComparison.OrdinalIgnoreCase));
 
-        public static DesktopEntry? Parse(string file)
+        public static DesktopEntry Parse(string file)
         {
             string? name = null, exec = null, mimeType = null;
             var hidden = false;
