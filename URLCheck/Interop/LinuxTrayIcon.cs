@@ -36,7 +36,15 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
 
     private IntPtr _indicator = IntPtr.Zero;
 
-    static LinuxTrayIcon() => NativeLibrary.SetDllImportResolver(typeof(LinuxTrayIcon).Assembly, ResolveLibrary);
+    static LinuxTrayIcon()
+    {
+        NativeLibrary.SetDllImportResolver(typeof(LinuxTrayIcon).Assembly, ResolveLibrary);
+
+        // The library announces its own deprecation on every start. Its -glib replacement is a different,
+        // GTK-free implementation with a different (GMenu) API, and is not packaged for Fedora, so the
+        // message is kept in our log at debug level instead of being printed to stderr.
+        LinuxGtk.RouteLogDomain("libayatana-appindicator", message => Log.Debug("appindicator: {Message}", message));
+    }
 
     public LinuxTrayIcon(
         string tooltip,

@@ -52,6 +52,38 @@ internal static partial class LinuxGtk
             IntPtr.Zero, 0);
 
     /// <summary>
+    ///     Reroutes a GLib log domain to Serilog instead of stderr. Used for libraries that announce
+    ///     their own deprecation on every start and would otherwise keep printing it.
+    /// </summary>
+    public static void RouteLogDomain(string domain, Action<string> sink)
+    {
+        try
+        {
+            LogHandler handler = (_, level, message, _) =>
+                sink($"[{level}] {Marshal.PtrToStringUTF8(message)}");
+
+            // The delegate must outlive the call, and GLib keeps the handler until it exits.
+            LogHandlers.Add(handler);
+            g_log_set_handler(domain, LogLevelWarning | LogLevelCritical | LogLevelError,
+                Marshal.GetFunctionPointerForDelegate(handler), IntPtr.Zero);
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to reroute the {Domain} log domain", domain);
+        }
+    }
+
+    // G_LOG_LEVEL_ERROR = 1 << 2, CRITICAL = 1 << 3, WARNING = 1 << 4.
+    private const int LogLevelError = 1 << 2;
+    private const int LogLevelCritical = 1 << 3;
+    private const int LogLevelWarning = 1 << 4;
+
+    private static readonly List<Delegate> LogHandlers = [];
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void LogHandler(IntPtr domain, int level, IntPtr message, IntPtr userData);
+
+    /// <summary>
     ///     Whether the screen supports RGBA visuals at all. This can be answered without a window, which
     ///     matters because the decision has to be taken before the popup is created.
     /// </summary>
@@ -278,6 +310,9 @@ internal static partial class LinuxGtk
 
     [LibraryImport(GlibLibrary, StringMarshalling = StringMarshalling.Utf8)]
     private static partial void g_set_prgname(string name);
+
+    [LibraryImport(GlibLibrary, StringMarshalling = StringMarshalling.Utf8)]
+    private static partial uint g_log_set_handler(string logDomain, int logLevels, IntPtr logFunc, IntPtr userData);
 
     // g_signal_connect_data lives in GObject, not GLib.
     [LibraryImport(GObjectLibrary, StringMarshalling = StringMarshalling.Utf8)]
