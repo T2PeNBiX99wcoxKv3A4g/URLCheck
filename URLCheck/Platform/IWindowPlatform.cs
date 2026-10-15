@@ -5,13 +5,6 @@ namespace URLCheck.Platform;
 /// <summary>Window operations that differ per platform (hide/show/always-on-top/drag).</summary>
 internal interface IWindowPlatform
 {
-    /// <summary>
-    ///     True when a top-level window cannot simply be closed without taking the whole application
-    ///     down — GTK wires <c>gtk_main_quit</c> to the destroy signal of top-level windows — so the
-    ///     popup is hidden and reused instead of closed.
-    /// </summary>
-    bool HidesPopupOnClose { get; }
-
     void Hide(PhotinoWindow window);
 
     void Show(PhotinoWindow window);
@@ -24,4 +17,11 @@ internal interface IWindowPlatform
 
     /// <summary>Applies the popup's platform-specific flags (chromeless, top-most, centring, sizing).</summary>
     void ConfigurePopup(PhotinoWindow window);
+
+    /// <summary>
+    ///     Creates the popup window, parented where the platform needs it: destroying a top-level GTK
+    ///     window quits the whole application, so a popup that is allowed to close must be a transient
+    ///     child of the host there.
+    /// </summary>
+    PhotinoWindow CreatePopupWindow(PhotinoWindow? parent);
 }

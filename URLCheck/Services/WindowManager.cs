@@ -90,7 +90,7 @@ internal sealed class WindowManager
             }
 
             case "popup.close":
-                DismissPopup(context.Window);
+                CloseWindow(context.Window);
                 return null;
 
             case "popup.resize":
@@ -185,8 +185,8 @@ internal sealed class WindowManager
                     _popupWindow = null;
                 }
 
-            // Top-level (not owned): an owned window would be hidden together with the hidden host.
-            var popup = new PhotinoWindow()
+            // Top-level on Win32, a transient child of the host on GTK (see CreatePopupWindow).
+            var popup = _platform.CreatePopupWindow(_mainWindow)
                 .SetTitle(Constants.PopupTitle)
                 .SetTemporaryFilesPath(WebViewDataPath)
                 .RegisterWebMessageReceivedHandler((sender, message) =>
@@ -194,18 +194,8 @@ internal sealed class WindowManager
                 .RegisterWindowCreatedHandler((_, _) => Log.Information("Popup window created"))
                 .RegisterWindowClosingHandler((_, _) =>
                 {
-                    // Closing a top-level GTK window quits the shared main loop, so on those platforms a
-                    // close request is turned into a hide and the window is reused.
-                    if (!_platform.HidesPopupOnClose)
-                    {
-                        _popupWindow = null;
-                        return false;
-                    }
-
-                    if (_popupWindow is { } window)
-                        _platform.Hide(window);
-
-                    return true;
+                    _popupWindow = null;
+                    return false;
                 });
 
             _platform.ConfigurePopup(popup);
@@ -215,7 +205,6 @@ internal sealed class WindowManager
 
             try
             {
-                // On GTK this is also what makes the window appear at all, so it must not be skipped.
                 popup.WaitForClose();
 
                 _platform.KeepOnTop(popup);
@@ -233,24 +222,6 @@ internal sealed class WindowManager
 
             Log.Information("Popup message loop returned");
         });
-    }
-
-    /// <summary>
-    ///     Dismisses the popup: closed where that is safe, hidden and reused where closing a top-level
-    ///     window would take the application down with it.
-    /// </summary>
-    private void DismissPopup(PhotinoWindow? window)
-    {
-        if (window is null)
-            return;
-
-        if (!_platform.HidesPopupOnClose)
-        {
-            CloseWindow(window);
-            return;
-        }
-
-        Invoke(window, _platform.Hide);
     }
 
     [PublicAPI]

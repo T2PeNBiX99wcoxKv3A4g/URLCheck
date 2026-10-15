@@ -7,12 +7,18 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("linux")]
 internal sealed class LinuxWindowPlatform : IWindowPlatform
 {
-    public bool HidesPopupOnClose => true;
-
-    public void Hide(PhotinoWindow window) => window.SetMinimized(true);
+    public void Hide(PhotinoWindow window)
+    {
+        // Minimising leaves the window in the taskbar; hiding it outright does not.
+        if (!LinuxGtk.Hide(window.Title))
+            window.SetMinimized(true);
+    }
 
     public void Show(PhotinoWindow window)
     {
+        if (LinuxGtk.Present(window.Title))
+            return;
+
         window.SetMinimized(false);
         window.SetTopMost(true);
     }
@@ -46,4 +52,13 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
         .SetChromeless(true)
         .SetTopMost(true)
         .Center();
+
+    /// <summary>
+    ///     A transient child of the host window. GTK quits the shared main loop when a <em>top-level</em>
+    ///     window is destroyed, so a popup that is allowed to close needs a parent; being transient also
+    ///     lets the compositor place it relative to the host, which is the only way to centre a window on
+    ///     Wayland.
+    /// </summary>
+    public PhotinoWindow CreatePopupWindow(PhotinoWindow? parent) =>
+        parent is null ? new PhotinoWindow() : new PhotinoWindow(parent);
 }

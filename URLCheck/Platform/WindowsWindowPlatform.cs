@@ -8,8 +8,6 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("windows")]
 internal sealed class WindowsWindowPlatform : IWindowPlatform
 {
-    public bool HidesPopupOnClose => false;
-
     public void Hide(PhotinoWindow window) =>
         UseHandle(window, handle => NativeMethods.ShowWindow(handle, NativeMethods.SwHide));
 
@@ -47,6 +45,12 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         .SetChromeless(true)
         .SetTopMost(true)
         .Center();
+
+    /// <summary>
+    ///     Top-level, deliberately not owned: an owned Win32 window is hidden together with its owner,
+    ///     which would take the popup down whenever the host hides to the tray.
+    /// </summary>
+    public PhotinoWindow CreatePopupWindow(PhotinoWindow? parent) => new();
 
     private static void UseHandle(PhotinoWindow window, Action<IntPtr> action)
     {
