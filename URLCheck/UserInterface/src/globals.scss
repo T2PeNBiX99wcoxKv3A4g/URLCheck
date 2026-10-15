@@ -48,6 +48,13 @@ body {
   height: 100%;
 }
 
+// The popup window is transparent (GTK) so its rounded corners are not filled in; the popup's own
+// root element carries the background instead.
+html.popup,
+html.popup body {
+  background-color: transparent;
+}
+
 // Scrollbar Styling for Dark Theme
 ::-webkit-scrollbar {
   width: 6px;

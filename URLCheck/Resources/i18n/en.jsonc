@@ -62,6 +62,8 @@
   "settings.pathMismatch": "The registered handler points at a different copy of URLCheck: {path}. Register http/https again to point it at this one.",
   "settings.language": "Language",
   "settings.languageDescription": "Language used by both the interface and the desktop backend.",
+  "settings.transparentPopup": "Transparent popup background",
+  "settings.transparentPopupDescription": "Leave the area outside the inspection popup's content transparent, so its rounded corners show (Linux only).",
   "settings.save": "Save Settings",
   "settings.saving": "Saving...",
   "settings.loading": "Loading...",

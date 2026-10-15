@@ -57,6 +57,8 @@
   "settings.pathMismatch": "已註冊的處理常式指向另一份 URLCheck：{path}。請重新註冊 http/https，讓它指向目前這一份。",
   "settings.language": "語言",
   "settings.languageDescription": "介面與桌面後端共用的語言。",
+  "settings.transparentPopup": "彈窗透明背景",
+  "settings.transparentPopupDescription": "讓檢查彈窗內容以外的區域保持透明，這樣圓角才會顯示出來（僅 Linux）。",
   "settings.save": "儲存設定",
   "settings.saving": "儲存中...",
   "settings.loading": "載入中...",

@@ -57,6 +57,8 @@
   "settings.pathMismatch": "登録されているハンドラーは別の URLCheck を指しています: {path}。http/https を登録し直して、こちらを指すようにしてください。",
   "settings.language": "言語",
   "settings.languageDescription": "インターフェースとデスクトップ バックエンドで共通の言語。",
+  "settings.transparentPopup": "ポップアップの背景を透明にする",
+  "settings.transparentPopupDescription": "検査ポップアップの内容の外側を透明にして、角丸を活かします（Linux のみ）。",
   "settings.save": "設定を保存",
   "settings.saving": "保存中...",
   "settings.loading": "読み込み中...",

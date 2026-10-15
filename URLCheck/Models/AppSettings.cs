@@ -26,6 +26,12 @@ internal sealed class AppSettings
     /// <summary>Browsers offered in the popup. The first entry is used as the default.</summary>
     public List<BrowserEntry> Browsers { get; set; } = [];
 
+    /// <summary>
+    ///     Give the inspection popup a transparent background so its rounded corners are not filled in.
+    ///     Linux only; the flag is accepted but ignored elsewhere.
+    /// </summary>
+    public bool TransparentPopup { get; set; } = true;
+
     public AppSettings Clone() => (AppSettings)MemberwiseClone();
 
     /// <summary>Clamps values into their supported ranges so invalid input can never be persisted.</summary>

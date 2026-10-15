@@ -24,6 +24,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     ],
     browsers: [],
     language: "en",
+    transparentPopup: true,
 };
 
 export interface SettingsPayload {
@@ -51,6 +52,7 @@ function normalize(settings: AppSettings): AppSettings {
             useCount: browser.useCount ?? 0,
         })),
         language: settings.language || DEFAULT_SETTINGS.language,
+        transparentPopup: settings.transparentPopup ?? DEFAULT_SETTINGS.transparentPopup,
     };
 }
 

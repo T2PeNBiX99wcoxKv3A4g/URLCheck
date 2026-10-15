@@ -1,5 +1,6 @@
 using System.Runtime.Versioning;
 using Photino.NET;
+using Serilog;
 
 namespace URLCheck.Platform;
 
@@ -45,13 +46,21 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
     ///     Unlike Win32, GTK ignores <c>gtk_window_resize</c> on a window that is not resizable — which is
     ///     exactly what the popup's auto-fit relies on — so the popup deliberately stays resizable here.
     /// </summary>
-    public void ConfigurePopup(PhotinoWindow window) => window
-        .SetUseOsDefaultSize(false)
-        .SetUseOsDefaultLocation(false)
-        .SetSize(new(560, 640))
-        .SetChromeless(true)
-        .SetTopMost(true)
-        .Center();
+    public void ConfigurePopup(PhotinoWindow window, bool transparentPopup)
+    {
+        window
+            .SetUseOsDefaultSize(false)
+            .SetUseOsDefaultLocation(false)
+            .SetSize(new(560, 640))
+            .SetChromeless(true)
+            .SetTopMost(true)
+            .Center();
+
+        // Photino has no transparency support on Linux, so this reaches into GTK directly. It has to
+        // happen before the window is realised, which is exactly where this runs.
+        if (transparentPopup && !LinuxGtk.MakeTransparent(window.Title))
+            Log.Information("The popup could not be made transparent; keeping an opaque background");
+    }
 
     /// <summary>
     ///     A transient child of the host window. GTK quits the shared main loop when a <em>top-level</em>

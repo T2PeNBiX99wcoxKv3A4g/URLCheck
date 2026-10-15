@@ -21,7 +21,6 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
 {
     private const string IndicatorLibrary = "libayatana-appindicator3.so.1";
     private const string GtkLibrary = "libgtk-3.so.0";
-    private const string GObjectLibrary = "libgobject-2.0.so.0";
 
     private const int StatusPassive = 0;
     private const int StatusActive = 1;
@@ -151,8 +150,7 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
         ActivateCallback callback = (_, _) => Dispatch(actionIndex);
         _callbacks.Add(callback);
 
-        g_signal_connect_data(item, "activate", Marshal.GetFunctionPointerForDelegate(callback),
-            IntPtr.Zero, IntPtr.Zero, 0);
+        LinuxGtk.Connect(item, "activate", callback, IntPtr.Zero);
 
         gtk_menu_shell_append(menu, item);
     }
@@ -227,10 +225,4 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
 
     [LibraryImport(GtkLibrary)]
     private static partial void gtk_widget_show_all(IntPtr widget);
-
-    // ---- libgobject-2.0 ----
-
-    [LibraryImport(GObjectLibrary, StringMarshalling = StringMarshalling.Utf8)]
-    private static partial ulong g_signal_connect_data(IntPtr instance, string detailedSignal, IntPtr handler,
-        IntPtr data, IntPtr destroyData, int flags);
 }

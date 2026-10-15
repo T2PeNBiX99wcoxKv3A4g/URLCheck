@@ -40,6 +40,9 @@ internal sealed class SettingsService
     /// <summary>The language from the cached settings (falls back before the first load).</summary>
     public string Language => _current?.Language ?? AppSettings.DefaultLanguage;
 
+    /// <summary>The cached settings, for synchronous callers that cannot await a load.</summary>
+    public AppSettings? Current => _current;
+
     /// <summary>Raised after the settings are saved or reset.</summary>
     public static event Action<SettingsPayload>? Changed;
 

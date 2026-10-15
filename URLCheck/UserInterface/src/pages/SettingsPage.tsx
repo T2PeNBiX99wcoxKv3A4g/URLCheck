@@ -289,9 +289,20 @@ const Select = styled.select`
   }
 `;
 
+const Checkbox = styled.input.attrs({type: "checkbox"})`
+  width: 18px;
+  height: 18px;
+  accent-color: #6366f1;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
 /** Language names are always shown in their own language. */
-const LOCALE_NAMES: Record<string, string> = {
-  en: "English",
+const LOCALE_NAMES: Record<string, string> = {  en: "English",
   "zh-TW": "繁體中文",
   "zh-CN": "简体中文",
   ja: "日本語",
@@ -567,6 +578,20 @@ export const SettingsPage: React.FC = () => {
               ))}
             </Select>
           </SettingRow>
+
+          {platform === "linux" && (
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.transparentPopup")}</SettingLabel>
+                  <SettingDescription>{t("settings.transparentPopupDescription")}</SettingDescription>
+                </SettingInfo>
+                <Checkbox
+                    disabled={busy}
+                    checked={settings.transparentPopup}
+                    onChange={(e) => update({transparentPopup: e.target.checked})}
+                />
+              </SettingRow>
+          )}
         </StackCard>
 
         <StackCard>

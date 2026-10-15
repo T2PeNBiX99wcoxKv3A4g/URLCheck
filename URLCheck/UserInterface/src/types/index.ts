@@ -10,6 +10,8 @@ export interface AppSettings {
     userAgents: UserAgentEntry[];
     browsers: BrowserEntry[];
     language: string;
+    /** Linux only: leave the popup's background transparent so its rounded corners show. */
+    transparentPopup: boolean;
 }
 
 export interface UserAgentEntry {

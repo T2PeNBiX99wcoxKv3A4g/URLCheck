@@ -37,7 +37,7 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
             sizeof(int));
     });
 
-    public void ConfigurePopup(PhotinoWindow window) => window
+    public void ConfigurePopup(PhotinoWindow window, bool transparentPopup) => window
         .SetUseOsDefaultSize(false)
         .SetUseOsDefaultLocation(false)
         .SetSize(new(560, 640))
