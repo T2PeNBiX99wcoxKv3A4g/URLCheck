@@ -51,9 +51,29 @@ internal static partial class LinuxGtk
             IntPtr.Zero, 0);
 
     /// <summary>
+    ///     Whether the screen supports RGBA visuals at all. This can be answered without a window, which
+    ///     matters because the decision has to be taken before the popup is created.
+    /// </summary>
+    public static bool CanBeTransparent
+    {
+        get
+        {
+            try
+            {
+                return gdk_screen_get_rgba_visual(gdk_screen_get_default()) != IntPtr.Zero;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Could not query the screen's RGBA visual");
+                return false;
+            }
+        }
+    }
+
+    /// <summary>
     ///     Makes a toplevel RGBA-transparent, so its CSS rounded corners are not filled in. GTK needs an
-    ///     RGBA visual plus a draw handler that clears the background. Returns false when the screen has
-    ///     no RGBA visual, in which case the window has to stay opaque.
+    ///     RGBA visual plus a draw handler that clears the background, and both have to be in place
+    ///     before the window is realised.
     /// </summary>
     public static bool MakeTransparent(string title)
     {
@@ -61,17 +81,24 @@ internal static partial class LinuxGtk
         {
             var window = FindByTitle(title);
             if (window == IntPtr.Zero)
+            {
+                Log.Warning("Could not find the {Title} window to make transparent", title);
                 return false;
+            }
 
             var visual = gdk_screen_get_rgba_visual(gtk_widget_get_screen(window));
             if (visual == IntPtr.Zero)
+            {
+                Log.Warning("The screen has no RGBA visual; the popup stays opaque");
                 return false;
+            }
 
+            var realized = gtk_widget_get_realized(window);
             gtk_widget_set_visual(window, visual);
             gtk_widget_set_app_paintable(window, true);
             Connect(window, "draw", DrawHandler, IntPtr.Zero);
 
-            Log.Information("Popup background is transparent");
+            Log.Information("Popup background is transparent (realised={Realized})", realized);
             return true;
         }
         catch (Exception ex)
@@ -160,7 +187,14 @@ internal static partial class LinuxGtk
     private static partial IntPtr gtk_widget_get_screen(IntPtr widget);
 
     [LibraryImport(GtkLibrary)]
+    private static partial IntPtr gdk_screen_get_default();
+
+    [LibraryImport(GtkLibrary)]
     private static partial IntPtr gdk_screen_get_rgba_visual(IntPtr screen);
+
+    [LibraryImport(GtkLibrary)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool gtk_widget_get_realized(IntPtr widget);
 
     [LibraryImport(GtkLibrary)]
     private static partial void gtk_widget_set_visual(IntPtr widget, IntPtr visual);

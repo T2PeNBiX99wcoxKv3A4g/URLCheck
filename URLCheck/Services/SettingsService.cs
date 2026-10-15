@@ -114,6 +114,14 @@ internal sealed class SettingsService
         }
     }
 
+    /// <summary>Saves and notifies the UI, for changes the backend makes on its own.</summary>
+    public async Task<AppSettings> SaveAndPublishAsync(AppSettings settings)
+    {
+        await SaveAsync(settings);
+        Changed?.Invoke(new SettingsPayload(settings, SettingsFilePath));
+        return settings;
+    }
+
     /// <summary>Restores defaults, re-detecting the installed browsers.</summary>
     [PublicAPI]
     public Task<AppSettings> ResetAsync() =>

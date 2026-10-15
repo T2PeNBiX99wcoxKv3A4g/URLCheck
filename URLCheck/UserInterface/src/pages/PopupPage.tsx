@@ -69,6 +69,18 @@ function readInitialUrl(): string {
     return new URLSearchParams(hash.slice(queryIndex + 1)).get("url") ?? "";
 }
 
+/**
+ * The effective borderless state, as decided by the backend: it may have fallen back when the screen
+ * cannot do transparent windows.
+ */
+function readBorderless(): boolean {
+    const hash = window.location.hash;
+    const queryIndex = hash.indexOf("?");
+    if (queryIndex < 0) return true;
+
+    return new URLSearchParams(hash.slice(queryIndex + 1)).get("borderless") !== "0";
+}
+
 /** Percent-decodes a value, leaving it untouched when it is not valid encoding. */
 function decode(value: string): string {
     try {
@@ -668,7 +680,7 @@ export const PopupPage: React.FC = () => {
     const [historyMenuOpen, setHistoryMenuOpen] = useState(false);
     const [privateMode, setPrivateMode] = useState(false);
     const [copied, setCopied] = useState(false);
-    const [borderless, setBorderless] = useState(true);
+    const [borderless] = useState(readBorderless);
     const [error, setError] = useState<string | null>(null);
     const [open, setOpen] = useState<SectionState>({domain: false, parameters: false, fragment: false});
 
@@ -701,10 +713,7 @@ export const PopupPage: React.FC = () => {
         (async () => {
             try {
                 const payload = await loadSettings();
-                if (cancelled) return;
-
-                setBrowsers(payload.settings.browsers);
-                setBorderless(payload.settings.borderlessPopup);
+                if (!cancelled) setBrowsers(payload.settings.browsers);
             } catch {
                 // The popup still works without a browser list.
             }

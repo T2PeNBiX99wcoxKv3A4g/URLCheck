@@ -141,6 +141,19 @@ internal sealed class WindowManager
     /// <summary>Starts the message loop; blocks until the host window is closed for real.</summary>
     public void Run() => _mainWindow?.WaitForClose();
 
+    /// <summary>
+    ///     Records that the platform could not deliver a borderless popup, so the setting stops claiming
+    ///     something the window does not actually do.
+    /// </summary>
+    private void RecordBorderlessFallback()
+    {
+        if (_settings.Current is not { BorderlessPopup: true } current)
+            return;
+
+        current.BorderlessPopup = false;
+        _ = _settings.SaveAndPublishAsync(current);
+    }
+
     /// <summary>Runs an action on the UI thread, once the message loop is running.</summary>
     public void RunOnMainWindow(Action action) => Invoke(_mainWindow, _ => action());
 
@@ -191,16 +204,26 @@ internal sealed class WindowManager
                 .SetTemporaryFilesPath(WebViewDataPath)
                 .RegisterWebMessageReceivedHandler((sender, message) =>
                     _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message))
-                .RegisterWindowCreatedHandler((_, _) => Log.Information("Popup window created"))
                 .RegisterWindowClosingHandler((_, _) =>
                 {
                     _popupWindow = null;
                     return false;
                 });
 
-            _platform.ConfigurePopup(popup, _settings.Current?.BorderlessPopup ?? true);
+            var requested = _settings.Current?.BorderlessPopup ?? true;
+            var borderless = _platform.ConfigurePopup(popup, requested);
+            if (borderless != requested)
+                RecordBorderlessFallback();
+
+            // The window only exists from here on, which is when a platform can still shape it.
+            popup.RegisterWindowCreatedHandler((_, _) =>
+            {
+                Log.Information("Popup window created");
+                _platform.OnPopupCreated(popup, borderless);
+            });
+
             ApplyIcon(popup);
-            popup.Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}");
+            popup.Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}&borderless={(borderless ? 1 : 0)}");
             _popupWindow = popup;
 
             try

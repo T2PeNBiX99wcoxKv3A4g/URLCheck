@@ -15,8 +15,14 @@ internal interface IWindowPlatform
 
     void RoundCorners(PhotinoWindow window);
 
-    /// <summary>Applies the popup's platform-specific flags (frame, top-most, centring, sizing).</summary>
-    void ConfigurePopup(PhotinoWindow window, bool borderless);
+    /// <summary>
+    ///     Applies the popup's platform-specific flags (frame, top-most, centring, sizing) and returns the
+    ///     borderless state actually in effect: a platform may have to fall back.
+    /// </summary>
+    bool ConfigurePopup(PhotinoWindow window, bool borderless);
+
+    /// <summary>Called once the popup's native window exists, but before it is shown.</summary>
+    void OnPopupCreated(PhotinoWindow window, bool borderless);
 
     /// <summary>
     ///     Creates the popup window, parented where the platform needs it: destroying a top-level GTK

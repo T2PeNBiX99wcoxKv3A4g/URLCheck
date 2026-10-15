@@ -37,14 +37,24 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
             sizeof(int));
     });
 
-    public void ConfigurePopup(PhotinoWindow window, bool borderless) => window
-        .SetUseOsDefaultSize(false)
-        .SetUseOsDefaultLocation(false)
-        .SetSize(new(560, 640))
-        .SetResizable(false)
-        .SetChromeless(borderless)
-        .SetTopMost(true)
-        .Center();
+    public bool ConfigurePopup(PhotinoWindow window, bool borderless)
+    {
+        window
+            .SetUseOsDefaultSize(false)
+            .SetUseOsDefaultLocation(false)
+            .SetSize(new(560, 640))
+            .SetResizable(false)
+            .SetChromeless(borderless)
+            .SetTopMost(true)
+            .Center();
+
+        return borderless;
+    }
+
+    /// <summary>Nothing to do: Win32 draws whatever frame it was asked for.</summary>
+    public void OnPopupCreated(PhotinoWindow window, bool borderless)
+    {
+    }
 
     /// <summary>
     ///     Top-level, deliberately not owned: an owned Win32 window is hidden together with its owner,

@@ -46,8 +46,16 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
     ///     Unlike Win32, GTK ignores <c>gtk_window_resize</c> on a window that is not resizable — which is
     ///     exactly what the popup's auto-fit relies on — so the popup deliberately stays resizable here.
     /// </summary>
-    public void ConfigurePopup(PhotinoWindow window, bool borderless)
+    public bool ConfigurePopup(PhotinoWindow window, bool borderless)
     {
+        // The RGBA visual has to be known before the window is built, so fall back here rather than
+        // finding out too late: a frameless popup with a filled-in background just looks broken.
+        if (borderless && !LinuxGtk.CanBeTransparent)
+        {
+            Log.Information("This screen cannot do transparent windows; falling back to a framed popup");
+            borderless = false;
+        }
+
         window
             .SetUseOsDefaultSize(false)
             .SetUseOsDefaultLocation(false)
@@ -56,11 +64,17 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
             .SetTopMost(true)
             .Center();
 
-        // Photino has no transparency support on Linux, so this reaches into GTK directly. It only makes
-        // sense without a frame, and has to happen before the window is realised — which is where this
-        // runs. When it cannot be done the UI is told, and keeps drawing an opaque background.
+        return borderless;
+    }
+
+    /// <summary>
+    ///     The window exists now and has not been realised yet, which is the only moment the visual can
+    ///     still be set — at ConfigurePopup time Photino has not created it at all.
+    /// </summary>
+    public void OnPopupCreated(PhotinoWindow window, bool borderless)
+    {
         if (borderless && !LinuxGtk.MakeTransparent(window.Title))
-            Log.Information("The popup could not be made transparent; keeping an opaque background");
+            Log.Warning("The popup could not be made transparent after all");
     }
 
     /// <summary>
