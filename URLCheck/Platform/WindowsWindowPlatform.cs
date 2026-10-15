@@ -8,7 +8,7 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("windows")]
 internal sealed class WindowsWindowPlatform : IWindowPlatform
 {
-    public bool WindowPerMessageLoop => true;
+    public bool HidesPopupOnClose => false;
 
     public void Hide(PhotinoWindow window) =>
         UseHandle(window, handle => NativeMethods.ShowWindow(handle, NativeMethods.SwHide));

@@ -41,16 +41,22 @@ internal sealed class BrowserService
         if (name.EndsWith(".exe", StringComparison.Ordinal))
             name = name[..^4];
 
-        return name switch
-        {
-            "chrome" or "google-chrome" or "google-chrome-stable" or "chromium" or "chromium-browser"
-                or "msedge" or "brave" or "brave-browser" or "vivaldi" or "thorium" => "--incognito",
-            "firefox" or "waterfox" or "librewolf" => "-private-window",
-            "opera" or "launcher" => "--private",
-            "iexplore" => "-private",
-            _ => null
-        };
+        // Match by family so variants like firefox-nightly or google-chrome-beta are covered too.
+        if (Starts(name, "chrome", "chromium", "brave", "vivaldi", "thorium", "google-chrome")
+            || name == "msedge")
+            return "--incognito";
+
+        if (Starts(name, "firefox", "waterfox", "librewolf"))
+            return "-private-window";
+
+        if (Starts(name, "opera") || name == "launcher")
+            return "--private";
+
+        return Starts(name, "iexplore") ? "-private" : null;
     }
+
+    private static bool Starts(string name, params string[] prefixes) =>
+        prefixes.Any(prefix => name.StartsWith(prefix, StringComparison.Ordinal));
 
     /// <summary>Handles the <c>browsers.*</c> messages.</summary>
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>

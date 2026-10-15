@@ -7,7 +7,7 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("linux")]
 internal sealed class LinuxWindowPlatform : IWindowPlatform
 {
-    public bool WindowPerMessageLoop => false;
+    public bool HidesPopupOnClose => true;
 
     public void Hide(PhotinoWindow window) => window.SetMinimized(true);
 

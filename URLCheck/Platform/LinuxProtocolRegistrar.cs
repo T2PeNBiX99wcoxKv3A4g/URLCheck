@@ -153,9 +153,12 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
         if (!isDefault && fallback is not null)
             isDefault = fallback.Equals(DesktopFileName, StringComparison.OrdinalIgnoreCase);
 
-        Log.Information(
-            "Default handler for {MimeType}: xdg-mime={Reported} (ran={Ran}), mimeapps.list={Fallback} -> {IsDefault}",
-            mimeType, reported.Length == 0 ? "<empty>" : reported, ok, fallback ?? "<none>", isDefault);
+        // Only worth an Information line when it is wrong; it is queried on every popup open.
+        var detail = $"xdg-mime={reported} (ran={ok}), mimeapps.list={fallback ?? "<none>"}";
+        if (isDefault)
+            Log.Debug("Default handler for {MimeType} is URLCheck ({Detail})", mimeType, detail);
+        else
+            Log.Information("Default handler for {MimeType} is NOT URLCheck ({Detail})", mimeType, detail);
 
         return isDefault;
     }

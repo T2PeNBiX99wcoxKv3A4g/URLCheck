@@ -6,11 +6,11 @@ namespace URLCheck.Platform;
 internal interface IWindowPlatform
 {
     /// <summary>
-    ///     True when the platform gives every top-level window its own blocking message loop (Win32).
-    ///     False when one shared loop drives them all (GTK), where a window must be dismissed by hiding
-    ///     it: closing it tears down that shared loop, and with it the whole application.
+    ///     True when a top-level window cannot simply be closed without taking the whole application
+    ///     down — GTK wires <c>gtk_main_quit</c> to the destroy signal of top-level windows — so the
+    ///     popup is hidden and reused instead of closed.
     /// </summary>
-    bool WindowPerMessageLoop { get; }
+    bool HidesPopupOnClose { get; }
 
     void Hide(PhotinoWindow window);
 

@@ -123,8 +123,12 @@ internal sealed class WindowManager
             {
                 // Stay resident: closing the host window hides it instead of shutting down.
                 if (_allowClose || !CloseToTray)
+                {
+                    Log.Information("Main window closing (allowed)");
                     return false;
+                }
 
+                Log.Information("Main window closing -> hiding to the tray");
                 HideMainWindow();
                 return true;
             });
@@ -138,10 +142,15 @@ internal sealed class WindowManager
     public void Run() => _mainWindow?.WaitForClose();
 
     [PublicAPI]
-    public void HideMainWindow() => Invoke(_mainWindow, _platform.Hide);
+    public void HideMainWindow()
+    {
+        Log.Information("Hiding the main window");
+        Invoke(_mainWindow, _platform.Hide);
+    }
 
     public void ShowMainWindow(string? tab = null)
     {
+        Log.Information("Showing the main window");
         Invoke(_mainWindow, _platform.Show);
 
         if (tab is { Length: > 0 })
@@ -179,11 +188,12 @@ internal sealed class WindowManager
                 .SetTemporaryFilesPath(WebViewDataPath)
                 .RegisterWebMessageReceivedHandler((sender, message) =>
                     _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message))
+                .RegisterWindowCreatedHandler((_, _) => Log.Information("Popup window created"))
                 .RegisterWindowClosingHandler((_, _) =>
                 {
-                    // Where one loop drives every window, closing the popup would take the app down with
-                    // it, so a close request is turned into a hide.
-                    if (_platform.WindowPerMessageLoop)
+                    // Closing a top-level GTK window quits the shared main loop, so on those platforms a
+                    // close request is turned into a hide and the window is reused.
+                    if (!_platform.HidesPopupOnClose)
                     {
                         _popupWindow = null;
                         return false;
@@ -200,12 +210,11 @@ internal sealed class WindowManager
             popup.Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}");
             _popupWindow = popup;
 
-            if (!_platform.WindowPerMessageLoop)
-                return;
-
             try
             {
+                // On GTK this is also what makes the window appear at all, so it must not be skipped.
                 popup.WaitForClose();
+
                 _platform.KeepOnTop(popup);
                 _platform.RoundCorners(popup);
 
@@ -218,19 +227,21 @@ internal sealed class WindowManager
                 Log.Warning(ex, "Failed to create popup");
                 _popupWindow = null;
             }
+
+            Log.Information("Popup message loop returned");
         });
     }
 
     /// <summary>
-    ///     Dismisses the popup. Where windows are independent it is closed; where a single loop drives
-    ///     them all, closing would take the application down, so it is hidden and reused instead.
+    ///     Dismisses the popup: closed where that is safe, hidden and reused where closing a top-level
+    ///     window would take the application down with it.
     /// </summary>
     private void DismissPopup(PhotinoWindow? window)
     {
         if (window is null)
             return;
 
-        if (_platform.WindowPerMessageLoop)
+        if (!_platform.HidesPopupOnClose)
         {
             CloseWindow(window);
             return;
