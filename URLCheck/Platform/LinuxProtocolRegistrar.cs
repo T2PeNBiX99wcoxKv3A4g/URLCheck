@@ -14,6 +14,12 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
     private const string DesktopFileName = "urlcheck.desktop";
     private const string CustomSchemeMime = "x-scheme-handler/urlcheck";
 
+    /// <summary>
+    ///     The Wayland app id GTK reports for our windows. It has to match the desktop entry's file name
+    ///     for the compositor to associate the two, which is how the window gets its icon.
+    /// </summary>
+    public const string ProcessName = "urlcheck";
+
     private static readonly string Home =
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
@@ -95,13 +101,18 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
     {
         Directory.CreateDirectory(ApplicationsDirectory);
 
+        // On Wayland the compositor takes a window's icon from the desktop entry matched to its app id,
+        // so this is what decides the title bar and taskbar icon. An absolute path is allowed here.
+        var icon = AppIcon.EnsureExtracted() ?? "web-browser";
+
         var content = $"""
                        [Desktop Entry]
                        Type=Application
                        Name=URLCheck
                        Comment=URLCheck URL intermediary
                        Exec="{ExecutablePath}" %u
-                       Icon=web-browser
+                       Icon={icon}
+                       StartupWMClass={ProcessName}
                        Terminal=false
                        Categories=Network;WebBrowser;
                        MimeType=x-scheme-handler/http;x-scheme-handler/https;{CustomSchemeMime};text/html;

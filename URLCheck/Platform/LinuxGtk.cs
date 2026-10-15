@@ -20,13 +20,25 @@ internal static partial class LinuxGtk
 
     /// <summary>Hides a toplevel by title. Returns false when it could not be found.</summary>
     public static bool Hide(string title) => WithWindow(title, gtk_widget_hide);
-
     /// <summary>Un-hides and raises a toplevel by title. Returns false when it could not be found.</summary>
     public static bool Present(string title) => WithWindow(title, window =>
     {
         gtk_widget_show(window);
         gtk_window_present(window);
     });
+
+    /// <summary>Sets the program name, which GTK reports as the Wayland app id.</summary>
+    public static void SetProgramName(string name)
+    {
+        try
+        {
+            g_set_prgname(name);
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to set the program name");
+        }
+    }
 
     private static bool WithWindow(string title, Action<IntPtr> action)
     {
@@ -89,4 +101,7 @@ internal static partial class LinuxGtk
 
     [LibraryImport(GlibLibrary)]
     private static partial void g_list_free(IntPtr list);
+
+    [LibraryImport(GlibLibrary, StringMarshalling = StringMarshalling.Utf8)]
+    private static partial void g_set_prgname(string name);
 }

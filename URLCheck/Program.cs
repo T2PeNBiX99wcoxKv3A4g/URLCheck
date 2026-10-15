@@ -27,7 +27,13 @@ internal static class Program
         Logging.Initialize();
 
         if (OperatingSystem.IsLinux())
+        {
             LinuxDiagnostics.Write();
+
+            // The Wayland app id must match the desktop entry's file name, or the compositor will not
+            // associate our windows with our icon.
+            LinuxGtk.SetProgramName(LinuxProtocolRegistrar.ProcessName);
+        }
 
         try
         {
