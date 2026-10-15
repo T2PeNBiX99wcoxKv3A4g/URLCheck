@@ -46,7 +46,10 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
             .SetResizable(false)
             .SetChromeless(borderless)
             .SetTopMost(true)
-            .Center();
+            .Center()
+            // Registering for toast notifications makes Photino drop a Start Menu shortcut named after
+            // the window, which is right for the main window but not for a transient popup.
+            .SetNotificationsEnabled(false);
 
         return borderless;
     }
