@@ -28,6 +28,9 @@ internal static class LinuxDiagnostics
         Log.Information("Tray support: {Support}", AppIndicatorLibrary is { } library
             ? $"{library} is available"
             : "no appindicator library found; the tray icon cannot be shown");
+
+        // Native libraries report through GLib's logging; mirror it into the log file as well.
+        LinuxGtk.RouteAllLogDomains();
     }
 
     private static string Variable(string name) =>

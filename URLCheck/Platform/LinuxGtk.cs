@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Serilog;
+using Serilog.Events;
 
 namespace URLCheck.Platform;
 
@@ -52,33 +53,53 @@ internal static partial class LinuxGtk
             IntPtr.Zero, 0);
 
     /// <summary>
-    ///     Reroutes a GLib log domain to Serilog instead of stderr. Used for libraries that announce
-    ///     their own deprecation on every start and would otherwise keep printing it.
+    ///     Reroutes a GLib log domain to Serilog at a fixed level. Used for libraries that announce their
+    ///     own deprecation on every start and would otherwise keep printing it to stderr.
     /// </summary>
-    public static void RouteLogDomain(string domain, Action<string> sink)
-    {
-        try
-        {
-            LogHandler handler = (_, level, message, _) =>
-                sink($"[{level}] {Marshal.PtrToStringUTF8(message)}");
+    public static void RouteLogDomain(string domain, LogEventLevel level) =>
+        g_log_set_handler(domain, LogLevelWarning | LogLevelCritical | LogLevelError,
+            Marshal.GetFunctionPointerForDelegate(Root((_, _, message, _) => Write(level, IntPtr.Zero, message))),
+            IntPtr.Zero);
 
-            // The delegate must outlive the call, and GLib keeps the handler until it exits.
-            LogHandlers.Add(handler);
-            g_log_set_handler(domain, LogLevelWarning | LogLevelCritical | LogLevelError,
-                Marshal.GetFunctionPointerForDelegate(handler), IntPtr.Zero);
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "Failed to reroute the {Domain} log domain", domain);
-        }
+    /// <summary>
+    ///     Reroutes every GLib domain that has no handler of its own — which is how GTK, WebKit and the
+    ///     other native libraries report problems — so their warnings reach the log file, not only stderr.
+    /// </summary>
+    public static void RouteAllLogDomains() =>
+        g_log_set_default_handler(
+            Marshal.GetFunctionPointerForDelegate(
+                Root((domain, level, message, _) => Write(ToSerilogLevel(level), domain, message))),
+            IntPtr.Zero);
+
+    /// <summary>Keeps a GLib callback alive: the library holds it for the life of the process.</summary>
+    private static LogHandler Root(LogHandler handler)
+    {
+        LogHandlers.Add(handler);
+        return handler;
     }
+
+    private static void Write(LogEventLevel level, IntPtr domain, IntPtr message)
+    {
+        var name = domain == IntPtr.Zero ? "glib" : Marshal.PtrToStringUTF8(domain) ?? "glib";
+        var text = (Marshal.PtrToStringUTF8(message) ?? string.Empty).TrimEnd();
+
+        if (text.Length > 0)
+            Log.Write(level, "[{Domain}] {Line}", name, text);
+    }
+
+    private static LogEventLevel ToSerilogLevel(int level) => level switch
+    {
+        LogLevelError or LogLevelCritical => LogEventLevel.Error,
+        LogLevelWarning => LogEventLevel.Warning,
+        _ => LogEventLevel.Debug
+    };
 
     // G_LOG_LEVEL_ERROR = 1 << 2, CRITICAL = 1 << 3, WARNING = 1 << 4.
     private const int LogLevelError = 1 << 2;
     private const int LogLevelCritical = 1 << 3;
     private const int LogLevelWarning = 1 << 4;
 
-    private static readonly List<Delegate> LogHandlers = [];
+    private static readonly List<LogHandler> LogHandlers = [];
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void LogHandler(IntPtr domain, int level, IntPtr message, IntPtr userData);
@@ -313,6 +334,9 @@ internal static partial class LinuxGtk
 
     [LibraryImport(GlibLibrary, StringMarshalling = StringMarshalling.Utf8)]
     private static partial uint g_log_set_handler(string logDomain, int logLevels, IntPtr logFunc, IntPtr userData);
+
+    [LibraryImport(GlibLibrary)]
+    private static partial IntPtr g_log_set_default_handler(IntPtr logFunc, IntPtr userData);
 
     // g_signal_connect_data lives in GObject, not GLib.
     [LibraryImport(GObjectLibrary, StringMarshalling = StringMarshalling.Utf8)]
