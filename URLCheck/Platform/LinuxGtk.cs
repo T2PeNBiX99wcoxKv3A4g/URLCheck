@@ -21,6 +21,7 @@ internal static partial class LinuxGtk
     private const string GlibLibrary = "libglib-2.0.so.0";
     private const string GObjectLibrary = "libgobject-2.0.so.0";
     private const string CairoLibrary = "libcairo.so.2";
+    private const string WebKitLibrary = "libwebkit2gtk-4.1.so.0";
 
     /// <summary>Hides a toplevel by title. Returns false when it could not be found.</summary>
     public static bool Hide(string title) => WithWindow(title, gtk_widget_hide);
@@ -108,6 +109,67 @@ internal static partial class LinuxGtk
         }
     }
 
+    /// <summary>
+    ///     Clears the web view's own background. Without this the GTK window can be transparent and the
+    ///     page can have transparent corners, and WebKit still paints opaque white behind them.
+    /// </summary>
+    public static bool MakeWebViewTransparent(string title)
+    {
+        try
+        {
+            var webView = FindWebView(FindByTitle(title));
+            if (webView == IntPtr.Zero)
+            {
+                Log.Warning("Could not find the web view inside {Title}", title);
+                return false;
+            }
+
+            var clear = new GdkRgba { Alpha = 0 };
+            webkit_web_view_set_background_color(webView, ref clear);
+
+            Log.Information("Web view background cleared");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to clear the web view background");
+            return false;
+        }
+    }
+
+    /// <summary>Depth-first search for the WebKitWebView inside a widget tree.</summary>
+    private static IntPtr FindWebView(IntPtr widget)
+    {
+        if (widget == IntPtr.Zero)
+            return IntPtr.Zero;
+
+        if (g_type_check_instance_is_a(widget, webkit_web_view_get_type()) != 0)
+            return widget;
+
+        if (g_type_check_instance_is_a(widget, gtk_container_get_type()) == 0)
+            return IntPtr.Zero;
+
+        var children = gtk_container_get_children(widget);
+        if (children == IntPtr.Zero)
+            return IntPtr.Zero;
+
+        try
+        {
+            for (var node = children; node != IntPtr.Zero; node = Marshal.ReadIntPtr(node, IntPtr.Size))
+            {
+                var found = FindWebView(Marshal.ReadIntPtr(node));
+                if (found != IntPtr.Zero)
+                    return found;
+            }
+        }
+        finally
+        {
+            g_list_free(children);
+        }
+
+        return IntPtr.Zero;
+    }
+
     /// <summary>Clears the window to fully transparent; the web view paints everything on top of it.</summary>
     private static int OnDraw(IntPtr widget, IntPtr cairo, IntPtr data)
     {
@@ -120,6 +182,15 @@ internal static partial class LinuxGtk
 
     private const int CairoOperatorClear = 0;
     private static readonly DrawCallback DrawHandler = OnDraw;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct GdkRgba
+    {
+        public double Red;
+        public double Green;
+        public double Blue;
+        public double Alpha;
+    }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int DrawCallback(IntPtr widget, IntPtr cairo, IntPtr data);
@@ -218,4 +289,23 @@ internal static partial class LinuxGtk
 
     [LibraryImport(CairoLibrary)]
     private static partial void cairo_paint(IntPtr cairo);
+
+    // ---- libgobject / libgtk (widget tree) ----
+
+    [LibraryImport(GObjectLibrary)]
+    private static partial int g_type_check_instance_is_a(IntPtr instance, IntPtr type);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial IntPtr gtk_container_get_type();
+
+    [LibraryImport(GtkLibrary)]
+    private static partial IntPtr gtk_container_get_children(IntPtr container);
+
+    // ---- libwebkit2gtk ----
+
+    [LibraryImport(WebKitLibrary)]
+    private static partial IntPtr webkit_web_view_get_type();
+
+    [LibraryImport(WebKitLibrary)]
+    private static partial void webkit_web_view_set_background_color(IntPtr webView, ref GdkRgba color);
 }

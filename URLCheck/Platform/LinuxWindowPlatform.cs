@@ -73,8 +73,19 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
     /// </summary>
     public void OnPopupCreated(PhotinoWindow window, bool borderless)
     {
-        if (borderless && !LinuxGtk.MakeTransparent(window.Title))
+        if (!borderless)
+            return;
+
+        if (!LinuxGtk.MakeTransparent(window.Title))
+        {
             Log.Warning("The popup could not be made transparent after all");
+            return;
+        }
+
+        // The window being transparent is not enough: WebKit paints its own opaque background behind the
+        // page, which is what shows through the rounded corners.
+        if (!LinuxGtk.MakeWebViewTransparent(window.Title))
+            Log.Warning("The popup window is transparent but the web view still paints a background");
     }
 
     /// <summary>
