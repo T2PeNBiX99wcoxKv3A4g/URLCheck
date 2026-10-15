@@ -1,7 +1,8 @@
 export interface HistoryItem {
     id: number;
     url: string;
-    timestamp: string;
+    /** Unix epoch milliseconds (UTC). */
+    timestamp: number;
 }
 
 export interface AppSettings {

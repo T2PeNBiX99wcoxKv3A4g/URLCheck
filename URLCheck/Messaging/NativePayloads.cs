@@ -37,7 +37,7 @@ internal sealed record LocalePayload(
 internal sealed record HistoryListPayload(IReadOnlyList<HistoryItemPayload> Entries);
 
 /// <summary>One row of <c>history.list</c>.</summary>
-internal sealed record HistoryItemPayload(int Id, string Url, DateTime Timestamp);
+internal sealed record HistoryItemPayload(int Id, string Url, long Timestamp);
 
 /// <summary>Body for <c>inspect.status</c>.</summary>
 internal sealed record InspectStatusPayload(int StatusCode, string StatusText, bool Ok);

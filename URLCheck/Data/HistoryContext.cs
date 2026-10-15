@@ -16,12 +16,6 @@ internal sealed class HistoryContext(DbContextOptions<HistoryContext> options) :
             entity.HasKey(entry => entry.Id);
             entity.Property(entry => entry.Url).IsRequired();
             entity.HasIndex(entry => entry.Timestamp);
-
-            // SQLite drops the DateTime kind, so restore UTC when reading back.
-            entity.Property(entry => entry.Timestamp)
-                .HasConversion(
-                    value => value,
-                    value => DateTime.SpecifyKind(value, DateTimeKind.Utc));
         });
     }
 }

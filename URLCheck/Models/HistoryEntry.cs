@@ -7,6 +7,6 @@ internal sealed class HistoryEntry
 
     public string Url { get; set; } = string.Empty;
 
-    /// <summary>UTC timestamp; SQLite cannot order by <see cref="DateTimeOffset" />.</summary>
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    /// <summary>UTC timestamp as Unix epoch milliseconds, stored as a SQLite INTEGER.</summary>
+    public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 }

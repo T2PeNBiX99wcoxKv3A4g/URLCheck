@@ -3,7 +3,7 @@ import styled from "styled-components";
 import {HistoryItem} from "../types";
 import {AlertTriangleIcon, SearchIcon, TrashIcon} from "../components/Icons";
 import {Card, PageContainer} from "../components/Layout";
-import {useTranslation} from "../i18n";
+import {useLocale, useTranslation} from "../i18n";
 import {clearHistory, listHistory} from "../api/history";
 import {showPopup} from "../api/system";
 
@@ -150,13 +150,15 @@ const ErrorBanner = styled.div`
     font-size: 0.85rem;
 `;
 
-function formatTimestamp(value: string): string {
+/** Renders an epoch-milliseconds timestamp in the app's language (local time zone). */
+function formatTimestamp(value: number, locale: string): string {
     const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString(locale);
 }
 
 export const HistoryPage: React.FC = () => {
     const t = useTranslation();
+    const locale = useLocale();
     const [history, setHistory] = useState<HistoryItem[]>([]);
     const [keyword, setKeyword] = useState("");
     const [loading, setLoading] = useState(true);
@@ -241,7 +243,7 @@ export const HistoryPage: React.FC = () => {
                         filteredHistory.map((item) => (
                             <tr key={item.id}>
                                 <td style={{color: "#9ca3af", fontSize: "0.85rem"}}>
-                                    {formatTimestamp(item.timestamp)}
+                                    {formatTimestamp(item.timestamp, locale)}
                                 </td>
                                 <UrlCell>
                                     <UrlLink

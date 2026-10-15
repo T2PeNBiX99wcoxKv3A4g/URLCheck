@@ -18,13 +18,21 @@ export function createTranslator(strings: Record<string, string>): Translate {
 
 export const TranslationContext = createContext<Translate>(createTranslator({}));
 
+/** BCP-47 tag of the language the backend resolved, for locale-aware formatting. */
+export const LocaleContext = createContext<string>("en");
+
 export function useTranslation(): Translate {
     return useContext(TranslationContext);
+}
+
+export function useLocale(): string {
+    return useContext(LocaleContext);
 }
 
 /** Loads the string table from the backend and reloads it whenever the settings change. */
 export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const [translate, setTranslate] = useState<Translate>(() => createTranslator({}));
+    const [locale, setLocale] = useState("en");
 
     useEffect(() => {
         let cancelled = false;
@@ -32,7 +40,10 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({c
         const load = async () => {
             try {
                 const payload = await loadStrings();
-                if (!cancelled) setTranslate(() => createTranslator(payload.strings));
+                if (cancelled) return;
+
+                setTranslate(() => createTranslator(payload.strings));
+                setLocale(payload.locale);
             } catch {
                 // Keep the key-fallback translator.
             }
@@ -51,5 +62,9 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({c
         };
     }, []);
 
-    return <TranslationContext.Provider value={translate}>{children}</TranslationContext.Provider>;
+    return (
+        <TranslationContext.Provider value={translate}>
+            <LocaleContext.Provider value={locale}>{children}</LocaleContext.Provider>
+        </TranslationContext.Provider>
+    );
 };
