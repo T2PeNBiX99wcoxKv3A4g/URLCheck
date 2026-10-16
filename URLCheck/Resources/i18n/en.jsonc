@@ -91,8 +91,6 @@
   "popup.checkStatus": "Check status",
   "popup.userAgentTooltip": "User-Agent sent with the status and redirect checks",
   "popup.checking": "Checking...",
-  "popup.redirect": "Redirect",
-  "popup.resolving": "Resolving...",
   "popup.redirectTooltip": "Follow the next redirect",
   "popup.tracking": "Tracking",
   "popup.removeTrackingTooltip": "Remove tracking parameters",

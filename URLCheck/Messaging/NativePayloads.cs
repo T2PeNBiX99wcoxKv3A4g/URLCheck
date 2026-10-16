@@ -39,11 +39,11 @@ internal sealed record HistoryListPayload(IReadOnlyList<HistoryItemPayload> Entr
 /// <summary>One row of <c>history.list</c>.</summary>
 internal sealed record HistoryItemPayload(int Id, string Url, long Timestamp);
 
-/// <summary>Body for <c>inspect.status</c>.</summary>
-internal sealed record InspectStatusPayload(int StatusCode, string StatusText, bool Ok);
-
-/// <summary>Body for <c>inspect.redirect</c>; a null location means "no further redirect".</summary>
-internal sealed record RedirectPayload(string? Location);
+/// <summary>
+///     Body for <c>inspect.status</c>. A non-null <paramref name="Location" /> marks a redirect the
+///     popup can follow.
+/// </summary>
+internal sealed record InspectStatusPayload(int StatusCode, string StatusText, bool Ok, string? Location);
 
 /// <summary>Body for the <c>app.navigate</c> event.</summary>
 internal sealed record NavigatePayload(string Tab);

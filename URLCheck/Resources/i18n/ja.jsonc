@@ -85,8 +85,6 @@
   "popup.checkStatus": "状態を確認",
   "popup.userAgentTooltip": "ステータス確認とリダイレクト確認で送信する User-Agent",
   "popup.checking": "確認中...",
-  "popup.redirect": "リダイレクト",
-  "popup.resolving": "解決中...",
   "popup.redirectTooltip": "次のリダイレクト先へ進む",
   "popup.tracking": "トラッキング",
   "popup.removeTrackingTooltip": "トラッキング パラメータを削除",

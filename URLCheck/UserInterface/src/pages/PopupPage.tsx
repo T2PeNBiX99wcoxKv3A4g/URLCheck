@@ -3,7 +3,7 @@ import styled, {keyframes} from "styled-components";
 import {BrowserEntry, UserAgentEntry} from "../types";
 import {loadSettings} from "../api/settings";
 import {openWithBrowser} from "../api/browsers";
-import {checkStatus, followRedirect, type StatusResult} from "../api/inspect";
+import {checkStatus, type StatusResult} from "../api/inspect";
 import {closePopup, resizePopup} from "../api/system";
 import {stripTrackingParams, trackingParamKeys} from "../data/trackingParams";
 import {useTranslation} from "../i18n";
@@ -718,7 +718,6 @@ export const PopupPage: React.FC = () => {
     const [userAgentId, setUserAgentId] = useState("");
     const [status, setStatus] = useState<StatusResult | null>(null);
     const [statusBusy, setStatusBusy] = useState(false);
-    const [redirectBusy, setRedirectBusy] = useState(false);
     const [browserMenuOpen, setBrowserMenuOpen] = useState(false);
     const [historyMenuOpen, setHistoryMenuOpen] = useState(false);
     const [privateMode, setPrivateMode] = useState(false);
@@ -873,19 +872,6 @@ export const PopupPage: React.FC = () => {
         commit(`${parsed.origin}/`);
     };
 
-    const handleFollowRedirect = async () => {
-        setRedirectBusy(true);
-        setError(null);
-        try {
-            const target = await followRedirect(url, userAgentId);
-            if (target) commit(target);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : String(err));
-        } finally {
-            setRedirectBusy(false);
-        }
-    };
-
     const handleCheckStatus = async () => {
         setStatusBusy(true);
         setError(null);
@@ -896,6 +882,19 @@ export const PopupPage: React.FC = () => {
         } finally {
             setStatusBusy(false);
         }
+    };
+
+    /**
+     * The status pill doubles as the redirect action: once a check has found a 3xx, the next click
+     * jumps to its target. The jump goes through the edit history, so the original URL is kept.
+     */
+    const handleStatusClick = async () => {
+        if (status?.location) {
+            commit(status.location);
+            return;
+        }
+
+        await handleCheckStatus();
     };
 
     const handleOpen = async (browserId?: string) => {
@@ -966,7 +965,14 @@ export const PopupPage: React.FC = () => {
                 ? `${status.statusCode || "!"} ${status.statusText === "error.timeout" ? t("error.timeout") : status.statusText}`.trim()
                 : t("popup.checkStatus");
 
-    const StatusIcon = tone === "ok" ? CheckCircleIcon : tone === "error" ? XCircleIcon : AlertTriangleIcon;
+    /* A found redirect swaps the icon for the arrow, hinting that the pill now jumps. */
+    const StatusIcon = status?.location
+        ? RedirectIcon
+        : tone === "ok"
+                ? CheckCircleIcon
+                : tone === "error"
+                        ? XCircleIcon
+                        : AlertTriangleIcon;
 
     return (
         <Root $borderless={borderless}>
@@ -1036,7 +1042,7 @@ export const PopupPage: React.FC = () => {
                     {userAgents.length > 0 && (
                         <UserAgentSelect
                             value={userAgentId}
-                            disabled={statusBusy || redirectBusy}
+                            disabled={statusBusy}
                             onChange={(e) => setUserAgentId(e.target.value)}
                             title={t("popup.userAgentTooltip")}
                         >
@@ -1046,17 +1052,11 @@ export const PopupPage: React.FC = () => {
                         </UserAgentSelect>
                     )}
 
-                    <StatusPill $tone={tone} onClick={handleCheckStatus} disabled={statusBusy}
-                                 title={t("popup.checkStatus")}>
+                    <StatusPill $tone={tone} onClick={handleStatusClick} disabled={statusBusy}
+                                 title={status?.location ? t("popup.redirectTooltip") : t("popup.checkStatus")}>
                         <StatusIcon size={13}/>
                         <span>{statusText}</span>
                     </StatusPill>
-
-                    <ActionButton onClick={handleFollowRedirect} disabled={redirectBusy || !parsed}
-                                  title={t("popup.redirectTooltip")}>
-                        <RedirectIcon size={13}/>
-                        {redirectBusy ? t("popup.resolving") : t("popup.redirect")}
-                    </ActionButton>
 
                     <ActionButton onClick={() => commit(stripTrackingParams(url))} disabled={!parsed}
                                   title={t("popup.removeTrackingTooltip")}>

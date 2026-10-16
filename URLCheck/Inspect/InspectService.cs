@@ -4,14 +4,14 @@ using URLCheck.Services;
 
 namespace URLCheck.Inspect;
 
-/// <summary>Answers the <c>inspect.*</c> messages: HTTP status checks and redirect lookups.</summary>
+/// <summary>Answers the <c>inspect.*</c> messages: the HTTP status of a URL, redirects included.</summary>
 internal sealed class InspectService
 {
-    /// <summary>Follows redirects, so a status check reports the final destination's status.</summary>
-    private static readonly HttpClient StatusClient = new(new SocketsHttpHandler { AllowAutoRedirect = true });
-
-    /// <summary>Does not follow redirects, so the first hop's Location can be read.</summary>
-    private static readonly HttpClient RedirectClient = new(new SocketsHttpHandler { AllowAutoRedirect = false });
+    /// <summary>
+    ///     Never follows redirects, so a 3xx is reported as-is together with its Location. The popup
+    ///     decides whether to jump, which also keeps the original URL in the edit history.
+    /// </summary>
+    private static readonly HttpClient Client = new(new SocketsHttpHandler { AllowAutoRedirect = false });
 
     private readonly SettingsService _settings;
 
@@ -24,7 +24,6 @@ internal sealed class InspectService
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch
     {
         "inspect.status" => CheckStatusAsync(context),
-        "inspect.redirect" => FollowRedirectAsync(context),
         _ => Task.FromResult<NativeResponse?>(null)
     };
 
@@ -41,41 +40,17 @@ internal sealed class InspectService
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.TryAddWithoutValidation("User-Agent", ResolveUserAgent(settings, payload.UserAgentId));
 
-            using var response = await StatusClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
+            using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
             return context.Reply("inspect.status.result",
                 new InspectStatusPayload((int)response.StatusCode, response.ReasonPhrase ?? string.Empty,
-                    response.IsSuccessStatusCode));
+                    response.IsSuccessStatusCode, response.Headers.Location?.ToString()));
         }
         catch (Exception ex)
         {
             // A failed request (DNS, TLS, timeout, ...) is reported as a non-OK status.
             return context.Reply("inspect.status.result",
-                new InspectStatusPayload(0, ex is TaskCanceledException ? "error.timeout" : ex.Message, false));
-        }
-    }
-
-    private async Task<NativeResponse?> FollowRedirectAsync(NativeContext context)
-    {
-        if (context.Payload<InspectRequest>() is not { Url: { Length: > 0 } url } payload)
-            return context.Fail("inspect.redirect.result", "error.missingUrl");
-
-        var settings = await _settings.GetAsync();
-
-        try
-        {
-            using var cts = new CancellationTokenSource(settings.RequestTimeoutMs);
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.TryAddWithoutValidation("User-Agent", ResolveUserAgent(settings, payload.UserAgentId));
-
-            using var response = await RedirectClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
-
-            return context.Reply("inspect.redirect.result",
-                new RedirectPayload(response.Headers.Location?.ToString()));
-        }
-        catch (Exception ex)
-        {
-            return context.Fail("inspect.redirect.result", ex.Message);
+                new InspectStatusPayload(0, ex is TaskCanceledException ? "error.timeout" : ex.Message, false, null));
         }
     }
 

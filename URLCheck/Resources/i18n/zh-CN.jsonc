@@ -85,8 +85,6 @@
   "popup.checkStatus": "检查状态",
   "popup.userAgentTooltip": "状态与重定向检查时发送的 User-Agent",
   "popup.checking": "检查中...",
-  "popup.redirect": "跳转",
-  "popup.resolving": "解析中...",
   "popup.redirectTooltip": "前往下一个跳转目标",
   "popup.tracking": "跟踪",
   "popup.removeTrackingTooltip": "移除跟踪参数",

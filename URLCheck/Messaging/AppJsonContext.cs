@@ -36,7 +36,6 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(LocalePayload))]
 [JsonSerializable(typeof(HistoryListPayload))]
 [JsonSerializable(typeof(InspectStatusPayload))]
-[JsonSerializable(typeof(RedirectPayload))]
 [JsonSerializable(typeof(NavigatePayload))]
 [JsonSerializable(typeof(PopupNavigatePayload))]
 [JsonSerializable(typeof(Dictionary<string, string>))]
