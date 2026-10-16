@@ -137,7 +137,12 @@ Error generating stack: `+e.message+`
         padding: 14px 18px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         color: #e2e8f0;
-        transition: background 0.15s ease;
+        transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Starting value for the accent bar so it slides in instead of popping. */
+    td:first-child {
+        box-shadow: inset 0 0 0 0 rgba(96, 165, 250, 0);
     }
 
     tr:last-child td {
@@ -145,7 +150,11 @@ Error generating stack: `+e.message+`
     }
 
     tr:hover td {
-        background: rgba(255, 255, 255, 0.02);
+        background: rgba(59, 130, 246, 0.09);
+    }
+
+    tr:hover td:first-child {
+        box-shadow: inset 3px 0 0 0 #60a5fa;
     }
 `,ci=P.td`
     word-break: break-all;
@@ -239,8 +248,15 @@ Error generating stack: `+e.message+`
     transition: all 0.2s ease;
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 
+    /* Gradients cannot be interpolated, so the hover motion lives in the glow and lift. */
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+        box-shadow: 0 0 28px rgba(99, 102, 241, 0.55);
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
     }
 
     &:disabled {

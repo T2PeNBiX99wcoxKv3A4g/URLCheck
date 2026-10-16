@@ -104,7 +104,12 @@ const Table = styled.table`
         padding: 14px 18px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         color: #e2e8f0;
-        transition: background 0.15s ease;
+        transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Starting value for the accent bar so it slides in instead of popping. */
+    td:first-child {
+        box-shadow: inset 0 0 0 0 rgba(96, 165, 250, 0);
     }
 
     tr:last-child td {
@@ -112,7 +117,11 @@ const Table = styled.table`
     }
 
     tr:hover td {
-        background: rgba(255, 255, 255, 0.02);
+        background: rgba(59, 130, 246, 0.09);
+    }
+
+    tr:hover td:first-child {
+        box-shadow: inset 3px 0 0 0 #60a5fa;
     }
 `;
 

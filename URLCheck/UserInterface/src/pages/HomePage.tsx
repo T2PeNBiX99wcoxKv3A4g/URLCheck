@@ -79,8 +79,15 @@ const PrimaryButton = styled.button`
     transition: all 0.2s ease;
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 
+    /* Gradients cannot be interpolated, so the hover motion lives in the glow and lift. */
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+        box-shadow: 0 0 28px rgba(99, 102, 241, 0.55);
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
     }
 
     &:disabled {
