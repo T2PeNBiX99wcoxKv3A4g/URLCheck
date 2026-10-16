@@ -1,32 +1,37 @@
 // Design Tokens & SCSS Variables (Dark Mode inspired by VPM)
 
 // The font stacks are CSS custom properties rather than SCSS variables because the components are
-// styled-components and cannot read SCSS. Only fonts that ship with the OS (or that people commonly
-// install anyway) belong in here: the app bundles none of them.
+// styled-components and cannot read SCSS.
+//
+// Inter and JetBrains Mono are bundled (SIL OFL, latin subsets only — see main.tsx). Everything
+// after them is a system fallback, and only fonts that ship with the OS (or that people commonly
+// install anyway) belong there: a CJK face is 66-80 MB per language, so those are never bundled.
 //
 // `--font-cjk` is kept separate because it has to be spliced in *before* the generic family:
 // Chromium picks the CJK fallback from the element's language, and a generic family would swallow
 // anything listed after it.
 html {
   --font-cjk: sans-serif;
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial;
-  --font-mono: ui-monospace, "Cascadia Mono", Consolas, "SFMono-Regular", Menlo, var(--font-cjk);
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, "SFMono-Regular", Menlo,
+          var(--font-cjk);
 
   font-family: var(--font-sans), var(--font-cjk);
 }
 
 // Without a language of its own, Japanese text gets drawn with a Chinese face (and the other way
-// round), which shows up as missing or oddly thin glyphs.
+// round), which shows up as missing or oddly thin glyphs. Noto first: the bundled Latin font makes
+// the interface look the same everywhere, so the CJK face should not fall back to the OS vendor's.
 html:lang(zh-TW) {
-  --font-cjk: "Microsoft JhengHei UI", "Noto Sans TC", "PingFang TC";
+  --font-cjk: "Noto Sans TC", "Microsoft JhengHei UI", "PingFang TC";
 }
 
 html:lang(zh-CN) {
-  --font-cjk: "Microsoft YaHei UI", "Noto Sans SC", "PingFang SC";
+  --font-cjk: "Noto Sans SC", "Microsoft YaHei UI", "PingFang SC";
 }
 
 html:lang(ja) {
-  --font-cjk: "Yu Gothic UI", "Noto Sans JP", "Hiragino Kaku Gothic ProN";
+  --font-cjk: "Noto Sans JP", "Yu Gothic UI", "Hiragino Kaku Gothic ProN";
 }
 
 $bg-primary: #0b0f19;
