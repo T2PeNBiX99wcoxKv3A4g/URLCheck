@@ -41,6 +41,18 @@ desktop version.
 - **History** — every intercepted URL is recorded locally in SQLite and can be searched, and
   clicking an entry reopens the popup for it.
 
+## Built with
+
+- **C# on .NET 10** — all of the logic: intercepting links, the tray, parsing and cleaning the URL,
+  launching the browser, and the history.
+- **React 19 + TypeScript**, bundled by **Vite** and styled with **styled-components** — the
+  interface. It is presentation only: it exchanges JSON messages with the C# side and does no work
+  of its own.
+- **Photino.NET** — the desktop shell. It shows the interface in the operating system's own web
+  view, which is why the web view is a runtime dependency: WebView2 on Windows, WebKitGTK on Linux.
+- **SQLite through EF Core** — the inspection history.
+- **Serilog** — logging, to the console and to a rolling file.
+
 ## Running
 
 The published builds are **self-contained** — they bundle the .NET runtime, so nothing needs to be
