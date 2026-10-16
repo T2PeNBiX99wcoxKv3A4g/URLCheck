@@ -67,11 +67,11 @@ combination this project is actually known to work on. Any other distribution is
 Linux runtime dependencies are the fiddly part, so start from the libraries rather than the
 package names:
 
-| Distribution | Packages |
-|---|---|
-| Fedora 44 | `sudo dnf install webkit2gtk4.1 libayatana-appindicator-gtk3` |
+| Distribution    | Packages                                                          |
+|-----------------|-------------------------------------------------------------------|
+| Fedora 44       | `sudo dnf install webkit2gtk4.1 libayatana-appindicator-gtk3`     |
 | Debian / Ubuntu | `sudo apt install libwebkit2gtk-4.1-0 libayatana-appindicator3-1` |
-| anything else | find whatever provides the libraries below |
+| anything else   | find whatever provides the libraries below                        |
 
 ```
 libwebkit2gtk-4.1.so.0          libjavascriptcoregtk-4.1.so.0
@@ -125,11 +125,11 @@ That produces a single self-contained executable per platform under
 
 ## Where things are stored
 
-| | Windows | Linux |
-|---|---|---|
-| Settings | `%APPDATA%\URLCheck\settings.json` | `~/.config/URLCheck/settings.json` |
-| History | `%APPDATA%\URLCheck\history.db` | `~/.config/URLCheck/history.db` |
-| Logs | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
+|          | Windows                                  | Linux                                    |
+|----------|------------------------------------------|------------------------------------------|
+| Settings | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
+| History  | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
+| Logs     | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
 
 Logs are written to the file and mirrored to the console, so a log file is enough to report a
 problem. They roll daily and the last seven are kept.
@@ -145,9 +145,4 @@ its own windows, so a few things behave differently there than on Windows or X11
 
 Neither is a bug in URLCheck; both are limitations of the protocol.
 
-Running a bare window manager on X11 instead? Then some of the above will not apply to you. You
-are clearly a super nerd, so fix it and send a pull request.
-
-## License
-
-[MIT](LICENSE)
+If you are a super nerd running like an old window manager on X11, you should fix by yourself then send a pull request.
