@@ -905,10 +905,16 @@ export const PopupPage: React.FC = () => {
         try {
             const result = await checkStatus(url, userAgentId);
             // The pill reports the response's own status — a redirect shows the exact 3xx it is — and
-            // the URL box moves straight to the target. That target is cleaned the same way the
-            // initial URL is, and the edit history keeps the original, so the jump needs no
-            // confirmation.
-            if (result.location) dispatch({type: "commit", value: cleanUrl(result.location)});
+            // the URL box moves straight to the target, with no confirmation.
+            if (result.location) {
+                // The target is recorded first and cleaned second, exactly like a URL that is opened
+                // directly, so the edit history keeps the uncleaned target as its own step.
+                dispatch({type: "commit", value: result.location});
+
+                const cleaned = cleanUrl(result.location);
+                if (cleaned !== result.location) dispatch({type: "commit", value: cleaned});
+            }
+
             setStatus(result);
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
