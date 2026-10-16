@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.1.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.0.2..v0.1.0) - 2026-10-16
+
+### ⛰️  Features
+
+- Force push up version - ([aa49515](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/aa49515b93f449325337d6c0fd501f69c4487d5b))
+- Force push up version - ([8a06ffc](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8a06ffc570feb64b1960cde9630341a81f4e29fa))
+
+### 📚 Documentation
+
+- Remove outdated mentions of SQLite and Serilog in README - ([4b83f0d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4b83f0d21b73fc26bf70a62ff323db5c5b4f6491))
+- Improve phrasing for unsupported Windows versions in README - ([1088979](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/10889796217e125bc57636d7c118b34c1bc57062))
+- Fix a missing verb in the KWin note - ([845bcfb](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/845bcfbfafdef0cb1e8697f1a027f8b32c635cf2))
+- Describe the technology stack - ([4350c6d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4350c6d0c3e925784752fbccb6aa03d7bd546005))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update Dependabot schedule to daily - ([4c0bed4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4c0bed483631d8353b1ad257287be177cff6c250))
+- Add the Dependabot auto-merge workflow - ([7802e3d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/7802e3dff4ec0a5c90b630a8bca1b41d47a43a64))
+- Track the npm lockfile for Dependabot - ([b9e19c8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b9e19c8718884f82a755d77058cc633de2f90836))
+- Add Dependabot configuration - ([11ff818](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/11ff8187618765abdde8cdc132b3526c51d8f7bb))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([eca2db6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/eca2db605685571cbb8090a13329af385fe3e1fd))
+
+
 ## [0.0.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.0.1..v0.0.2) - 2026-10-16
 
 ### 📚 Documentation
