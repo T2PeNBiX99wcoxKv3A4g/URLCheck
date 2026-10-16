@@ -9,11 +9,11 @@ inspection popup instead of going straight to a browser. You get to see where th
 goes, strip the tracking junk, and only then hand it to the browser you actually want.
 
 <div align="center">
-  <a href="docs/img.png"><img src="docs/img.png" alt="The inspection popup" width="440"></a>
+  <a href="docs/popup.png"><img src="docs/popup.png" alt="The inspection popup" width="440"></a>
   <br>
   <em>The inspection popup</em>
   <br><br>
-  <a href="docs/img2.png"><img src="docs/img2.png" alt="The main window" width="880"></a>
+  <a href="docs/main-window.png"><img src="docs/main-window.png" alt="The main window" width="880"></a>
   <br>
   <em>The main window</em>
 </div>
