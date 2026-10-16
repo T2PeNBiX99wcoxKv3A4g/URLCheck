@@ -1,12 +1,22 @@
-![icon.svg](icon.svg)
-
-# URLCheck
-
-**Check the URL before it opens in your browser.**
+<div align="center">
+  <img src="icon.svg" alt="" width="120">
+  <h1>URLCheck</h1>
+  <p><strong>Check the URL before it opens in your browser.</strong></p>
+</div>
 
 URLCheck registers itself as a link handler, so clicking an `http`/`https` link opens a small
 inspection popup instead of going straight to a browser. You get to see where the link really
 goes, strip the tracking junk, and only then hand it to the browser you actually want.
+
+<div align="center">
+  <a href="docs/img.png"><img src="docs/img.png" alt="The inspection popup" width="440"></a>
+  <br>
+  <em>The inspection popup</em>
+  <br><br>
+  <a href="docs/img2.png"><img src="docs/img2.png" alt="The main window" width="880"></a>
+  <br>
+  <em>The main window</em>
+</div>
 
 ## Why
 
