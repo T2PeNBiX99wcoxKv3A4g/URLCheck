@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
-import styled from "styled-components";
+import styled, {css} from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
 import {useTranslation} from "../i18n";
@@ -84,6 +84,10 @@ const BaseButton = styled.button`
   gap: 8px;
   transition: all 0.2s ease;
 
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
   &:disabled {
     opacity: 0.55;
     cursor: not-allowed;
@@ -102,15 +106,21 @@ const SaveButton = styled(BaseButton)`
   }
 `;
 
-const ResetButton = styled(BaseButton)`
-  background: rgba(255, 255, 255, 0.06);
-  color: #d1d5db;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+/** Shared red treatment for the destructive actions (discard edits, reset to defaults). */
+const dangerStyles = css`
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
 
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.12);
-    color: #f9fafb;
+    background: rgba(239, 68, 68, 0.24);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.5);
   }
+`;
+
+const ResetButton = styled(BaseButton)`
+  ${dangerStyles}
 `;
 
 /**
@@ -119,18 +129,11 @@ const ResetButton = styled(BaseButton)`
  * leaves no trace.
  */
 const DiscardButton = styled(BaseButton)<{ $visible: boolean }>`
-  background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
-  border: solid rgba(239, 68, 68, 0.35);
+  ${dangerStyles}
   white-space: nowrap;
   overflow: hidden;
   flex-shrink: 0;
   transform-origin: left center;
-
-  &:hover:not(:disabled) {
-    background: rgba(239, 68, 68, 0.24);
-    color: #fca5a5;
-  }
 
   &:disabled {
     opacity: ${(props) => (props.$visible ? 0.55 : 0)};
@@ -145,7 +148,7 @@ const DiscardButton = styled(BaseButton)<{ $visible: boolean }>`
   pointer-events: ${(props) => (props.$visible ? "auto" : "none")};
   transition: max-width 0.28s ease, padding 0.28s ease, border-width 0.28s ease,
     margin-left 0.28s ease, opacity 0.28s ease, transform 0.28s ease, background 0.15s ease,
-    color 0.15s ease;
+    color 0.15s ease, border-color 0.15s ease;
 `;
 
 const Toast = styled.div`
@@ -258,9 +261,12 @@ const ListInput = styled.input`
   color: #f9fafb;
   font-size: 0.82rem;
   outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 
   &:focus {
     border-color: #3b82f6;
+    background: rgba(15, 23, 42, 0.95);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
   }
 
   &.name {
@@ -325,10 +331,16 @@ const IconOnlyButton = styled.button`
   padding: 6px;
   border-radius: 6px;
   flex-shrink: 0;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 
   &:hover {
     color: #f87171;
     background: rgba(239, 68, 68, 0.12);
+    transform: scale(1.08);
+  }
+
+  &:active {
+    transform: scale(0.94);
   }
 `;
 
@@ -363,9 +375,11 @@ const Select = styled.select`
   outline: none;
   cursor: pointer;
   min-width: 200px;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 
   &:focus {
     border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
   }
 
   &:disabled {
@@ -384,6 +398,11 @@ const Checkbox = styled.input.attrs({type: "checkbox"})`
   height: 18px;
   accent-color: #6366f1;
   cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.12);
+  }
 
   &:disabled {
     opacity: 0.5;

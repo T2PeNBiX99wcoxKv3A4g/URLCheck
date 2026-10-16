@@ -130,6 +130,12 @@ const Banner = styled.div`
     border: 1px solid rgba(245, 158, 11, 0.35);
     background: rgba(245, 158, 11, 0.12);
     color: #fbbf24;
+    transition: border-color 0.25s ease, background 0.25s ease;
+
+    &:hover {
+        border-color: rgba(245, 158, 11, 0.5);
+        background: rgba(245, 158, 11, 0.16);
+    }
 
     @media (max-width: 640px) {
         flex-direction: column;
@@ -168,9 +174,14 @@ const BannerButton = styled.button`
     font-size: 0.85rem;
     cursor: pointer;
     white-space: nowrap;
+    transition: filter 0.2s ease, transform 0.15s ease;
 
     &:hover {
         filter: brightness(1.1);
+    }
+
+    &:active {
+        transform: scale(0.97);
     }
 `;
 

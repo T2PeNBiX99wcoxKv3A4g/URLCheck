@@ -104,6 +104,7 @@ const Table = styled.table`
         padding: 14px 18px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         color: #e2e8f0;
+        transition: background 0.15s ease;
     }
 
     tr:last-child td {

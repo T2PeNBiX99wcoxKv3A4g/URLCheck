@@ -111,6 +111,7 @@ const Root = styled.div<{ $borderless: boolean }>`
     border-radius: ${(p) => (p.$borderless ? "8px" : "0")};
     box-shadow: ${(p) => (p.$borderless ? "inset 0 0 0 1px rgba(255, 255, 255, 0.12)" : "none")};
     overflow: hidden;
+    animation: ${fadeIn} 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
 const TopBar = styled.div`
@@ -224,6 +225,7 @@ const HistoryMenu = styled.div`
     padding: 5px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
     z-index: 30;
+    animation: ${fadeIn} 0.15s ease;
 `;
 
 const HistoryItem = styled.button<{ $active: boolean }>`
@@ -640,6 +642,7 @@ const BrowserMenu = styled.div`
     padding: 5px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
     z-index: 30;
+    animation: ${fadeIn} 0.15s ease;
 `;
 
 const BrowserMenuItem = styled.button`
@@ -656,6 +659,7 @@ const BrowserMenuItem = styled.button`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
         background: rgba(59, 130, 246, 0.18);

@@ -22,6 +22,18 @@ const HeaderContainer = styled.header`
 const PageTitleGroup = styled.div`
   display: flex;
   flex-direction: column;
+  animation: headerEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+
+  @keyframes headerEnter {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 `;
 
 const PageTitle = styled.h1`
@@ -42,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({currentTab}) => {
 
   return (
       <HeaderContainer>
-        <PageTitleGroup>
+        <PageTitleGroup key={currentTab}>
           <PageTitle>{t(current.titleKey)}</PageTitle>
           <PageSubtitle>{t(current.subtitleKey)}</PageSubtitle>
         </PageTitleGroup>

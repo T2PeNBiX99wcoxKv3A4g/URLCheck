@@ -88,6 +88,18 @@ html.popup-transparent body {
   background-color: transparent;
 }
 
+// Motion: the interface animates page entries, buttons and inputs. Anyone who asked the OS to
+// reduce motion gets the same UI with the durations collapsed instead of a separate code path.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
 // Scrollbar Styling for Dark Theme
 ::-webkit-scrollbar {
   width: 6px;
