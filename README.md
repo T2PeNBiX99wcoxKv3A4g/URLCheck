@@ -8,9 +8,12 @@ goes, strip the tracking junk, and only then hand it to the browser you actually
 
 ## Why
 
-Links arrive with a lot of baggage: `utm_*` and `fbclid` parameters, shorteners that hide the
-destination, and `http://` URLs that should have been `https://`. URLCheck puts a step in
-between so you can look and clean up first, without changing how you browse.
+Links can be dangerous if you're not checking the URL first.
+
+This software is made for doing this.
+
+Another reason is the [URLCheck](https://github.com/TrianguloY/URLCheckhttps://github.com/TrianguloY/URLCheck)
+doesn't have a desktop version.
 
 ## Features
 
@@ -28,32 +31,6 @@ between so you can look and clean up first, without changing how you browse.
   clicking an entry reopens the popup for it.
 - **Localised** — English, Traditional Chinese, Simplified Chinese and Japanese, switchable at
   runtime and shared between the interface and the backend.
-
-## How it works
-
-The desktop backend is C# (.NET 10) and holds *all* of the logic. The interface is a React +
-TypeScript app rendered in a Photino window, and it is presentation only: the two sides talk in
-JSON over Photino's `window.external.sendMessage` / `receiveMessage` bridge.
-
-```
-URLCheck/
-├── Program.cs            composition root: single instance, windows, tray
-├── Messaging/            the JSON bridge and its source-generated serialization context
-├── Services/             settings, history, browsers, protocol registration, localisation
-├── Inspect/              HTTP status checks and redirect lookups
-├── Platform/             everything that differs per OS (browsers, windows, protocols, GTK)
-├── Interop/              Win32 and GTK/tray plumbing
-├── Resources/i18n/       translations, embedded as JSONC
-└── UserInterface/        the React app (embedded into the executable for release builds)
-```
-
-Platform differences are kept behind small interfaces (`IBrowserLocator`, `IWindowPlatform`,
-`IProtocolRegistrar`), and each implementation is marked with the OS it belongs to.
-
-- **Windows** registers itself in the registry as a candidate browser. Windows protects the
-  default-handler choice, so you still confirm it once in *Default apps*.
-- **Linux** writes a `urlcheck.desktop` entry and sets the handler through `xdg-mime`, and uses
-  the StatusNotifierItem protocol for its tray icon.
 
 ## Requirements
 
