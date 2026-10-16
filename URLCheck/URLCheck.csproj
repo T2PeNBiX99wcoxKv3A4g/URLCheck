@@ -23,8 +23,6 @@
         <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
         <PublishTrimmed>true</PublishTrimmed>
         <TrimMode>partial</TrimMode>
-        <!-- The startup shortcut is created through IShellLink; keep COM alive when trimming. -->
-        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <!-- Suppress trim warnings from third-party libraries -->
         <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
     </PropertyGroup>
@@ -36,6 +34,7 @@
         <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.13" />
         <PackageReference Include="Photino.NET" Version="4.0.16" />
         <PackageReference Include="Photino.NET.Server" Version="4.0.12" />
+        <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
         <PackageReference Include="Serilog" Version="4.4.0" />
         <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />

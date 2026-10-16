@@ -97,6 +97,14 @@ async function npmEntries() {
     return entries;
 }
 
+/**
+ * Packages whose nuspec declares no licence at all. Their text is fetched from the project instead;
+ * the list stays short and explicit because it should only hold packages that give us no choice.
+ */
+const LICENSE_OVERRIDES = {
+    "securifybv.ShellLink": "https://raw.githubusercontent.com/securifybv/ShellLink/master/LICENSE.txt",
+};
+
 /** Every NuGet package referenced by the desktop project. */
 async function nugetEntries() {
     const project = await readFile(csprojPath, "utf8");
@@ -120,7 +128,10 @@ async function nugetEntries() {
         let license = expression ?? "";
         let text;
 
-        if (fileName) {
+        if (LICENSE_OVERRIDES[id]) {
+            text = await remoteText(LICENSE_OVERRIDES[id], id);
+            license = detectLicense(text);
+        } else if (fileName) {
             const file = path.join(directory, fileName.replace(/\\/g, path.sep));
             text = existsSync(file) ? (await readFile(file, "utf8")).trim() : "";
         } else if (expression) {
