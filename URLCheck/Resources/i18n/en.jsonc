@@ -70,6 +70,7 @@
   "settings.loading": "Loading...",
   "settings.reset": "Reset to Defaults",
   "settings.saved": "Settings saved successfully",
+  "settings.unsaved": "You have unsaved changes",
   "settings.fileInfo": "Settings are persisted by the C# backend at:",
   "settings.yes": "yes",
   "settings.no": "no",

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import styled from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
@@ -132,6 +132,61 @@ const ErrorBanner = styled.div`
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #f87171;
   font-size: 0.85rem;
+`;
+
+/**
+ * Sticky reminder that the form differs from the last saved settings. It stays pinned directly
+ * under the page header while the content scrolls, and collapses smoothly when nothing is dirty.
+ * The negative bottom margin cancels the page gap so the hidden state leaves no empty space.
+ */
+const UnsavedBanner = styled.div<{ $visible: boolean }>`
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  border-radius: 10px;
+  border: solid rgba(251, 191, 36, 0.35);
+  background: rgba(30, 27, 17, 0.92);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  color: #fbbf24;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transform-origin: top;
+  transition: opacity 0.28s ease, transform 0.28s ease, max-height 0.28s ease,
+    padding 0.28s ease, border-width 0.28s ease, margin-bottom 0.28s ease;
+
+  max-height: ${(props) => (props.$visible ? "120px" : "0")};
+  opacity: ${(props) => (props.$visible ? 1 : 0)};
+  transform: ${(props) => (props.$visible ? "translateY(0)" : "translateY(-8px)")};
+  padding: ${(props) => (props.$visible ? "10px 16px" : "0 16px")};
+  border-width: ${(props) => (props.$visible ? "1px" : "0")};
+  margin-bottom: ${(props) => (props.$visible ? "0" : "-24px")};
+  pointer-events: ${(props) => (props.$visible ? "auto" : "none")};
+`;
+
+const PulseDot = styled.span`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fbbf24;
+  flex-shrink: 0;
+  animation: unsavedPulse 1.8s ease-out infinite;
+
+  @keyframes unsavedPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.5);
+    }
+    70% {
+      box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+    }
+  }
 `;
 
 const FileInfo = styled.div`
@@ -311,6 +366,8 @@ const LOCALE_NAMES: Record<string, string> = {  en: "English",
 export const SettingsPage: React.FC = () => {
   const t = useTranslation();
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  /** Last persisted snapshot; the form is "dirty" while it differs from this. */
+  const [baseline, setBaseline] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [settingsFilePath, setSettingsFilePath] = useState("");
   const [locales, setLocales] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -335,6 +392,13 @@ export const SettingsPage: React.FC = () => {
     loadStrings().then((payload) => setLocales(payload.available)).catch(() => setLocales([]));
   }, []);
 
+  /** Applies a backend payload and treats it as the new saved baseline. */
+  const applyPayload = (payload: SettingsPayload) => {
+    setSettings(payload.settings);
+    setBaseline(payload.settings);
+    setSettingsFilePath(payload.settingsFilePath);
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -343,8 +407,7 @@ export const SettingsPage: React.FC = () => {
         const payload = await loadSettings();
         if (cancelled) return;
 
-        setSettings(payload.settings);
-        setSettingsFilePath(payload.settingsFilePath);
+        applyPayload(payload);
         setError(null);
       } catch (err) {
         if (cancelled) return;
@@ -365,8 +428,7 @@ export const SettingsPage: React.FC = () => {
     return Native.on((message) => {
       const event = message as { type?: string; data?: SettingsPayload };
       if (event.type === "settings.changed" && event.data) {
-        setSettings(event.data.settings);
-        setSettingsFilePath(event.data.settingsFilePath);
+        applyPayload(event.data);
       }
     });
   }, []);
@@ -385,8 +447,7 @@ export const SettingsPage: React.FC = () => {
     setError(null);
     try {
       const payload = await saveSettings(settings);
-      setSettings(payload.settings);
-      setSettingsFilePath(payload.settingsFilePath);
+      applyPayload(payload);
       flashSaved();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -400,8 +461,7 @@ export const SettingsPage: React.FC = () => {
     setError(null);
     try {
       const payload = await resetSettings();
-      setSettings(payload.settings);
-      setSettingsFilePath(payload.settingsFilePath);
+      applyPayload(payload);
       flashSaved();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -411,6 +471,11 @@ export const SettingsPage: React.FC = () => {
   };
 
   const busy = loading || saving;
+  // Language is applied immediately, so it is part of the baseline and never counts as dirty.
+  const unsaved = useMemo(
+      () => !loading && JSON.stringify(settings) !== JSON.stringify(baseline),
+      [settings, baseline, loading]
+  );
 
   const updateBrowser = (id: string, patch: Partial<BrowserEntry>) => {
     setSettings((prev) => ({
@@ -525,8 +590,7 @@ export const SettingsPage: React.FC = () => {
     setError(null);
     try {
       const payload = await saveSettings(next);
-      setSettings(payload.settings);
-      setSettingsFilePath(payload.settingsFilePath);
+      applyPayload(payload);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -534,6 +598,11 @@ export const SettingsPage: React.FC = () => {
 
   return (
       <PageContainer $maxWidth={800}>
+        <UnsavedBanner $visible={unsaved}>
+          <PulseDot/>
+          <span>{t("settings.unsaved")}</span>
+        </UnsavedBanner>
+
         {error && (
             <ErrorBanner>
               <AlertTriangleIcon size={16}/>

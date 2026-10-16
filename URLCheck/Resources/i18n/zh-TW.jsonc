@@ -65,6 +65,7 @@
   "settings.loading": "載入中...",
   "settings.reset": "回復預設值",
   "settings.saved": "設定已儲存",
+  "settings.unsaved": "有尚未儲存的變更",
   "settings.fileInfo": "設定由 C# 後端保存在：",
   "settings.yes": "是",
   "settings.no": "否",
