@@ -120,7 +120,7 @@ const TopBar = styled.div`
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 0 6px;
+    padding: 0 2px 0 6px;
 `;
 
 const CloseButton = styled.button`
@@ -727,6 +727,15 @@ export const PopupPage: React.FC = () => {
     const [autoStrip] = useState(() => readPopupFlag("strip"));
     /* The URL-cleaning rules come from the backend: the embedded list plus every enabled filter list. */
     const [rules, setRules] = useState<CompiledRules | null>(null);
+
+    /**
+     * Cleans a URL with the filter lists, but only when the setting asks for it. Untouched URLs are
+     * returned as they are, so a URL without tracking parameters is never re-serialized.
+     */
+    const cleanUrl = (value: string) =>
+        autoStrip && rules && trackingParamKeys(value, rules).length > 0
+            ? stripTrackingParams(value, rules)
+            : value;
     const [error, setError] = useState<string | null>(null);
     const [open, setOpen] = useState<SectionState>({domain: false, parameters: false, fragment: false});
 
@@ -806,10 +815,8 @@ export const PopupPage: React.FC = () => {
 
     /* tracking parameters are stripped as soon as the popup opens, unless the setting turns it off */
     useEffect(() => {
-        if (!autoStrip || !rules) return;
-
-        const stripped = stripTrackingParams(initialUrl, rules);
-        if (stripped !== initialUrl) dispatch({type: "commit", value: stripped});
+        const cleaned = cleanUrl(initialUrl);
+        if (cleaned !== initialUrl) dispatch({type: "commit", value: cleaned});
     }, [initialUrl, autoStrip, rules]);
 
     /* keep the window sized to its content */
@@ -898,9 +905,10 @@ export const PopupPage: React.FC = () => {
         try {
             const result = await checkStatus(url, userAgentId);
             // The pill reports the response's own status — a redirect shows the exact 3xx it is — and
-            // the URL box moves straight to the target. The edit history keeps the original, so the
-            // jump needs no confirmation.
-            if (result.location) dispatch({type: "commit", value: result.location});
+            // the URL box moves straight to the target. That target is cleaned the same way the
+            // initial URL is, and the edit history keeps the original, so the jump needs no
+            // confirmation.
+            if (result.location) dispatch({type: "commit", value: cleanUrl(result.location)});
             setStatus(result);
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
