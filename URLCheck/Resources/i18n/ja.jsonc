@@ -66,6 +66,7 @@
   "settings.reset": "既定値に戻す",
   "settings.saved": "設定を保存しました",
   "settings.unsaved": "未保存の変更があります",
+  "settings.discard": "変更を破棄",
   "settings.fileInfo": "設定は C# バックエンドが次に保存します:",
   "settings.yes": "はい",
   "settings.no": "いいえ",

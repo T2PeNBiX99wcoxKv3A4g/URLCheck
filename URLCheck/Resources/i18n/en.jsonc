@@ -71,6 +71,7 @@
   "settings.reset": "Reset to Defaults",
   "settings.saved": "Settings saved successfully",
   "settings.unsaved": "You have unsaved changes",
+  "settings.discard": "Discard Changes",
   "settings.fileInfo": "Settings are persisted by the C# backend at:",
   "settings.yes": "yes",
   "settings.no": "no",

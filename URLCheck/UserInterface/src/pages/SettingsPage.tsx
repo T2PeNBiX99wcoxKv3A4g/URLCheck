@@ -113,6 +113,41 @@ const ResetButton = styled(BaseButton)`
   }
 `;
 
+/**
+ * Reverts the form to the last saved snapshot. It sits next to Save and only exists while there
+ * are unsaved edits: the collapsed state animates down to zero width and cancels the row gap so it
+ * leaves no trace.
+ */
+const DiscardButton = styled(BaseButton)<{ $visible: boolean }>`
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: solid rgba(239, 68, 68, 0.35);
+  white-space: nowrap;
+  overflow: hidden;
+  flex-shrink: 0;
+  transform-origin: left center;
+
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.24);
+    color: #fca5a5;
+  }
+
+  &:disabled {
+    opacity: ${(props) => (props.$visible ? 0.55 : 0)};
+  }
+
+  max-width: ${(props) => (props.$visible ? "240px" : "0")};
+  padding: ${(props) => (props.$visible ? "10px 24px" : "0")};
+  border-width: ${(props) => (props.$visible ? "1px" : "0")};
+  margin-left: ${(props) => (props.$visible ? "0" : "-10px")};
+  opacity: ${(props) => (props.$visible ? 1 : 0)};
+  transform: ${(props) => (props.$visible ? "translateX(0)" : "translateX(-8px)")};
+  pointer-events: ${(props) => (props.$visible ? "auto" : "none")};
+  transition: max-width 0.28s ease, padding 0.28s ease, border-width 0.28s ease,
+    margin-left 0.28s ease, opacity 0.28s ease, transform 0.28s ease, background 0.15s ease,
+    color 0.15s ease;
+`;
+
 const Toast = styled.div`
   display: inline-flex;
   align-items: center;
@@ -454,6 +489,12 @@ export const SettingsPage: React.FC = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  /** Throws away the edits and restores the last saved snapshot. */
+  const handleDiscard = () => {
+    setSettings(baseline);
+    setError(null);
   };
 
   const handleReset = async () => {
@@ -829,6 +870,9 @@ export const SettingsPage: React.FC = () => {
           <SaveButton onClick={handleSave} disabled={busy}>
             {loading ? t("settings.loading") : saving ? t("settings.saving") : t("settings.save")}
           </SaveButton>
+          <DiscardButton $visible={unsaved} type="button" onClick={handleDiscard} disabled={busy}>
+            {t("settings.discard")}
+          </DiscardButton>
           <ResetButton onClick={handleReset} disabled={busy}>
             {t("settings.reset")}
           </ResetButton>
