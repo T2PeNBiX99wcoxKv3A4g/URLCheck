@@ -93,7 +93,7 @@
   "settings.startup": "起動",
   "settings.startupDescription": "URLCheck をシステムと一緒に起動する方法。",
   "settings.startWithSession": "システム起動時に開始",
-  "settings.startWithSessionDescription": "ユーザー アカウントのスタートアップ フォルダーにショートカットを追加し、リンクをクリックしたときに URLCheck がすでに実行されているようにします。チェックを外すと削除されます。",
+  "settings.startWithSessionDescription": "URLCheck をログイン時の起動に登録し、リンクをクリックしたときにすでに実行されているようにします。チェックを外すと削除されます。",
   "settings.hideOnLaunch": "起動時に隠す",
   "settings.hideOnLaunchDescription": "起動時にメイン ウィンドウを表示しません。検査ポップアップは通常どおり表示されます。トレイ アイコンが必要で、リンクから起動した場合は適用されません。",
   "settings.autoStripTracking": "開いたときにトラッキング パラメーターを削除",

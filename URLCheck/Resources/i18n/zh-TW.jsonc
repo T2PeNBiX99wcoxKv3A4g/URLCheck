@@ -93,7 +93,7 @@
   "settings.startup": "開機啟動",
   "settings.startupDescription": "URLCheck 隨系統啟動的方式。",
   "settings.startWithSession": "隨系統啟動",
-  "settings.startWithSessionDescription": "在使用者帳戶的「啟動」資料夾加入捷徑，這樣點連結時 URLCheck 已經在執行。取消勾選會移除該捷徑。",
+  "settings.startWithSessionDescription": "把 URLCheck 註冊為隨登入啟動，這樣點連結時它已經在執行。取消勾選會移除該項目。",
   "settings.hideOnLaunch": "啟動時隱藏",
   "settings.hideOnLaunchDescription": "啟動時不顯示主視窗；檢查彈窗仍會正常出現。需要系統匣圖示，且由連結啟動時一律不適用。",
   "settings.autoStripTracking": "開啟時自動清理追蹤參數",

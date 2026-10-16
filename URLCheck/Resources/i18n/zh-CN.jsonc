@@ -93,7 +93,7 @@
   "settings.startup": "开机启动",
   "settings.startupDescription": "URLCheck 随系统启动的方式。",
   "settings.startWithSession": "随系统启动",
-  "settings.startWithSessionDescription": "在用户账户的“启动”文件夹添加快捷方式，这样点击链接时 URLCheck 已经在运行。取消勾选会移除该快捷方式。",
+  "settings.startWithSessionDescription": "把 URLCheck 注册为随登录启动，这样点击链接时它已经在运行。取消勾选会移除该项。",
   "settings.hideOnLaunch": "启动时隐藏",
   "settings.hideOnLaunchDescription": "启动时不显示主窗口；检查弹窗仍会正常出现。需要托盘图标，且由链接启动时一律不适用。",
   "settings.autoStripTracking": "打开时自动清理跟踪参数",

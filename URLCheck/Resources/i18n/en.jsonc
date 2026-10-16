@@ -98,7 +98,7 @@
   "settings.startup": "Startup",
   "settings.startupDescription": "How URLCheck starts together with the system.",
   "settings.startWithSession": "Start with the system",
-  "settings.startWithSessionDescription": "Adds a shortcut to your user account's Startup folder, so URLCheck is already running when a link is clicked. Unchecking removes it again.",
+  "settings.startWithSessionDescription": "Registers URLCheck to start with your session, so it is already running when a link is clicked. Unchecking removes it again.",
   "settings.hideOnLaunch": "Start hidden",
   "settings.hideOnLaunchDescription": "Launch without showing the management window; the inspection popup still appears. Needs the tray icon, and never applies when a link started the app.",
   "settings.autoStripTracking": "Strip tracking parameters on open",

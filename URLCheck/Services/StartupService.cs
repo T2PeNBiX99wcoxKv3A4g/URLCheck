@@ -1,4 +1,4 @@
-using System.Runtime.Versioning;
+using System.Text;
 using JetBrains.Annotations;
 using Serilog;
 using URLCheck.Messaging;
@@ -7,28 +7,36 @@ using URLCheck.Platform;
 namespace URLCheck.Services;
 
 /// <summary>
-///     Adds or removes the per-user startup shortcut. Nothing is stored in the settings: the
-///     shortcut's presence <em>is</em> the state, exactly like the shell's own Startup folder, so
-///     removing the file by hand turns the feature off too.
+///     Registers URLCheck to start with the user's session. Nothing is stored in the settings: the
+///     autostart entry's presence <em>is</em> the state, so deleting the file by hand turns the
+///     feature off too.
 /// </summary>
+/// <remarks>
+///     Windows uses a shortcut in the per-user Startup folder; the freedesktop desktops (KDE, GNOME,
+///     XFCE, ...) use the XDG autostart directory, which is the same mechanism their own settings
+///     panels write to.
+/// </remarks>
 [PublicAPI]
 internal sealed class StartupService
 {
     private const string ShortcutName = "URLCheck.lnk";
+    private const string DesktopEntryName = "URLCheck.desktop";
 
-    private readonly string _shortcutPath;
+    private readonly string _entryPath;
 
     public StartupService()
     {
-        _shortcutPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.Startup), ShortcutName);
+        _entryPath = OperatingSystem.IsWindows()
+            ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), ShortcutName)
+            : Path.Combine(ConfigHome(), "autostart", DesktopEntryName);
+
         NativeBridge.MessageReceived += HandleMessageAsync;
     }
 
-    /// <summary>Only Windows has a per-user Startup folder this app can drop a shortcut into.</summary>
-    public static bool IsSupported => OperatingSystem.IsWindows();
+    /// <summary>True on the platforms that have a per-user autostart location we can write to.</summary>
+    public static bool IsSupported => OperatingSystem.IsWindows() || OperatingSystem.IsLinux();
 
-    private bool IsEnabled => IsSupported && File.Exists(_shortcutPath);
+    private bool IsEnabled => IsSupported && File.Exists(_entryPath);
 
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch
     {
@@ -50,33 +58,56 @@ internal sealed class StartupService
         try
         {
             if (enabled)
-            {
-                if (OperatingSystem.IsWindows()) Create();
-            }
-            else if (File.Exists(_shortcutPath))
-            {
-                File.Delete(_shortcutPath);
-            }
+                Create();
+            else if (File.Exists(_entryPath))
+                File.Delete(_entryPath);
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "Failed to update the startup shortcut");
+            Log.Warning(ex, "Failed to update the autostart entry");
         }
 
         return context.Reply("app.setStartup.result", new StartupPayload(IsSupported, IsEnabled));
     }
 
-    [SupportedOSPlatform("windows")]
     private void Create()
     {
         var executable = Environment.ProcessPath;
         if (string.IsNullOrEmpty(executable))
         {
-            Log.Warning("Cannot create the startup shortcut: the executable path is unknown");
+            Log.Warning("Cannot create the autostart entry: the executable path is unknown");
             return;
         }
 
-        WindowsShortcut.Create(_shortcutPath, executable, "", Path.GetDirectoryName(executable) ?? "",
-            Constants.WindowTitle);
+        if (OperatingSystem.IsWindows())
+            WindowsShortcut.Create(_entryPath, executable, "", Path.GetDirectoryName(executable) ?? "",
+                Constants.WindowTitle);
+        else
+            WriteDesktopEntry(executable);
+    }
+
+    private void WriteDesktopEntry(string executable)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(_entryPath)!);
+
+        // Quoted because an installation path may contain spaces.
+        File.WriteAllText(_entryPath, $"""
+            [Desktop Entry]
+            Type=Application
+            Name={Constants.WindowTitle}
+            Comment={Constants.WindowTitle}
+            Exec="{executable}"
+            Terminal=false
+            X-GNOME-Autostart-enabled=true
+            """, Encoding.UTF8);
+    }
+
+    /// <summary>The XDG config directory, which is where autostart entries live.</summary>
+    private static string ConfigHome()
+    {
+        var configured = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+        return string.IsNullOrEmpty(configured)
+            ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config")
+            : configured;
     }
 }
