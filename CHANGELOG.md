@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.1.1..v0.1.2) - 2026-10-16
+
+### ⚙️ Miscellaneous Tasks
+
+- New website build - ([2c6aae2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2c6aae284f559bab59afa51a01b138e52b840ac4))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([5722fb4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5722fb4c2759543b412bae126622cd55fb52156a))
+
+
 ## [0.1.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.1.0..v0.1.1) - 2026-10-16
 
 ### 🐛 Bug Fixes
