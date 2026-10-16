@@ -36,18 +36,16 @@ installed for them. What the operating system still has to provide:
 
 ### Windows
 
-- Windows 10 or later. That is the floor for both .NET 10 and the current WebView2 Runtime, so
-  Windows 7 and 8.1 are out.
-- The Microsoft Edge **WebView2 Runtime**. This is the web view, and it is a separate component
-  from the operating system: it ships with Windows 11 and comes with Microsoft Edge on Windows 10,
-  so most machines already have it. If the app refuses to start, install it from
+1. The Microsoft Edge **WebView2 Runtime**. If you are not using Windows 11, you need it.
   [Microsoft's page](https://developer.microsoft.com/microsoft-edge/webview2/).
+2. Any Windows version lower than 11 is not supported.
+   You need to fix by yourself.
 
 ### Linux
 
-- The web view and GTK libraries, listed below.
-- An AppIndicator library, for the tray icon only.
-- Tested on **Fedora 44 with KDE Plasma on Wayland**. Every other distribution is untested, and the
+1. The web view for GTK.
+2. An AppIndicator library, for the tray icon only.
+3. Only tested on **Fedora 44 with KDE Plasma on Wayland**. Every other distribution is untested, and the
   runtime libraries are the fiddly part, so start from the libraries rather than the package names.
 
 | Distribution    | Packages                                                          |
@@ -134,4 +132,4 @@ its own windows, so a few things behave differently there than on Windows or X11
 Neither is a bug in URLCheck; both are limitations of the protocol.
 
 If you are a super nerd running something like an old window manager on X11, you should fix it
-yourself and send a pull request.
+by yourself and send a pull request.
