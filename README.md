@@ -19,7 +19,7 @@ desktop version.
 - **Intercept links** — installed as the default handler for `http`/`https`, so every clicked
   link passes through the popup. Stays resident in the tray.
 - **Inspect before opening** — a borderless popup that fits its own content, on top of the
-  other windows, showing the URL broken into scheme, host, parameters and fragment.
+  other windows, showing the URL broken into scheme, host, parameters, and fragment.
 - **Clean the URL** — edit or remove any query parameter, clear the fragment, drop the whole
   parameter list, or strip well-known tracking parameters in one click.
 - **Check before trusting** — ask for the HTTP status of the URL (following redirects), or step
@@ -128,8 +128,10 @@ problem. They roll daily and the last seven are kept.
 Tested on Fedora 44, KDE Plasma, Wayland. Wayland deliberately does not let an application place
 its own windows, so a few things behave differently there than on Windows or X11:
 
-- the popup cannot be forced to the centre of the screen — the compositor positions it, usually
+- the popup cannot be forced to the center of the screen — the compositor positions it, usually
   relative to the main window;
 - always-on-top is a no-op, because the GTK Wayland backend has no implementation for it.
+
+You can make popup windows to always-on-top and forced to the center of the screen in KWin if you on KDE Plasma.
 
 Neither is a bug in URLCheck; both are limitations of the protocol.
