@@ -62,7 +62,7 @@ const StyledRange = styled.div`
     color: #60a5fa;
     min-width: 50px;
     text-align: right;
-    font-family: monospace;
+    font-family: var(--font-mono);
   }
 `;
 
@@ -143,7 +143,7 @@ const FileInfo = styled.div`
 
   code {
     color: #9ca3af;
-    font-family: monospace;
+    font-family: var(--font-mono);
     word-break: break-all;
   }
 `;
@@ -180,12 +180,12 @@ const ListInput = styled.input`
 
   &.path {
     flex: 1;
-    font-family: monospace;
+    font-family: var(--font-mono);
   }
 
   &.args {
     flex: 0 0 160px;
-    font-family: monospace;
+    font-family: var(--font-mono);
   }
 `;
 

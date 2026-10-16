@@ -124,7 +124,7 @@ const UrlLink = styled.button`
     border: none;
     padding: 0;
     font: inherit;
-    font-family: monospace;
+    font-family: var(--font-mono);
     color: #60a5fa;
     text-align: left;
     word-break: break-all;

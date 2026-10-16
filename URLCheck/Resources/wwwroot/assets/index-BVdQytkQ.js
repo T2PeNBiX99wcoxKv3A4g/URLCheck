@@ -134,7 +134,7 @@ Error generating stack: `+e.message+`
     border: none;
     padding: 0;
     font: inherit;
-    font-family: monospace;
+    font-family: var(--font-mono);
     color: #60a5fa;
     text-align: left;
     word-break: break-all;
@@ -340,7 +340,7 @@ Error generating stack: `+e.message+`
     color: #60a5fa;
     min-width: 50px;
     text-align: right;
-    font-family: monospace;
+    font-family: var(--font-mono);
   }
 `,Ki=F.div`
   display: flex;
@@ -407,7 +407,7 @@ Error generating stack: `+e.message+`
 
   code {
     color: #9ca3af;
-    font-family: monospace;
+    font-family: var(--font-mono);
     word-break: break-all;
   }
 `,$i=F.div`
@@ -438,12 +438,12 @@ Error generating stack: `+e.message+`
 
   &.path {
     flex: 1;
-    font-family: monospace;
+    font-family: var(--font-mono);
   }
 
   &.args {
     flex: 0 0 160px;
-    font-family: monospace;
+    font-family: var(--font-mono);
   }
 `,na=F.button`
   padding: 8px 14px;
@@ -623,7 +623,7 @@ Error generating stack: `+e.message+`
 `,xa=F.span`
     font-size: 0.75rem;
     color: #6b7280;
-    font-family: monospace;
+    font-family: var(--font-mono);
 `,Sa=({currentTab:e,onSelectTab:t})=>{let n=Br(),[r,i]=(0,_.useState)(null);return(0,_.useEffect)(()=>{$r().then(e=>i(e.version)).catch(()=>i(null))},[]),(0,I.jsxs)(fa,{children:[(0,I.jsxs)(pa,{children:[(0,I.jsx)(ma,{children:(0,I.jsx)(ur,{size:40})}),(0,I.jsxs)(ha,{children:[(0,I.jsx)(ga,{children:`URLCheck`}),(0,I.jsx)(_a,{children:n(`app.tagline`)})]})]}),(0,I.jsx)(va,{children:la.map(r=>{let i=r.icon;return(0,I.jsxs)(ya,{$active:e===r.id,onClick:()=>t(r.id),children:[(0,I.jsx)(i,{size:18}),(0,I.jsx)(`span`,{children:n(r.labelKey)})]},r.id)})}),(0,I.jsx)(ba,{children:(0,I.jsx)(xa,{children:r?`v${r}`:`…`})})]})},Ca=F.header`
   height: 64px;
   background: rgba(17, 24, 39, 0.75);
@@ -716,7 +716,7 @@ Error generating stack: `+e.message+`
     border: 1px solid ${e=>e.$warn?`rgba(245, 158, 11, 0.6)`:`rgba(255, 255, 255, 0.12)`};
     background: ${e=>e.$warn?`rgba(245, 158, 11, 0.1)`:`rgba(15, 23, 42, 0.8)`};
     color: #f9fafb;
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 0.8rem;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -787,7 +787,7 @@ Error generating stack: `+e.message+`
     border-radius: 6px;
     background: ${e=>e.$active?`rgba(59, 130, 246, 0.2)`:`transparent`};
     color: ${e=>e.$active?`#ffffff`:`#cbd5e1`};
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 0.72rem;
     cursor: pointer;
     overflow: hidden;
@@ -982,7 +982,7 @@ Error generating stack: `+e.message+`
     gap: 10px;
     padding: 4px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 0.75rem;
 `,ho=F.span`
     color: #60a5fa;

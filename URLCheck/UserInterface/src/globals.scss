@@ -1,16 +1,33 @@
 // Design Tokens & SCSS Variables (Dark Mode inspired by VPM)
-// Only fonts that ship with the OS (or that people commonly install anyway) belong in here: the
-// app bundles none of them, so an exotic name is just a dead entry in the list.
-$font-latin: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial;
-$font-family: $font-latin, sans-serif;
-$font-mono: ui-monospace, "Cascadia Mono", Consolas, "SFMono-Regular", Menlo, monospace;
 
-// Chromium picks the CJK fallback from the element's language. With a Latin-only stack it instead
-// falls back to whatever the system locale suggests, so Japanese text gets drawn with a Chinese
-// face (and the other way round) — which shows up as missing or oddly thin glyphs.
-$cjk-zh-tw: "Microsoft JhengHei UI", "Noto Sans TC", "PingFang TC";
-$cjk-zh-cn: "Microsoft YaHei UI", "Noto Sans SC", "PingFang SC";
-$cjk-ja: "Yu Gothic UI", "Noto Sans JP", "Hiragino Kaku Gothic ProN";
+// The font stacks are CSS custom properties rather than SCSS variables because the components are
+// styled-components and cannot read SCSS. Only fonts that ship with the OS (or that people commonly
+// install anyway) belong in here: the app bundles none of them.
+//
+// `--font-cjk` is kept separate because it has to be spliced in *before* the generic family:
+// Chromium picks the CJK fallback from the element's language, and a generic family would swallow
+// anything listed after it.
+html {
+  --font-cjk: sans-serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, "SFMono-Regular", Menlo, var(--font-cjk);
+
+  font-family: var(--font-sans), var(--font-cjk);
+}
+
+// Without a language of its own, Japanese text gets drawn with a Chinese face (and the other way
+// round), which shows up as missing or oddly thin glyphs.
+html:lang(zh-TW) {
+  --font-cjk: "Microsoft JhengHei UI", "Noto Sans TC", "PingFang TC";
+}
+
+html:lang(zh-CN) {
+  --font-cjk: "Microsoft YaHei UI", "Noto Sans SC", "PingFang SC";
+}
+
+html:lang(ja) {
+  --font-cjk: "Yu Gothic UI", "Noto Sans JP", "Hiragino Kaku Gothic ProN";
+}
 
 $bg-primary: #0b0f19;
 $bg-secondary: #111827;
@@ -38,24 +55,6 @@ $accent-glow: 0 0 24px rgba(99, 102, 241, 0.35);
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-html {
-  font-family: $font-family;
-}
-
-// The CJK face has to sit before the `sans-serif` generic, otherwise that generic swallows
-// everything after it and the language-specific font is never reached.
-html:lang(zh-TW) {
-  font-family: $font-latin, $cjk-zh-tw, sans-serif;
-}
-
-html:lang(zh-CN) {
-  font-family: $font-latin, $cjk-zh-cn, sans-serif;
-}
-
-html:lang(ja) {
-  font-family: $font-latin, $cjk-ja, sans-serif;
 }
 
 // No font-family here on purpose: body inherits it from html, so the :lang() rules above keep

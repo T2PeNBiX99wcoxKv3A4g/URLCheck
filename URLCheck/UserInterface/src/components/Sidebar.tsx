@@ -110,7 +110,7 @@ const FooterSection = styled.div`
 const VersionLabel = styled.span`
     font-size: 0.75rem;
     color: #6b7280;
-    font-family: monospace;
+    font-family: var(--font-mono);
 `;
 
 export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {

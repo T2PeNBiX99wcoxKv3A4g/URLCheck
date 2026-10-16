@@ -154,7 +154,7 @@ const UrlInput = styled.input<{ $warn?: boolean }>`
     border: 1px solid ${(p) => (p.$warn ? "rgba(245, 158, 11, 0.6)" : "rgba(255, 255, 255, 0.12)")};
     background: ${(p) => (p.$warn ? "rgba(245, 158, 11, 0.1)" : "rgba(15, 23, 42, 0.8)")};
     color: #f9fafb;
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 0.8rem;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -235,7 +235,7 @@ const HistoryItem = styled.button<{ $active: boolean }>`
     border-radius: 6px;
     background: ${(p) => (p.$active ? "rgba(59, 130, 246, 0.2)" : "transparent")};
     color: ${(p) => (p.$active ? "#ffffff" : "#cbd5e1")};
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 0.72rem;
     cursor: pointer;
     overflow: hidden;
@@ -479,7 +479,7 @@ const Row = styled.div`
     gap: 10px;
     padding: 4px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 0.75rem;
 `;
 
