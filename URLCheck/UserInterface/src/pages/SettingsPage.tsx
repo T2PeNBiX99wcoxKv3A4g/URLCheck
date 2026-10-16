@@ -70,6 +70,8 @@ const ActionRow = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  /* On a narrow window (or a high display scale) the buttons wrap instead of being clipped. */
+  flex-wrap: wrap;
 `;
 
 const BaseButton = styled.button`
@@ -82,6 +84,9 @@ const BaseButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  /* Keep the label on one line and let the row wrap rather than squeezing the button. */
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.2s ease;
 
   &:active:not(:disabled) {
@@ -130,9 +135,7 @@ const ResetButton = styled(BaseButton)`
  */
 const DiscardButton = styled(BaseButton)<{ $visible: boolean }>`
   ${dangerStyles}
-  white-space: nowrap;
   overflow: hidden;
-  flex-shrink: 0;
   transform-origin: left center;
 
   &:disabled {
@@ -142,7 +145,8 @@ const DiscardButton = styled(BaseButton)<{ $visible: boolean }>`
   max-width: ${(props) => (props.$visible ? "240px" : "0")};
   padding: ${(props) => (props.$visible ? "10px 24px" : "0")};
   border-width: ${(props) => (props.$visible ? "1px" : "0")};
-  margin-left: ${(props) => (props.$visible ? "0" : "-10px")};
+  /* Collapsed, the item still sits between two 12px gaps; cancel one so the pair looks like one. */
+  margin-left: ${(props) => (props.$visible ? "0" : "-12px")};
   opacity: ${(props) => (props.$visible ? 1 : 0)};
   transform: ${(props) => (props.$visible ? "translateX(0)" : "translateX(-8px)")};
   pointer-events: ${(props) => (props.$visible ? "auto" : "none")};
