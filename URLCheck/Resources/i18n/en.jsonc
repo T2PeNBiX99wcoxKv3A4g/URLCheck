@@ -93,6 +93,7 @@
   "popup.checkStatus": "Check status",
   "popup.userAgentTooltip": "User-Agent sent with the status and redirect checks",
   "popup.checking": "Checking...",
+  "popup.redirected": "Redirected",
   "popup.tracking": "Tracking",
   "popup.removeTrackingTooltip": "Remove tracking parameters",
   "popup.httpWarning": "Insecure http:// — switch to https",

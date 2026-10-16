@@ -954,10 +954,17 @@ export const PopupPage: React.FC = () => {
                         ? "info"
                         : "error";
 
+    /* A followed redirect says so, rather than repeating the server's "Found"/"Moved Permanently". */
+    const statusDetail = status?.location
+        ? t("popup.redirected")
+        : status?.statusText === "error.timeout"
+                ? t("error.timeout")
+                : status?.statusText;
+
     const statusText = statusBusy
         ? t("popup.checking")
         : status
-                ? `${status.statusCode || "!"} ${status.statusText === "error.timeout" ? t("error.timeout") : status.statusText}`.trim()
+                ? `${status.statusCode || "!"} ${statusDetail ?? ""}`.trim()
                 : t("popup.checkStatus");
 
     const StatusIcon = tone === "ok" ? CheckCircleIcon : tone === "error" ? XCircleIcon : AlertTriangleIcon;

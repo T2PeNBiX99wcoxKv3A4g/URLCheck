@@ -87,6 +87,7 @@
   "popup.checkStatus": "檢查狀態",
   "popup.userAgentTooltip": "狀態與重新導向檢查時送出的 User-Agent",
   "popup.checking": "檢查中...",
+  "popup.redirected": "已跳轉",
   "popup.tracking": "跟蹤",
   "popup.removeTrackingTooltip": "移除跟蹤參數",
   "popup.httpWarning": "不安全的 http:// — 改用 https",

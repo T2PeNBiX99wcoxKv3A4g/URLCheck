@@ -87,6 +87,7 @@
   "popup.checkStatus": "状態を確認",
   "popup.userAgentTooltip": "ステータス確認とリダイレクト確認で送信する User-Agent",
   "popup.checking": "確認中...",
+  "popup.redirected": "リダイレクト済み",
   "popup.tracking": "トラッキング",
   "popup.removeTrackingTooltip": "トラッキング パラメータを削除",
   "popup.httpWarning": "安全でない http:// — https に切り替えてください",
