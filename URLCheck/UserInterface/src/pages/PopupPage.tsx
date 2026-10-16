@@ -19,6 +19,7 @@ import {
     TrashIcon,
     XCircleIcon,
 } from "../components/Icons";
+import {Dropdown, DropdownItem, DropdownMenu} from "../components/Dropdown";
 
 /* ------------------------------------------------------------------ history */
 
@@ -213,45 +214,6 @@ const SmallButton = styled.button`
     }
 `;
 
-const HistoryMenu = styled.div`
-    position: absolute;
-    top: calc(100% + 5px);
-    left: 0;
-    right: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    background: #111827;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 9px;
-    padding: 5px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-    z-index: 30;
-    animation: ${fadeIn} 0.15s ease;
-`;
-
-const HistoryItem = styled.button<{ $active: boolean }>`
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 6px 8px;
-    border: none;
-    border-radius: 6px;
-    background: ${(p) => (p.$active ? "rgba(59, 130, 246, 0.2)" : "transparent")};
-    color: ${(p) => (p.$active ? "#ffffff" : "#cbd5e1")};
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    cursor: pointer;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: background 0.15s ease, color 0.15s ease;
-
-    &:hover {
-        background: rgba(59, 130, 246, 0.15);
-        color: #ffffff;
-    }
-`;
-
 const StatusPill = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
     display: flex;
     align-items: center;
@@ -343,42 +305,6 @@ const ActionButton = styled.button<{ $accent?: boolean }>`
     &:disabled {
         opacity: 0.4;
         cursor: not-allowed;
-    }
-`;
-
-const UserAgentSelect = styled.select`
-    /* Fixed height so it lines up with the action buttons. */
-    height: 30px;
-    box-sizing: border-box;
-    max-width: 150px;
-    padding: 0 6px;
-    border-radius: 7px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: #d1d5db;
-    font-size: 0.76rem;
-    line-height: 1;
-    cursor: pointer;
-    outline: none;
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-
-    &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.12);
-        color: #f9fafb;
-    }
-
-    &:focus {
-        border-color: #3b82f6;
-    }
-
-    &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
-
-    option {
-        background: #111827;
-        color: #f9fafb;
     }
 `;
 
@@ -629,42 +555,6 @@ const ArrowButton = styled.button`
     &:disabled {
         opacity: 0.55;
         cursor: not-allowed;
-    }
-`;
-
-const BrowserMenu = styled.div`
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 0;
-    min-width: 200px;
-    background: #111827;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px;
-    padding: 5px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-    z-index: 30;
-    animation: ${fadeIn} 0.15s ease;
-`;
-
-const BrowserMenuItem = styled.button`
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 7px 9px;
-    border: none;
-    border-radius: 6px;
-    background: none;
-    color: #e2e8f0;
-    font-size: 0.8rem;
-    cursor: pointer;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: background 0.15s ease, color 0.15s ease;
-
-    &:hover {
-        background: rgba(59, 130, 246, 0.18);
-        color: #ffffff;
     }
 `;
 
@@ -1046,10 +936,11 @@ export const PopupPage: React.FC = () => {
                     </SmallButton>
 
                     {historyMenuOpen && (
-                        <HistoryMenu>
+                        <DropdownMenu $stretch>
                             {history.entries.map((entry, index) => (
-                                <HistoryItem
+                                <DropdownItem
                                     key={`${index}-${entry}`}
+                                    $mono
                                     $active={index === history.index}
                                     onClick={() => {
                                         dispatch({type: "jump", index});
@@ -1057,25 +948,22 @@ export const PopupPage: React.FC = () => {
                                     }}
                                 >
                                     {entry}
-                                </HistoryItem>
+                                </DropdownItem>
                             ))}
-                        </HistoryMenu>
+                        </DropdownMenu>
                     )}
                 </Toolbar>
                 )}
 
                 <Actions>
                     {userAgents.length > 0 && (
-                        <UserAgentSelect
+                        <Dropdown
                             value={userAgentId}
                             disabled={statusBusy}
-                            onChange={(e) => setUserAgentId(e.target.value)}
+                            options={userAgents.map((agent) => ({value: agent.id, label: agent.name}))}
+                            onChange={setUserAgentId}
                             title={t("popup.userAgentTooltip")}
-                        >
-                            {userAgents.map((agent) => (
-                                <option key={agent.id} value={agent.id}>{agent.name}</option>
-                            ))}
-                        </UserAgentSelect>
+                        />
                     )}
 
                     <StatusPill $tone={tone} onClick={handleCheckStatus} disabled={statusBusy}
@@ -1226,13 +1114,13 @@ export const PopupPage: React.FC = () => {
                             ▾
                         </ArrowButton>
                         {browserMenuOpen && (
-                            <BrowserMenu>
+                            <DropdownMenu $up>
                                 {browsers.map((browser) => (
-                                    <BrowserMenuItem key={browser.id} onClick={() => handleOpen(browser.id)}>
+                                    <DropdownItem key={browser.id} onClick={() => handleOpen(browser.id)}>
                                         {browser.name}
-                                    </BrowserMenuItem>
+                                    </DropdownItem>
                                 ))}
-                            </BrowserMenu>
+                            </DropdownMenu>
                         )}
                     </SplitButton>
 

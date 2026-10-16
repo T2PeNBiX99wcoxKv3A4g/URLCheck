@@ -2,6 +2,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import styled, {css} from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
+import {Dropdown} from "../components/Dropdown";
 import {useLocale, useTranslation} from "../i18n";
 import {loadStrings} from "../api/i18n";
 import {AppSettings, BrowserEntry, UserAgentEntry} from "../types";
@@ -377,34 +378,6 @@ const WarnText = styled.div`
   font-size: 0.78rem;
   line-height: 1.4;
   color: #fbbf24;
-`;
-
-const Select = styled.select`
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(15, 23, 42, 0.75);
-  color: #f9fafb;
-  font-size: 0.875rem;
-  outline: none;
-  cursor: pointer;
-  min-width: 200px;
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-
-  &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  option {
-    background: #111827;
-    color: #f9fafb;
-  }
 `;
 
 const Checkbox = styled.input.attrs({type: "checkbox"})`
@@ -1020,15 +993,13 @@ export const SettingsPage: React.FC = () => {
               <SettingLabel>{t("settings.language")}</SettingLabel>
               <SettingDescription>{t("settings.languageDescription")}</SettingDescription>
             </SettingInfo>
-            <Select
+            <Dropdown
+                variant="form"
                 disabled={busy || locales.length === 0}
                 value={settings.language}
-                onChange={(e) => handleLanguageChange(e.target.value)}
-            >
-              {locales.map((locale) => (
-                  <option key={locale} value={locale}>{LOCALE_NAMES[locale] ?? locale}</option>
-              ))}
-            </Select>
+                options={locales.map((locale) => ({value: locale, label: LOCALE_NAMES[locale] ?? locale}))}
+                onChange={handleLanguageChange}
+            />
           </SettingRow>
 
           <SettingRow>
@@ -1069,15 +1040,13 @@ export const SettingsPage: React.FC = () => {
             <SettingInfo>
               <SettingLabel>{t("settings.userAgentDefault")}</SettingLabel>
             </SettingInfo>
-            <Select
+            <Dropdown
+                variant="form"
                 disabled={busy || settings.userAgents.length === 0}
                 value={settings.selectedUserAgentId}
-                onChange={(e) => update({selectedUserAgentId: e.target.value})}
-            >
-              {settings.userAgents.map((agent) => (
-                  <option key={agent.id} value={agent.id}>{agent.name}</option>
-              ))}
-            </Select>
+                options={settings.userAgents.map((agent) => ({value: agent.id, label: agent.name}))}
+                onChange={(selectedUserAgentId) => update({selectedUserAgentId})}
+            />
           </SettingRow>
 
           <ListEditor>

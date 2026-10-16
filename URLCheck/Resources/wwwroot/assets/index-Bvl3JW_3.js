@@ -343,7 +343,121 @@ Error generating stack: `+e.message+`
     &:active {
         transform: scale(0.97);
     }
-`,Di=[`http://www.google.com/?ref=referrer&foo=bar#tag`,`https://www.google.com/search?q=photino+net&utm_source=test&utm_medium=email`,`https://example.com/path/to/page?key=value&lang=en#section`],Oi=Di[0],ki=()=>{let e=zr(),t=fi(),[n,r]=(0,_.useState)(Oi),[i,a]=(0,_.useState)(!1),[o,s]=(0,_.useState)(!0);return(0,_.useEffect)(()=>{$r().then(s).catch(()=>s(!0))},[]),(0,I.jsxs)(Cr,{$maxWidth:820,children:[!o&&(0,I.jsxs)(Si,{children:[(0,I.jsxs)(Ci,{children:[(0,I.jsxs)(wi,{children:[(0,I.jsx)(hr,{size:16}),(0,I.jsx)(`span`,{children:e(`home.bannerTitle`)})]}),(0,I.jsx)(Ti,{children:e(`home.bannerBody`)})]}),(0,I.jsx)(Ei,{onClick:()=>t(`settings`),children:e(`home.openSettings`)})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsxs)(pi,{children:[(0,I.jsx)(lr,{size:18}),(0,I.jsx)(`span`,{children:e(`home.openTitle`)})]}),(0,I.jsx)(mi,{children:e(`home.openDescription`)}),(0,I.jsxs)(hi,{onSubmit:async e=>{e.preventDefault();let t=n.trim();if(t){a(!0);try{await Wr(t)}finally{a(!1)}}},children:[(0,I.jsxs)(gi,{children:[(0,I.jsx)(_r,{size:20}),(0,I.jsx)(_i,{type:`text`,placeholder:`https://example.com/path?key=value`,value:n,onChange:e=>r(e.target.value)})]}),(0,I.jsxs)(vi,{type:`submit`,disabled:i,children:[(0,I.jsx)(vr,{size:18}),(0,I.jsx)(`span`,{children:e(`home.open`)})]})]}),(0,I.jsxs)(yi,{children:[(0,I.jsx)(bi,{children:e(`home.samples`)}),Di.map(e=>(0,I.jsx)(xi,{type:`button`,onClick:()=>r(e),children:e},e))]})]})]})},Ai={requestTimeoutMs:5e3,userAgents:[{id:`default`,name:`Default (URLCheck)`,value:`URLCheck Desktop Agent/1.0`},{id:`chrome`,name:`Chrome (Windows)`,value:`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36`},{id:`safari`,name:`Safari (macOS)`,value:`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15`},{id:`curl`,name:`cURL`,value:`curl/8.4.0`},{id:`bot`,name:`Googlebot`,value:`Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)`}],browsers:[],language:`en`,borderlessPopup:!0,autoStripTrackingParams:!0,selectedUserAgentId:`default`},ji=`urlcheck.settings`;function Mi(e,t,n){return Math.min(Math.max(e,t),n)}function Ni(e){let t=Array.isArray(e.userAgents)&&e.userAgents.length>0?e.userAgents:Ai.userAgents;return{...e,requestTimeoutMs:Mi(e.requestTimeoutMs,1e3,15e3),userAgents:t,selectedUserAgentId:t.some(t=>t.id===e.selectedUserAgentId)?e.selectedUserAgentId:t[0].id,browsers:(Array.isArray(e.browsers)?e.browsers:[]).map(e=>({...e,arguments:e.arguments??``,useCount:e.useCount??0})),language:e.language||Ai.language,borderlessPopup:e.borderlessPopup??Ai.borderlessPopup,autoStripTrackingParams:e.autoStripTrackingParams??Ai.autoStripTrackingParams}}function Pi(){try{let e=window.localStorage.getItem(ji);if(e)return Ni({...Ai,...JSON.parse(e)})}catch(e){console.warn(`[settings] Failed to read local settings:`,e)}return{...Ai}}async function Fi(){return L.available?await L.request(`settings.get`):{settings:Pi(),settingsFilePath:`(browser localStorage)`}}async function Ii(e){let t=Ni(e);return L.available?await L.request(`settings.save`,t):(window.localStorage.setItem(ji,JSON.stringify(t)),{settings:t,settingsFilePath:`(browser localStorage)`})}async function Li(){return L.available?await L.request(`settings.reset`):(window.localStorage.removeItem(ji),{settings:{...Ai},settingsFilePath:`(browser localStorage)`})}async function Ri(){return L.available?(await L.request(`browsers.detect`)).browsers??[]:[]}async function zi(e,t,n=!1){L.available?await L.request(`popup.open`,{url:e,browserId:t,private:n}):window.open(e,`_blank`,`noopener,noreferrer`)}var Bi={lists:[],builtinRuleCount:0};async function Vi(){return L.available?await L.request(`filters.get`):Bi}async function Hi(e,t){return await L.request(`filters.add`,{name:e,url:t})}async function Ui(e){return await L.request(`filters.remove`,{id:e})}async function Wi(e,t){return await L.request(`filters.setEnabled`,{id:e,enabled:t})}async function Gi(e){return await L.request(`filters.update`,{id:e??``})}async function Ki(){return L.available?(await L.request(`filters.rules`)).rules:[]}var qi=[{name:`AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_17_TrackParam/filter.txt`,descriptionKey:`filters.catalog.adguardUrlTracking`},{name:`uBlock Origin – AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt`,descriptionKey:`filters.catalog.uboUrlTracking`},{name:`ClearURLs`,url:`https://rules1.clearurls.xyz/data.minify.json`,descriptionKey:`filters.catalog.clearUrls`},{name:`Firefox – Query Parameter Stripping`,url:`https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/query-stripping/records`,descriptionKey:`filters.catalog.firefox`}],Ji=F.div`
+`,Di=[`http://www.google.com/?ref=referrer&foo=bar#tag`,`https://www.google.com/search?q=photino+net&utm_source=test&utm_medium=email`,`https://example.com/path/to/page?key=value&lang=en#section`],Oi=Di[0],ki=()=>{let e=zr(),t=fi(),[n,r]=(0,_.useState)(Oi),[i,a]=(0,_.useState)(!1),[o,s]=(0,_.useState)(!0);return(0,_.useEffect)(()=>{$r().then(s).catch(()=>s(!0))},[]),(0,I.jsxs)(Cr,{$maxWidth:820,children:[!o&&(0,I.jsxs)(Si,{children:[(0,I.jsxs)(Ci,{children:[(0,I.jsxs)(wi,{children:[(0,I.jsx)(hr,{size:16}),(0,I.jsx)(`span`,{children:e(`home.bannerTitle`)})]}),(0,I.jsx)(Ti,{children:e(`home.bannerBody`)})]}),(0,I.jsx)(Ei,{onClick:()=>t(`settings`),children:e(`home.openSettings`)})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsxs)(pi,{children:[(0,I.jsx)(lr,{size:18}),(0,I.jsx)(`span`,{children:e(`home.openTitle`)})]}),(0,I.jsx)(mi,{children:e(`home.openDescription`)}),(0,I.jsxs)(hi,{onSubmit:async e=>{e.preventDefault();let t=n.trim();if(t){a(!0);try{await Wr(t)}finally{a(!1)}}},children:[(0,I.jsxs)(gi,{children:[(0,I.jsx)(_r,{size:20}),(0,I.jsx)(_i,{type:`text`,placeholder:`https://example.com/path?key=value`,value:n,onChange:e=>r(e.target.value)})]}),(0,I.jsxs)(vi,{type:`submit`,disabled:i,children:[(0,I.jsx)(vr,{size:18}),(0,I.jsx)(`span`,{children:e(`home.open`)})]})]}),(0,I.jsxs)(yi,{children:[(0,I.jsx)(bi,{children:e(`home.samples`)}),Di.map(e=>(0,I.jsx)(xi,{type:`button`,onClick:()=>r(e),children:e},e))]})]})]})},Ai=Un`
+    from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+`,ji=Un`
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+`,Mi=F.div`
+    position: absolute;
+    ${e=>e.$up?`bottom: calc(100% + 6px);`:`top: calc(100% + 5px);`}
+    left: 0;
+    ${e=>e.$stretch?`right: 0;`:`min-width: 200px;`}
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 5px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #111827;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    z-index: 30;
+    transform-origin: ${e=>e.$up?`bottom`:`top`};
+    animation: ${e=>e.$up?Ai:ji} 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+`,Ni=F.button`
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 7px 9px;
+    border: none;
+    border-radius: 6px;
+    background: ${e=>e.$active?`rgba(59, 130, 246, 0.2)`:`transparent`};
+    color: ${e=>e.$active?`#ffffff`:`#e2e8f0`};
+    font-size: ${e=>e.$mono?`0.72rem`:`0.8rem`};
+    font-family: ${e=>e.$mono?`var(--font-mono)`:`inherit`};
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: rgba(59, 130, 246, 0.18);
+        color: #ffffff;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+`,Pi=F.div`
+    position: relative;
+    display: inline-flex;
+`,Fi=F.button`
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.2s ease;
+
+    ${e=>e.$variant===`compact`?`
+        height: 30px;
+        max-width: 170px;
+        padding: 0 8px;
+        border-radius: 7px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #d1d5db;
+        font-size: 0.76rem;
+        line-height: 1;
+    `:`
+        min-width: 200px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(15, 23, 42, 0.75);
+        color: #f9fafb;
+        font-size: 0.875rem;
+    `}
+
+    &:hover:not(:disabled) {
+        ${e=>e.$variant===`compact`?`background: rgba(255, 255, 255, 0.12); color: #f9fafb;`:`border-color: rgba(255, 255, 255, 0.24);`}
+    }
+
+    &:focus-visible {
+        border-color: #3b82f6;
+        ${e=>e.$variant===`form`?`box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);`:``}
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+`,Ii=F.span`
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+`,Li=F.span`
+    flex-shrink: 0;
+    font-size: 0.7em;
+    opacity: 0.75;
+    transition: transform 0.18s ease;
+    transform: rotate(${e=>e.$open?`180deg`:`0`});
+`,Ri=({value:e,options:t,onChange:n,variant:r=`compact`,up:i,disabled:a,title:o})=>{let[s,c]=(0,_.useState)(!1),l=(0,_.useRef)(null);(0,_.useEffect)(()=>{if(!s)return;let e=e=>{l.current?.contains(e.target)||c(!1)},t=e=>{e.key===`Escape`&&c(!1)};return document.addEventListener(`mousedown`,e),document.addEventListener(`keydown`,t),()=>{document.removeEventListener(`mousedown`,e),document.removeEventListener(`keydown`,t)}},[s]);let u=t.find(t=>t.value===e)?.label??e;return(0,I.jsxs)(Pi,{ref:l,children:[(0,I.jsxs)(Fi,{type:`button`,$variant:r,disabled:a,title:o,"aria-haspopup":`listbox`,"aria-expanded":s,onClick:()=>c(e=>!e),children:[(0,I.jsx)(Ii,{children:u}),(0,I.jsx)(Li,{$open:s,children:`▾`})]}),s&&(0,I.jsx)(Mi,{$up:i,role:`listbox`,children:t.map(t=>(0,I.jsx)(Ni,{type:`button`,role:`option`,"aria-selected":t.value===e,$active:t.value===e,onClick:()=>{c(!1),n(t.value)},children:t.label},t.value))})]})},zi={requestTimeoutMs:5e3,userAgents:[{id:`default`,name:`Default (URLCheck)`,value:`URLCheck Desktop Agent/1.0`},{id:`chrome`,name:`Chrome (Windows)`,value:`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36`},{id:`safari`,name:`Safari (macOS)`,value:`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15`},{id:`curl`,name:`cURL`,value:`curl/8.4.0`},{id:`bot`,name:`Googlebot`,value:`Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)`}],browsers:[],language:`en`,borderlessPopup:!0,autoStripTrackingParams:!0,selectedUserAgentId:`default`},Bi=`urlcheck.settings`;function Vi(e,t,n){return Math.min(Math.max(e,t),n)}function Hi(e){let t=Array.isArray(e.userAgents)&&e.userAgents.length>0?e.userAgents:zi.userAgents;return{...e,requestTimeoutMs:Vi(e.requestTimeoutMs,1e3,15e3),userAgents:t,selectedUserAgentId:t.some(t=>t.id===e.selectedUserAgentId)?e.selectedUserAgentId:t[0].id,browsers:(Array.isArray(e.browsers)?e.browsers:[]).map(e=>({...e,arguments:e.arguments??``,useCount:e.useCount??0})),language:e.language||zi.language,borderlessPopup:e.borderlessPopup??zi.borderlessPopup,autoStripTrackingParams:e.autoStripTrackingParams??zi.autoStripTrackingParams}}function Ui(){try{let e=window.localStorage.getItem(Bi);if(e)return Hi({...zi,...JSON.parse(e)})}catch(e){console.warn(`[settings] Failed to read local settings:`,e)}return{...zi}}async function Wi(){return L.available?await L.request(`settings.get`):{settings:Ui(),settingsFilePath:`(browser localStorage)`}}async function Gi(e){let t=Hi(e);return L.available?await L.request(`settings.save`,t):(window.localStorage.setItem(Bi,JSON.stringify(t)),{settings:t,settingsFilePath:`(browser localStorage)`})}async function Ki(){return L.available?await L.request(`settings.reset`):(window.localStorage.removeItem(Bi),{settings:{...zi},settingsFilePath:`(browser localStorage)`})}async function qi(){return L.available?(await L.request(`browsers.detect`)).browsers??[]:[]}async function Ji(e,t,n=!1){L.available?await L.request(`popup.open`,{url:e,browserId:t,private:n}):window.open(e,`_blank`,`noopener,noreferrer`)}var Yi={lists:[],builtinRuleCount:0};async function Xi(){return L.available?await L.request(`filters.get`):Yi}async function Zi(e,t){return await L.request(`filters.add`,{name:e,url:t})}async function Qi(e){return await L.request(`filters.remove`,{id:e})}async function $i(e,t){return await L.request(`filters.setEnabled`,{id:e,enabled:t})}async function ea(e){return await L.request(`filters.update`,{id:e??``})}async function ta(){return L.available?(await L.request(`filters.rules`)).rules:[]}var na=[{name:`AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_17_TrackParam/filter.txt`,descriptionKey:`filters.catalog.adguardUrlTracking`},{name:`uBlock Origin – AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt`,descriptionKey:`filters.catalog.uboUrlTracking`},{name:`ClearURLs`,url:`https://rules1.clearurls.xyz/data.minify.json`,descriptionKey:`filters.catalog.clearUrls`},{name:`Firefox – Query Parameter Stripping`,url:`https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/query-stripping/records`,descriptionKey:`filters.catalog.firefox`}],ra=F.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -353,18 +467,18 @@ Error generating stack: `+e.message+`
     flex-direction: column;
     align-items: flex-start;
   }
-`,Yi=F.div`
+`,ia=F.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-`,Xi=F.span`
+`,aa=F.span`
   font-size: 0.925rem;
   font-weight: 600;
   color: #f9fafb;
-`,Zi=F.span`
+`,R=F.span`
   font-size: 0.8rem;
   color: #9ca3af;
-`,Qi=F.div`
+`,z=F.div`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -389,13 +503,13 @@ Error generating stack: `+e.message+`
     text-align: right;
     font-family: var(--font-mono);
   }
-`,$i=F.div`
+`,oa=F.div`
   display: flex;
   align-items: center;
   gap: 12px;
   /* On a narrow window (or a high display scale) the buttons wrap instead of being clipped. */
   flex-wrap: wrap;
-`,ea=F.button`
+`,sa=F.button`
   padding: 10px 24px;
   border: none;
   border-radius: 8px;
@@ -419,7 +533,7 @@ Error generating stack: `+e.message+`
     cursor: not-allowed;
     box-shadow: none;
   }
-`,ta=F(ea)`
+`,ca=F(sa)`
   background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
   color: #ffffff;
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
@@ -428,7 +542,7 @@ Error generating stack: `+e.message+`
     background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
     box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
   }
-`,na=Rn`
+`,la=Rn`
   background: rgba(239, 68, 68, 0.12);
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.35);
@@ -438,10 +552,10 @@ Error generating stack: `+e.message+`
     color: #fca5a5;
     border-color: rgba(239, 68, 68, 0.5);
   }
-`,ra=F(ea)`
-  ${na}
-`,ia=F(ea)`
-  ${na}
+`,ua=F(sa)`
+  ${la}
+`,da=F(sa)`
+  ${la}
   overflow: hidden;
   transform-origin: left center;
 
@@ -460,14 +574,14 @@ Error generating stack: `+e.message+`
   transition: max-width 0.28s ease, padding 0.28s ease, border-width 0.28s ease,
     margin-left 0.28s ease, opacity 0.28s ease, transform 0.28s ease, background 0.15s ease,
     color 0.15s ease, border-color 0.15s ease;
-`,aa=F.div`
+`,fa=F.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
   color: #34d399;
   font-size: 0.85rem;
   font-weight: 500;
-`,R=F.div`
+`,pa=F.div`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -477,7 +591,7 @@ Error generating stack: `+e.message+`
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #f87171;
   font-size: 0.85rem;
-`,z=F.div`
+`,ma=F.div`
   position: sticky;
   top: 0;
   z-index: 20;
@@ -504,7 +618,7 @@ Error generating stack: `+e.message+`
   border-width: ${e=>e.$visible?`1px`:`0`};
   margin-bottom: ${e=>e.$visible?`0`:`-24px`};
   pointer-events: ${e=>e.$visible?`auto`:`none`};
-`,oa=F.span`
+`,ha=F.span`
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -523,7 +637,7 @@ Error generating stack: `+e.message+`
       box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
     }
   }
-`,sa=F.div`
+`,ga=F.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -535,15 +649,15 @@ Error generating stack: `+e.message+`
     font-family: var(--font-mono);
     word-break: break-all;
   }
-`,ca=F.div`
+`,_a=F.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-`,la=F.div`
+`,va=F.div`
   display: flex;
   align-items: center;
   gap: 8px;
-`,ua=F.input`
+`,ya=F.input`
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -573,7 +687,7 @@ Error generating stack: `+e.message+`
     flex: 0 0 160px;
     font-family: var(--font-mono);
   }
-`,da=F.button`
+`,ba=F.button`
   padding: 8px 14px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -596,7 +710,7 @@ Error generating stack: `+e.message+`
     opacity: 0.55;
     cursor: not-allowed;
   }
-`,fa=F(da)`
+`,xa=F(ba)`
   border-color: rgba(239, 68, 68, 0.35);
   background: rgba(239, 68, 68, 0.12);
   color: #f87171;
@@ -605,7 +719,7 @@ Error generating stack: `+e.message+`
     background: rgba(239, 68, 68, 0.24);
     color: #fca5a5;
   }
-`,pa=F.button`
+`,Sa=F.button`
   background: none;
   border: none;
   cursor: pointer;
@@ -626,48 +740,22 @@ Error generating stack: `+e.message+`
   &:active {
     transform: scale(0.94);
   }
-`,ma=F.div`
+`,Ca=F.div`
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-`,ha=F.span`
+`,wa=F.span`
   font-size: 0.78rem;
   color: #9ca3af;
-`,ga=F.div`
+`,Ta=F.div`
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 0.78rem;
   line-height: 1.4;
   color: #fbbf24;
-`,_a=F.select`
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(15, 23, 42, 0.75);
-  color: #f9fafb;
-  font-size: 0.875rem;
-  outline: none;
-  cursor: pointer;
-  min-width: 200px;
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-
-  &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  option {
-    background: #111827;
-    color: #f9fafb;
-  }
-`,va=F.input.attrs({type:`checkbox`})`
+`,Ea=F.input.attrs({type:`checkbox`})`
   width: 18px;
   height: 18px;
   accent-color: #6366f1;
@@ -682,11 +770,11 @@ Error generating stack: `+e.message+`
     opacity: 0.5;
     cursor: not-allowed;
   }
-`,ya=F.div`
+`,Da=F.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-`,ba=F.div`
+`,Oa=F.div`
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -700,41 +788,41 @@ Error generating stack: `+e.message+`
     border-color: rgba(255, 255, 255, 0.16);
     background: rgba(15, 23, 42, 0.72);
   }
-`,xa=F.div`
+`,ka=F.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
   flex: 1;
   min-width: 0;
-`,Sa=F.span`
+`,Aa=F.span`
   font-size: 0.9rem;
   font-weight: 600;
   color: #f9fafb;
   word-break: break-word;
-`,Ca=F.span`
+`,ja=F.span`
   font-size: 0.75rem;
   color: #6b7280;
   font-family: var(--font-mono);
   word-break: break-all;
-`,wa=F.span`
+`,Ma=F.span`
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   font-size: 0.75rem;
   color: #9ca3af;
-`,Ta=F.span`
+`,Na=F.span`
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 0.75rem;
   color: #f87171;
   word-break: break-word;
-`,Ea=F.div`
+`,Pa=F.div`
   display: flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
-`,Da=F.button`
+`,Fa=F.button`
   position: relative;
   width: 38px;
   height: 22px;
@@ -762,7 +850,7 @@ Error generating stack: `+e.message+`
     opacity: 0.5;
     cursor: not-allowed;
   }
-`,Oa=F.div`
+`,Ia=F.div`
   position: fixed;
   inset: 0;
   z-index: 60;
@@ -782,7 +870,7 @@ Error generating stack: `+e.message+`
       opacity: 1;
     }
   }
-`,ka=F.div`
+`,La=F.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -807,16 +895,16 @@ Error generating stack: `+e.message+`
       transform: translateY(0) scale(1);
     }
   }
-`,Aa=F.h3`
+`,Ra=F.h3`
   font-size: 1.05rem;
   font-weight: 700;
   color: #f9fafb;
-`,ja=F.div`
+`,za=F.div`
   display: flex;
   gap: 6px;
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-`,Ma=F.button`
+`,Ba=F.button`
   padding: 8px 14px;
   border: none;
   border-radius: 8px;
@@ -831,14 +919,14 @@ Error generating stack: `+e.message+`
     background: ${e=>e.$active?`rgba(59, 130, 246, 0.24)`:`rgba(255, 255, 255, 0.06)`};
     color: #f9fafb;
   }
-`,Na=F.div`
+`,Va=F.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
   max-height: 320px;
   overflow-y: auto;
   padding-right: 4px;
-`,Pa=F.div`
+`,Ha=F.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -846,20 +934,20 @@ Error generating stack: `+e.message+`
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(15, 23, 42, 0.6);
-`,Fa=F.div`
+`,Ua=F.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-`,Ia=F.span`
+`,Wa=F.span`
   font-size: 0.875rem;
   font-weight: 600;
   color: #f9fafb;
-`,La=F.span`
+`,Ga=F.span`
   font-size: 0.78rem;
   line-height: 1.5;
   color: #9ca3af;
-`,Ra=F.div`
+`,Ka=F.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -875,15 +963,15 @@ Error generating stack: `+e.message+`
     font-weight: 600;
     color: #93c5fd;
   }
-`,za=F.label`
+`,qa=F.label`
   display: flex;
   flex-direction: column;
   gap: 6px;
   font-size: 0.8rem;
   color: #9ca3af;
-`,Ba=F(ua)`
+`,Ja=F(ya)`
   width: 100%;
-`,Va={en:`English`,"zh-TW":`繁體中文`,"zh-CN":`简体中文`,ja:`日本語`},Ha=[{id:`home`,labelKey:`tabs.home.label`,titleKey:`tabs.home.title`,subtitleKey:`tabs.home.subtitle`,icon:dr,page:ki},{id:`history`,labelKey:`tabs.history.label`,titleKey:`tabs.history.title`,subtitleKey:`tabs.history.subtitle`,icon:fr,page:ui},{id:`settings`,labelKey:`tabs.settings.label`,titleKey:`tabs.settings.title`,subtitleKey:`tabs.settings.subtitle`,icon:pr,page:()=>{let e=zr(),t=Br(),[n,r]=(0,_.useState)(Ai),[i,a]=(0,_.useState)(Ai),[o,s]=(0,_.useState)(``),[c,l]=(0,_.useState)([]),[u,d]=(0,_.useState)(!0),[f,p]=(0,_.useState)(!1),[m,h]=(0,_.useState)(!1),[g,v]=(0,_.useState)(null),[y,b]=(0,_.useState)(!1),[x,S]=(0,_.useState)(!1),[C,ee]=(0,_.useState)(null),[w,te]=(0,_.useState)(null),[T,ne]=(0,_.useState)(`windows`),[re,ie]=(0,_.useState)([]),[ae,oe]=(0,_.useState)(0),[se,ce]=(0,_.useState)(!1),[E,D]=(0,_.useState)(!1),[O,le]=(0,_.useState)(`catalog`),[ue,de]=(0,_.useState)(``),[fe,pe]=(0,_.useState)(``),[me,he]=(0,_.useState)(!1);(0,_.useEffect)(()=>{Yr().then(te).catch(()=>te(null))},[]),(0,_.useEffect)(()=>{Qr().then(e=>ne(e.platform)).catch(()=>void 0)},[]),(0,_.useEffect)(()=>{Fr().then(e=>l(e.available)).catch(()=>l([]))},[]),(0,_.useEffect)(()=>{let e=!1;return Vi().then(t=>{e||ge(t)}).catch(()=>void 0),()=>{e=!0}},[]);let ge=e=>{ie(e.lists),oe(e.builtinRuleCount)},_e=e=>{r(e.settings),a(e.settings),s(e.settingsFilePath)};(0,_.useEffect)(()=>{let e=!1;return(async()=>{try{let t=await Fi();if(e)return;_e(t),v(null)}catch(t){if(e)return;v(t instanceof Error?t.message:String(t))}finally{e||d(!1)}})(),()=>{e=!0}},[]),(0,_.useEffect)(()=>L.on(e=>{let t=e;t.type===`settings.changed`&&t.data&&_e(t.data)}),[]);let ve=e=>{r(t=>({...t,...e}))},k=()=>{h(!0),setTimeout(()=>h(!1),2500)},ye=async()=>{p(!0),v(null);try{let e=await Ii(n);_e(e),k()}catch(e){v(e instanceof Error?e.message:String(e))}finally{p(!1)}},be=()=>{r(i),v(null)},A=async()=>{p(!0),v(null);try{let e=await Li();_e(e),k()}catch(e){v(e instanceof Error?e.message:String(e))}finally{p(!1)}},j=u||f,xe=(0,_.useMemo)(()=>!u&&JSON.stringify(n)!==JSON.stringify(i),[n,i,u]),Se=(e,t)=>{r(n=>({...n,browsers:n.browsers.map(n=>n.id===e?{...n,...t}:n)}))},Ce=()=>{let e=Math.random().toString(36).slice(2,10);r(t=>({...t,browsers:[...t.browsers,{id:e,name:``,executablePath:``,arguments:``,useCount:0}]}))},we=e=>{r(t=>({...t,browsers:t.browsers.filter(t=>t.id!==e)}))},M=(e,t)=>{r(n=>({...n,userAgents:n.userAgents.map(n=>n.id===e?{...n,...t}:n)}))},N=()=>{let e=Math.random().toString(36).slice(2,10);r(t=>({...t,userAgents:[...t.userAgents,{id:e,name:`Custom`,value:``}]}))},Te=e=>{r(t=>({...t,userAgents:t.userAgents.filter(t=>t.id!==e)}))},Ee=async()=>{b(!0),v(null);try{let e=await Ri();r(t=>{let n=new Set(t.browsers.map(e=>e.executablePath.toLowerCase())),r=e.filter(e=>!n.has(e.executablePath.toLowerCase()));return{...t,browsers:[...t.browsers,...r]}}),e.length===0&&ee({key:`settings.noBrowsersDetected`})}catch(e){v(e instanceof Error?e.message:String(e))}finally{b(!1)}},De=async()=>{S(!0),ee(null);try{let e=await Kr();ee({key:`settings.registeredHttp`,params:{path:e.executablePath}}),te(await Yr())}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},Oe=async()=>{S(!0),ee(null);try{let e=await qr();ee({key:`settings.registeredUrlcheck`,params:{path:e.executablePath}}),te(await Yr())}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},ke=async()=>{S(!0),ee(null);try{await Jr(),ee({key:`settings.unregistered`}),te(await Yr())}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},Ae=async()=>{S(!0);try{await Xr(),ee({key:`settings.openedDefaultApps`})}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},je=async e=>{let t={...n,language:e};r(t),v(null);try{let e=await Ii(t);_e(e)}catch(e){v(e instanceof Error?e.message:String(e))}},Me=async(e,t)=>{t(!0),v(null);try{return ge(await e()),!0}catch(e){return v(e instanceof Error?e.message:String(e)),!1}finally{t(!1)}},Ne=async(e,t)=>{await Me(()=>Hi(e,t),he)&&(D(!1),de(``),pe(``))},Pe=e=>Me(()=>Ui(e),ce),Fe=(e,t)=>Me(()=>Wi(e,t),ce);return(0,I.jsxs)(Cr,{$maxWidth:800,children:[(0,I.jsxs)(z,{$visible:xe,children:[(0,I.jsx)(oa,{}),(0,I.jsx)(`span`,{children:e(`settings.unsaved`)})]}),g&&(0,I.jsxs)(R,{children:[(0,I.jsx)(hr,{size:16}),(0,I.jsx)(`span`,{children:e(g)})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsx)(Er,{children:e(`settings.network`)}),(0,I.jsxs)(Ji,{children:[(0,I.jsxs)(Yi,{children:[(0,I.jsx)(Xi,{children:e(`settings.requestTimeout`)}),(0,I.jsx)(Zi,{children:e(`settings.requestTimeoutDescription`)})]}),(0,I.jsxs)(Qi,{children:[(0,I.jsx)(`input`,{type:`range`,min:`1000`,max:`15000`,step:`500`,disabled:j,value:n.requestTimeoutMs,onChange:e=>ve({requestTimeoutMs:Number(e.target.value)})}),(0,I.jsxs)(`span`,{children:[n.requestTimeoutMs/1e3,`s`]})]})]}),(0,I.jsxs)(Ji,{children:[(0,I.jsxs)(Yi,{children:[(0,I.jsx)(Xi,{children:e(`settings.language`)}),(0,I.jsx)(Zi,{children:e(`settings.languageDescription`)})]}),(0,I.jsx)(_a,{disabled:j||c.length===0,value:n.language,onChange:e=>je(e.target.value),children:c.map(e=>(0,I.jsx)(`option`,{value:e,children:Va[e]??e},e))})]}),(0,I.jsxs)(Ji,{children:[(0,I.jsxs)(Yi,{children:[(0,I.jsx)(Xi,{children:e(`settings.borderlessPopup`)}),(0,I.jsx)(Zi,{children:e(`settings.borderlessPopupDescription`)})]}),(0,I.jsx)(va,{disabled:j,checked:n.borderlessPopup,onChange:e=>ve({borderlessPopup:e.target.checked})})]}),(0,I.jsxs)(Ji,{children:[(0,I.jsxs)(Yi,{children:[(0,I.jsx)(Xi,{children:e(`settings.autoStripTracking`)}),(0,I.jsx)(Zi,{children:e(`settings.autoStripTrackingDescription`)})]}),(0,I.jsx)(va,{disabled:j,checked:n.autoStripTrackingParams,onChange:e=>ve({autoStripTrackingParams:e.target.checked})})]})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsx)(Er,{children:e(`settings.userAgent`)}),(0,I.jsx)(Yi,{children:(0,I.jsx)(Zi,{children:e(`settings.userAgentDescription`)})}),(0,I.jsxs)(Ji,{children:[(0,I.jsx)(Yi,{children:(0,I.jsx)(Xi,{children:e(`settings.userAgentDefault`)})}),(0,I.jsx)(_a,{disabled:j||n.userAgents.length===0,value:n.selectedUserAgentId,onChange:e=>ve({selectedUserAgentId:e.target.value}),children:n.userAgents.map(e=>(0,I.jsx)(`option`,{value:e.id,children:e.name},e.id))})]}),(0,I.jsx)(ca,{children:n.userAgents.map(t=>(0,I.jsxs)(la,{children:[(0,I.jsx)(ua,{className:`name`,placeholder:e(`settings.browserNamePlaceholder`),disabled:j,value:t.name,onChange:e=>M(t.id,{name:e.target.value})}),(0,I.jsx)(ua,{className:`path`,placeholder:e(`settings.userAgentValuePlaceholder`),disabled:j,value:t.value,onChange:e=>M(t.id,{value:e.target.value})}),(0,I.jsx)(pa,{type:`button`,title:e(`settings.removeUserAgent`),onClick:()=>Te(t.id),children:(0,I.jsx)(Sr,{size:16})})]},t.id))}),(0,I.jsx)(ma,{children:(0,I.jsx)(da,{type:`button`,onClick:N,disabled:j,children:e(`settings.addUserAgent`)})})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsx)(Er,{children:e(`settings.browsers`)}),(0,I.jsx)(Yi,{children:(0,I.jsx)(Zi,{children:e(`settings.browsersDescription`)})}),(0,I.jsx)(ca,{children:n.browsers.map(t=>(0,I.jsxs)(la,{children:[(0,I.jsx)(ua,{className:`name`,placeholder:e(`settings.browserNamePlaceholder`),disabled:j,value:t.name,onChange:e=>Se(t.id,{name:e.target.value})}),(0,I.jsx)(ua,{className:`path`,placeholder:e(`settings.browserPathPlaceholder`),disabled:j,value:t.executablePath,onChange:e=>Se(t.id,{executablePath:e.target.value})}),(0,I.jsx)(ua,{className:`args`,placeholder:e(`settings.browserArgsPlaceholder`),title:e(`settings.browserArgsTitle`),disabled:j,value:t.arguments,onChange:e=>Se(t.id,{arguments:e.target.value})}),(0,I.jsx)(pa,{type:`button`,title:e(`settings.removeBrowser`),onClick:()=>we(t.id),children:(0,I.jsx)(Sr,{size:16})})]},t.id))}),(0,I.jsxs)(ma,{children:[(0,I.jsx)(da,{type:`button`,onClick:Ce,disabled:j,children:e(`settings.addBrowser`)}),(0,I.jsx)(da,{type:`button`,onClick:Ee,disabled:j||y,children:e(y?`settings.detecting`:`settings.detectInstalled`)})]})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsx)(Er,{children:e(`settings.systemIntegration`)}),(0,I.jsx)(Yi,{children:(0,I.jsx)(Zi,{children:e(T===`windows`?`settings.systemIntegrationDescription`:`settings.systemIntegrationDescriptionLinux`)})}),(0,I.jsxs)(ma,{children:[(0,I.jsxs)(da,{type:`button`,onClick:De,disabled:x,children:[(0,I.jsx)(lr,{size:15}),e(`settings.registerHttp`)]}),(0,I.jsxs)(da,{type:`button`,onClick:Oe,disabled:x,children:[(0,I.jsx)(lr,{size:15}),e(`settings.registerUrlcheck`)]}),T===`windows`&&(0,I.jsx)(da,{type:`button`,onClick:Ae,disabled:x,children:e(`settings.openDefaultApps`)}),(0,I.jsxs)(fa,{type:`button`,onClick:ke,disabled:x,children:[(0,I.jsx)(Sr,{size:15}),e(`settings.unregister`)]})]}),w&&(0,I.jsx)(ha,{children:e(`settings.protocolStatus`,{isDefault:w.isDefault&&w.pathMatches?e(`settings.yes`):e(`settings.no`),scheme:w.customSchemeRegistered?e(`settings.yes`):e(`settings.no`)})}),w?.isDefault&&!w.pathMatches&&(0,I.jsxs)(ga,{children:[(0,I.jsx)(hr,{size:14}),(0,I.jsx)(`span`,{children:e(`settings.pathMismatch`,{path:w.registeredPath??`?`})})]}),C&&(0,I.jsx)(ha,{children:e(C.key,C.params)})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsx)(Er,{children:e(`settings.filterLists`)}),(0,I.jsx)(Yi,{children:(0,I.jsx)(Zi,{children:e(`settings.filterListsDescription`,{count:ae})})}),re.length===0?(0,I.jsx)(ha,{children:e(`settings.filterListsEmpty`)}):(0,I.jsx)(ya,{children:re.map(n=>(0,I.jsxs)(ba,{children:[(0,I.jsxs)(xa,{children:[(0,I.jsx)(Sa,{children:n.name}),(0,I.jsx)(Ca,{children:n.url}),(0,I.jsxs)(wa,{children:[(0,I.jsx)(`span`,{children:e(`settings.filterRules`,{count:n.ruleCount})}),(0,I.jsx)(`span`,{children:n.lastUpdated?e(`settings.filterUpdated`,{date:new Date(n.lastUpdated).toLocaleString(t)}):e(`settings.filterNeverUpdated`)})]}),n.error&&(0,I.jsxs)(Ta,{children:[(0,I.jsx)(hr,{size:13}),(0,I.jsx)(`span`,{children:e(n.error)})]})]}),(0,I.jsxs)(Ea,{children:[(0,I.jsx)(Da,{type:`button`,$on:n.enabled,disabled:se,"aria-pressed":n.enabled,title:e(n.enabled?`settings.filterDisable`:`settings.filterEnable`),onClick:()=>Fe(n.id,!n.enabled)}),(0,I.jsx)(pa,{type:`button`,disabled:se,title:e(`settings.removeFilterList`),onClick:()=>Pe(n.id),children:(0,I.jsx)(Sr,{size:16})})]})]},n.id))}),(0,I.jsxs)(ma,{children:[(0,I.jsx)(da,{type:`button`,disabled:se,onClick:()=>D(!0),children:e(`settings.addFilterList`)}),(0,I.jsx)(da,{type:`button`,disabled:se||re.length===0,onClick:()=>Me(()=>Gi(),ce),children:e(se?`settings.filterUpdating`:`settings.checkFilterUpdates`)})]})]}),(0,I.jsxs)($i,{children:[(0,I.jsx)(ta,{onClick:ye,disabled:j,children:e(u?`settings.loading`:f?`settings.saving`:`settings.save`)}),(0,I.jsx)(ia,{$visible:xe,type:`button`,onClick:be,disabled:j,children:e(`settings.discard`)}),(0,I.jsx)(ra,{onClick:A,disabled:j,children:e(`settings.reset`)}),m&&(0,I.jsxs)(aa,{children:[(0,I.jsx)(mr,{size:16}),(0,I.jsx)(`span`,{children:e(`settings.saved`)})]})]}),(0,I.jsxs)(sa,{children:[(0,I.jsx)(`span`,{children:e(`settings.fileInfo`)}),(0,I.jsx)(`code`,{children:o||`...`})]}),E&&(0,I.jsx)(Oa,{onClick:()=>!me&&D(!1),children:(0,I.jsxs)(ka,{onClick:e=>e.stopPropagation(),children:[(0,I.jsx)(Aa,{children:e(`settings.filterAddTitle`)}),(0,I.jsxs)(ja,{children:[(0,I.jsx)(Ma,{type:`button`,$active:O===`catalog`,onClick:()=>le(`catalog`),children:e(`settings.filterAddFromCatalog`)}),(0,I.jsx)(Ma,{type:`button`,$active:O===`custom`,onClick:()=>le(`custom`),children:e(`settings.filterAddCustom`)})]}),O===`catalog`?(0,I.jsx)(Na,{children:qi.map(t=>(0,I.jsxs)(Pa,{children:[(0,I.jsxs)(Fa,{children:[(0,I.jsx)(Ia,{children:t.name}),(0,I.jsx)(da,{type:`button`,disabled:me,onClick:()=>Ne(t.name,t.url),children:e(me?`settings.filterAdding`:`settings.filterAdd`)})]}),(0,I.jsx)(La,{children:e(t.descriptionKey)}),(0,I.jsx)(Ca,{children:t.url})]},t.url))}):(0,I.jsxs)(I.Fragment,{children:[(0,I.jsxs)(za,{children:[e(`settings.filterName`),(0,I.jsx)(Ba,{value:ue,placeholder:e(`settings.filterNamePlaceholder`),onChange:e=>de(e.target.value)})]}),(0,I.jsxs)(za,{children:[e(`settings.filterUrl`),(0,I.jsx)(Ba,{value:fe,placeholder:e(`settings.filterUrlPlaceholder`),onChange:e=>pe(e.target.value)})]}),(0,I.jsx)(ma,{children:(0,I.jsx)(da,{type:`button`,disabled:me||!ue.trim()||!fe.trim(),onClick:()=>Ne(ue,fe),children:e(me?`settings.filterAdding`:`settings.filterAdd`)})})]}),(0,I.jsxs)(Ra,{children:[(0,I.jsx)(`strong`,{children:e(`settings.filterFormatTitle`)}),(0,I.jsx)(`span`,{children:e(`settings.filterFormatBody`)})]}),(0,I.jsx)(ma,{children:(0,I.jsx)(da,{type:`button`,disabled:me,onClick:()=>D(!1),children:e(`settings.filterCancel`)})})]})})]})}}],Ua=Ha[0].id;function Wa(e){return Ha.find(t=>t.id===e)??Ha[0]}var Ga=F.aside`
+`,Ya={en:`English`,"zh-TW":`繁體中文`,"zh-CN":`简体中文`,ja:`日本語`},Xa=[{id:`home`,labelKey:`tabs.home.label`,titleKey:`tabs.home.title`,subtitleKey:`tabs.home.subtitle`,icon:dr,page:ki},{id:`history`,labelKey:`tabs.history.label`,titleKey:`tabs.history.title`,subtitleKey:`tabs.history.subtitle`,icon:fr,page:ui},{id:`settings`,labelKey:`tabs.settings.label`,titleKey:`tabs.settings.title`,subtitleKey:`tabs.settings.subtitle`,icon:pr,page:()=>{let e=zr(),t=Br(),[n,r]=(0,_.useState)(zi),[i,a]=(0,_.useState)(zi),[o,s]=(0,_.useState)(``),[c,l]=(0,_.useState)([]),[u,d]=(0,_.useState)(!0),[f,p]=(0,_.useState)(!1),[m,h]=(0,_.useState)(!1),[g,v]=(0,_.useState)(null),[y,b]=(0,_.useState)(!1),[x,S]=(0,_.useState)(!1),[C,ee]=(0,_.useState)(null),[w,te]=(0,_.useState)(null),[T,ne]=(0,_.useState)(`windows`),[re,ie]=(0,_.useState)([]),[ae,oe]=(0,_.useState)(0),[se,ce]=(0,_.useState)(!1),[E,D]=(0,_.useState)(!1),[O,le]=(0,_.useState)(`catalog`),[ue,de]=(0,_.useState)(``),[fe,pe]=(0,_.useState)(``),[me,he]=(0,_.useState)(!1);(0,_.useEffect)(()=>{Yr().then(te).catch(()=>te(null))},[]),(0,_.useEffect)(()=>{Qr().then(e=>ne(e.platform)).catch(()=>void 0)},[]),(0,_.useEffect)(()=>{Fr().then(e=>l(e.available)).catch(()=>l([]))},[]),(0,_.useEffect)(()=>{let e=!1;return Xi().then(t=>{e||ge(t)}).catch(()=>void 0),()=>{e=!0}},[]);let ge=e=>{ie(e.lists),oe(e.builtinRuleCount)},_e=e=>{r(e.settings),a(e.settings),s(e.settingsFilePath)};(0,_.useEffect)(()=>{let e=!1;return(async()=>{try{let t=await Wi();if(e)return;_e(t),v(null)}catch(t){if(e)return;v(t instanceof Error?t.message:String(t))}finally{e||d(!1)}})(),()=>{e=!0}},[]),(0,_.useEffect)(()=>L.on(e=>{let t=e;t.type===`settings.changed`&&t.data&&_e(t.data)}),[]);let ve=e=>{r(t=>({...t,...e}))},k=()=>{h(!0),setTimeout(()=>h(!1),2500)},ye=async()=>{p(!0),v(null);try{let e=await Gi(n);_e(e),k()}catch(e){v(e instanceof Error?e.message:String(e))}finally{p(!1)}},be=()=>{r(i),v(null)},A=async()=>{p(!0),v(null);try{let e=await Ki();_e(e),k()}catch(e){v(e instanceof Error?e.message:String(e))}finally{p(!1)}},j=u||f,xe=(0,_.useMemo)(()=>!u&&JSON.stringify(n)!==JSON.stringify(i),[n,i,u]),Se=(e,t)=>{r(n=>({...n,browsers:n.browsers.map(n=>n.id===e?{...n,...t}:n)}))},Ce=()=>{let e=Math.random().toString(36).slice(2,10);r(t=>({...t,browsers:[...t.browsers,{id:e,name:``,executablePath:``,arguments:``,useCount:0}]}))},we=e=>{r(t=>({...t,browsers:t.browsers.filter(t=>t.id!==e)}))},M=(e,t)=>{r(n=>({...n,userAgents:n.userAgents.map(n=>n.id===e?{...n,...t}:n)}))},N=()=>{let e=Math.random().toString(36).slice(2,10);r(t=>({...t,userAgents:[...t.userAgents,{id:e,name:`Custom`,value:``}]}))},Te=e=>{r(t=>({...t,userAgents:t.userAgents.filter(t=>t.id!==e)}))},Ee=async()=>{b(!0),v(null);try{let e=await qi();r(t=>{let n=new Set(t.browsers.map(e=>e.executablePath.toLowerCase())),r=e.filter(e=>!n.has(e.executablePath.toLowerCase()));return{...t,browsers:[...t.browsers,...r]}}),e.length===0&&ee({key:`settings.noBrowsersDetected`})}catch(e){v(e instanceof Error?e.message:String(e))}finally{b(!1)}},De=async()=>{S(!0),ee(null);try{let e=await Kr();ee({key:`settings.registeredHttp`,params:{path:e.executablePath}}),te(await Yr())}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},Oe=async()=>{S(!0),ee(null);try{let e=await qr();ee({key:`settings.registeredUrlcheck`,params:{path:e.executablePath}}),te(await Yr())}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},ke=async()=>{S(!0),ee(null);try{await Jr(),ee({key:`settings.unregistered`}),te(await Yr())}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},Ae=async()=>{S(!0);try{await Xr(),ee({key:`settings.openedDefaultApps`})}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},je=async e=>{let t={...n,language:e};r(t),v(null);try{let e=await Gi(t);_e(e)}catch(e){v(e instanceof Error?e.message:String(e))}},Me=async(e,t)=>{t(!0),v(null);try{return ge(await e()),!0}catch(e){return v(e instanceof Error?e.message:String(e)),!1}finally{t(!1)}},Ne=async(e,t)=>{await Me(()=>Zi(e,t),he)&&(D(!1),de(``),pe(``))},Pe=e=>Me(()=>Qi(e),ce),Fe=(e,t)=>Me(()=>$i(e,t),ce);return(0,I.jsxs)(Cr,{$maxWidth:800,children:[(0,I.jsxs)(ma,{$visible:xe,children:[(0,I.jsx)(ha,{}),(0,I.jsx)(`span`,{children:e(`settings.unsaved`)})]}),g&&(0,I.jsxs)(pa,{children:[(0,I.jsx)(hr,{size:16}),(0,I.jsx)(`span`,{children:e(g)})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsx)(Er,{children:e(`settings.network`)}),(0,I.jsxs)(ra,{children:[(0,I.jsxs)(ia,{children:[(0,I.jsx)(aa,{children:e(`settings.requestTimeout`)}),(0,I.jsx)(R,{children:e(`settings.requestTimeoutDescription`)})]}),(0,I.jsxs)(z,{children:[(0,I.jsx)(`input`,{type:`range`,min:`1000`,max:`15000`,step:`500`,disabled:j,value:n.requestTimeoutMs,onChange:e=>ve({requestTimeoutMs:Number(e.target.value)})}),(0,I.jsxs)(`span`,{children:[n.requestTimeoutMs/1e3,`s`]})]})]}),(0,I.jsxs)(ra,{children:[(0,I.jsxs)(ia,{children:[(0,I.jsx)(aa,{children:e(`settings.language`)}),(0,I.jsx)(R,{children:e(`settings.languageDescription`)})]}),(0,I.jsx)(Ri,{variant:`form`,disabled:j||c.length===0,value:n.language,options:c.map(e=>({value:e,label:Ya[e]??e})),onChange:je})]}),(0,I.jsxs)(ra,{children:[(0,I.jsxs)(ia,{children:[(0,I.jsx)(aa,{children:e(`settings.borderlessPopup`)}),(0,I.jsx)(R,{children:e(`settings.borderlessPopupDescription`)})]}),(0,I.jsx)(Ea,{disabled:j,checked:n.borderlessPopup,onChange:e=>ve({borderlessPopup:e.target.checked})})]}),(0,I.jsxs)(ra,{children:[(0,I.jsxs)(ia,{children:[(0,I.jsx)(aa,{children:e(`settings.autoStripTracking`)}),(0,I.jsx)(R,{children:e(`settings.autoStripTrackingDescription`)})]}),(0,I.jsx)(Ea,{disabled:j,checked:n.autoStripTrackingParams,onChange:e=>ve({autoStripTrackingParams:e.target.checked})})]})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsx)(Er,{children:e(`settings.userAgent`)}),(0,I.jsx)(ia,{children:(0,I.jsx)(R,{children:e(`settings.userAgentDescription`)})}),(0,I.jsxs)(ra,{children:[(0,I.jsx)(ia,{children:(0,I.jsx)(aa,{children:e(`settings.userAgentDefault`)})}),(0,I.jsx)(Ri,{variant:`form`,disabled:j||n.userAgents.length===0,value:n.selectedUserAgentId,options:n.userAgents.map(e=>({value:e.id,label:e.name})),onChange:e=>ve({selectedUserAgentId:e})})]}),(0,I.jsx)(_a,{children:n.userAgents.map(t=>(0,I.jsxs)(va,{children:[(0,I.jsx)(ya,{className:`name`,placeholder:e(`settings.browserNamePlaceholder`),disabled:j,value:t.name,onChange:e=>M(t.id,{name:e.target.value})}),(0,I.jsx)(ya,{className:`path`,placeholder:e(`settings.userAgentValuePlaceholder`),disabled:j,value:t.value,onChange:e=>M(t.id,{value:e.target.value})}),(0,I.jsx)(Sa,{type:`button`,title:e(`settings.removeUserAgent`),onClick:()=>Te(t.id),children:(0,I.jsx)(Sr,{size:16})})]},t.id))}),(0,I.jsx)(Ca,{children:(0,I.jsx)(ba,{type:`button`,onClick:N,disabled:j,children:e(`settings.addUserAgent`)})})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsx)(Er,{children:e(`settings.browsers`)}),(0,I.jsx)(ia,{children:(0,I.jsx)(R,{children:e(`settings.browsersDescription`)})}),(0,I.jsx)(_a,{children:n.browsers.map(t=>(0,I.jsxs)(va,{children:[(0,I.jsx)(ya,{className:`name`,placeholder:e(`settings.browserNamePlaceholder`),disabled:j,value:t.name,onChange:e=>Se(t.id,{name:e.target.value})}),(0,I.jsx)(ya,{className:`path`,placeholder:e(`settings.browserPathPlaceholder`),disabled:j,value:t.executablePath,onChange:e=>Se(t.id,{executablePath:e.target.value})}),(0,I.jsx)(ya,{className:`args`,placeholder:e(`settings.browserArgsPlaceholder`),title:e(`settings.browserArgsTitle`),disabled:j,value:t.arguments,onChange:e=>Se(t.id,{arguments:e.target.value})}),(0,I.jsx)(Sa,{type:`button`,title:e(`settings.removeBrowser`),onClick:()=>we(t.id),children:(0,I.jsx)(Sr,{size:16})})]},t.id))}),(0,I.jsxs)(Ca,{children:[(0,I.jsx)(ba,{type:`button`,onClick:Ce,disabled:j,children:e(`settings.addBrowser`)}),(0,I.jsx)(ba,{type:`button`,onClick:Ee,disabled:j||y,children:e(y?`settings.detecting`:`settings.detectInstalled`)})]})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsx)(Er,{children:e(`settings.systemIntegration`)}),(0,I.jsx)(ia,{children:(0,I.jsx)(R,{children:e(T===`windows`?`settings.systemIntegrationDescription`:`settings.systemIntegrationDescriptionLinux`)})}),(0,I.jsxs)(Ca,{children:[(0,I.jsxs)(ba,{type:`button`,onClick:De,disabled:x,children:[(0,I.jsx)(lr,{size:15}),e(`settings.registerHttp`)]}),(0,I.jsxs)(ba,{type:`button`,onClick:Oe,disabled:x,children:[(0,I.jsx)(lr,{size:15}),e(`settings.registerUrlcheck`)]}),T===`windows`&&(0,I.jsx)(ba,{type:`button`,onClick:Ae,disabled:x,children:e(`settings.openDefaultApps`)}),(0,I.jsxs)(xa,{type:`button`,onClick:ke,disabled:x,children:[(0,I.jsx)(Sr,{size:15}),e(`settings.unregister`)]})]}),w&&(0,I.jsx)(wa,{children:e(`settings.protocolStatus`,{isDefault:w.isDefault&&w.pathMatches?e(`settings.yes`):e(`settings.no`),scheme:w.customSchemeRegistered?e(`settings.yes`):e(`settings.no`)})}),w?.isDefault&&!w.pathMatches&&(0,I.jsxs)(Ta,{children:[(0,I.jsx)(hr,{size:14}),(0,I.jsx)(`span`,{children:e(`settings.pathMismatch`,{path:w.registeredPath??`?`})})]}),C&&(0,I.jsx)(wa,{children:e(C.key,C.params)})]}),(0,I.jsxs)(Tr,{children:[(0,I.jsx)(Er,{children:e(`settings.filterLists`)}),(0,I.jsx)(ia,{children:(0,I.jsx)(R,{children:e(`settings.filterListsDescription`,{count:ae})})}),re.length===0?(0,I.jsx)(wa,{children:e(`settings.filterListsEmpty`)}):(0,I.jsx)(Da,{children:re.map(n=>(0,I.jsxs)(Oa,{children:[(0,I.jsxs)(ka,{children:[(0,I.jsx)(Aa,{children:n.name}),(0,I.jsx)(ja,{children:n.url}),(0,I.jsxs)(Ma,{children:[(0,I.jsx)(`span`,{children:e(`settings.filterRules`,{count:n.ruleCount})}),(0,I.jsx)(`span`,{children:n.lastUpdated?e(`settings.filterUpdated`,{date:new Date(n.lastUpdated).toLocaleString(t)}):e(`settings.filterNeverUpdated`)})]}),n.error&&(0,I.jsxs)(Na,{children:[(0,I.jsx)(hr,{size:13}),(0,I.jsx)(`span`,{children:e(n.error)})]})]}),(0,I.jsxs)(Pa,{children:[(0,I.jsx)(Fa,{type:`button`,$on:n.enabled,disabled:se,"aria-pressed":n.enabled,title:e(n.enabled?`settings.filterDisable`:`settings.filterEnable`),onClick:()=>Fe(n.id,!n.enabled)}),(0,I.jsx)(Sa,{type:`button`,disabled:se,title:e(`settings.removeFilterList`),onClick:()=>Pe(n.id),children:(0,I.jsx)(Sr,{size:16})})]})]},n.id))}),(0,I.jsxs)(Ca,{children:[(0,I.jsx)(ba,{type:`button`,disabled:se,onClick:()=>D(!0),children:e(`settings.addFilterList`)}),(0,I.jsx)(ba,{type:`button`,disabled:se||re.length===0,onClick:()=>Me(()=>ea(),ce),children:e(se?`settings.filterUpdating`:`settings.checkFilterUpdates`)})]})]}),(0,I.jsxs)(oa,{children:[(0,I.jsx)(ca,{onClick:ye,disabled:j,children:e(u?`settings.loading`:f?`settings.saving`:`settings.save`)}),(0,I.jsx)(da,{$visible:xe,type:`button`,onClick:be,disabled:j,children:e(`settings.discard`)}),(0,I.jsx)(ua,{onClick:A,disabled:j,children:e(`settings.reset`)}),m&&(0,I.jsxs)(fa,{children:[(0,I.jsx)(mr,{size:16}),(0,I.jsx)(`span`,{children:e(`settings.saved`)})]})]}),(0,I.jsxs)(ga,{children:[(0,I.jsx)(`span`,{children:e(`settings.fileInfo`)}),(0,I.jsx)(`code`,{children:o||`...`})]}),E&&(0,I.jsx)(Ia,{onClick:()=>!me&&D(!1),children:(0,I.jsxs)(La,{onClick:e=>e.stopPropagation(),children:[(0,I.jsx)(Ra,{children:e(`settings.filterAddTitle`)}),(0,I.jsxs)(za,{children:[(0,I.jsx)(Ba,{type:`button`,$active:O===`catalog`,onClick:()=>le(`catalog`),children:e(`settings.filterAddFromCatalog`)}),(0,I.jsx)(Ba,{type:`button`,$active:O===`custom`,onClick:()=>le(`custom`),children:e(`settings.filterAddCustom`)})]}),O===`catalog`?(0,I.jsx)(Va,{children:na.map(t=>(0,I.jsxs)(Ha,{children:[(0,I.jsxs)(Ua,{children:[(0,I.jsx)(Wa,{children:t.name}),(0,I.jsx)(ba,{type:`button`,disabled:me,onClick:()=>Ne(t.name,t.url),children:e(me?`settings.filterAdding`:`settings.filterAdd`)})]}),(0,I.jsx)(Ga,{children:e(t.descriptionKey)}),(0,I.jsx)(ja,{children:t.url})]},t.url))}):(0,I.jsxs)(I.Fragment,{children:[(0,I.jsxs)(qa,{children:[e(`settings.filterName`),(0,I.jsx)(Ja,{value:ue,placeholder:e(`settings.filterNamePlaceholder`),onChange:e=>de(e.target.value)})]}),(0,I.jsxs)(qa,{children:[e(`settings.filterUrl`),(0,I.jsx)(Ja,{value:fe,placeholder:e(`settings.filterUrlPlaceholder`),onChange:e=>pe(e.target.value)})]}),(0,I.jsx)(Ca,{children:(0,I.jsx)(ba,{type:`button`,disabled:me||!ue.trim()||!fe.trim(),onClick:()=>Ne(ue,fe),children:e(me?`settings.filterAdding`:`settings.filterAdd`)})})]}),(0,I.jsxs)(Ka,{children:[(0,I.jsx)(`strong`,{children:e(`settings.filterFormatTitle`)}),(0,I.jsx)(`span`,{children:e(`settings.filterFormatBody`)})]}),(0,I.jsx)(Ca,{children:(0,I.jsx)(ba,{type:`button`,disabled:me,onClick:()=>D(!1),children:e(`settings.filterCancel`)})})]})})]})}}],Za=Xa[0].id;function Qa(e){return Xa.find(t=>t.id===e)??Xa[0]}var $a=F.aside`
     width: 260px;
     background: rgba(17, 24, 39, 0.85);
     backdrop-filter: blur(16px);
@@ -893,13 +981,13 @@ Error generating stack: `+e.message+`
     height: 100vh;
     flex-shrink: 0;
     user-select: none;
-`,Ka=F.div`
+`,eo=F.div`
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 24px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-`,qa=F.div`
+`,to=F.div`
     width: 40px;
     height: 40px;
     border-radius: 10px;
@@ -909,25 +997,25 @@ Error generating stack: `+e.message+`
     align-items: center;
     justify-content: center;
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
-`,Ja=F.div`
+`,no=F.div`
     display: flex;
     flex-direction: column;
-`,Ya=F.span`
+`,ro=F.span`
     font-size: 1.15rem;
     font-weight: 700;
     color: #f9fafb;
     letter-spacing: -0.02em;
-`,Xa=F.span`
+`,io=F.span`
     font-size: 0.7rem;
     color: #9ca3af;
     font-weight: 500;
-`,Za=F.nav`
+`,ao=F.nav`
     padding: 16px 12px;
     display: flex;
     flex-direction: column;
     gap: 6px;
     flex: 1;
-`,Qa=F.button`
+`,oo=F.button`
     display: flex;
     align-items: center;
     gap: 12px;
@@ -957,16 +1045,16 @@ Error generating stack: `+e.message+`
     &:hover svg {
         stroke: ${e=>e.$active?`#93c5fd`:`#f9fafb`};
     }
-`,$a=F.div`
+`,so=F.div`
     padding: 16px 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
-`,eo=F.span`
+`,co=F.span`
     font-size: 0.75rem;
     color: #6b7280;
     font-family: var(--font-mono);
-`,to=({currentTab:e,onSelectTab:t})=>{let n=zr(),[r,i]=(0,_.useState)(null);return(0,_.useEffect)(()=>{Qr().then(e=>i(e.version)).catch(()=>i(null))},[]),(0,I.jsxs)(Ga,{children:[(0,I.jsxs)(Ka,{children:[(0,I.jsx)(qa,{children:(0,I.jsx)(ur,{size:40})}),(0,I.jsxs)(Ja,{children:[(0,I.jsx)(Ya,{children:`URLCheck`}),(0,I.jsx)(Xa,{children:n(`app.tagline`)})]})]}),(0,I.jsx)(Za,{children:Ha.map(r=>{let i=r.icon;return(0,I.jsxs)(Qa,{$active:e===r.id,onClick:()=>t(r.id),children:[(0,I.jsx)(i,{size:18}),(0,I.jsx)(`span`,{children:n(r.labelKey)})]},r.id)})}),(0,I.jsx)($a,{children:(0,I.jsx)(eo,{children:r?`v${r}`:`…`})})]})},no=F.header`
+`,lo=({currentTab:e,onSelectTab:t})=>{let n=zr(),[r,i]=(0,_.useState)(null);return(0,_.useEffect)(()=>{Qr().then(e=>i(e.version)).catch(()=>i(null))},[]),(0,I.jsxs)($a,{children:[(0,I.jsxs)(eo,{children:[(0,I.jsx)(to,{children:(0,I.jsx)(ur,{size:40})}),(0,I.jsxs)(no,{children:[(0,I.jsx)(ro,{children:`URLCheck`}),(0,I.jsx)(io,{children:n(`app.tagline`)})]})]}),(0,I.jsx)(ao,{children:Xa.map(r=>{let i=r.icon;return(0,I.jsxs)(oo,{$active:e===r.id,onClick:()=>t(r.id),children:[(0,I.jsx)(i,{size:18}),(0,I.jsx)(`span`,{children:n(r.labelKey)})]},r.id)})}),(0,I.jsx)(so,{children:(0,I.jsx)(co,{children:r?`v${r}`:`…`})})]})},uo=F.header`
   height: 64px;
   background: rgba(17, 24, 39, 0.75);
   backdrop-filter: blur(16px);
@@ -976,7 +1064,7 @@ Error generating stack: `+e.message+`
   justify-content: space-between;
   padding: 0 32px;
   flex-shrink: 0;
-`,ro=F.div`
+`,fo=F.div`
   display: flex;
   flex-direction: column;
   animation: headerEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1);
@@ -991,15 +1079,15 @@ Error generating stack: `+e.message+`
       transform: translateY(0);
     }
   }
-`,io=F.h1`
+`,po=F.h1`
   font-size: 1.25rem;
   font-weight: 700;
   color: #f9fafb;
   letter-spacing: -0.01em;
-`,ao=F.span`
+`,mo=F.span`
   font-size: 0.8rem;
   color: #9ca3af;
-`,oo=({currentTab:e})=>{let t=zr(),n=Wa(e);return(0,I.jsx)(no,{children:(0,I.jsxs)(ro,{children:[(0,I.jsx)(io,{children:t(n.titleKey)}),(0,I.jsx)(ao,{children:t(n.subtitleKey)})]},e)})},so=F.div`
+`,ho=({currentTab:e})=>{let t=zr(),n=Qa(e);return(0,I.jsx)(uo,{children:(0,I.jsxs)(fo,{children:[(0,I.jsx)(po,{children:t(n.titleKey)}),(0,I.jsx)(mo,{children:t(n.subtitleKey)})]},e)})},go=F.div`
     display: flex;
     width: 100vw;
     height: 100vh;
@@ -1007,18 +1095,18 @@ Error generating stack: `+e.message+`
     background-color: #0b0f19;
     background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 70%);
     color: #f9fafb;
-`,co=F.div`
+`,_o=F.div`
     display: flex;
     flex-direction: column;
     flex: 1;
     min-width: 0;
     height: 100vh;
     overflow: hidden;
-`,lo=F.main`
+`,vo=F.main`
     flex: 1;
     padding: 28px 32px 40px;
     overflow-y: auto;
-`;function uo(){let[e,t]=(0,_.useState)(Ua);(0,_.useEffect)(()=>L.on(e=>{let n=e;n.type===`app.navigate`&&n.data?.tab&&t(n.data.tab)}),[]);let n=Wa(e).page;return(0,I.jsxs)(so,{children:[(0,I.jsx)(to,{currentTab:e,onSelectTab:t}),(0,I.jsxs)(co,{children:[(0,I.jsx)(oo,{currentTab:e}),(0,I.jsx)(lo,{children:(0,I.jsx)(di.Provider,{value:t,children:(0,I.jsx)(n,{})})})]})]})}async function fo(e,t){return await L.request(`inspect.status`,{url:e,userAgentId:t})}function po(e){return e.replace(/[.*+?^${}()|[\]\\]/g,`\\$&`)}function mo(e){let t=po(e.toLowerCase()).replace(/\\\*/g,`.*`);return RegExp(`(^|\\.)${t}$`)}function ho(e){let t={globalLiterals:new Set,globalRegex:[],scopes:[]};for(let n of e)if(!n.urlPattern&&!n.include?.length&&!n.exclude?.length&&!n.urlExceptions?.length)n.regex?t.globalRegex.push(new RegExp(n.pattern,`i`)):t.globalLiterals.add(n.pattern.toLowerCase());else for(let e of n.include?.length?n.include:[null])t.scopes.push({host:e?mo(e):null,url:n.urlPattern?new RegExp(n.urlPattern,`i`):null,exclude:n.exclude?.map(mo)??null,urlExceptions:n.urlExceptions?.map(e=>new RegExp(e,`i`))??null,literals:n.regex?new Set:new Set([n.pattern.toLowerCase()]),regex:n.regex?[new RegExp(n.pattern,`i`)]:[]});return t}function go(e,t,n,r){let i=e.toLowerCase();if(t.globalLiterals.has(i)||t.globalRegex.some(t=>t.test(e)))return!0;for(let a of t.scopes)if((!a.host||a.host.test(n))&&(!a.url||a.url.test(r))&&!a.exclude?.some(e=>e.test(n))&&!a.urlExceptions?.some(e=>e.test(r))&&(a.literals.has(i)||a.regex.some(t=>t.test(e))))return!0;return!1}function _o(e){try{return new URL(e)}catch{return null}}function vo(e,t){let n=_o(e);return n?[...n.searchParams.keys()].filter(r=>go(r,t,n.hostname,e)):[]}function yo(e,t){let n=_o(e);if(!n)return e;for(let r of[...n.searchParams.keys()])go(r,t,n.hostname,e)&&n.searchParams.delete(r);return n.toString()}function bo(e,t){if(e.entries[e.index]===t)return{...e,editing:!1};let n=[...e.entries.slice(0,e.index+1),t];return{entries:n,index:n.length-1,editing:!1}}function xo(e,t){switch(t.type){case`edit`:if(e.editing){let n=[...e.entries];return n[e.index]=t.value,{...e,entries:n}}return{...bo(e,t.value),editing:!0};case`commit`:return bo(e,t.value);case`jump`:return{...e,index:Math.max(0,Math.min(t.index,e.entries.length-1)),editing:!1}}}function So(){let e=window.location.hash,t=e.indexOf(`?`);return t<0?``:new URLSearchParams(e.slice(t+1)).get(`url`)??``}function Co(e){let t=window.location.hash,n=t.indexOf(`?`);return n<0||new URLSearchParams(t.slice(n+1)).get(e)!==`0`}function wo(e){try{return decodeURIComponent(e)}catch{return e}}var To=Un`
+`;function yo(){let[e,t]=(0,_.useState)(Za);(0,_.useEffect)(()=>L.on(e=>{let n=e;n.type===`app.navigate`&&n.data?.tab&&t(n.data.tab)}),[]);let n=Qa(e).page;return(0,I.jsxs)(go,{children:[(0,I.jsx)(lo,{currentTab:e,onSelectTab:t}),(0,I.jsxs)(_o,{children:[(0,I.jsx)(ho,{currentTab:e}),(0,I.jsx)(vo,{children:(0,I.jsx)(di.Provider,{value:t,children:(0,I.jsx)(n,{})})})]})]})}async function bo(e,t){return await L.request(`inspect.status`,{url:e,userAgentId:t})}function xo(e){return e.replace(/[.*+?^${}()|[\]\\]/g,`\\$&`)}function So(e){let t=xo(e.toLowerCase()).replace(/\\\*/g,`.*`);return RegExp(`(^|\\.)${t}$`)}function Co(e){let t={globalLiterals:new Set,globalRegex:[],scopes:[]};for(let n of e)if(!n.urlPattern&&!n.include?.length&&!n.exclude?.length&&!n.urlExceptions?.length)n.regex?t.globalRegex.push(new RegExp(n.pattern,`i`)):t.globalLiterals.add(n.pattern.toLowerCase());else for(let e of n.include?.length?n.include:[null])t.scopes.push({host:e?So(e):null,url:n.urlPattern?new RegExp(n.urlPattern,`i`):null,exclude:n.exclude?.map(So)??null,urlExceptions:n.urlExceptions?.map(e=>new RegExp(e,`i`))??null,literals:n.regex?new Set:new Set([n.pattern.toLowerCase()]),regex:n.regex?[new RegExp(n.pattern,`i`)]:[]});return t}function wo(e,t,n,r){let i=e.toLowerCase();if(t.globalLiterals.has(i)||t.globalRegex.some(t=>t.test(e)))return!0;for(let a of t.scopes)if((!a.host||a.host.test(n))&&(!a.url||a.url.test(r))&&!a.exclude?.some(e=>e.test(n))&&!a.urlExceptions?.some(e=>e.test(r))&&(a.literals.has(i)||a.regex.some(t=>t.test(e))))return!0;return!1}function To(e){try{return new URL(e)}catch{return null}}function Eo(e,t){let n=To(e);return n?[...n.searchParams.keys()].filter(r=>wo(r,t,n.hostname,e)):[]}function Do(e,t){let n=To(e);if(!n)return e;for(let r of[...n.searchParams.keys()])wo(r,t,n.hostname,e)&&n.searchParams.delete(r);return n.toString()}function Oo(e,t){if(e.entries[e.index]===t)return{...e,editing:!1};let n=[...e.entries.slice(0,e.index+1),t];return{entries:n,index:n.length-1,editing:!1}}function ko(e,t){switch(t.type){case`edit`:if(e.editing){let n=[...e.entries];return n[e.index]=t.value,{...e,entries:n}}return{...Oo(e,t.value),editing:!0};case`commit`:return Oo(e,t.value);case`jump`:return{...e,index:Math.max(0,Math.min(t.index,e.entries.length-1)),editing:!1}}}function Ao(){let e=window.location.hash,t=e.indexOf(`?`);return t<0?``:new URLSearchParams(e.slice(t+1)).get(`url`)??``}function jo(e){let t=window.location.hash,n=t.indexOf(`?`);return n<0||new URLSearchParams(t.slice(n+1)).get(e)!==`0`}function Mo(e){try{return decodeURIComponent(e)}catch{return e}}var No=Un`
     from {
         opacity: 0;
         transform: translateY(-4px);
@@ -1027,7 +1115,7 @@ Error generating stack: `+e.message+`
         opacity: 1;
         transform: translateY(0);
     }
-`,Eo=F.div`
+`,Po=F.div`
     min-height: 100vh;
     background-color: #0b0f19;
     background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 70%);
@@ -1035,14 +1123,14 @@ Error generating stack: `+e.message+`
     border-radius: ${e=>e.$borderless?`8px`:`0`};
     box-shadow: ${e=>e.$borderless?`inset 0 0 0 1px rgba(255, 255, 255, 0.12)`:`none`};
     overflow: hidden;
-    animation: ${To} 0.24s cubic-bezier(0.22, 1, 0.36, 1);
-`,Do=F.div`
+    animation: ${No} 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+`,Fo=F.div`
     height: 24px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     padding: 0 2px 0 6px;
-`,Oo=F.button`
+`,Io=F.button`
     width: 24px;
     height: 20px;
     border-radius: 6px;
@@ -1058,12 +1146,12 @@ Error generating stack: `+e.message+`
         background: rgba(239, 68, 68, 0.15);
         color: #f87171;
     }
-`,ko=F.div`
+`,Lo=F.div`
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding: 0 12px 12px;
-`,Ao=F.input`
+`,Ro=F.input`
     width: 100%;
     height: 34px;
     padding: 0 11px;
@@ -1080,21 +1168,21 @@ Error generating stack: `+e.message+`
         border-color: ${e=>e.$warn?`#f59e0b`:`#3b82f6`};
         box-shadow: 0 0 0 3px ${e=>e.$warn?`rgba(245, 158, 11, 0.25)`:`rgba(59, 130, 246, 0.25)`};
     }
-`,jo=F.div`
+`,zo=F.div`
     display: flex;
     align-items: center;
     gap: 6px;
     margin-top: -4px;
     color: #fbbf24;
     font-size: 0.74rem;
-    animation: ${To} 0.15s ease;
-`,Mo=F.div`
+    animation: ${No} 0.15s ease;
+`,Bo=F.div`
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 5px;
-`,No=F.button`
+`,Vo=F.button`
     min-width: 28px;
     height: 24px;
     padding: 0 6px;
@@ -1120,42 +1208,7 @@ Error generating stack: `+e.message+`
         opacity: 0.35;
         cursor: not-allowed;
     }
-`,Po=F.div`
-    position: absolute;
-    top: calc(100% + 5px);
-    left: 0;
-    right: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    background: #111827;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 9px;
-    padding: 5px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-    z-index: 30;
-    animation: ${To} 0.15s ease;
-`,Fo=F.button`
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 6px 8px;
-    border: none;
-    border-radius: 6px;
-    background: ${e=>e.$active?`rgba(59, 130, 246, 0.2)`:`transparent`};
-    color: ${e=>e.$active?`#ffffff`:`#cbd5e1`};
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    cursor: pointer;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: background 0.15s ease, color 0.15s ease;
-
-    &:hover {
-        background: rgba(59, 130, 246, 0.15);
-        color: #ffffff;
-    }
-`,Io=F.button`
+`,Ho=F.button`
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -1182,13 +1235,13 @@ Error generating stack: `+e.message+`
         ${e=>e.$tone===`ok`?`rgba(16, 185, 129, 0.3)`:e.$tone===`info`?`rgba(59, 130, 246, 0.3)`:e.$tone===`error`?`rgba(239, 68, 68, 0.3)`:`rgba(255, 255, 255, 0.1)`};
     background: ${e=>e.$tone===`ok`?`rgba(16, 185, 129, 0.12)`:e.$tone===`info`?`rgba(59, 130, 246, 0.12)`:e.$tone===`error`?`rgba(239, 68, 68, 0.12)`:`rgba(255, 255, 255, 0.04)`};
     color: ${e=>e.$tone===`ok`?`#34d399`:e.$tone===`info`?`#60a5fa`:e.$tone===`error`?`#f87171`:`#9ca3af`};
-`,Lo=F.div`
+`,Uo=F.div`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: 6px;
-`,Ro=F.button`
+`,B=F.button`
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1222,51 +1275,17 @@ Error generating stack: `+e.message+`
         opacity: 0.4;
         cursor: not-allowed;
     }
-`,zo=F.select`
-    /* Fixed height so it lines up with the action buttons. */
-    height: 30px;
-    box-sizing: border-box;
-    max-width: 150px;
-    padding: 0 6px;
-    border-radius: 7px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: #d1d5db;
-    font-size: 0.76rem;
-    line-height: 1;
-    cursor: pointer;
-    outline: none;
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-
-    &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.12);
-        color: #f9fafb;
-    }
-
-    &:focus {
-        border-color: #3b82f6;
-    }
-
-    &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
-
-    option {
-        background: #111827;
-        color: #f9fafb;
-    }
-`,Bo=F.div`
+`,V=F.div`
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 8px;
     overflow: hidden;
     background: rgba(15, 23, 42, 0.5);
-`,Vo=F.div`
+`,Wo=F.div`
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 4px 6px 4px 10px;
-`,Ho=F.button`
+`,Go=F.button`
     display: flex;
     align-items: center;
     gap: 7px;
@@ -1285,7 +1304,7 @@ Error generating stack: `+e.message+`
     &:hover {
         color: #f9fafb;
     }
-`,Uo=F.button`
+`,Ko=F.button`
     display: flex;
     align-items: center;
     flex-shrink: 0;
@@ -1306,17 +1325,17 @@ Error generating stack: `+e.message+`
         opacity: 0.35;
         cursor: not-allowed;
     }
-`,B=F(Uo)`
+`,qo=F(Ko)`
     &:hover:not(:disabled) {
         color: #f87171;
         background: rgba(239, 68, 68, 0.12);
     }
-`,V=F.span`
+`,Jo=F.span`
     display: inline-block;
     transition: transform 0.15s ease;
     transform: rotate(${e=>e.$open?`90deg`:`0deg`});
     font-size: 0.65rem;
-`,Wo=F.span`
+`,Yo=F.span`
     background: rgba(255, 255, 255, 0.08);
     color: #cbd5e1;
     border-radius: 9999px;
@@ -1324,34 +1343,34 @@ Error generating stack: `+e.message+`
     font-size: 0.68rem;
     font-weight: 600;
     flex-shrink: 0;
-`,Go=F.span`
+`,Xo=F.span`
     padding: 6px 2px;
     color: #6b7280;
     font-size: 0.76rem;
-`,Ko=F.div`
+`,Zo=F.div`
     display: flex;
     flex-direction: column;
     padding: 0 10px 7px;
-    animation: ${To} 0.15s ease;
-`,qo=F.div`
+    animation: ${No} 0.15s ease;
+`,H=F.div`
     display: flex;
     gap: 10px;
     padding: 4px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     font-family: var(--font-mono);
     font-size: 0.75rem;
-`,Jo=F.span`
+`,Qo=F.span`
     color: #60a5fa;
     flex-shrink: 0;
     min-width: 78px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-`,Yo=F.span`
+`,$o=F.span`
     color: #cbd5e1;
     flex: 1;
     word-break: break-all;
-`,Xo=F.button`
+`,es=F.button`
     background: none;
     border: none;
     padding: 0;
@@ -1366,7 +1385,7 @@ Error generating stack: `+e.message+`
     &:hover {
         color: #93c5fd;
     }
-`,Zo=F.input`
+`,ts=F.input`
     background: transparent;
     border: 1px solid transparent;
     border-radius: 5px;
@@ -1396,7 +1415,7 @@ Error generating stack: `+e.message+`
         border-color: #3b82f6;
         background: rgba(15, 23, 42, 0.9);
     }
-`,H=F.button`
+`,ns=F.button`
     background: none;
     border: none;
     color: #6b7280;
@@ -1408,17 +1427,17 @@ Error generating stack: `+e.message+`
     &:hover {
         color: #f87171;
     }
-`,Qo=F.div`
+`,rs=F.div`
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 7px;
     margin-top: 2px;
-`,$o=F.div`
+`,is=F.div`
     position: relative;
     display: flex;
-`,es=F.button`
+`,as=F.button`
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -1450,7 +1469,7 @@ Error generating stack: `+e.message+`
         cursor: not-allowed;
         box-shadow: none;
     }
-`,ts=F.button`
+`,os=F.button`
     width: 30px;
     border: none;
     border-left: 1px solid rgba(255, 255, 255, 0.2);
@@ -1468,39 +1487,7 @@ Error generating stack: `+e.message+`
         opacity: 0.55;
         cursor: not-allowed;
     }
-`,ns=F.div`
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 0;
-    min-width: 200px;
-    background: #111827;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px;
-    padding: 5px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-    z-index: 30;
-    animation: ${To} 0.15s ease;
-`,rs=F.button`
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 7px 9px;
-    border: none;
-    border-radius: 6px;
-    background: none;
-    color: #e2e8f0;
-    font-size: 0.8rem;
-    cursor: pointer;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: background 0.15s ease, color 0.15s ease;
-
-    &:hover {
-        background: rgba(59, 130, 246, 0.18);
-        color: #ffffff;
-    }
-`,is=F(Ro)`
+`,ss=F(B)`
     height: 32px;
     border-color: ${e=>e.$active?`rgba(99, 102, 241, 0.5)`:`rgba(255, 255, 255, 0.1)`};
     background: ${e=>e.$active?`rgba(99, 102, 241, 0.22)`:`rgba(255, 255, 255, 0.05)`};
@@ -1513,7 +1500,7 @@ Error generating stack: `+e.message+`
         background: ${e=>e.$active?`rgba(99, 102, 241, 0.34)`:`rgba(255, 255, 255, 0.12)`};
         color: ${e=>e.$active?`#e0e7ff`:`#f9fafb`};
     }
-`,as=F.div`
+`,cs=F.div`
     display: flex;
     align-items: center;
     gap: 7px;
@@ -1523,4 +1510,4 @@ Error generating stack: `+e.message+`
     background: ${e=>e.$tone===`error`?`rgba(239, 68, 68, 0.12)`:`rgba(16, 185, 129, 0.12)`};
     border: 1px solid ${e=>e.$tone===`error`?`rgba(239, 68, 68, 0.3)`:`rgba(16, 185, 129, 0.3)`};
     color: ${e=>e.$tone===`error`?`#f87171`:`#34d399`};
-`,os=()=>{let e=zr(),t=(0,_.useMemo)(So,[]),[n,r]=(0,_.useReducer)(xo,{entries:[t],index:0,editing:!1}),i=n.entries[n.index],[a,o]=(0,_.useState)([]),[s,c]=(0,_.useState)([]),[l,u]=(0,_.useState)(``),[d,f]=(0,_.useState)(null),[p,m]=(0,_.useState)(!1),[h,g]=(0,_.useState)(!1),[v,y]=(0,_.useState)(!1),[b,x]=(0,_.useState)(!1),[S,C]=(0,_.useState)(!1),[ee]=(0,_.useState)(()=>Co(`borderless`)),[w]=(0,_.useState)(()=>Co(`strip`)),[te,T]=(0,_.useState)(null),ne=e=>w&&te&&vo(e,te).length>0?yo(e,te):e,[re,ie]=(0,_.useState)(null),[ae,oe]=(0,_.useState)({domain:!1,parameters:!1,fragment:!1}),se=(0,_.useRef)(null),ce=(0,_.useRef)(0),E=(0,_.useRef)(void 0),D=(0,_.useMemo)(()=>{try{return new URL(i)}catch{return null}},[i]),O=(0,_.useMemo)(()=>D?[...D.searchParams.entries()].map(([e,t])=>({key:e,value:t})):[],[D]),le=wo(D?.hash.replace(/^#/,``)??``),ue=D?.protocol===`http:`,de=a[0],fe=!!D&&a.length>0,pe=te?vo(i,te).length:0;(0,_.useEffect)(()=>{let e=!1;return(async()=>{try{let t=await Fi();if(e)return;o(t.settings.browsers),c(t.settings.userAgents),u(t.settings.selectedUserAgentId)}catch{}})(),()=>{e=!0}},[]),(0,_.useEffect)(()=>{let e=!1;return Ki().then(t=>{e||T(ho(t))}).catch(()=>void 0),()=>{e=!0}},[]),(0,_.useEffect)(()=>(document.documentElement.classList.toggle(`popup-transparent`,ee),()=>document.documentElement.classList.remove(`popup-transparent`)),[ee]),(0,_.useEffect)(()=>L.on(e=>{let t=e;t.type===`popup.navigate`&&t.data?.url&&(r({type:`commit`,value:t.data.url}),f(null),ie(null))}),[]),(0,_.useEffect)(()=>{let e=ne(t);e!==t&&r({type:`commit`,value:e})},[t,w,te]),(0,_.useEffect)(()=>{let e=se.current;if(!e)return;let t=()=>{window.clearTimeout(E.current),E.current=window.setTimeout(()=>{let t=Math.ceil(e.offsetHeight)+24;Math.abs(t-ce.current)<2||(ce.current=t,Zr(t))},60)},n=new ResizeObserver(t);return n.observe(e),window.addEventListener(`resize`,t),()=>{window.clearTimeout(E.current),n.disconnect(),window.removeEventListener(`resize`,t)}},[]);let me=e=>{r({type:`commit`,value:e}),f(null)},he=e=>{r({type:`edit`,value:e}),f(null)},ge=(e,t)=>{if(!D)return;let n=[...D.searchParams.entries()].map(([n,r],i)=>i===e?{key:t.key??n,value:t.value??r}:{key:n,value:r}),r=new URL(i);r.search=``;for(let e of n)r.searchParams.append(e.key,e.value);he(r.toString())},_e=e=>{if(!D)return;let t=new URL(i);t.hash=e,he(t.toString())},ve=()=>{if(!D)return;let e=new URL(i);e.searchParams.append(``,``),me(e.toString())},k=()=>{if(!D)return;let e=new URL(i);e.hash=``,me(e.toString())},ye=()=>{D&&me(`${D.origin}/`)},be=async()=>{m(!0),ie(null);try{let e=await fo(i,l);if(e.location){r({type:`commit`,value:e.location});let t=ne(e.location);t!==e.location&&r({type:`commit`,value:t})}f(e)}catch(e){ie(e instanceof Error?e.message:String(e))}finally{m(!1)}},A=async e=>{g(!1),ie(null);try{await zi(i,e,b),Gr()}catch(e){ie(e instanceof Error?e.message:String(e))}},j=async()=>{ie(null);try{await navigator.clipboard.writeText(i),C(!0),setTimeout(()=>C(!1),1500)}catch(e){ie(e instanceof Error?e.message:String(e))}},xe=(e,t)=>{if(!D)return;let n=new URL(i),r=[...n.searchParams.entries()];n.search=``;for(let[i,a]of r)(i!==e||a!==t)&&n.searchParams.append(i,a);me(n.toString())},Se=()=>{if(!D)return;let e=new URL(i);e.search=``,me(e.toString())},Ce=()=>{if(!D)return;let e=new URL(i);e.protocol=`https:`,me(e.toString())},we=e=>oe(t=>({...t,[e]:!t[e]})),M=d?d.ok?`ok`:d.statusCode>=300&&d.statusCode<400?`info`:`error`:`idle`,N=d?.location?e(`popup.redirected`):d?.statusText===`error.timeout`?e(`error.timeout`):d?.statusText,Te=p?e(`popup.checking`):d?`${d.statusCode||`!`} ${N??``}`.trim():e(`popup.checkStatus`),Ee=M===`ok`?mr:M===`error`?gr:hr;return(0,I.jsxs)(Eo,{$borderless:ee,children:[(0,I.jsx)(Do,{children:(0,I.jsx)(Oo,{onClick:Gr,title:e(`popup.close`),children:`✕`})}),(0,I.jsxs)(ko,{ref:se,children:[(0,I.jsx)(Ao,{type:`text`,value:i,spellCheck:!1,$warn:ue,onChange:e=>he(e.target.value),onBlur:()=>r({type:`commit`,value:i}),placeholder:`https://example.com/path?key=value`}),ue&&(0,I.jsxs)(jo,{children:[(0,I.jsx)(hr,{size:13}),(0,I.jsx)(`span`,{children:e(`popup.httpWarning`)})]}),n.entries.length>1&&(0,I.jsxs)(Mo,{children:[(0,I.jsx)(No,{onClick:()=>r({type:`jump`,index:0}),disabled:n.index===0,title:e(`popup.first`),children:`|◀`}),(0,I.jsx)(No,{onClick:()=>r({type:`jump`,index:n.index-1}),disabled:n.index===0,title:e(`popup.back`),children:`◀`}),(0,I.jsx)(No,{onClick:()=>y(e=>!e),title:e(`popup.history`),children:`▾`}),(0,I.jsx)(No,{onClick:()=>r({type:`jump`,index:n.index+1}),disabled:n.index>=n.entries.length-1,title:e(`popup.forward`),children:`▶`}),(0,I.jsx)(No,{onClick:()=>r({type:`jump`,index:n.entries.length-1}),disabled:n.index>=n.entries.length-1,title:e(`popup.last`),children:`▶|`}),v&&(0,I.jsx)(Po,{children:n.entries.map((e,t)=>(0,I.jsx)(Fo,{$active:t===n.index,onClick:()=>{r({type:`jump`,index:t}),y(!1)},children:e},`${t}-${e}`))})]}),(0,I.jsxs)(Lo,{children:[s.length>0&&(0,I.jsx)(zo,{value:l,disabled:p,onChange:e=>u(e.target.value),title:e(`popup.userAgentTooltip`),children:s.map(e=>(0,I.jsx)(`option`,{value:e.id,children:e.name},e.id))}),(0,I.jsxs)(Io,{$tone:M,onClick:be,disabled:p,title:e(`popup.checkStatus`),children:[(0,I.jsx)(Ee,{size:13}),(0,I.jsx)(`span`,{children:Te})]}),(0,I.jsxs)(Ro,{onClick:()=>te&&me(yo(i,te)),disabled:!D||!te,title:e(`popup.removeTrackingTooltip`),children:[(0,I.jsx)(Sr,{size:13}),e(`popup.tracking`),pe>0?` (${pe})`:``]}),ue&&(0,I.jsx)(Ro,{$accent:!0,onClick:Ce,children:e(`popup.useHttps`)})]}),(0,I.jsxs)(Bo,{children:[(0,I.jsx)(Vo,{children:(0,I.jsxs)(Ho,{onClick:()=>we(`domain`),children:[(0,I.jsx)(V,{$open:ae.domain,children:`▶`}),(0,I.jsx)(`span`,{children:e(`popup.domain`)})]})}),ae.domain&&(0,I.jsxs)(Ko,{children:[(0,I.jsxs)(qo,{children:[(0,I.jsx)(Jo,{children:e(`popup.scheme`)}),(0,I.jsx)(Yo,{children:D?.protocol.replace(/:$/,``)??`(none)`})]}),(0,I.jsxs)(qo,{children:[(0,I.jsx)(Jo,{children:e(`popup.host`)}),(0,I.jsx)(Yo,{children:D?(0,I.jsx)(Xo,{onClick:ye,title:e(`popup.hostTooltip`),children:D.host}):`(none)`})]})]})]}),(0,I.jsxs)(Bo,{children:[(0,I.jsxs)(Vo,{children:[(0,I.jsxs)(Ho,{onClick:()=>we(`parameters`),children:[(0,I.jsx)(V,{$open:ae.parameters,children:`▶`}),(0,I.jsx)(`span`,{children:e(`popup.parameters`)})]}),(0,I.jsx)(Wo,{children:O.length}),(0,I.jsx)(Uo,{title:e(`popup.addParameter`),onClick:ve,disabled:!D,children:(0,I.jsx)(xr,{size:14})}),(0,I.jsx)(B,{title:e(`popup.removeAllParameters`),onClick:Se,disabled:!D||O.length===0,children:(0,I.jsx)(Sr,{size:13})})]}),ae.parameters&&(0,I.jsxs)(Ko,{children:[O.length===0&&(0,I.jsx)(Go,{children:e(`popup.noParameters`)}),O.map((t,n)=>(0,I.jsxs)(qo,{children:[(0,I.jsx)(Zo,{className:`key`,title:e(`popup.parameterName`),value:t.key,onChange:e=>ge(n,{key:e.target.value})}),(0,I.jsx)(Zo,{className:`value`,title:e(`popup.parameterValue`),placeholder:e(`popup.empty`),value:t.value,onChange:e=>ge(n,{value:e.target.value})}),(0,I.jsx)(H,{title:e(`popup.removeParameter`),onClick:()=>xe(t.key,t.value),children:(0,I.jsx)(Sr,{size:12})})]},n))]})]}),(0,I.jsxs)(Bo,{children:[(0,I.jsxs)(Vo,{children:[(0,I.jsxs)(Ho,{onClick:()=>we(`fragment`),children:[(0,I.jsx)(V,{$open:ae.fragment,children:`▶`}),(0,I.jsx)(`span`,{children:e(`popup.fragment`)})]}),(0,I.jsx)(B,{title:e(`popup.removeFragment`),onClick:k,disabled:!D||le.length===0,children:(0,I.jsx)(Sr,{size:13})})]}),ae.fragment&&(0,I.jsx)(Ko,{children:(0,I.jsxs)(qo,{children:[(0,I.jsx)(Jo,{children:`#`}),(0,I.jsx)(Zo,{className:`value`,title:e(`popup.fragmentTooltip`),placeholder:e(`popup.empty`),value:le,onChange:e=>_e(e.target.value)})]})})]}),re&&(0,I.jsxs)(as,{$tone:`error`,children:[(0,I.jsx)(hr,{size:13}),(0,I.jsx)(`span`,{children:e(re)})]}),(0,I.jsxs)(Qo,{children:[(0,I.jsxs)($o,{children:[(0,I.jsxs)(es,{disabled:!fe,onClick:()=>A(),children:[(0,I.jsx)(vr,{size:14}),(0,I.jsx)(`span`,{children:e(`popup.open`,{browser:de?.name??e(`popup.openFallback`)})})]}),(0,I.jsx)(ts,{disabled:a.length===0,onClick:()=>g(e=>!e),title:e(`popup.chooseBrowser`),children:`▾`}),h&&(0,I.jsx)(ns,{children:a.map(e=>(0,I.jsx)(rs,{onClick:()=>A(e.id),children:e.name},e.id))})]}),(0,I.jsxs)(is,{$active:b,onClick:()=>x(e=>!e),title:e(`popup.privateTooltip`),children:[(0,I.jsx)(yr,{size:13}),e(`popup.private`)]}),(0,I.jsxs)(is,{onClick:j,disabled:!D,children:[(0,I.jsx)(br,{size:13}),e(S?`popup.copied`:`popup.copy`)]})]})]})]})},ss=document.getElementById(`root`);if(ss){let e=window.location.hash.startsWith(`#popup`);(0,v.createRoot)(ss).render((0,I.jsx)(_.StrictMode,{children:(0,I.jsx)(Vr,{children:e?(0,I.jsx)(os,{}):(0,I.jsx)(uo,{})})}))}
+`,ls=()=>{let e=zr(),t=(0,_.useMemo)(Ao,[]),[n,r]=(0,_.useReducer)(ko,{entries:[t],index:0,editing:!1}),i=n.entries[n.index],[a,o]=(0,_.useState)([]),[s,c]=(0,_.useState)([]),[l,u]=(0,_.useState)(``),[d,f]=(0,_.useState)(null),[p,m]=(0,_.useState)(!1),[h,g]=(0,_.useState)(!1),[v,y]=(0,_.useState)(!1),[b,x]=(0,_.useState)(!1),[S,C]=(0,_.useState)(!1),[ee]=(0,_.useState)(()=>jo(`borderless`)),[w]=(0,_.useState)(()=>jo(`strip`)),[te,T]=(0,_.useState)(null),ne=e=>w&&te&&Eo(e,te).length>0?Do(e,te):e,[re,ie]=(0,_.useState)(null),[ae,oe]=(0,_.useState)({domain:!1,parameters:!1,fragment:!1}),se=(0,_.useRef)(null),ce=(0,_.useRef)(0),E=(0,_.useRef)(void 0),D=(0,_.useMemo)(()=>{try{return new URL(i)}catch{return null}},[i]),O=(0,_.useMemo)(()=>D?[...D.searchParams.entries()].map(([e,t])=>({key:e,value:t})):[],[D]),le=Mo(D?.hash.replace(/^#/,``)??``),ue=D?.protocol===`http:`,de=a[0],fe=!!D&&a.length>0,pe=te?Eo(i,te).length:0;(0,_.useEffect)(()=>{let e=!1;return(async()=>{try{let t=await Wi();if(e)return;o(t.settings.browsers),c(t.settings.userAgents),u(t.settings.selectedUserAgentId)}catch{}})(),()=>{e=!0}},[]),(0,_.useEffect)(()=>{let e=!1;return ta().then(t=>{e||T(Co(t))}).catch(()=>void 0),()=>{e=!0}},[]),(0,_.useEffect)(()=>(document.documentElement.classList.toggle(`popup-transparent`,ee),()=>document.documentElement.classList.remove(`popup-transparent`)),[ee]),(0,_.useEffect)(()=>L.on(e=>{let t=e;t.type===`popup.navigate`&&t.data?.url&&(r({type:`commit`,value:t.data.url}),f(null),ie(null))}),[]),(0,_.useEffect)(()=>{let e=ne(t);e!==t&&r({type:`commit`,value:e})},[t,w,te]),(0,_.useEffect)(()=>{let e=se.current;if(!e)return;let t=()=>{window.clearTimeout(E.current),E.current=window.setTimeout(()=>{let t=Math.ceil(e.offsetHeight)+24;Math.abs(t-ce.current)<2||(ce.current=t,Zr(t))},60)},n=new ResizeObserver(t);return n.observe(e),window.addEventListener(`resize`,t),()=>{window.clearTimeout(E.current),n.disconnect(),window.removeEventListener(`resize`,t)}},[]);let me=e=>{r({type:`commit`,value:e}),f(null)},he=e=>{r({type:`edit`,value:e}),f(null)},ge=(e,t)=>{if(!D)return;let n=[...D.searchParams.entries()].map(([n,r],i)=>i===e?{key:t.key??n,value:t.value??r}:{key:n,value:r}),r=new URL(i);r.search=``;for(let e of n)r.searchParams.append(e.key,e.value);he(r.toString())},_e=e=>{if(!D)return;let t=new URL(i);t.hash=e,he(t.toString())},ve=()=>{if(!D)return;let e=new URL(i);e.searchParams.append(``,``),me(e.toString())},k=()=>{if(!D)return;let e=new URL(i);e.hash=``,me(e.toString())},ye=()=>{D&&me(`${D.origin}/`)},be=async()=>{m(!0),ie(null);try{let e=await bo(i,l);if(e.location){r({type:`commit`,value:e.location});let t=ne(e.location);t!==e.location&&r({type:`commit`,value:t})}f(e)}catch(e){ie(e instanceof Error?e.message:String(e))}finally{m(!1)}},A=async e=>{g(!1),ie(null);try{await Ji(i,e,b),Gr()}catch(e){ie(e instanceof Error?e.message:String(e))}},j=async()=>{ie(null);try{await navigator.clipboard.writeText(i),C(!0),setTimeout(()=>C(!1),1500)}catch(e){ie(e instanceof Error?e.message:String(e))}},xe=(e,t)=>{if(!D)return;let n=new URL(i),r=[...n.searchParams.entries()];n.search=``;for(let[i,a]of r)(i!==e||a!==t)&&n.searchParams.append(i,a);me(n.toString())},Se=()=>{if(!D)return;let e=new URL(i);e.search=``,me(e.toString())},Ce=()=>{if(!D)return;let e=new URL(i);e.protocol=`https:`,me(e.toString())},we=e=>oe(t=>({...t,[e]:!t[e]})),M=d?d.ok?`ok`:d.statusCode>=300&&d.statusCode<400?`info`:`error`:`idle`,N=d?.location?e(`popup.redirected`):d?.statusText===`error.timeout`?e(`error.timeout`):d?.statusText,Te=p?e(`popup.checking`):d?`${d.statusCode||`!`} ${N??``}`.trim():e(`popup.checkStatus`),Ee=M===`ok`?mr:M===`error`?gr:hr;return(0,I.jsxs)(Po,{$borderless:ee,children:[(0,I.jsx)(Fo,{children:(0,I.jsx)(Io,{onClick:Gr,title:e(`popup.close`),children:`✕`})}),(0,I.jsxs)(Lo,{ref:se,children:[(0,I.jsx)(Ro,{type:`text`,value:i,spellCheck:!1,$warn:ue,onChange:e=>he(e.target.value),onBlur:()=>r({type:`commit`,value:i}),placeholder:`https://example.com/path?key=value`}),ue&&(0,I.jsxs)(zo,{children:[(0,I.jsx)(hr,{size:13}),(0,I.jsx)(`span`,{children:e(`popup.httpWarning`)})]}),n.entries.length>1&&(0,I.jsxs)(Bo,{children:[(0,I.jsx)(Vo,{onClick:()=>r({type:`jump`,index:0}),disabled:n.index===0,title:e(`popup.first`),children:`|◀`}),(0,I.jsx)(Vo,{onClick:()=>r({type:`jump`,index:n.index-1}),disabled:n.index===0,title:e(`popup.back`),children:`◀`}),(0,I.jsx)(Vo,{onClick:()=>y(e=>!e),title:e(`popup.history`),children:`▾`}),(0,I.jsx)(Vo,{onClick:()=>r({type:`jump`,index:n.index+1}),disabled:n.index>=n.entries.length-1,title:e(`popup.forward`),children:`▶`}),(0,I.jsx)(Vo,{onClick:()=>r({type:`jump`,index:n.entries.length-1}),disabled:n.index>=n.entries.length-1,title:e(`popup.last`),children:`▶|`}),v&&(0,I.jsx)(Mi,{$stretch:!0,children:n.entries.map((e,t)=>(0,I.jsx)(Ni,{$mono:!0,$active:t===n.index,onClick:()=>{r({type:`jump`,index:t}),y(!1)},children:e},`${t}-${e}`))})]}),(0,I.jsxs)(Uo,{children:[s.length>0&&(0,I.jsx)(Ri,{value:l,disabled:p,options:s.map(e=>({value:e.id,label:e.name})),onChange:u,title:e(`popup.userAgentTooltip`)}),(0,I.jsxs)(Ho,{$tone:M,onClick:be,disabled:p,title:e(`popup.checkStatus`),children:[(0,I.jsx)(Ee,{size:13}),(0,I.jsx)(`span`,{children:Te})]}),(0,I.jsxs)(B,{onClick:()=>te&&me(Do(i,te)),disabled:!D||!te,title:e(`popup.removeTrackingTooltip`),children:[(0,I.jsx)(Sr,{size:13}),e(`popup.tracking`),pe>0?` (${pe})`:``]}),ue&&(0,I.jsx)(B,{$accent:!0,onClick:Ce,children:e(`popup.useHttps`)})]}),(0,I.jsxs)(V,{children:[(0,I.jsx)(Wo,{children:(0,I.jsxs)(Go,{onClick:()=>we(`domain`),children:[(0,I.jsx)(Jo,{$open:ae.domain,children:`▶`}),(0,I.jsx)(`span`,{children:e(`popup.domain`)})]})}),ae.domain&&(0,I.jsxs)(Zo,{children:[(0,I.jsxs)(H,{children:[(0,I.jsx)(Qo,{children:e(`popup.scheme`)}),(0,I.jsx)($o,{children:D?.protocol.replace(/:$/,``)??`(none)`})]}),(0,I.jsxs)(H,{children:[(0,I.jsx)(Qo,{children:e(`popup.host`)}),(0,I.jsx)($o,{children:D?(0,I.jsx)(es,{onClick:ye,title:e(`popup.hostTooltip`),children:D.host}):`(none)`})]})]})]}),(0,I.jsxs)(V,{children:[(0,I.jsxs)(Wo,{children:[(0,I.jsxs)(Go,{onClick:()=>we(`parameters`),children:[(0,I.jsx)(Jo,{$open:ae.parameters,children:`▶`}),(0,I.jsx)(`span`,{children:e(`popup.parameters`)})]}),(0,I.jsx)(Yo,{children:O.length}),(0,I.jsx)(Ko,{title:e(`popup.addParameter`),onClick:ve,disabled:!D,children:(0,I.jsx)(xr,{size:14})}),(0,I.jsx)(qo,{title:e(`popup.removeAllParameters`),onClick:Se,disabled:!D||O.length===0,children:(0,I.jsx)(Sr,{size:13})})]}),ae.parameters&&(0,I.jsxs)(Zo,{children:[O.length===0&&(0,I.jsx)(Xo,{children:e(`popup.noParameters`)}),O.map((t,n)=>(0,I.jsxs)(H,{children:[(0,I.jsx)(ts,{className:`key`,title:e(`popup.parameterName`),value:t.key,onChange:e=>ge(n,{key:e.target.value})}),(0,I.jsx)(ts,{className:`value`,title:e(`popup.parameterValue`),placeholder:e(`popup.empty`),value:t.value,onChange:e=>ge(n,{value:e.target.value})}),(0,I.jsx)(ns,{title:e(`popup.removeParameter`),onClick:()=>xe(t.key,t.value),children:(0,I.jsx)(Sr,{size:12})})]},n))]})]}),(0,I.jsxs)(V,{children:[(0,I.jsxs)(Wo,{children:[(0,I.jsxs)(Go,{onClick:()=>we(`fragment`),children:[(0,I.jsx)(Jo,{$open:ae.fragment,children:`▶`}),(0,I.jsx)(`span`,{children:e(`popup.fragment`)})]}),(0,I.jsx)(qo,{title:e(`popup.removeFragment`),onClick:k,disabled:!D||le.length===0,children:(0,I.jsx)(Sr,{size:13})})]}),ae.fragment&&(0,I.jsx)(Zo,{children:(0,I.jsxs)(H,{children:[(0,I.jsx)(Qo,{children:`#`}),(0,I.jsx)(ts,{className:`value`,title:e(`popup.fragmentTooltip`),placeholder:e(`popup.empty`),value:le,onChange:e=>_e(e.target.value)})]})})]}),re&&(0,I.jsxs)(cs,{$tone:`error`,children:[(0,I.jsx)(hr,{size:13}),(0,I.jsx)(`span`,{children:e(re)})]}),(0,I.jsxs)(rs,{children:[(0,I.jsxs)(is,{children:[(0,I.jsxs)(as,{disabled:!fe,onClick:()=>A(),children:[(0,I.jsx)(vr,{size:14}),(0,I.jsx)(`span`,{children:e(`popup.open`,{browser:de?.name??e(`popup.openFallback`)})})]}),(0,I.jsx)(os,{disabled:a.length===0,onClick:()=>g(e=>!e),title:e(`popup.chooseBrowser`),children:`▾`}),h&&(0,I.jsx)(Mi,{$up:!0,children:a.map(e=>(0,I.jsx)(Ni,{onClick:()=>A(e.id),children:e.name},e.id))})]}),(0,I.jsxs)(ss,{$active:b,onClick:()=>x(e=>!e),title:e(`popup.privateTooltip`),children:[(0,I.jsx)(yr,{size:13}),e(`popup.private`)]}),(0,I.jsxs)(ss,{onClick:j,disabled:!D,children:[(0,I.jsx)(br,{size:13}),e(S?`popup.copied`:`popup.copy`)]})]})]})]})},us=document.getElementById(`root`);if(us){let e=window.location.hash.startsWith(`#popup`);(0,v.createRoot)(us).render((0,I.jsx)(_.StrictMode,{children:(0,I.jsx)(Vr,{children:e?(0,I.jsx)(ls,{}):(0,I.jsx)(yo,{})})}))}
