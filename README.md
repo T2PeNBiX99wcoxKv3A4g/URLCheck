@@ -12,7 +12,7 @@ Links can be dangerous if you're not checking the URL first.
 
 This software is made for doing this.
 
-Another reason is the [URLCheck](https://github.com/TrianguloY/URLCheckhttps://github.com/TrianguloY/URLCheck)
+Another reason is the [URLCheck](https://github.com/TrianguloY/URLCheck)
 doesn't have a desktop version.
 
 ## Features
