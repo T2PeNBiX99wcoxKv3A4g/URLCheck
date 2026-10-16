@@ -19,15 +19,19 @@ export interface FilterListsPayload {
     builtinRuleCount: number;
 }
 
-/** One AdGuard / uBlock Origin `$removeparam` rule, as parsed by the backend. */
+/** One parameter-removal rule, as parsed by the backend from any supported list format. */
 export interface RemoveParamRule {
     /** A literal parameter name, or a regular expression source when `regex` is true. */
     pattern: string;
     regex: boolean;
-    /** Hosts the rule is limited to; null means every host. */
-    include: string[] | null;
-    /** Hosts the rule is skipped on; null means none. */
-    exclude: string[] | null;
+    /** Full-URL regex the rule is limited to (ClearURLs providers); absent means every URL. */
+    urlPattern?: string | null;
+    /** Hosts the rule is limited to; absent means every host. */
+    include?: string[] | null;
+    /** Hosts the rule is skipped on. */
+    exclude?: string[] | null;
+    /** Full-URL regexes that skip the rule. */
+    urlExceptions?: string[] | null;
 }
 
 /**
@@ -39,7 +43,7 @@ const FALLBACK_RULES: RemoveParamRule[] = [
     "utm_reader", "utm_creative_format", "utm_marketing_tactic", "fbclid", "gclid", "dclid", "gbraid",
     "wbraid", "msclkid", "yclid", "twclid", "igshid", "mc_cid", "mc_eid", "mkt_tok", "vero_id",
     "oly_anon_id", "oly_enc_id", "wickedid", "_ga", "_gl", "_s_kwcid", "spm", "scm", "trk", "trkcampaign",
-].map((pattern) => ({pattern, regex: false, include: null, exclude: null}));
+].map((pattern) => ({pattern, regex: false}));
 
 const EMPTY_LISTS: FilterListsPayload = {lists: [], builtinRuleCount: FALLBACK_RULES.length};
 

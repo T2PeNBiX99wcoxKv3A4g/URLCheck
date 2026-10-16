@@ -1,21 +1,61 @@
+using System.Text.Json;
+
 namespace URLCheck.Filters;
 
 /// <summary>
-///     Pulls the <c>$removeparam</c> rules out of an AdGuard / uBlock Origin filter list. Everything
-///     else — ad rules, cosmetic rules, other modifiers — is ignored, so any standard list can be
-///     installed even though only the URL-cleaning part of it is used.
+///     Turns a downloaded rule file into the parameter-removal rules the popup applies. The format is
+///     detected from the content, so any supported list can be installed from a plain URL:
+///     AdGuard / uBlock Origin filter lists, ClearURLs' JSON catalog, and Firefox's query-stripping
+///     Remote Settings records.
 /// </summary>
 /// <remarks>
-///     Supported: <c>$removeparam=name</c>, <c>$removeparam=/regex/</c>, host scoping through
-///     <c>||host^</c> and <c>domain=a|b</c>, and <c>domain=~c</c> / <c>denyallow=</c> exclusions.
-///     Rules with a pattern this app cannot scope (a path, a query fragment, ...) are skipped rather
-///     than applied everywhere, and "remove every parameter" (<c>$removeparam</c> with no value) is
-///     ignored so a single bad third-party rule cannot gut a URL.
+///     <para>
+///         AdGuard: <c>$removeparam=name</c>, <c>$removeparam=/regex/</c>, host scoping through
+///         <c>||host^</c> and <c>domain=a|b</c>, and <c>domain=~c</c> / <c>denyallow=</c> exclusions.
+///         Rules with a pattern this app cannot scope (a path, a query fragment, ...) are skipped
+///         rather than applied everywhere, and "remove every parameter" is ignored so a single bad
+///         third-party rule cannot gut a URL.
+///     </para>
+///     <para>
+///         ClearURLs: every provider's <c>rules</c> (and <c>referralMarketing</c>) become rules limited
+///         to that provider's <c>urlPattern</c>, with the provider's <c>exceptions</c> kept as URL
+///         exceptions. <c>rawRules</c>, <c>redirections</c> and <c>completeProvider</c> are ignored.
+///     </para>
+///     <para>
+///         Firefox: every record's <c>stripList</c> becomes global rules, with the record's
+///         <c>allowList</c> kept as host exclusions. <c>filter_expression</c> is ignored.
+///     </para>
 /// </remarks>
 internal static class FilterParser
 {
-    /// <summary>Parses a whole filter list, keeping only the rules that touch a URL's query string.</summary>
+    /// <summary>Parses a rule file, detecting which of the supported formats it uses.</summary>
     public static List<RemoveParamRule> Parse(string text)
+    {
+        var trimmed = text.TrimStart();
+        if (trimmed.StartsWith('{') || trimmed.StartsWith('['))
+        {
+            try
+            {
+                using var document = JsonDocument.Parse(text);
+
+                var clearUrls = ParseClearUrls(document.RootElement);
+                if (clearUrls.Count > 0)
+                    return clearUrls;
+
+                return ParseFirefox(document.RootElement);
+            }
+            catch (JsonException)
+            {
+                // Not JSON after all; fall through to the line-based parser.
+            }
+        }
+
+        return ParseAdGuard(text);
+    }
+
+    // ---------------------------------------------------------------- AdGuard / uBlock Origin
+
+    private static List<RemoveParamRule> ParseAdGuard(string text)
     {
         var rules = new List<RemoveParamRule>();
 
@@ -25,14 +65,14 @@ internal static class FilterParser
             if (line.Length == 0 || line[0] is '!' or '[' or '#')
                 continue;
 
-            if (TryParse(line, out var rule))
+            if (TryParseAdGuardRule(line, out var rule))
                 rules.Add(rule);
         }
 
         return rules;
     }
 
-    private static bool TryParse(string line, out RemoveParamRule rule)
+    private static bool TryParseAdGuardRule(string line, out RemoveParamRule rule)
     {
         rule = null!;
 
@@ -91,8 +131,8 @@ internal static class FilterParser
         }
 
         var (source, isRegex) = SplitRegex(value);
-        rule = new RemoveParamRule(source, isRegex, include.Count > 0 ? include : null,
-            exclude.Count > 0 ? exclude : null);
+        rule = new RemoveParamRule(source, isRegex, Include: include.Count > 0 ? include : null,
+            Exclude: exclude.Count > 0 ? exclude : null);
         return true;
     }
 
@@ -130,5 +170,126 @@ internal static class FilterParser
 
         var end = value.LastIndexOf('/');
         return end <= 0 ? (value, false) : (value[1..end], true);
+    }
+
+    // ------------------------------------------------------------------------------- ClearURLs
+
+    private static List<RemoveParamRule> ParseClearUrls(JsonElement root)
+    {
+        var rules = new List<RemoveParamRule>();
+
+        if (root.ValueKind != JsonValueKind.Object ||
+            !root.TryGetProperty("providers", out var providers))
+            return rules;
+
+        switch (providers.ValueKind)
+        {
+            case JsonValueKind.Object:
+                foreach (var provider in providers.EnumerateObject())
+                    AddClearUrlsProvider(rules, provider.Value);
+                break;
+
+            // The newer "compiled" catalog keeps providers in an array.
+            case JsonValueKind.Array:
+                foreach (var provider in providers.EnumerateArray())
+                    AddClearUrlsProvider(rules, provider);
+                break;
+        }
+
+        return rules;
+    }
+
+    private static void AddClearUrlsProvider(List<RemoveParamRule> rules, JsonElement provider)
+    {
+        if (provider.ValueKind != JsonValueKind.Object ||
+            !provider.TryGetProperty("urlPattern", out var patternElement) ||
+            patternElement.ValueKind != JsonValueKind.String ||
+            patternElement.GetString() is not { Length: > 0 } urlPattern)
+            return;
+
+        // `completeProvider` blocks the whole URL, which is not a parameter removal.
+        if (provider.TryGetProperty("completeProvider", out var complete) && complete.ValueKind == JsonValueKind.True)
+            return;
+
+        var exceptions = ReadStrings(provider, "exceptions");
+
+        // The classic catalog lists rule names as plain strings.
+        foreach (var name in ReadStrings(provider, "rules").Concat(ReadStrings(provider, "referralMarketing")))
+            AddClearUrlsRule(rules, name, urlPattern, exceptions);
+
+        // The compiled catalog lists them as objects with `kind` / `match` / `action`.
+        if (!provider.TryGetProperty("rules", out var ruleArray) || ruleArray.ValueKind != JsonValueKind.Array)
+            return;
+
+        foreach (var rule in ruleArray.EnumerateArray())
+        {
+            if (rule.ValueKind != JsonValueKind.Object)
+                continue;
+
+            if (rule.TryGetProperty("kind", out var kind) && kind.ValueKind == JsonValueKind.String &&
+                kind.GetString() != "field")
+                continue;
+
+            if (HasNonRemovalAction(rule))
+                continue;
+
+            if (!rule.TryGetProperty("match", out var match) || match.ValueKind != JsonValueKind.String ||
+                match.GetString() is not { Length: > 0 } pattern)
+                continue;
+
+            AddClearUrlsRule(rules, pattern, urlPattern, [.. exceptions, .. ReadStrings(rule, "exceptions")]);
+        }
+    }
+
+    private static bool HasNonRemovalAction(JsonElement rule) =>
+        rule.TryGetProperty("action", out var action) &&
+        action.ValueKind == JsonValueKind.Object &&
+        action.TryGetProperty("type", out var type) &&
+        type.ValueKind == JsonValueKind.String &&
+        type.GetString() is { } name && name != "remove";
+
+    private static void AddClearUrlsRule(List<RemoveParamRule> rules, string pattern, string urlPattern,
+        List<string> exceptions) =>
+        rules.Add(new RemoveParamRule(pattern, true, urlPattern,
+            UrlExceptions: exceptions.Count > 0 ? exceptions : null));
+
+    // -------------------------------------------------------------------------------- Firefox
+
+    private static List<RemoveParamRule> ParseFirefox(JsonElement root)
+    {
+        var rules = new List<RemoveParamRule>();
+
+        if (root.ValueKind != JsonValueKind.Object ||
+            !root.TryGetProperty("data", out var records) || records.ValueKind != JsonValueKind.Array)
+            return rules;
+
+        foreach (var record in records.EnumerateArray())
+        {
+            if (record.ValueKind != JsonValueKind.Object)
+                continue;
+
+            var allowList = ReadStrings(record, "allowList");
+            foreach (var name in ReadStrings(record, "stripList"))
+                rules.Add(new RemoveParamRule(name, false, Exclude: allowList.Count > 0 ? allowList : null));
+        }
+
+        return rules;
+    }
+
+    // ---------------------------------------------------------------------------------- shared
+
+    private static List<string> ReadStrings(JsonElement element, string property)
+    {
+        var values = new List<string>();
+
+        if (element.ValueKind != JsonValueKind.Object ||
+            !element.TryGetProperty(property, out var array) || array.ValueKind != JsonValueKind.Array)
+            return values;
+
+        foreach (var item in array.EnumerateArray())
+            if (item.ValueKind == JsonValueKind.String && item.GetString() is { Length: > 0 } value)
+                values.Add(value);
+
+        return values;
     }
 }

@@ -1,3 +1,6 @@
+using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using JetBrains.Annotations;
 using Serilog;
@@ -195,12 +198,30 @@ internal sealed class FilterService
         }
     }
 
-    /// <summary>Fetches a rule file, parses it and stores it. Returns an error key, or null on success.</summary>
+    /// <summary>
+    ///     Fetches a rule file, parses it and stores it. Two layers keep a repeated check cheap: a
+    ///     conditional request (ETag / Last-Modified) lets the server answer 304 without a body, and
+    ///     the SHA-256 of the content catches servers that ignore it. Returns an error key, or null.
+    /// </summary>
     private async Task<string?> DownloadAsync(FilterListEntry entry)
     {
         try
         {
-            using var response = await Client.GetAsync(entry.Url);
+            using var request = new HttpRequestMessage(HttpMethod.Get, entry.Url);
+            if (!string.IsNullOrEmpty(entry.ETag))
+                request.Headers.TryAddWithoutValidation("If-None-Match", entry.ETag);
+            else if (!string.IsNullOrEmpty(entry.LastModified))
+                request.Headers.TryAddWithoutValidation("If-Modified-Since", entry.LastModified);
+
+            using var response = await Client.SendAsync(request);
+
+            // Nothing changed since the last check, so there is no body to read or store.
+            if (response.StatusCode == HttpStatusCode.NotModified)
+            {
+                entry.Error = null;
+                return null;
+            }
+
             if (!response.IsSuccessStatusCode)
             {
                 entry.Error = $"HTTP {(int)response.StatusCode}";
@@ -208,6 +229,15 @@ internal sealed class FilterService
             }
 
             var text = await response.Content.ReadAsStringAsync();
+            var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
+
+            // The server did not honour the conditional request, but the file is byte-identical.
+            if (hash == entry.Hash)
+            {
+                entry.Error = null;
+                return null;
+            }
+
             var rules = FilterParser.Parse(text);
             if (rules.Count == 0)
             {
@@ -216,6 +246,9 @@ internal sealed class FilterService
             }
 
             await File.WriteAllTextAsync(RuleFilePath(entry.Id), text);
+            entry.Hash = hash;
+            entry.ETag = response.Headers.ETag?.ToString();
+            entry.LastModified = response.Content.Headers.LastModified?.ToString("R");
             entry.RuleCount = rules.Count;
             entry.LastUpdated = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             entry.Error = null;

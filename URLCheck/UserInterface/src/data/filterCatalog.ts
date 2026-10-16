@@ -3,9 +3,9 @@
  * name and a direct download URL — installing one only downloads and parses it, so no copy of the
  * rules ships with the app.
  *
- * Every entry here has to be an AdGuard / uBlock Origin style list, which is what the parser
- * understands. Formats with their own schema (ClearURLs' JSON, Firefox's Remote Settings records)
- * would need their own parser before they can be offered.
+ * Any format the backend's parser understands can be listed here: AdGuard / uBlock Origin filter
+ * lists, ClearURLs' JSON catalog and Firefox's query-stripping records. The format is detected from
+ * the downloaded content.
  */
 export interface CatalogEntry {
     name: string;
@@ -24,5 +24,15 @@ export const FILTER_CATALOG: CatalogEntry[] = [
         name: "uBlock Origin – AdGuard URL Tracking Protection",
         url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt",
         descriptionKey: "filters.catalog.uboUrlTracking",
+    },
+    {
+        name: "ClearURLs",
+        url: "https://rules1.clearurls.xyz/data.minify.json",
+        descriptionKey: "filters.catalog.clearUrls",
+    },
+    {
+        name: "Firefox – Query Parameter Stripping",
+        url: "https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/query-stripping/records",
+        descriptionKey: "filters.catalog.firefox",
     },
 ];

@@ -18,8 +18,17 @@ internal sealed class FilterListEntry
     /// <summary>Unix epoch milliseconds of the last successful download, or 0 when never fetched.</summary>
     public long LastUpdated { get; set; }
 
-    /// <summary>Number of <c>$removeparam</c> rules parsed from the last download.</summary>
+    /// <summary>Number of parameter-removal rules parsed from the last download.</summary>
     public int RuleCount { get; set; }
+
+    /// <summary>Lower-case SHA-256 of the downloaded file, so identical content is never re-stored.</summary>
+    public string Hash { get; set; } = "";
+
+    /// <summary>ETag of the last download, sent back as <c>If-None-Match</c> to skip the body.</summary>
+    public string? ETag { get; set; }
+
+    /// <summary>Last-Modified of the last download, sent back as <c>If-Modified-Since</c>.</summary>
+    public string? LastModified { get; set; }
 
     /// <summary>Last download/parse error, cleared by a successful update.</summary>
     public string? Error { get; set; }
