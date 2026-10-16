@@ -42,6 +42,13 @@ internal sealed class AppSettings
     /// </summary>
     public bool AutoStripTrackingParams { get; set; } = true;
 
+    /// <summary>
+    ///     Start with the management window hidden, the way a link launch does. The popup is a window
+    ///     of its own, so it still appears. Ignored when there is no tray icon to restore the window
+    ///     from.
+    /// </summary>
+    public bool HideOnLaunch { get; set; }
+
     public AppSettings Clone() => (AppSettings)MemberwiseClone();
 
     /// <summary>Clamps values into their supported ranges so invalid input can never be persisted.</summary>

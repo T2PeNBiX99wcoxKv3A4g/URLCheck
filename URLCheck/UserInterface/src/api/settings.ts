@@ -26,6 +26,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     language: "en",
     borderlessPopup: true,
     autoStripTrackingParams: true,
+    hideOnLaunch: false,
     selectedUserAgentId: "default",
 };
 
@@ -63,6 +64,7 @@ function normalize(settings: AppSettings): AppSettings {
         borderlessPopup: settings.borderlessPopup ?? DEFAULT_SETTINGS.borderlessPopup,
         autoStripTrackingParams:
             settings.autoStripTrackingParams ?? DEFAULT_SETTINGS.autoStripTrackingParams,
+        hideOnLaunch: settings.hideOnLaunch ?? DEFAULT_SETTINGS.hideOnLaunch,
     };
 }
 

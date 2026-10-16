@@ -28,6 +28,12 @@ internal sealed record BrowsersPayload(IReadOnlyList<BrowserEntry> Browsers);
 /// <summary>Body for <c>app.info</c>.</summary>
 internal sealed record AppInfoPayload(string Version, string Platform);
 
+/// <summary>
+///     Body for the <c>app.startup</c> messages. The state lives in the Startup folder, so it is
+///     reported rather than stored, and platforms without one report <c>Supported: false</c>.
+/// </summary>
+internal sealed record StartupPayload(bool Supported, bool Enabled);
+
 /// <summary>Body for <c>i18n.get</c>.</summary>
 internal sealed record LocalePayload(
     string Locale,

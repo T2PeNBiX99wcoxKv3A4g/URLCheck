@@ -53,6 +53,24 @@ export async function protocolStatus(): Promise<ProtocolStatus> {
     return await Native.request<ProtocolStatus>("app.protocolStatus");
 }
 
+export interface StartupStatus {
+    /** False on platforms with no per-user Startup folder (Linux). */
+    supported: boolean;
+    enabled: boolean;
+}
+
+/** Reports whether URLCheck starts with the user's session. */
+export async function startupStatus(): Promise<StartupStatus> {
+    if (!Native.available) return {supported: false, enabled: false};
+
+    return await Native.request<StartupStatus>("app.startup");
+}
+
+/** Adds or removes the per-user startup shortcut. */
+export async function setStartup(enabled: boolean): Promise<StartupStatus> {
+    return await Native.request<StartupStatus>("app.setStartup", {enabled});
+}
+
 /** Opens the Windows "Default apps" settings page. */
 export async function openDefaultAppsSettings(): Promise<void> {
     await Native.request("app.openDefaultApps");

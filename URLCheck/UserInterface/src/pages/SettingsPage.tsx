@@ -24,7 +24,7 @@ import {FILTER_CATALOG} from "../data/filterCatalog";
 const AttributionPage = React.lazy(() =>
     import("./AttributionPage").then((module) => ({default: module.AttributionPage}))
 );
-import {getAppInfo, openDefaultAppsSettings, protocolStatus, registerCustomScheme, registerProtocols, unregisterProtocols, type ProtocolStatus} from "../api/system";
+import {getAppInfo, openDefaultAppsSettings, protocolStatus, registerCustomScheme, registerProtocols, setStartup, startupStatus, unregisterProtocols, type ProtocolStatus, type StartupStatus} from "../api/system";
 
 const SettingRow = styled.div`
   display: flex;
@@ -707,6 +707,8 @@ export const SettingsPage: React.FC = () => {
   const [newFilterUrl, setNewFilterUrl] = useState("");
   const [adding, setAdding] = useState(false);
   const [attributionOpen, setAttributionOpen] = useState(false);
+  const [startup, setStartupState] = useState<StartupStatus | null>(null);
+  const [startupBusy, setStartupBusy] = useState(false);
 
   useEffect(() => {
     protocolStatus().then(setProtocols).catch(() => setProtocols(null));
@@ -714,6 +716,10 @@ export const SettingsPage: React.FC = () => {
 
   useEffect(() => {
     getAppInfo().then((info) => setPlatform(info.platform)).catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    startupStatus().then(setStartupState).catch(() => setStartupState(null));
   }, []);
 
   useEffect(() => {
@@ -983,6 +989,19 @@ export const SettingsPage: React.FC = () => {
 
   const handleCheckFilterUpdates = () =>
       runFilterAction(() => updateFilterLists(), setFiltersBusy);
+
+  /** The startup shortcut is applied immediately; nothing about it lives in the settings. */
+  const handleStartupChange = async (enabled: boolean) => {
+    setStartupBusy(true);
+    setError(null);
+    try {
+      setStartupState(await setStartup(enabled));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setStartupBusy(false);
+    }
+  };
 
   return (
       <PageContainer $maxWidth={800}>
@@ -1287,6 +1306,41 @@ export const SettingsPage: React.FC = () => {
               {filtersBusy ? t("settings.filterUpdating") : t("settings.checkFilterUpdates")}
             </GhostButton>
           </ButtonRow>
+        </StackCard>
+
+        <StackCard>
+          <SectionTitle>{t("settings.startup")}</SectionTitle>
+
+          <SettingInfo>
+            <SettingDescription>{t("settings.startupDescription")}</SettingDescription>
+          </SettingInfo>
+
+          {/* Only Windows has a per-user Startup folder, so the row is absent elsewhere. */}
+          {startup?.supported && (
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.startWithSession")}</SettingLabel>
+                  <SettingDescription>{t("settings.startWithSessionDescription")}</SettingDescription>
+                </SettingInfo>
+                <Checkbox
+                    disabled={startupBusy}
+                    checked={startup.enabled}
+                    onChange={(event) => handleStartupChange(event.target.checked)}
+                />
+              </SettingRow>
+          )}
+
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>{t("settings.hideOnLaunch")}</SettingLabel>
+              <SettingDescription>{t("settings.hideOnLaunchDescription")}</SettingDescription>
+            </SettingInfo>
+            <Checkbox
+                disabled={busy}
+                checked={settings.hideOnLaunch}
+                onChange={(event) => update({hideOnLaunch: event.target.checked})}
+            />
+          </SettingRow>
         </StackCard>
 
         <ActionRow>

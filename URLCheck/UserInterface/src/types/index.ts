@@ -16,6 +16,8 @@ export interface AppSettings {
     borderlessPopup: boolean;
     /** Strip known tracking parameters from a URL as soon as the popup opens. */
     autoStripTrackingParams: boolean;
+    /** Start with the management window hidden, like a link launch. Ignored without a tray icon. */
+    hideOnLaunch: boolean;
 }
 
 export interface UserAgentEntry {

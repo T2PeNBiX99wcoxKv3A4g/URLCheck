@@ -47,9 +47,6 @@ internal static class Program
             var hasTray = OperatingSystem.IsWindows() ||
                           (OperatingSystem.IsLinux() && LinuxDiagnostics.AppIndicatorLibrary is not null);
 
-            // Show the management window unless we were launched to handle a link, or asked to stay in the tray.
-            var showMainWindow = !hasTray || (!args.Contains("--tray") && startupUrls.Count == 0);
-
             // Only one instance may run; later launches hand their URLs to it and exit.
             using var singleInstance = new SingleInstance();
             if (!singleInstance.IsFirstInstance)
@@ -79,12 +76,21 @@ internal static class Program
             var settings = new SettingsService(browserLocator);
             _ = settings.GetAsync().GetAwaiter().GetResult(); // know the language before the tray is built
 
+            // Show the management window unless we were launched to handle a link, asked to stay in the
+            // tray, or the settings say to start hidden. Without a tray there is no way back to the
+            // window, so it always shows. The popup is its own window and is never affected.
+            var startHidden = args.Contains("--tray") ||
+                              startupUrls.Count > 0 ||
+                              (settings.Current?.HideOnLaunch ?? false);
+            var showMainWindow = !hasTray || !startHidden;
+
             var localization = new LocalizationService(settings);
             var history = new HistoryService();
             var iconPath = AppIcon.EnsureExtracted();
             _ = new AppInfoService();
             _ = new BrowserService(browserLocator);
             _ = new ProtocolRegistrationService(protocolRegistrar);
+            _ = new StartupService();
             _ = new InspectService(settings);
             _ = new FilterService();
             var manager = new WindowManager(appUrl, windowPlatform, settings, history)
