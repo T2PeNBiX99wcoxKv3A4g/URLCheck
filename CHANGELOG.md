@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.0.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.0.1..v0.0.2) - 2026-10-16
+
+### 📚 Documentation
+
+- Update image references and rename image files in README - ([f3ed7be](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f3ed7befd7087ce2bb1097f988c85db8b16d6fd8))
+- Center the header and add UI screenshots - ([5e8057c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5e8057ccb5c92eeccd05c566504045c106cefc0f))
+- Add images to documentation resources - ([ef66a4d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ef66a4de0664f6febf7f5dc5ef387570fb3146ac))
+- Add project icon to README - ([488a701](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/488a7018ecedfca7dfd1d6a9405bd0d82fb2091c))
+- Fix formatting and clarify Wayland behavior in README - ([ebb7a2d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ebb7a2dd26c4e1423670d6ea756cd52dcaa3990b))
+- Fix typos in README and clarify Wayland-specific behavior - ([4d72452](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4d72452e50bbaffc6c7dc7a7b3f1ab7e4a52eb23))
+- Clarify Wayland support and update README requirements - ([9f46a41](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/9f46a41b05382ea4f9003b9f04bf1a19d23c72c3))
+- Simplify Windows and Linux requirements in README - ([a6ee185](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a6ee1853a50d8df7c577fcb40d0d885415ccac66))
+- Remove outdated localization details from README - ([922703a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/922703adba556c3f55466d34399542df526c4286))
+- Give each platform its own section in the runtime requirements - ([a38f36e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a38f36e167211220b9bfcc040010c63aa68a1705))
+- Separate runtime requirements from build requirements - ([e6162a4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e6162a45ff34ed1255e452cf6286a55ed98a8646))
+- Fix malformed URL in README - ([69f6b64](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/69f6b64dd8410b9a31a274c9642a7c63dbe7b86a))
+- Clarify URLCheck purpose and update README structure - ([f08b7f7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f08b7f79a167175a4e40cf52dd65ff05a921ba3b))
+- Improve table formatting and clarify wording in README - ([ca821bb](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ca821bbecef7cbed14d09925179cebb4ed86aa4e))
+- Be specific about the tested Linux distribution and dependencies - ([1caba79](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1caba797bd66cc485afac6d046ac8435f7000b64))
+- Add README - ([bcbabed](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/bcbabede2c6aa4c6a1dd914bbd289156dbc6605e))
+
+### ⚙️ Miscellaneous Tasks
+
+- Add MIT license file to the project - ([afe8ac9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/afe8ac9b74f2eef9119d3e1d67cdf1afb3f201d1))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([e30e28f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e30e28fb58411d95d0b90e63b8cd619a65b0cfea))
+
+## New Contributors ❤️
+
+* @github-actions[bot] made their first contribution
+
 ## [0.0.1] - 2026-10-15
 
 ### ⛰️  Features
