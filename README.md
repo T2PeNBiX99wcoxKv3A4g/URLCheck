@@ -70,8 +70,7 @@ installed for them. What the operating system still has to provide:
 3. Only tested on **Fedora 44 with KDE Plasma on Wayland**. Every other distribution is untested, and the
   runtime libraries are the fiddly part, so start from the libraries rather than the package names.
 4. Only support Wayland right now. If you are a super nerd running something like an old window manager on X11, you
-   should fix it
-   by yourself and send a pull request.
+   should fix any issues by yourself.
 
 | Distribution    | Packages                                                          |
 |-----------------|-------------------------------------------------------------------|
