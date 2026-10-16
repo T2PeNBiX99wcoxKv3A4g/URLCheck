@@ -35,15 +35,21 @@ export interface RemoveParamRule {
 }
 
 /**
- * No rules are hard-coded in the front-end: they always come from the backend, which owns the
- * embedded built-in file and the downloaded lists. Outside the desktop shell there is simply
- * nothing to apply, so the popup leaves URLs untouched.
+ * Rules applied when the native bridge is missing, so the popup still cleans URLs during plain
+ * browser development. The real list comes from the backend's embedded `builtin.txt`.
  */
-const NO_LISTS: FilterListsPayload = {lists: [], builtinRuleCount: 0};
+const FALLBACK_RULES: RemoveParamRule[] = [
+    "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "utm_id", "utm_name",
+    "utm_reader", "utm_creative_format", "utm_marketing_tactic", "fbclid", "gclid", "dclid", "gbraid",
+    "wbraid", "msclkid", "yclid", "twclid", "igshid", "mc_cid", "mc_eid", "mkt_tok", "vero_id",
+    "oly_anon_id", "oly_enc_id", "wickedid", "_ga", "_gl", "_s_kwcid", "spm", "scm", "trk", "trkcampaign",
+].map((pattern) => ({pattern, regex: false}));
+
+const EMPTY_LISTS: FilterListsPayload = {lists: [], builtinRuleCount: FALLBACK_RULES.length};
 
 /** The installed filter lists plus the built-in rule count. */
 export async function loadFilterLists(): Promise<FilterListsPayload> {
-    if (!Native.available) return NO_LISTS;
+    if (!Native.available) return EMPTY_LISTS;
     return await Native.request<FilterListsPayload>("filters.get");
 }
 
@@ -67,7 +73,7 @@ export async function updateFilterLists(id?: string): Promise<FilterListsPayload
 
 /** Every rule the popup should apply: the built-in list plus every enabled installed list. */
 export async function loadFilterRules(): Promise<RemoveParamRule[]> {
-    if (!Native.available) return [];
+    if (!Native.available) return FALLBACK_RULES;
     return (await Native.request<FilterRulesPayload>("filters.rules")).rules;
 }
 
