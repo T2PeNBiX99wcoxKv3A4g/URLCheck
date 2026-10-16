@@ -158,4 +158,4 @@ its own windows, so a few things behave differently there than on Windows or X11
 
 Neither is a bug in URLCheck; both are limitations of the protocol.
 
-You can make popup windows to always-on-top and forced to the center of the screen in KWin if you on KDE Plasma.
+You can make popup windows always-on-top and forced to the center of the screen in KWin if you are on KDE Plasma.
