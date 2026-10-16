@@ -1,3 +1,5 @@
+![icon.svg](icon.svg)
+
 # URLCheck
 
 **Check the URL before it opens in your browser.**
