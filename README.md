@@ -60,12 +60,32 @@ Platform differences are kept behind small interfaces (`IBrowserLocator`, `IWind
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/) 20 or newer, to build the interface
 
-On Linux the app also needs the runtime libraries the web view and tray use:
+### Linux
 
-```bash
-# Fedora
-sudo dnf install webkit2gtk4.1 libayatana-appindicator-gtk3
+Development and testing happen on **Fedora 44 with KDE Plasma on Wayland** — that is the
+combination this project is actually known to work on. Any other distribution is untested, and
+Linux runtime dependencies are the fiddly part, so start from the libraries rather than the
+package names:
+
+| Distribution | Packages |
+|---|---|
+| Fedora 44 | `sudo dnf install webkit2gtk4.1 libayatana-appindicator-gtk3` |
+| Debian / Ubuntu | `sudo apt install libwebkit2gtk-4.1-0 libayatana-appindicator3-1` |
+| anything else | find whatever provides the libraries below |
+
 ```
+libwebkit2gtk-4.1.so.0          libjavascriptcoregtk-4.1.so.0
+libgtk-3.so.0                   libglib-2.0.so.0
+libayatana-appindicator3.so.1   (or the older libappindicator3.so.1)
+```
+
+A missing web view library shows up as `Unable to load shared library 'Photino.Native'` at
+startup. To find the package that owns a missing soname, ask your package manager — for example
+`dnf provides 'libwebkit2gtk-4.1.so.0'`, `apt-file search libwebkit2gtk-4.1.so.0`, or
+`pacman -F libwebkit2gtk-4.1.so.0`.
+
+The AppIndicator library is only needed for the tray icon: without it the app still runs, it
+just has no tray and keeps its main window visible instead.
 
 ## Build and run
 
@@ -116,14 +136,17 @@ problem. They roll daily and the last seven are kept.
 
 ## Notes on Linux
 
-Wayland deliberately does not let an application place its own windows, so a few things behave
-differently there than on Windows or X11:
+Tested on Fedora 44, KDE Plasma, Wayland. Wayland deliberately does not let an application place
+its own windows, so a few things behave differently there than on Windows or X11:
 
 - the popup cannot be forced to the centre of the screen — the compositor positions it, usually
   relative to the main window;
-- always-on-top is a no-op, because the Wayland backend has no implementation for it.
+- always-on-top is a no-op, because the GTK Wayland backend has no implementation for it.
 
 Neither is a bug in URLCheck; both are limitations of the protocol.
+
+Running a bare window manager on X11 instead? Then some of the above will not apply to you. You
+are clearly a super nerd, so fix it and send a pull request.
 
 ## License
 
