@@ -132,6 +132,6 @@ its own windows, so a few things behave differently there than on Windows or X11
   relative to the main window;
 - always-on-top is a no-op, because the GTK Wayland backend has no implementation for it.
 
-You can make popup windows to always-on-top and forced to the center of the screen in KWin if you on KDE Plasma.
-
 Neither is a bug in URLCheck; both are limitations of the protocol.
+
+You can make popup windows to always-on-top and forced to the center of the screen in KWin if you on KDE Plasma.
