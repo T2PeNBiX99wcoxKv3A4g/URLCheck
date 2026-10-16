@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.1.2..v0.2.0) - 2026-10-16
+
+### ⛰️  Features
+
+- Pick the User-Agent used for status and redirect checks - ([da2f246](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/da2f2469674f2abc44297212a81cc6790cd931e3))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([02ff489](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/02ff489c7e37913455896545191b2362c750ad63))
+
+
 ## [0.1.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.1.1..v0.1.2) - 2026-10-16
 
 ### ⚙️ Miscellaneous Tasks
