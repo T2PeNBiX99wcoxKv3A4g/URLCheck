@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.1.0..v0.1.1) - 2026-10-16
+
+### 🐛 Bug Fixes
+
+- *(ui)* Resolve the vite 8 peer conflict and regenerate the lockfile - ([8493cf7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8493cf76d7e2699ddd7de370de93324aaf2d419f))
+
+### ⚙️ Miscellaneous Tasks
+
+- Restore npm updates in Dependabot and make the upgrade script drop the lockfile - ([5c61940](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5c61940e0c1f5fd5d6e8fd6883efbcf9bff6210f))
+- Stop tracking the npm lockfile and drop npm from Dependabot - ([ff61a89](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ff61a8963bf552d15252372f02bf199919696aa0))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([690331c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/690331c735dceb5f816d03d8a9da34683368569f))
+
+## New Contributors ❤️
+
+* @dependabot[bot] made their first contribution
+
 ## [0.1.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.0.2..v0.1.0) - 2026-10-16
 
 ### ⛰️  Features
