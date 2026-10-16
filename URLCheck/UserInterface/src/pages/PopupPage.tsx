@@ -14,7 +14,6 @@ import {
     CopyIcon,
     LockIcon,
     PlusIcon,
-    RedirectIcon,
     ShieldCheckIcon,
     TrashIcon,
     XCircleIcon,
@@ -70,15 +69,16 @@ function readInitialUrl(): string {
 }
 
 /**
- * The effective borderless state, as decided by the backend: it may have fallen back when the screen
- * cannot do transparent windows.
+ * Reads a `1`/`0` flag from the popup's `#popup?...` query. The backend decides these — the
+ * borderless state may have fallen back when the screen cannot do transparent windows — so a missing
+ * query means "on".
  */
-function readBorderless(): boolean {
+function readPopupFlag(name: string): boolean {
     const hash = window.location.hash;
     const queryIndex = hash.indexOf("?");
     if (queryIndex < 0) return true;
 
-    return new URLSearchParams(hash.slice(queryIndex + 1)).get("borderless") !== "0";
+    return new URLSearchParams(hash.slice(queryIndex + 1)).get(name) !== "0";
 }
 
 /** Percent-decodes a value, leaving it untouched when it is not valid encoding. */
@@ -722,7 +722,8 @@ export const PopupPage: React.FC = () => {
     const [historyMenuOpen, setHistoryMenuOpen] = useState(false);
     const [privateMode, setPrivateMode] = useState(false);
     const [copied, setCopied] = useState(false);
-    const [borderless] = useState(readBorderless);
+    const [borderless] = useState(() => readPopupFlag("borderless"));
+    const [autoStrip] = useState(() => readPopupFlag("strip"));
     const [error, setError] = useState<string | null>(null);
     const [open, setOpen] = useState<SectionState>({domain: false, parameters: false, fragment: false});
 
@@ -786,11 +787,13 @@ export const PopupPage: React.FC = () => {
         });
     }, []);
 
-    /* tracking parameters are stripped as soon as the popup opens */
+    /* tracking parameters are stripped as soon as the popup opens, unless the setting turns it off */
     useEffect(() => {
+        if (!autoStrip) return;
+
         const stripped = stripTrackingParams(initialUrl);
         if (stripped !== initialUrl) dispatch({type: "commit", value: stripped});
-    }, [initialUrl]);
+    }, [initialUrl, autoStrip]);
 
     /* keep the window sized to its content */
     useEffect(() => {
@@ -876,25 +879,17 @@ export const PopupPage: React.FC = () => {
         setStatusBusy(true);
         setError(null);
         try {
-            setStatus(await checkStatus(url, userAgentId));
+            const result = await checkStatus(url, userAgentId);
+            // The pill reports the response's own status — a redirect shows the exact 3xx it is — and
+            // the URL box moves straight to the target. The edit history keeps the original, so the
+            // jump needs no confirmation.
+            if (result.location) dispatch({type: "commit", value: result.location});
+            setStatus(result);
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
         } finally {
             setStatusBusy(false);
         }
-    };
-
-    /**
-     * The status pill doubles as the redirect action: once a check has found a 3xx, the next click
-     * jumps to its target. The jump goes through the edit history, so the original URL is kept.
-     */
-    const handleStatusClick = async () => {
-        if (status?.location) {
-            commit(status.location);
-            return;
-        }
-
-        await handleCheckStatus();
     };
 
     const handleOpen = async (browserId?: string) => {
@@ -965,14 +960,7 @@ export const PopupPage: React.FC = () => {
                 ? `${status.statusCode || "!"} ${status.statusText === "error.timeout" ? t("error.timeout") : status.statusText}`.trim()
                 : t("popup.checkStatus");
 
-    /* A found redirect swaps the icon for the arrow, hinting that the pill now jumps. */
-    const StatusIcon = status?.location
-        ? RedirectIcon
-        : tone === "ok"
-                ? CheckCircleIcon
-                : tone === "error"
-                        ? XCircleIcon
-                        : AlertTriangleIcon;
+    const StatusIcon = tone === "ok" ? CheckCircleIcon : tone === "error" ? XCircleIcon : AlertTriangleIcon;
 
     return (
         <Root $borderless={borderless}>
@@ -1052,8 +1040,8 @@ export const PopupPage: React.FC = () => {
                         </UserAgentSelect>
                     )}
 
-                    <StatusPill $tone={tone} onClick={handleStatusClick} disabled={statusBusy}
-                                 title={status?.location ? t("popup.redirectTooltip") : t("popup.checkStatus")}>
+                    <StatusPill $tone={tone} onClick={handleCheckStatus} disabled={statusBusy}
+                                 title={t("popup.checkStatus")}>
                         <StatusIcon size={13}/>
                         <span>{statusText}</span>
                     </StatusPill>

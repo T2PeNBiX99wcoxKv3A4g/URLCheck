@@ -723,6 +723,18 @@ export const SettingsPage: React.FC = () => {
                 onChange={(e) => update({borderlessPopup: e.target.checked})}
             />
           </SettingRow>
+
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>{t("settings.autoStripTracking")}</SettingLabel>
+              <SettingDescription>{t("settings.autoStripTrackingDescription")}</SettingDescription>
+            </SettingInfo>
+            <Checkbox
+                disabled={busy}
+                checked={settings.autoStripTrackingParams}
+                onChange={(e) => update({autoStripTrackingParams: e.target.checked})}
+            />
+          </SettingRow>
         </StackCard>
 
         <StackCard>

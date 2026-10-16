@@ -40,8 +40,8 @@ internal sealed record HistoryListPayload(IReadOnlyList<HistoryItemPayload> Entr
 internal sealed record HistoryItemPayload(int Id, string Url, long Timestamp);
 
 /// <summary>
-///     Body for <c>inspect.status</c>. A non-null <paramref name="Location" /> marks a redirect the
-///     popup can follow.
+///     Body for <c>inspect.status</c>. <paramref name="Location" /> is the target of the redirect
+///     whose status is reported, or null when the response was not a redirect.
 /// </summary>
 internal sealed record InspectStatusPayload(int StatusCode, string StatusText, bool Ok, string? Location);
 

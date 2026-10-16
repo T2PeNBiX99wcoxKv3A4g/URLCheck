@@ -8,8 +8,9 @@ namespace URLCheck.Inspect;
 internal sealed class InspectService
 {
     /// <summary>
-    ///     Never follows redirects, so a 3xx is reported as-is together with its Location. The popup
-    ///     decides whether to jump, which also keeps the original URL in the edit history.
+    ///     Never follows redirects, so the response keeps its own status: a redirect comes back as the
+    ///     exact 3xx it is (301, 302, 303, 307, 308, ...) together with its Location. The popup then
+    ///     reports that code and jumps to the target.
     /// </summary>
     private static readonly HttpClient Client = new(new SocketsHttpHandler { AllowAutoRedirect = false });
 

@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     browsers: [],
     language: "en",
     borderlessPopup: true,
+    autoStripTrackingParams: true,
     selectedUserAgentId: "default",
 };
 
@@ -60,6 +61,8 @@ function normalize(settings: AppSettings): AppSettings {
         })),
         language: settings.language || DEFAULT_SETTINGS.language,
         borderlessPopup: settings.borderlessPopup ?? DEFAULT_SETTINGS.borderlessPopup,
+        autoStripTrackingParams:
+            settings.autoStripTrackingParams ?? DEFAULT_SETTINGS.autoStripTrackingParams,
     };
 }
 

@@ -4,13 +4,13 @@ export interface StatusResult {
     statusCode: number;
     statusText: string;
     ok: boolean;
-    /** Set when the response is a redirect; the popup offers to follow it. */
+    /** Redirect target when the response was a 3xx; the popup jumps to it. */
     location: string | null;
 }
 
 /**
  * Asks the backend to request the URL and report its HTTP status. Redirects are not followed, so a
- * 3xx comes back as-is with its {@link StatusResult.location}.
+ * redirect keeps its own code (301, 302, 307, ...) instead of the destination's.
  */
 export async function checkStatus(url: string, userAgentId?: string): Promise<StatusResult> {
     return await Native.request<StatusResult>("inspect.status", {url, userAgentId});

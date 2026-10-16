@@ -36,6 +36,12 @@ internal sealed class AppSettings
     /// </summary>
     public bool BorderlessPopup { get; set; } = true;
 
+    /// <summary>
+    ///     Strip known tracking parameters from a URL as soon as the popup opens. When off, the URL
+    ///     is left alone until the popup's tracking button is pressed.
+    /// </summary>
+    public bool AutoStripTrackingParams { get; set; } = true;
+
     public AppSettings Clone() => (AppSettings)MemberwiseClone();
 
     /// <summary>Clamps values into their supported ranges so invalid input can never be persisted.</summary>

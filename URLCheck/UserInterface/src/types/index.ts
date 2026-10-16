@@ -14,6 +14,8 @@ export interface AppSettings {
     language: string;
     /** Cross-platform: show the popup without window decorations, drawing our own rounded frame. */
     borderlessPopup: boolean;
+    /** Strip known tracking parameters from a URL as soon as the popup opens. */
+    autoStripTrackingParams: boolean;
 }
 
 export interface UserAgentEntry {

@@ -222,8 +222,11 @@ internal sealed class WindowManager
                 _platform.OnPopupCreated(popup, borderless);
             });
 
+            var stripTracking = _settings.Current?.AutoStripTrackingParams ?? true;
+
             ApplyIcon(popup);
-            popup.Load($"{_appUrl}#popup?url={Uri.EscapeDataString(url)}&borderless={(borderless ? 1 : 0)}");
+            popup.Load(
+                $"{_appUrl}#popup?url={Uri.EscapeDataString(url)}&borderless={(borderless ? 1 : 0)}&strip={(stripTracking ? 1 : 0)}");
             _popupWindow = popup;
 
             try
