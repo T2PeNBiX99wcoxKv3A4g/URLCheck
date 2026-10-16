@@ -465,7 +465,10 @@ const FilterActions = styled.div`
   flex-shrink: 0;
 `;
 
-/** A switch, so a list can be turned on and off at any time without removing it. */
+/**
+ * A switch, so a list can be turned on and off at any time without removing it. The "on" state uses
+ * the same indigo as the settings' checkboxes and sliders.
+ */
 const Toggle = styled.button<{ $on: boolean }>`
   position: relative;
   width: 38px;
@@ -473,8 +476,8 @@ const Toggle = styled.button<{ $on: boolean }>`
   padding: 0;
   flex-shrink: 0;
   border-radius: 999px;
-  border: 1px solid ${(props) => (props.$on ? "rgba(59, 130, 246, 0.5)" : "rgba(255, 255, 255, 0.15)")};
-  background: ${(props) => (props.$on ? "rgba(59, 130, 246, 0.3)" : "rgba(255, 255, 255, 0.06)")};
+  border: 1px solid ${(props) => (props.$on ? "#6366f1" : "rgba(255, 255, 255, 0.15)")};
+  background: ${(props) => (props.$on ? "#6366f1" : "rgba(255, 255, 255, 0.06)")};
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
 
@@ -486,8 +489,13 @@ const Toggle = styled.button<{ $on: boolean }>`
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: ${(props) => (props.$on ? "#93c5fd" : "#9ca3af")};
+    background: ${(props) => (props.$on ? "#ffffff" : "#9ca3af")};
     transition: left 0.2s ease, background 0.2s ease;
+  }
+
+  &:hover:not(:disabled) {
+    background: ${(props) => (props.$on ? "#4f46e5" : "rgba(255, 255, 255, 0.12)")};
+    border-color: ${(props) => (props.$on ? "#4f46e5" : "rgba(255, 255, 255, 0.24)")};
   }
 
   &:disabled {

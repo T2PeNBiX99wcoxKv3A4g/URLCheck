@@ -829,8 +829,8 @@ Error generating stack: `+e.message+`
   padding: 0;
   flex-shrink: 0;
   border-radius: 999px;
-  border: 1px solid ${e=>e.$on?`rgba(59, 130, 246, 0.5)`:`rgba(255, 255, 255, 0.15)`};
-  background: ${e=>e.$on?`rgba(59, 130, 246, 0.3)`:`rgba(255, 255, 255, 0.06)`};
+  border: 1px solid ${e=>e.$on?`#6366f1`:`rgba(255, 255, 255, 0.15)`};
+  background: ${e=>e.$on?`#6366f1`:`rgba(255, 255, 255, 0.06)`};
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
 
@@ -842,8 +842,13 @@ Error generating stack: `+e.message+`
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: ${e=>e.$on?`#93c5fd`:`#9ca3af`};
+    background: ${e=>e.$on?`#ffffff`:`#9ca3af`};
     transition: left 0.2s ease, background 0.2s ease;
+  }
+
+  &:hover:not(:disabled) {
+    background: ${e=>e.$on?`#4f46e5`:`rgba(255, 255, 255, 0.12)`};
+    border-color: ${e=>e.$on?`#4f46e5`:`rgba(255, 255, 255, 0.24)`};
   }
 
   &:disabled {
