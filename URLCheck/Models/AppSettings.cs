@@ -17,8 +17,11 @@ internal sealed class AppSettings
     /// <summary>Maximum milliseconds to wait for a single URL response.</summary>
     public int RequestTimeoutMs { get; set; } = 5_000;
 
-    /// <summary>User-Agent headers offered in the settings. The first entry is the default.</summary>
+    /// <summary>User-Agent headers offered in the popup and the settings.</summary>
     public List<UserAgentEntry> UserAgents { get; set; } = [];
+
+    /// <summary>Id of the <see cref="UserAgents" /> entry used for outbound requests. The first entry is the fallback.</summary>
+    public string SelectedUserAgentId { get; set; } = "";
 
     /// <summary>UI language, e.g. <c>en</c>, <c>zh-TW</c>.</summary>
     public string Language { get; set; } = DefaultLanguage;
@@ -54,6 +57,10 @@ internal sealed class AppSettings
             if (string.IsNullOrWhiteSpace(agent.Name))
                 agent.Name = "Custom";
         }
+
+        // Removing the selected entry must not leave the setting pointing at nothing.
+        if (!UserAgents.Any(agent => agent.Id == SelectedUserAgentId))
+            SelectedUserAgentId = UserAgents[0].Id;
 
         // Most-used browser first, so the popup's main button follows your habits.
         Browsers = [.. Browsers.OrderByDescending(browser => browser.UseCount)];

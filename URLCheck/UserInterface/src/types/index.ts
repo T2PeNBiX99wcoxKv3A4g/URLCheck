@@ -8,6 +8,8 @@ export interface HistoryItem {
 export interface AppSettings {
     requestTimeoutMs: number;
     userAgents: UserAgentEntry[];
+    /** Id of the entry used for outbound requests; falls back to the first entry. */
+    selectedUserAgentId: string;
     browsers: BrowserEntry[];
     language: string;
     /** Cross-platform: show the popup without window decorations, drawing our own rounded frame. */

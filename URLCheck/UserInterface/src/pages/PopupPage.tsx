@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useReducer, useRef, useState} from "react";
 import styled, {keyframes} from "styled-components";
-import {BrowserEntry} from "../types";
+import {BrowserEntry, UserAgentEntry} from "../types";
 import {loadSettings} from "../api/settings";
 import {openWithBrowser} from "../api/browsers";
 import {checkStatus, followRedirect, type StatusResult} from "../api/inspect";
@@ -343,6 +343,42 @@ const ActionButton = styled.button<{ $accent?: boolean }>`
     }
 `;
 
+const UserAgentSelect = styled.select`
+    /* Fixed height so it lines up with the action buttons. */
+    height: 30px;
+    box-sizing: border-box;
+    max-width: 150px;
+    padding: 0 6px;
+    border-radius: 7px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #d1d5db;
+    font-size: 0.76rem;
+    line-height: 1;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+    &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.12);
+        color: #f9fafb;
+    }
+
+    &:focus {
+        border-color: #3b82f6;
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    option {
+        background: #111827;
+        color: #f9fafb;
+    }
+`;
+
 const Section = styled.div`
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 8px;
@@ -673,6 +709,9 @@ export const PopupPage: React.FC = () => {
     const url = history.entries[history.index];
 
     const [browsers, setBrowsers] = useState<BrowserEntry[]>([]);
+    const [userAgents, setUserAgents] = useState<UserAgentEntry[]>([]);
+    /* Picked here for this popup only; the settings hold the default. */
+    const [userAgentId, setUserAgentId] = useState("");
     const [status, setStatus] = useState<StatusResult | null>(null);
     const [statusBusy, setStatusBusy] = useState(false);
     const [redirectBusy, setRedirectBusy] = useState(false);
@@ -707,13 +746,16 @@ export const PopupPage: React.FC = () => {
     const canOpen = Boolean(parsed) && browsers.length > 0;
     const trackingCount = trackingParamKeys(url).length;
 
-    /* load the browser list */
+    /* load the browser and User-Agent lists */
     useEffect(() => {
         let cancelled = false;
         (async () => {
             try {
                 const payload = await loadSettings();
-                if (!cancelled) setBrowsers(payload.settings.browsers);
+                if (cancelled) return;
+                setBrowsers(payload.settings.browsers);
+                setUserAgents(payload.settings.userAgents);
+                setUserAgentId(payload.settings.selectedUserAgentId);
             } catch {
                 // The popup still works without a browser list.
             }
@@ -831,7 +873,7 @@ export const PopupPage: React.FC = () => {
         setRedirectBusy(true);
         setError(null);
         try {
-            const target = await followRedirect(url);
+            const target = await followRedirect(url, userAgentId);
             if (target) commit(target);
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
@@ -844,7 +886,7 @@ export const PopupPage: React.FC = () => {
         setStatusBusy(true);
         setError(null);
         try {
-            setStatus(await checkStatus(url));
+            setStatus(await checkStatus(url, userAgentId));
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
         } finally {
@@ -987,6 +1029,19 @@ export const PopupPage: React.FC = () => {
                 )}
 
                 <Actions>
+                    {userAgents.length > 0 && (
+                        <UserAgentSelect
+                            value={userAgentId}
+                            disabled={statusBusy || redirectBusy}
+                            onChange={(e) => setUserAgentId(e.target.value)}
+                            title={t("popup.userAgentTooltip")}
+                        >
+                            {userAgents.map((agent) => (
+                                <option key={agent.id} value={agent.id}>{agent.name}</option>
+                            ))}
+                        </UserAgentSelect>
+                    )}
+
                     <StatusPill $tone={tone} onClick={handleCheckStatus} disabled={statusBusy}
                                  title={t("popup.checkStatus")}>
                         <StatusIcon size={13}/>

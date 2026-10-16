@@ -601,6 +601,21 @@ export const SettingsPage: React.FC = () => {
             </SettingDescription>
           </SettingInfo>
 
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>{t("settings.userAgentDefault")}</SettingLabel>
+            </SettingInfo>
+            <Select
+                disabled={busy || settings.userAgents.length === 0}
+                value={settings.selectedUserAgentId}
+                onChange={(e) => update({selectedUserAgentId: e.target.value})}
+            >
+              {settings.userAgents.map((agent) => (
+                  <option key={agent.id} value={agent.id}>{agent.name}</option>
+              ))}
+            </Select>
+          </SettingRow>
+
           <ListEditor>
             {settings.userAgents.map((agent) => (
                 <ListRow key={agent.id}>

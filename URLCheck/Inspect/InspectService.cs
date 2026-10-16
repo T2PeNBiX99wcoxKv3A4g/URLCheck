@@ -30,7 +30,7 @@ internal sealed class InspectService
 
     private async Task<NativeResponse?> CheckStatusAsync(NativeContext context)
     {
-        if (context.Payload<InspectRequest>() is not { Url: { Length: > 0 } url })
+        if (context.Payload<InspectRequest>() is not { Url: { Length: > 0 } url } payload)
             return context.Fail("inspect.status.result", "error.missingUrl");
 
         var settings = await _settings.GetAsync();
@@ -39,7 +39,7 @@ internal sealed class InspectService
         {
             using var cts = new CancellationTokenSource(settings.RequestTimeoutMs);
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.TryAddWithoutValidation("User-Agent", ResolveUserAgent(settings));
+            request.Headers.TryAddWithoutValidation("User-Agent", ResolveUserAgent(settings, payload.UserAgentId));
 
             using var response = await StatusClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
@@ -57,7 +57,7 @@ internal sealed class InspectService
 
     private async Task<NativeResponse?> FollowRedirectAsync(NativeContext context)
     {
-        if (context.Payload<InspectRequest>() is not { Url: { Length: > 0 } url })
+        if (context.Payload<InspectRequest>() is not { Url: { Length: > 0 } url } payload)
             return context.Fail("inspect.redirect.result", "error.missingUrl");
 
         var settings = await _settings.GetAsync();
@@ -66,7 +66,7 @@ internal sealed class InspectService
         {
             using var cts = new CancellationTokenSource(settings.RequestTimeoutMs);
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.TryAddWithoutValidation("User-Agent", ResolveUserAgent(settings));
+            request.Headers.TryAddWithoutValidation("User-Agent", ResolveUserAgent(settings, payload.UserAgentId));
 
             using var response = await RedirectClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
@@ -79,8 +79,16 @@ internal sealed class InspectService
         }
     }
 
-    private static string ResolveUserAgent(AppSettings settings) =>
-        settings.UserAgents.FirstOrDefault()?.Value is { Length: > 0 } value
-            ? value
-            : "URLCheck Desktop Agent/1.0";
+    /// <summary>
+    ///     Picks the header for an outbound request: the entry the popup asked for, otherwise the
+    ///     configured default, otherwise the first entry.
+    /// </summary>
+    private static string ResolveUserAgent(AppSettings settings, string? requestedId)
+    {
+        var entry = settings.UserAgents.FirstOrDefault(agent => agent.Id == requestedId)
+                    ?? settings.UserAgents.FirstOrDefault(agent => agent.Id == settings.SelectedUserAgentId)
+                    ?? settings.UserAgents.FirstOrDefault();
+
+        return entry?.Value is { Length: > 0 } value ? value : "URLCheck Desktop Agent/1.0";
+    }
 }

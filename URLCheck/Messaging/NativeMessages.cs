@@ -97,8 +97,8 @@ internal sealed record PopupOpenRequest(string Url, string? BrowserId, bool Priv
 /// <summary>Payload for <c>popup.resize</c>.</summary>
 internal sealed record PopupResizeRequest(int Height);
 
-/// <summary>Payload for the <c>inspect.*</c> messages.</summary>
-internal sealed record InspectRequest(string Url);
+/// <summary>Payload for the <c>inspect.*</c> messages. The User-Agent is optional: the configured default is used when it is empty.</summary>
+internal sealed record InspectRequest(string Url, string? UserAgentId = null);
 
 /// <summary>Payload for <c>i18n.get</c>.</summary>
 internal sealed record LocaleRequest(string? Locale);

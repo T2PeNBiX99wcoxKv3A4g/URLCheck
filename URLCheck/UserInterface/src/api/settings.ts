@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     browsers: [],
     language: "en",
     borderlessPopup: true,
+    selectedUserAgentId: "default",
 };
 
 export interface SettingsPayload {
@@ -39,13 +40,19 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function normalize(settings: AppSettings): AppSettings {
+    const userAgents =
+        Array.isArray(settings.userAgents) && settings.userAgents.length > 0
+            ? settings.userAgents
+            : DEFAULT_SETTINGS.userAgents;
+
     return {
         ...settings,
         requestTimeoutMs: clamp(settings.requestTimeoutMs, 1000, 15000),
-        userAgents:
-            Array.isArray(settings.userAgents) && settings.userAgents.length > 0
-                ? settings.userAgents
-                : DEFAULT_SETTINGS.userAgents,
+        userAgents,
+        // Removing the selected entry must not leave the setting pointing at nothing.
+        selectedUserAgentId: userAgents.some((agent) => agent.id === settings.selectedUserAgentId)
+            ? settings.selectedUserAgentId
+            : userAgents[0].id,
         browsers: (Array.isArray(settings.browsers) ? settings.browsers : []).map((browser) => ({
             ...browser,
             arguments: browser.arguments ?? "",
