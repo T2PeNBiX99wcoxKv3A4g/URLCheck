@@ -19,7 +19,7 @@ import {
     TrashIcon,
     XCircleIcon,
 } from "../components/Icons";
-import {Dropdown, DropdownItem, DropdownMenu} from "../components/Dropdown";
+import {Dropdown, DropdownItem, DropdownMenu, useMenuFit} from "../components/Dropdown";
 
 /* ------------------------------------------------------------------ history */
 
@@ -632,6 +632,12 @@ export const PopupPage: React.FC = () => {
     const contentRef = useRef<HTMLDivElement>(null);
     const lastHeight = useRef(0);
     const resizeTimer = useRef<number | undefined>(undefined);
+    /* Anchors for the two menus that are not `Dropdown`s, so they stay inside the window too. */
+    const historyAnchor = useRef<HTMLDivElement>(null);
+    const browserAnchor = useRef<HTMLDivElement>(null);
+
+    const historyMenuStyle = useMenuFit(historyMenuOpen, false, historyAnchor);
+    const browserMenuStyle = useMenuFit(browserMenuOpen, true, browserAnchor);
 
     const parsed = useMemo(() => {
         try {
@@ -917,7 +923,7 @@ export const PopupPage: React.FC = () => {
                 )}
 
                 {history.entries.length > 1 && (
-                <Toolbar>
+                <Toolbar ref={historyAnchor}>
                     <SmallButton onClick={() => dispatch({type: "jump", index: 0})} disabled={history.index === 0}
                                  title={t("popup.first")}>|◀
                     </SmallButton>
@@ -936,7 +942,7 @@ export const PopupPage: React.FC = () => {
                     </SmallButton>
 
                     {historyMenuOpen && (
-                        <DropdownMenu $stretch>
+                        <DropdownMenu $stretch style={historyMenuStyle}>
                             {history.entries.map((entry, index) => (
                                 <DropdownItem
                                     key={`${index}-${entry}`}
@@ -1101,7 +1107,7 @@ export const PopupPage: React.FC = () => {
                 )}
 
                 <Footer>
-                    <SplitButton>
+                    <SplitButton ref={browserAnchor}>
                         <OpenButton disabled={!canOpen} onClick={() => handleOpen()}>
                             <ShieldCheckIcon size={14}/>
                             <span>{t("popup.open", {browser: defaultBrowser?.name ?? t("popup.openFallback")})}</span>
@@ -1114,7 +1120,7 @@ export const PopupPage: React.FC = () => {
                             ▾
                         </ArrowButton>
                         {browserMenuOpen && (
-                            <DropdownMenu $up>
+                            <DropdownMenu $up style={browserMenuStyle}>
                                 {browsers.map((browser) => (
                                     <DropdownItem key={browser.id} onClick={() => handleOpen(browser.id)}>
                                         {browser.name}

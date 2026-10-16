@@ -83,6 +83,38 @@ const Root = styled.div`
     display: inline-flex;
 `;
 
+/**
+ * Keeps an open menu inside the window. The popup is sized to its content and clips whatever leaves
+ * it, and a menu is out of flow so it never makes the popup grow; capping its height to the space
+ * the anchor really has turns an overflowing menu into a scrolling one instead.
+ */
+export function useMenuFit(
+    open: boolean,
+    up: boolean | undefined,
+    anchor: React.RefObject<HTMLElement | null>
+): React.CSSProperties {
+    const [style, setStyle] = useState<React.CSSProperties>({});
+
+    useEffect(() => {
+        if (!open) return;
+
+        const measure = () => {
+            const rect = anchor.current?.getBoundingClientRect();
+            if (!rect) return;
+
+            // A small margin keeps the menu from touching the window edge.
+            const space = up ? rect.top : window.innerHeight - rect.bottom;
+            setStyle({maxHeight: Math.max(120, Math.floor(space - 10))});
+        };
+
+        measure();
+        window.addEventListener("resize", measure);
+        return () => window.removeEventListener("resize", measure);
+    }, [open, up, anchor]);
+
+    return style;
+}
+
 const Trigger = styled.button<{ $variant: "compact" | "form" }>`
     display: inline-flex;
     align-items: center;
@@ -171,6 +203,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 }) => {
     const [open, setOpen] = useState(false);
     const root = useRef<HTMLDivElement>(null);
+    const menuStyle = useMenuFit(open, up, root);
 
     /* Close on a click elsewhere or on Escape, the way a native select does. */
     useEffect(() => {
@@ -209,7 +242,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
             </Trigger>
 
             {open && (
-                <DropdownMenu $up={up} role="listbox">
+                <DropdownMenu $up={up} role="listbox" style={menuStyle}>
                     {options.map((option) => (
                         <DropdownItem
                             key={option.value}

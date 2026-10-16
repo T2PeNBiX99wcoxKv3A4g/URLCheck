@@ -62,6 +62,14 @@ $accent-glow: 0 0 24px rgba(99, 102, 241, 0.35);
   padding: 0;
 }
 
+// WebKitGTK paints its own themed background on buttons, which shows through the app's translucent
+// surfaces and washes the label out (very visible on Linux). Dropping the native appearance keeps
+// the theme out of the way. Inputs are left alone so checkboxes and range sliders keep their look.
+button {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
 // No font-family here on purpose: body inherits it from html, so the :lang() rules above keep
 // working. Declaring it again would shadow them.
 html,
