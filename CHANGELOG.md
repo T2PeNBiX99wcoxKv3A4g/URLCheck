@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.3.0..v0.4.0) - 2026-10-16
+
+### ⛰️  Features
+
+- *(ui)* Red reset button and broader motion transitions - ([06e6238](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/06e6238651b05c07d51e6cbf29cdd6c743da7d27))
+- *(ui)* Add discard button for unsaved settings changes - ([0ac49ee](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0ac49eed06e3fba477282a24d1a51ad475e587e4))
+- *(ui)* Warn about unsaved settings changes - ([d28b54f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d28b54fd716d238ceba012b4b6b1d12fd50cb85f))
+
+### 🐛 Bug Fixes
+
+- *(ui)* Animate home open button and history row highlight - ([de342ed](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/de342edbff3fa13d2b1bafb485d11f5cc4a4fb1c))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([69538c4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/69538c48f355c040990205507e48a34479f6cbda))
+
+
 ## [0.3.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.2.0..v0.3.0) - 2026-10-16
 
 ### ⛰️  Features
