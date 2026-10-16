@@ -18,7 +18,7 @@
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^6.1.2",
     "npm-check-updates": "^23.1.0",
     "sass": "^1.105.0",
     "typescript": "^7",
