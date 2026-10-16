@@ -183,10 +183,7 @@ export const AttributionPage: React.FC<{ onClose: () => void }> = ({onClose}) =>
                                 <SectionHeader type="button" aria-expanded={open} onClick={() => toggle(entry.name)}>
                                     <Chevron $open={open}>▶</Chevron>
                                     <Name>{entry.name}</Name>
-                                    <Meta>
-                                        {entry.version ? `${entry.version} · ` : ""}
-                                        {entry.license}
-                                    </Meta>
+                                    <Meta>{[entry.version, entry.license].filter(Boolean).join(" · ")}</Meta>
                                 </SectionHeader>
 
                                 {open && <Body>{entry.text}</Body>}

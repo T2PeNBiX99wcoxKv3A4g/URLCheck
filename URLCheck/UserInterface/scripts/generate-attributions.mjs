@@ -28,7 +28,22 @@ async function findLicenseFile(directory) {
     return match ? path.join(directory, match) : null;
 }
 
-/** Canonical text for an SPDX id, downloaded once and then cached in the repository. */
+/** Downloads a licence text once and caches it in the repository. */
+async function remoteText(url, cacheName) {
+    const cached = path.join(licenseCache, `${cacheName}.txt`);
+    if (existsSync(cached)) return (await readFile(cached, "utf8")).trim();
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Cannot download ${url}: HTTP ${response.status}`);
+
+    const text = (await response.text()).trim();
+    await mkdir(licenseCache, {recursive: true});
+    await writeFile(cached, `${text}\n`, "utf8");
+    console.log(`cached scripts/licenses/${cacheName}.txt`);
+    return text;
+}
+
+/** Canonical text for an SPDX id, fetched once from spdx.org and cached in the repository. */
 async function spdxText(id) {
     const cached = path.join(licenseCache, `${id}.txt`);
     if (existsSync(cached)) return (await readFile(cached, "utf8")).trim();
@@ -44,6 +59,17 @@ async function spdxText(id) {
     console.log(`cached scripts/licenses/${id}.txt`);
     return licenseText.trim();
 }
+
+/** Guesses the SPDX id of a licence text, for packages that only link to one. */
+const KNOWN_LICENSES = [
+    [/MIT License/i, "MIT"],
+    [/Apache License\s+Version 2\.0/i, "Apache-2.0"],
+    [/SIL OPEN FONT LICENSE Version 1\.1/i, "OFL-1.1"],
+    [/BSD 3-Clause/i, "BSD-3-Clause"],
+    [/ISC License/i, "ISC"],
+];
+
+const detectLicense = (text) => KNOWN_LICENSES.find(([pattern]) => pattern.test(text))?.[1] ?? "";
 
 /** Every npm package the app builds or ships with. */
 async function npmEntries() {
@@ -100,12 +126,17 @@ async function nugetEntries() {
         } else if (expression) {
             text = await spdxText(expression);
         } else {
+            // Older packages only link their licence, so download it and name it from the text.
             const url = spec.match(/<licenseUrl>([^<]*)<\/licenseUrl>/)?.[1]?.trim();
-            license = url ? `see ${url}` : "unknown";
-            text = "";
+            text = url ? await remoteText(url, id) : "";
+            license = detectLicense(text);
         }
 
-        const header = [`Licensed under ${license}.`, authors && `Authors: ${authors}`, projectUrl && `Project: ${projectUrl}`]
+        const header = [
+            license && `Licensed under ${license}.`,
+            authors && `Authors: ${authors}`,
+            projectUrl && `Project: ${projectUrl}`,
+        ]
             .filter(Boolean)
             .join("\n");
 
