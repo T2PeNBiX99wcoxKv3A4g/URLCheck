@@ -25,6 +25,7 @@ nul
 **/dist/
 **/build/
 *.tsbuildinfo
+**/package-lock.json
 **/node_modules/
 
 opencode.json
