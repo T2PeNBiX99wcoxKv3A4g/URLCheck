@@ -28,8 +28,6 @@ desktop version.
   The most-used browser becomes the default button.
 - **History** — every intercepted URL is recorded locally in SQLite and can be searched, and
   clicking an entry reopens the popup for it.
-- **Localised** — English, Traditional Chinese, Simplified Chinese and Japanese, switchable at
-  runtime and shared between the interface and the backend.
 
 ## Running
 
