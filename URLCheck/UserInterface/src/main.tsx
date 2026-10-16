@@ -13,6 +13,7 @@ import "@fontsource/jetbrains-mono/latin-600.css";
 import "@fontsource/jetbrains-mono/latin-700.css";
 import App from "./App";
 import {LocalizationProvider} from "./i18n";
+import {SelectionPopup} from "./components/SelectionPopup";
 import {PopupPage} from "./pages/PopupPage";
 
 const rootElement = document.getElementById("root");
@@ -24,6 +25,8 @@ if (rootElement) {
         <StrictMode>
             <LocalizationProvider>
                 {isPopup ? <PopupPage/> : <App/>}
+                {/* Lives outside the pages so selecting a URL works in every window. */}
+                <SelectionPopup/>
             </LocalizationProvider>
         </StrictMode>
     );

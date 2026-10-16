@@ -112,6 +112,7 @@
   "settings.noBrowsersDetected": "未偵測到已安裝的瀏覽器。",
 
   "popup.close": "關閉",
+  "selection.open": "用 URLCheck 開啟",
   "popup.history": "歷史",
   "popup.first": "最前",
   "popup.back": "上一筆",

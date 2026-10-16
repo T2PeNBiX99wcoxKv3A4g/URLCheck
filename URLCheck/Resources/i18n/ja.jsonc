@@ -112,6 +112,7 @@
   "settings.noBrowsersDetected": "インストール済みのブラウザが見つかりませんでした。",
 
   "popup.close": "閉じる",
+  "selection.open": "URLCheck で開く",
   "popup.history": "履歴",
   "popup.first": "最初",
   "popup.back": "前へ",

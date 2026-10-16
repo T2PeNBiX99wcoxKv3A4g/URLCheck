@@ -118,6 +118,7 @@
 
   // ----------------------------------------------------------------- popup
   "popup.close": "Close",
+  "selection.open": "Open in URLCheck",
   "popup.history": "History",
   "popup.first": "First",
   "popup.back": "Back",
