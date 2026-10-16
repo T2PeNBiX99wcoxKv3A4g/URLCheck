@@ -6,7 +6,7 @@ updates:
   - package-ecosystem: nuget
     directory: /URLCheck
     schedule:
-      interval: weekly
+      interval: daily
     groups:
       nuget:
         patterns: ["*"]
@@ -19,7 +19,7 @@ updates:
   - package-ecosystem: npm
     directory: /URLCheck/UserInterface
     schedule:
-      interval: weekly
+      interval: daily
     groups:
       npm:
         patterns: ["*"]
@@ -32,7 +32,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
+      interval: daily
     commit-message:
       prefix: "chore"
       include: "scope"
