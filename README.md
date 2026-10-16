@@ -8,12 +8,11 @@ goes, strip the tracking junk, and only then hand it to the browser you actually
 
 ## Why
 
-Links can be dangerous if you're not checking the URL first.
+Links can be dangerous if you do not check the URL first. This software makes that check happen
+before the browser does anything.
 
-This software is made for doing this.
-
-Another reason is the [URLCheck](https://github.com/TrianguloY/URLCheck)
-doesn't have a desktop version.
+It also fills a gap: [URLCheck](https://github.com/TrianguloY/URLCheck) covers Android, and has no
+desktop version.
 
 ## Features
 
@@ -34,15 +33,17 @@ doesn't have a desktop version.
 
 ## Requirements
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- [Node.js](https://nodejs.org/) 20 or newer, to build the interface
+### Running
 
-### Linux
+The published builds are **self-contained** — they bundle the .NET runtime, so nothing needs to be
+installed for them.
 
-Development and testing happen on **Fedora 44 with KDE Plasma on Wayland** — that is the
-combination this project is actually known to work on. Any other distribution is untested, and
-Linux runtime dependencies are the fiddly part, so start from the libraries rather than the
-package names:
+- **Windows** — nothing extra. The web view uses the Microsoft Edge **WebView2 Runtime**, which
+  ships with Windows 11 and comes with Microsoft Edge on Windows 10.
+- **Linux** — the web view and GTK libraries listed below. The tray icon additionally needs an
+  AppIndicator library. Tested on **Fedora 44 with KDE Plasma on Wayland**; every other
+  distribution is untested, and the runtime libraries are the fiddly part, so start from the
+  libraries rather than the package names.
 
 | Distribution    | Packages                                                          |
 |-----------------|-------------------------------------------------------------------|
@@ -63,6 +64,11 @@ startup. To find the package that owns a missing soname, ask your package manage
 
 The AppIndicator library is only needed for the tray icon: without it the app still runs, it
 just has no tray and keeps its main window visible instead.
+
+### Building
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Node.js](https://nodejs.org/) 20 or newer, to build the interface
 
 ## Build and run
 
@@ -122,4 +128,5 @@ its own windows, so a few things behave differently there than on Windows or X11
 
 Neither is a bug in URLCheck; both are limitations of the protocol.
 
-If you are a super nerd running like an old window manager on X11, you should fix by yourself then send a pull request.
+If you are a super nerd running something like an old window manager on X11, you should fix it
+yourself and send a pull request.
