@@ -50,8 +50,6 @@ desktop version.
   of its own.
 - **Photino.NET** — the desktop shell. It shows the interface in the operating system's own web
   view, which is why the web view is a runtime dependency: WebView2 on Windows, WebKitGTK on Linux.
-- **SQLite through EF Core** — the inspection history.
-- **Serilog** — logging, to the console and to a rolling file.
 
 ## Running
 
