@@ -31,19 +31,26 @@ desktop version.
 - **Localised** — English, Traditional Chinese, Simplified Chinese and Japanese, switchable at
   runtime and shared between the interface and the backend.
 
-## Requirements
-
-### Running
+## Running
 
 The published builds are **self-contained** — they bundle the .NET runtime, so nothing needs to be
-installed for them.
+installed for them. What the operating system still has to provide:
 
-- **Windows** — nothing extra. The web view uses the Microsoft Edge **WebView2 Runtime**, which
-  ships with Windows 11 and comes with Microsoft Edge on Windows 10.
-- **Linux** — the web view and GTK libraries listed below. The tray icon additionally needs an
-  AppIndicator library. Tested on **Fedora 44 with KDE Plasma on Wayland**; every other
-  distribution is untested, and the runtime libraries are the fiddly part, so start from the
-  libraries rather than the package names.
+### Windows
+
+- Windows 10 or later. That is the floor for both .NET 10 and the current WebView2 Runtime, so
+  Windows 7 and 8.1 are out.
+- The Microsoft Edge **WebView2 Runtime**. This is the web view, and it is a separate component
+  from the operating system: it ships with Windows 11 and comes with Microsoft Edge on Windows 10,
+  so most machines already have it. If the app refuses to start, install it from
+  [Microsoft's page](https://developer.microsoft.com/microsoft-edge/webview2/).
+
+### Linux
+
+- The web view and GTK libraries, listed below.
+- An AppIndicator library, for the tray icon only.
+- Tested on **Fedora 44 with KDE Plasma on Wayland**. Every other distribution is untested, and the
+  runtime libraries are the fiddly part, so start from the libraries rather than the package names.
 
 | Distribution    | Packages                                                          |
 |-----------------|-------------------------------------------------------------------|
@@ -62,10 +69,10 @@ startup. To find the package that owns a missing soname, ask your package manage
 `dnf provides 'libwebkit2gtk-4.1.so.0'`, `apt-file search libwebkit2gtk-4.1.so.0`, or
 `pacman -F libwebkit2gtk-4.1.so.0`.
 
-The AppIndicator library is only needed for the tray icon: without it the app still runs, it
-just has no tray and keeps its main window visible instead.
+The AppIndicator library is only needed for the tray icon: without it the app still runs, it just
+has no tray and keeps its main window visible instead.
 
-### Building
+## Building
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/) 20 or newer, to build the interface
