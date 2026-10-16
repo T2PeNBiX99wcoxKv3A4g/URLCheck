@@ -63,7 +63,7 @@ installed for them. What the operating system still has to provide:
 1. The Microsoft Edge **WebView2 Runtime**. If you are not using Windows 11, you need it.
   [Microsoft's page](https://developer.microsoft.com/microsoft-edge/webview2/).
 2. Any Windows version lower than 11 is not supported.
-   You need to fix by yourself.
+   If you have any issues, You need to fix by yourself.
 
 ### Linux
 
