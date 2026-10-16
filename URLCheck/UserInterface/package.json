@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/copy-build.mjs",
     "preview": "vite preview",
-    "upgrade": "npm-check-updates -u"
+    "upgrade": "node -e \"require('fs').rmSync('package-lock.json',{force:true})\" && npm-check-updates -u && npm install"
   },
   "dependencies": {
     "react": "^19",

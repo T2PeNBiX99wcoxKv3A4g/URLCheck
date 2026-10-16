@@ -15,9 +15,21 @@ updates:
       prefix: "chore"
       include: "scope"
 
-  # The React interface is upgraded by hand (`npm run upgrade`), so Dependabot
-  # does not manage it. Without a committed lockfile it could not do npm
-  # security updates anyway.
+  # The React interface — URLCheck/UserInterface/package.json
+  # No lockfile is committed on purpose, so this only covers direct dependencies.
+  # That is fine: npm security updates would need a lockfile, but the lockfile
+  # caused more trouble than it was worth here.
+  - package-ecosystem: npm
+    directory: /URLCheck/UserInterface
+    schedule:
+      interval: daily
+    groups:
+      npm:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
 
   # The workflow files — .github/workflows/*
   - package-ecosystem: github-actions
