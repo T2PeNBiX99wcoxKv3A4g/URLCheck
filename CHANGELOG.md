@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.3.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.2.0..v0.3.0) - 2026-10-16
+
+### ⛰️  Features
+
+- *(ui)* Self-host Inter and JetBrains Mono - ([6a8276a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6a8276aef75bb4f355e82decbe7225cd189b989f))
+
+### 🐛 Bug Fixes
+
+- *(ui)* Give monospace text the language font too - ([4bbac0d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4bbac0da545d7fe2ead4d3954818463803101c58))
+- *(ui)* Give each language its own CJK font - ([2d2b262](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2d2b262d6ac98d05efd0b8025b82a2860a1ce27e))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([cda08a8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cda08a8649886a119dc652a18dc75970e7856044))
+
+
 ## [0.2.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.1.2..v0.2.0) - 2026-10-16
 
 ### ⛰️  Features
