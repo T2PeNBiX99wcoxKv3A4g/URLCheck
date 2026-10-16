@@ -47,6 +47,9 @@ installed for them. What the operating system still has to provide:
 2. An AppIndicator library, for the tray icon only.
 3. Only tested on **Fedora 44 with KDE Plasma on Wayland**. Every other distribution is untested, and the
   runtime libraries are the fiddly part, so start from the libraries rather than the package names.
+4. Only support Wayland right now. If you are a super nerd running something like an old window manager on X11, you
+   should fix it
+   by yourself and send a pull request.
 
 | Distribution    | Packages                                                          |
 |-----------------|-------------------------------------------------------------------|
@@ -130,6 +133,3 @@ its own windows, so a few things behave differently there than on Windows or X11
 - always-on-top is a no-op, because the GTK Wayland backend has no implementation for it.
 
 Neither is a bug in URLCheck; both are limitations of the protocol.
-
-If you are a super nerd running something like an old window manager on X11, you should fix it
-by yourself and send a pull request.
