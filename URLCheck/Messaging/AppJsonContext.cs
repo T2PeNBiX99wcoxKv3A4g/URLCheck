@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using URLCheck.Filters;
 using URLCheck.Models;
 
 namespace URLCheck.Messaging;
@@ -36,6 +37,15 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(LocalePayload))]
 [JsonSerializable(typeof(HistoryListPayload))]
 [JsonSerializable(typeof(InspectStatusPayload))]
+[JsonSerializable(typeof(FilterListEntry))]
+[JsonSerializable(typeof(List<FilterListEntry>))]
+[JsonSerializable(typeof(FilterAddRequest))]
+[JsonSerializable(typeof(FilterIdRequest))]
+[JsonSerializable(typeof(FilterToggleRequest))]
+[JsonSerializable(typeof(FilterListPayload))]
+[JsonSerializable(typeof(FilterRulesPayload))]
+[JsonSerializable(typeof(RemoveParamRule))]
+[JsonSerializable(typeof(List<RemoveParamRule>))]
 [JsonSerializable(typeof(NavigatePayload))]
 [JsonSerializable(typeof(PopupNavigatePayload))]
 [JsonSerializable(typeof(Dictionary<string, string>))]

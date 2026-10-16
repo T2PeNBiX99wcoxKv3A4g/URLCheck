@@ -1,0 +1,46 @@
+! URLCheck built-in tracking-parameter rules.
+!
+! These rules are always active and cannot be removed or disabled, and they are deliberately not
+! listed with the user-installed filter lists. They use the same AdGuard / uBlock Origin
+! `$removeparam` syntax as every list installed from the settings, so one parser handles both.
+!
+! ---------------------------------------------------------------------- campaigns (UTM)
+$removeparam=utm_source
+$removeparam=utm_medium
+$removeparam=utm_campaign
+$removeparam=utm_term
+$removeparam=utm_content
+$removeparam=utm_id
+$removeparam=utm_name
+$removeparam=utm_reader
+$removeparam=utm_creative_format
+$removeparam=utm_marketing_tactic
+!
+! ---------------------------------------------------------------------- advertising click ids
+$removeparam=fbclid
+$removeparam=gclid
+$removeparam=dclid
+$removeparam=gbraid
+$removeparam=wbraid
+$removeparam=msclkid
+$removeparam=yclid
+$removeparam=twclid
+!
+! ---------------------------------------------------------------------- social & e-mail
+$removeparam=igshid
+$removeparam=mc_cid
+$removeparam=mc_eid
+$removeparam=mkt_tok
+!
+! ---------------------------------------------------------------------- analytics
+$removeparam=vero_id
+$removeparam=oly_anon_id
+$removeparam=oly_enc_id
+$removeparam=wickedid
+$removeparam=_ga
+$removeparam=_gl
+$removeparam=s_kwcid
+$removeparam=spm
+$removeparam=scm
+$removeparam=trk
+$removeparam=trkcampaign

@@ -2,12 +2,22 @@ import React, {useEffect, useMemo, useState} from "react";
 import styled, {css} from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
-import {useTranslation} from "../i18n";
+import {useLocale, useTranslation} from "../i18n";
 import {loadStrings} from "../api/i18n";
 import {AppSettings, BrowserEntry, UserAgentEntry} from "../types";
 import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
+import {
+  addFilterList,
+  loadFilterLists,
+  removeFilterList,
+  setFilterListEnabled,
+  updateFilterLists,
+  type FilterListEntry,
+  type FilterListsPayload,
+} from "../api/filters";
+import {FILTER_CATALOG} from "../data/filterCatalog";
 import {getAppInfo, openDefaultAppsSettings, protocolStatus, registerCustomScheme, registerProtocols, unregisterProtocols, type ProtocolStatus} from "../api/system";
 
 const SettingRow = styled.div`
@@ -414,6 +424,252 @@ const Checkbox = styled.input.attrs({type: "checkbox"})`
   }
 `;
 
+const FilterList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const FilterRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.5);
+  transition: border-color 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(15, 23, 42, 0.72);
+  }
+`;
+
+const FilterBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+`;
+
+const FilterName = styled.span`
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f9fafb;
+  word-break: break-word;
+`;
+
+const FilterUrl = styled.span`
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-family: var(--font-mono);
+  word-break: break-all;
+`;
+
+const FilterMeta = styled.span`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: #9ca3af;
+`;
+
+const FilterError = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #f87171;
+  word-break: break-word;
+`;
+
+const FilterActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+`;
+
+/** A switch, so a list can be turned on and off at any time without removing it. */
+const Toggle = styled.button<{ $on: boolean }>`
+  position: relative;
+  width: 38px;
+  height: 22px;
+  padding: 0;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid ${(props) => (props.$on ? "rgba(59, 130, 246, 0.5)" : "rgba(255, 255, 255, 0.15)")};
+  background: ${(props) => (props.$on ? "rgba(59, 130, 246, 0.3)" : "rgba(255, 255, 255, 0.06)")};
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: ${(props) => (props.$on ? "18px" : "2px")};
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: ${(props) => (props.$on ? "#93c5fd" : "#9ca3af")};
+    transition: left 0.2s ease, background 0.2s ease;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(3, 7, 18, 0.72);
+  backdrop-filter: blur(4px);
+  animation: overlayIn 0.2s ease;
+
+  @keyframes overlayIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+`;
+
+const Dialog = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 22px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #111827;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  animation: dialogIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+
+  @keyframes dialogIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+`;
+
+const DialogTitle = styled.h3`
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f9fafb;
+`;
+
+const Tabs = styled.div`
+  display: flex;
+  gap: 6px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+`;
+
+const Tab = styled.button<{ $active: boolean }>`
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.18)" : "transparent")};
+  color: ${(props) => (props.$active ? "#93c5fd" : "#9ca3af")};
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.24)" : "rgba(255, 255, 255, 0.06)")};
+    color: #f9fafb;
+  }
+`;
+
+const CatalogList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+`;
+
+const CatalogItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.6);
+`;
+
+const CatalogItemHead = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+`;
+
+const CatalogName = styled.span`
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #f9fafb;
+`;
+
+const CatalogDescription = styled.span`
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: #9ca3af;
+`;
+
+const FormatNote = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  background: rgba(59, 130, 246, 0.08);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: #cbd5e1;
+
+  strong {
+    font-weight: 600;
+    color: #93c5fd;
+  }
+`;
+
+const FieldLabel = styled.label`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #9ca3af;
+`;
+
+const DialogInput = styled(ListInput)`
+  width: 100%;
+`;
+
 /** Language names are always shown in their own language. */
 const LOCALE_NAMES: Record<string, string> = {  en: "English",
   "zh-TW": "繁體中文",
@@ -423,6 +679,7 @@ const LOCALE_NAMES: Record<string, string> = {  en: "English",
 
 export const SettingsPage: React.FC = () => {
   const t = useTranslation();
+  const locale = useLocale();
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   /** Last persisted snapshot; the form is "dirty" while it differs from this. */
   const [baseline, setBaseline] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -437,6 +694,14 @@ export const SettingsPage: React.FC = () => {
   const [integrationMessage, setIntegrationMessage] = useState<{ key: string; params?: Record<string, string> } | null>(null);
   const [protocols, setProtocols] = useState<ProtocolStatus | null>(null);
   const [platform, setPlatform] = useState("windows");
+  const [filterLists, setFilterLists] = useState<FilterListEntry[]>([]);
+  const [builtinRuleCount, setBuiltinRuleCount] = useState(0);
+  const [filtersBusy, setFiltersBusy] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [addTab, setAddTab] = useState<"catalog" | "custom">("catalog");
+  const [newFilterName, setNewFilterName] = useState("");
+  const [newFilterUrl, setNewFilterUrl] = useState("");
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     protocolStatus().then(setProtocols).catch(() => setProtocols(null));
@@ -449,6 +714,25 @@ export const SettingsPage: React.FC = () => {
   useEffect(() => {
     loadStrings().then((payload) => setLocales(payload.available)).catch(() => setLocales([]));
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    loadFilterLists()
+        .then((payload) => {
+          if (!cancelled) applyFilterLists(payload);
+        })
+        .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const applyFilterLists = (payload: FilterListsPayload) => {
+    setFilterLists(payload.lists);
+    setBuiltinRuleCount(payload.builtinRuleCount);
+  };
 
   /** Applies a backend payload and treats it as the new saved baseline. */
   const applyPayload = (payload: SettingsPayload) => {
@@ -659,6 +943,41 @@ export const SettingsPage: React.FC = () => {
       setError(err instanceof Error ? err.message : String(err));
     }
   };
+
+  /** Runs a filter-list action and reports failure through the shared error banner. */
+  const runFilterAction = async (
+      action: () => Promise<FilterListsPayload>,
+      setBusy: (value: boolean) => void
+  ): Promise<boolean> => {
+    setBusy(true);
+    setError(null);
+    try {
+      applyFilterLists(await action());
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleAddFilterList = async (name: string, url: string) => {
+    if (!(await runFilterAction(() => addFilterList(name, url), setAdding))) return;
+
+    setAddOpen(false);
+    setNewFilterName("");
+    setNewFilterUrl("");
+  };
+
+  const handleRemoveFilterList = (id: string) =>
+      runFilterAction(() => removeFilterList(id), setFiltersBusy);
+
+  const handleToggleFilterList = (id: string, enabled: boolean) =>
+      runFilterAction(() => setFilterListEnabled(id, enabled), setFiltersBusy);
+
+  const handleCheckFilterUpdates = () =>
+      runFilterAction(() => updateFilterLists(), setFiltersBusy);
 
   return (
       <PageContainer $maxWidth={800}>
@@ -901,6 +1220,74 @@ export const SettingsPage: React.FC = () => {
           {integrationMessage && <InfoText>{t(integrationMessage.key, integrationMessage.params)}</InfoText>}
         </StackCard>
 
+        <StackCard>
+          <SectionTitle>{t("settings.filterLists")}</SectionTitle>
+
+          <SettingInfo>
+            <SettingDescription>
+              {t("settings.filterListsDescription", {count: builtinRuleCount})}
+            </SettingDescription>
+          </SettingInfo>
+
+          {filterLists.length === 0 ? (
+              <InfoText>{t("settings.filterListsEmpty")}</InfoText>
+          ) : (
+              <FilterList>
+                {filterLists.map((list) => (
+                    <FilterRow key={list.id}>
+                      <FilterBody>
+                        <FilterName>{list.name}</FilterName>
+                        <FilterUrl>{list.url}</FilterUrl>
+                        <FilterMeta>
+                          <span>{t("settings.filterRules", {count: list.ruleCount})}</span>
+                          <span>
+                            {list.lastUpdated
+                                ? t("settings.filterUpdated", {date: new Date(list.lastUpdated).toLocaleString(locale)})
+                                : t("settings.filterNeverUpdated")}
+                          </span>
+                        </FilterMeta>
+                        {list.error && (
+                            <FilterError>
+                              <AlertTriangleIcon size={13}/>
+                              <span>{t(list.error)}</span>
+                            </FilterError>
+                        )}
+                      </FilterBody>
+
+                      <FilterActions>
+                        <Toggle
+                            type="button"
+                            $on={list.enabled}
+                            disabled={filtersBusy}
+                            aria-pressed={list.enabled}
+                            title={t(list.enabled ? "settings.filterDisable" : "settings.filterEnable")}
+                            onClick={() => handleToggleFilterList(list.id, !list.enabled)}
+                        />
+                        <IconOnlyButton
+                            type="button"
+                            disabled={filtersBusy}
+                            title={t("settings.removeFilterList")}
+                            onClick={() => handleRemoveFilterList(list.id)}
+                        >
+                          <TrashIcon size={16}/>
+                        </IconOnlyButton>
+                      </FilterActions>
+                    </FilterRow>
+                ))}
+              </FilterList>
+          )}
+
+          <ButtonRow>
+            <GhostButton type="button" disabled={filtersBusy} onClick={() => setAddOpen(true)}>
+              {t("settings.addFilterList")}
+            </GhostButton>
+            <GhostButton type="button" disabled={filtersBusy || filterLists.length === 0}
+                         onClick={handleCheckFilterUpdates}>
+              {filtersBusy ? t("settings.filterUpdating") : t("settings.checkFilterUpdates")}
+            </GhostButton>
+          </ButtonRow>
+        </StackCard>
+
         <ActionRow>
           <SaveButton onClick={handleSave} disabled={busy}>
             {loading ? t("settings.loading") : saving ? t("settings.saving") : t("settings.save")}
@@ -923,6 +1310,72 @@ export const SettingsPage: React.FC = () => {
           <span>{t("settings.fileInfo")}</span>
           <code>{settingsFilePath || "..."}</code>
         </FileInfo>
+
+        {addOpen && (
+            <Overlay onClick={() => !adding && setAddOpen(false)}>
+              <Dialog onClick={(event) => event.stopPropagation()}>
+                <DialogTitle>{t("settings.filterAddTitle")}</DialogTitle>
+
+                <Tabs>
+                  <Tab type="button" $active={addTab === "catalog"} onClick={() => setAddTab("catalog")}>
+                    {t("settings.filterAddFromCatalog")}
+                  </Tab>
+                  <Tab type="button" $active={addTab === "custom"} onClick={() => setAddTab("custom")}>
+                    {t("settings.filterAddCustom")}
+                  </Tab>
+                </Tabs>
+
+                {addTab === "catalog" ? (
+                    <CatalogList>
+                      {FILTER_CATALOG.map((entry) => (
+                          <CatalogItem key={entry.url}>
+                            <CatalogItemHead>
+                              <CatalogName>{entry.name}</CatalogName>
+                              <GhostButton type="button" disabled={adding}
+                                           onClick={() => handleAddFilterList(entry.name, entry.url)}>
+                                {adding ? t("settings.filterAdding") : t("settings.filterAdd")}
+                              </GhostButton>
+                            </CatalogItemHead>
+                            <CatalogDescription>{t(entry.descriptionKey)}</CatalogDescription>
+                            <FilterUrl>{entry.url}</FilterUrl>
+                          </CatalogItem>
+                      ))}
+                    </CatalogList>
+                ) : (
+                    <>
+                      <FieldLabel>
+                        {t("settings.filterName")}
+                        <DialogInput value={newFilterName} placeholder={t("settings.filterNamePlaceholder")}
+                                     onChange={(event) => setNewFilterName(event.target.value)}/>
+                      </FieldLabel>
+                      <FieldLabel>
+                        {t("settings.filterUrl")}
+                        <DialogInput value={newFilterUrl} placeholder={t("settings.filterUrlPlaceholder")}
+                                     onChange={(event) => setNewFilterUrl(event.target.value)}/>
+                      </FieldLabel>
+                      <ButtonRow>
+                        <GhostButton type="button"
+                                     disabled={adding || !newFilterName.trim() || !newFilterUrl.trim()}
+                                     onClick={() => handleAddFilterList(newFilterName, newFilterUrl)}>
+                          {adding ? t("settings.filterAdding") : t("settings.filterAdd")}
+                        </GhostButton>
+                      </ButtonRow>
+                    </>
+                )}
+
+                <FormatNote>
+                  <strong>{t("settings.filterFormatTitle")}</strong>
+                  <span>{t("settings.filterFormatBody")}</span>
+                </FormatNote>
+
+                <ButtonRow>
+                  <GhostButton type="button" disabled={adding} onClick={() => setAddOpen(false)}>
+                    {t("settings.filterCancel")}
+                  </GhostButton>
+                </ButtonRow>
+              </Dialog>
+            </Overlay>
+        )}
       </PageContainer>
   );
 };

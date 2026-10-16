@@ -103,6 +103,15 @@ internal sealed record InspectRequest(string Url, string? UserAgentId = null);
 /// <summary>Payload for <c>i18n.get</c>.</summary>
 internal sealed record LocaleRequest(string? Locale);
 
+/// <summary>Payload for <c>filters.add</c>: a display name and a direct rule-file URL.</summary>
+internal sealed record FilterAddRequest(string Name, string Url);
+
+/// <summary>Payload for <c>filters.remove</c> and <c>filters.update</c>; an empty id targets every list.</summary>
+internal sealed record FilterIdRequest(string? Id);
+
+/// <summary>Payload for <c>filters.setEnabled</c>.</summary>
+internal sealed record FilterToggleRequest(string Id, bool Enabled);
+
 /// <summary>Shared serialization helpers for the native bridge.</summary>
 internal static class NativeProtocol
 {

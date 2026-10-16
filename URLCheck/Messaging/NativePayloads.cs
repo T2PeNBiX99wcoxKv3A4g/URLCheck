@@ -1,3 +1,4 @@
+using URLCheck.Filters;
 using URLCheck.Models;
 
 namespace URLCheck.Messaging;
@@ -44,6 +45,15 @@ internal sealed record HistoryItemPayload(int Id, string Url, long Timestamp);
 ///     whose status is reported, or null when the response was not a redirect.
 /// </summary>
 internal sealed record InspectStatusPayload(int StatusCode, string StatusText, bool Ok, string? Location);
+
+/// <summary>
+///     Body for the <c>filters.*</c> messages that return the installed lists. The built-in rules are
+///     only reported as a count: they are never listed, toggled or removed.
+/// </summary>
+internal sealed record FilterListPayload(List<FilterListEntry> Lists, int BuiltinRuleCount);
+
+/// <summary>Body for <c>filters.rules</c>: every rule the popup should apply, built-in included.</summary>
+internal sealed record FilterRulesPayload(List<RemoveParamRule> Rules);
 
 /// <summary>Body for the <c>app.navigate</c> event.</summary>
 internal sealed record NavigatePayload(string Tab);

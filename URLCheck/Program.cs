@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 using Serilog;
+using URLCheck.Filters;
 using URLCheck.Inspect;
 using URLCheck.Interop;
 using URLCheck.Platform;
@@ -85,6 +86,7 @@ internal static class Program
             _ = new BrowserService(browserLocator);
             _ = new ProtocolRegistrationService(protocolRegistrar);
             _ = new InspectService(settings);
+            _ = new FilterService();
             var manager = new WindowManager(appUrl, windowPlatform, settings, history)
             {
                 ShowMainWindowOnStartup = showMainWindow,

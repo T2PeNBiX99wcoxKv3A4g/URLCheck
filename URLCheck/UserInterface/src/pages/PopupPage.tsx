@@ -5,7 +5,8 @@ import {loadSettings} from "../api/settings";
 import {openWithBrowser} from "../api/browsers";
 import {checkStatus, type StatusResult} from "../api/inspect";
 import {closePopup, resizePopup} from "../api/system";
-import {stripTrackingParams, trackingParamKeys} from "../data/trackingParams";
+import {loadFilterRules} from "../api/filters";
+import {compileRules, stripTrackingParams, trackingParamKeys, type CompiledRules} from "../data/filterRules";
 import {useTranslation} from "../i18n";
 import {Native} from "../Native";
 import {
@@ -724,6 +725,8 @@ export const PopupPage: React.FC = () => {
     const [copied, setCopied] = useState(false);
     const [borderless] = useState(() => readPopupFlag("borderless"));
     const [autoStrip] = useState(() => readPopupFlag("strip"));
+    /* The URL-cleaning rules come from the backend: the embedded list plus every enabled filter list. */
+    const [rules, setRules] = useState<CompiledRules | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [open, setOpen] = useState<SectionState>({domain: false, parameters: false, fragment: false});
 
@@ -748,7 +751,7 @@ export const PopupPage: React.FC = () => {
     const isHttp = parsed?.protocol === "http:";
     const defaultBrowser = browsers[0];
     const canOpen = Boolean(parsed) && browsers.length > 0;
-    const trackingCount = trackingParamKeys(url).length;
+    const trackingCount = rules ? trackingParamKeys(url, rules).length : 0;
 
     /* load the browser and User-Agent lists */
     useEffect(() => {
@@ -764,6 +767,20 @@ export const PopupPage: React.FC = () => {
                 // The popup still works without a browser list.
             }
         })();
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    /* load the URL-cleaning rules */
+    useEffect(() => {
+        let cancelled = false;
+        loadFilterRules()
+            .then((loaded) => {
+                if (!cancelled) setRules(compileRules(loaded));
+            })
+            .catch(() => undefined);
+
         return () => {
             cancelled = true;
         };
@@ -789,11 +806,11 @@ export const PopupPage: React.FC = () => {
 
     /* tracking parameters are stripped as soon as the popup opens, unless the setting turns it off */
     useEffect(() => {
-        if (!autoStrip) return;
+        if (!autoStrip || !rules) return;
 
-        const stripped = stripTrackingParams(initialUrl);
+        const stripped = stripTrackingParams(initialUrl, rules);
         if (stripped !== initialUrl) dispatch({type: "commit", value: stripped});
-    }, [initialUrl, autoStrip]);
+    }, [initialUrl, autoStrip, rules]);
 
     /* keep the window sized to its content */
     useEffect(() => {
@@ -1053,7 +1070,8 @@ export const PopupPage: React.FC = () => {
                         <span>{statusText}</span>
                     </StatusPill>
 
-                    <ActionButton onClick={() => commit(stripTrackingParams(url))} disabled={!parsed}
+                    <ActionButton onClick={() => rules && commit(stripTrackingParams(url, rules))}
+                                  disabled={!parsed || !rules}
                                   title={t("popup.removeTrackingTooltip")}>
                         <TrashIcon size={13}/>
                         {t("popup.tracking")}{trackingCount > 0 ? ` (${trackingCount})` : ""}
