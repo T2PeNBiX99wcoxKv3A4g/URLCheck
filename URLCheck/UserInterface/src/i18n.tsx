@@ -62,6 +62,11 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({c
         };
     }, []);
 
+    /* Chromium picks the CJK fallback font from this, so it has to follow the UI language. */
+    useEffect(() => {
+        document.documentElement.lang = locale;
+    }, [locale]);
+
     return (
         <TranslationContext.Provider value={translate}>
             <LocaleContext.Provider value={locale}>{children}</LocaleContext.Provider>

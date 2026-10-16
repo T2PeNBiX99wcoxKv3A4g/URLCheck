@@ -1,6 +1,16 @@
 // Design Tokens & SCSS Variables (Dark Mode inspired by VPM)
-$font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-$font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+// Only fonts that ship with the OS (or that people commonly install anyway) belong in here: the
+// app bundles none of them, so an exotic name is just a dead entry in the list.
+$font-latin: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial;
+$font-family: $font-latin, sans-serif;
+$font-mono: ui-monospace, "Cascadia Mono", Consolas, "SFMono-Regular", Menlo, monospace;
+
+// Chromium picks the CJK fallback from the element's language. With a Latin-only stack it instead
+// falls back to whatever the system locale suggests, so Japanese text gets drawn with a Chinese
+// face (and the other way round) — which shows up as missing or oddly thin glyphs.
+$cjk-zh-tw: "Microsoft JhengHei UI", "Noto Sans TC", "PingFang TC";
+$cjk-zh-cn: "Microsoft YaHei UI", "Noto Sans SC", "PingFang SC";
+$cjk-ja: "Yu Gothic UI", "Noto Sans JP", "Hiragino Kaku Gothic ProN";
 
 $bg-primary: #0b0f19;
 $bg-secondary: #111827;
@@ -30,11 +40,30 @@ $accent-glow: 0 0 24px rgba(99, 102, 241, 0.35);
   padding: 0;
 }
 
+html {
+  font-family: $font-family;
+}
+
+// The CJK face has to sit before the `sans-serif` generic, otherwise that generic swallows
+// everything after it and the language-specific font is never reached.
+html:lang(zh-TW) {
+  font-family: $font-latin, $cjk-zh-tw, sans-serif;
+}
+
+html:lang(zh-CN) {
+  font-family: $font-latin, $cjk-zh-cn, sans-serif;
+}
+
+html:lang(ja) {
+  font-family: $font-latin, $cjk-ja, sans-serif;
+}
+
+// No font-family here on purpose: body inherits it from html, so the :lang() rules above keep
+// working. Declaring it again would shadow them.
 html,
 body {
   width: 100%;
   height: 100%;
-  font-family: $font-family;
   color: $text-primary;
   background-color: $bg-primary;
   line-height: 1.5;
