@@ -19,6 +19,11 @@ import {
   type FilterListsPayload,
 } from "../api/filters";
 import {FILTER_CATALOG} from "../data/filterCatalog";
+
+/* Loaded on demand: the licence texts are far too large to sit in the main bundle. */
+const AttributionPage = React.lazy(() =>
+    import("./AttributionPage").then((module) => ({default: module.AttributionPage}))
+);
 import {getAppInfo, openDefaultAppsSettings, protocolStatus, registerCustomScheme, registerProtocols, unregisterProtocols, type ProtocolStatus} from "../api/system";
 
 const SettingRow = styled.div`
@@ -253,6 +258,24 @@ const FileInfo = styled.div`
     color: #9ca3af;
     font-family: var(--font-mono);
     word-break: break-all;
+  }
+`;
+
+/** A quiet link at the very bottom of the page, opening the open-source notices. */
+const AttributionLink = styled.button`
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #6b7280;
+  font-size: 0.78rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: #9ca3af;
   }
 `;
 
@@ -683,6 +706,7 @@ export const SettingsPage: React.FC = () => {
   const [newFilterName, setNewFilterName] = useState("");
   const [newFilterUrl, setNewFilterUrl] = useState("");
   const [adding, setAdding] = useState(false);
+  const [attributionOpen, setAttributionOpen] = useState(false);
 
   useEffect(() => {
     protocolStatus().then(setProtocols).catch(() => setProtocols(null));
@@ -1287,6 +1311,16 @@ export const SettingsPage: React.FC = () => {
           <span>{t("settings.fileInfo")}</span>
           <code>{settingsFilePath || "..."}</code>
         </FileInfo>
+
+        <AttributionLink type="button" onClick={() => setAttributionOpen(true)}>
+          {t("attribution.title")}
+        </AttributionLink>
+
+        {attributionOpen && (
+            <React.Suspense fallback={null}>
+              <AttributionPage onClose={() => setAttributionOpen(false)}/>
+            </React.Suspense>
+        )}
 
         {addOpen && (
             <Overlay onClick={() => !adding && setAddOpen(false)}>
