@@ -44,10 +44,6 @@ internal interface IWindowPlatform
     /// </summary>
     System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size);
 
-    /// <summary>Shows the button window without revealing it, so its web view can start up. The window
-    ///     is minimised rather than hidden: a web view created in a hidden window would never render.</summary>
-    void PrepareSelectionButton(PhotinoWindow window);
-
     /// <summary>
     ///     True while a mouse button is down, so the floating button can be dismissed the moment the
     ///     user clicks anywhere else: no window ever tells us that such a click happened.

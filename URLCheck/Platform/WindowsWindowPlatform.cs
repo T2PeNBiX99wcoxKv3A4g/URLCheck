@@ -21,13 +21,6 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         NativeMethods.SetForegroundWindow(handle);
     });
 
-    /// <summary>
-    ///     Keeps the button window out of sight while its web view starts up. Minimising it is what
-    ///     makes that possible: a web view created in a hidden window would never render afterwards.
-    /// </summary>
-    public void PrepareSelectionButton(PhotinoWindow window) =>
-        UseHandle(window, handle => NativeMethods.ShowWindow(handle, NativeMethods.SwShowMinNoActive));
-
     public void KeepOnTop(PhotinoWindow window) => UseHandle(window, handle =>
         NativeMethods.SetWindowPos(handle, NativeMethods.HwndTopMost, 0, 0, 0, 0,
             NativeMethods.SwpNoMove | NativeMethods.SwpNoSize | NativeMethods.SwpNoActivate));
@@ -104,14 +97,13 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
     {
         var placed = ClampToMonitor(x, y, size);
 
-        // Shown without stealing focus, and placed in the same call: a separate move can be swallowed
-        // by the show, and Photino's own clamp mixes logical and physical pixels. The size is forced
-        // too, because a tiling window manager is free to resize the window while it is on screen.
+        // Shown without stealing focus, and placed and sized in the same call: a separate move can be
+        // swallowed by the show, and Photino's own clamp mixes logical and physical pixels.
         UseHandle(window, handle =>
         {
             NativeMethods.ShowWindow(handle, NativeMethods.SwShowNoActivate);
             NativeMethods.SetWindowPos(handle, NativeMethods.HwndTopMost, placed.Left, placed.Top, size, size,
-                NativeMethods.SwpNoActivate);
+                NativeMethods.SwpNoActivate | NativeMethods.SwpShowWindow);
         });
 
         Log.Debug("Selection button placed at {Left},{Top}", placed.Left, placed.Top);

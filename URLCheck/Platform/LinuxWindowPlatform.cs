@@ -131,11 +131,5 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
     /// </summary>
     public bool PointerButtonPressed() => LinuxGtk.IsPointerButtonPressed();
 
-    /// <summary>
-    ///     GTK can keep a window out of the taskbar while it is iconified, so the button gets the same
-    ///     treatment as any other window here and never has to be unmapped.
-    /// </summary>
-    public void PrepareSelectionButton(PhotinoWindow window) => LinuxGtk.Hide(window.Title);
-
     public bool TryGetCursorPosition(out int x, out int y) => LinuxGtk.TryGetPointerPosition(out x, out y);
 }

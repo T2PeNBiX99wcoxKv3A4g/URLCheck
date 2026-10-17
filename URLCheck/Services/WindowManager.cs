@@ -41,6 +41,9 @@ internal sealed class WindowManager
     /// <summary>How long a hidden start waits for the interface to report in before hiding anyway.</summary>
     private static readonly TimeSpan StartupHideTimeout = TimeSpan.FromSeconds(10);
 
+    /// <summary>How long after showing the button its position is re-asserted, once everything settled.</summary>
+    private static readonly TimeSpan PositionNudgeDelay = TimeSpan.FromMilliseconds(400);
+
     /// <summary>Longer than any sane URL; a clipboard value this big is never one.</summary>
     private const int MaxUrlLength = 2048;
 
@@ -62,9 +65,6 @@ internal sealed class WindowManager
 
     /// <summary>Set while a hidden start is still waiting for the interface's first render.</summary>
     private bool _hideWhenRendered;
-
-    /// <summary>Set while the button window is still starting up and has to stay minimised.</summary>
-    private bool _buttonWarming;
 
     public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings, HistoryService history,
         IClipboardWatcher clipboard)
@@ -146,17 +146,6 @@ internal sealed class WindowManager
 
             case "app.ready":
                 HideWhenRendered();
-                return null;
-
-            case "selection.ready":
-                if (_buttonWarming)
-                {
-                    // The button has rendered, so hiding it now is safe and takes it out of the
-                    // window manager's hands while it waits for the next copied URL.
-                    _buttonWarming = false;
-                    HideSelectionButton();
-                }
-
                 return null;
 
             case "popup.resize":
@@ -323,8 +312,26 @@ internal sealed class WindowManager
 
             _buttonAt = _platform.ShowSelectionButton(button, x, y, ButtonSize);
 
+            // Placing it again shortly after gives anything that resized or moved the window while it
+            // was coming back — a window manager, say — a chance to settle, so the button still ends
+            // up the right size under the pointer.
+            _ = Task.Delay(PositionNudgeDelay).ContinueWith(_ => ReassertButtonPosition(button, x, y));
+
             _buttonTimer.Change(ButtonLifetime, Timeout.InfiniteTimeSpan);
             _pointerTimer.Change(PointerPollInterval, PointerPollInterval);
+        });
+    }
+
+    /// <summary>Re-places the button, unless it has been dismissed in the meantime.</summary>
+    private void ReassertButtonPosition(PhotinoWindow button, int x, int y)
+    {
+        if (_buttonAt is null || !ReferenceEquals(_buttonWindow, button))
+            return;
+
+        RunOnMainWindow(() =>
+        {
+            if (_buttonAt is not null && ReferenceEquals(_buttonWindow, button))
+                _platform.ShowSelectionButton(button, x, y, ButtonSize);
         });
     }
 
@@ -386,22 +393,16 @@ internal sealed class WindowManager
                 .SetChromeless(true)
                 .SetTransparent(true)
                 .SetTopMost(true)
-                // Created minimised so nothing paints before it is cloaked below: hiding it outright
-                // would leave its web view permanently blank.
-                .SetMinimized(true)
                 // Registering for notifications would drop a Start Menu shortcut named after the button.
                 .SetNotificationsEnabled(false)
                 .RegisterWebMessageReceivedHandler((sender, message) =>
                     _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message));
 
-            // The window exists from here on, which is when the platform can still shape it. It is
-            // kept minimised until its page reports that it has rendered; hiding it now would leave
-            // its web view blank for good.
-            _buttonWarming = true;
+            // The window exists from here on, which is when the platform can still shape it.
             button.RegisterWindowCreatedHandler((_, _) =>
             {
                 _platform.ConfigureSelectionButtonWindow(button);
-                _platform.PrepareSelectionButton(button);
+                _platform.Hide(button);
             });
 
             ApplyIcon(button);

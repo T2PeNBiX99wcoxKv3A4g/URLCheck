@@ -72,13 +72,6 @@ export const SelectionButtonPage: React.FC = () => {
         return () => document.documentElement.classList.remove("selection-transparent");
     }, []);
 
-    // Reports that the button has rendered. The backend keeps its window minimised until then, because
-    // a window hidden while its web view is still starting up never renders again.
-    useEffect(() => {
-        const timer = window.setTimeout(() => Native.send({type: "selection.ready"}), 250);
-        return () => window.clearTimeout(timer);
-    }, []);
-
     if (!url) return null;
 
     const open = () => {
