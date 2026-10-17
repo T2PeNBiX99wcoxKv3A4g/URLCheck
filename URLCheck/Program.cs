@@ -76,12 +76,11 @@ internal static class Program
             var settings = new SettingsService(browserLocator);
             _ = settings.GetAsync().GetAwaiter().GetResult(); // know the language before the tray is built
 
-            // Show the management window unless we were launched to handle a link, asked to stay in the
-            // tray, or the settings say to start hidden. Without a tray there is no way back to the
-            // window, so it always shows. The popup is its own window and is never affected.
-            var startHidden = args.Contains("--tray") ||
-                              startupUrls.Count > 0 ||
-                              (settings.Current?.HideOnLaunch ?? false);
+            // Show the management window unless we were launched to stay in the tray or the settings
+            // say to start hidden. A link launch does not hide it by itself: the setting is the only
+            // thing that decides. Without a tray there is no way back to the window, so it always
+            // shows. The popup is its own window and is never affected.
+            var startHidden = args.Contains("--tray") || (settings.Current?.HideOnLaunch ?? false);
             var showMainWindow = !hasTray || !startHidden;
 
             var localization = new LocalizationService(settings);

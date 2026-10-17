@@ -27,6 +27,7 @@ internal static partial class NativeMethods
     public const uint SwpNoMove = 0x0002;
     public const uint SwpNoZOrder = 0x0004;
     public const uint SwpNoActivate = 0x0010;
+    public const uint SwpShowWindow = 0x0040;
     public static readonly IntPtr HwndTopMost = new(-1);
 
     [LibraryImport("user32.dll", EntryPoint = "ShowWindow")]
@@ -86,6 +87,23 @@ internal static partial class NativeMethods
 
     [LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
     public static partial IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+    // ---- Pointer state and monitor work area ----
+
+    public const int VkLButton = 0x01;
+    public const int VkRButton = 0x02;
+    public const int VkMButton = 0x04;
+    public const uint MonitorDefaultToNearest = 2;
+
+    [LibraryImport("user32.dll")]
+    public static partial short GetAsyncKeyState(int vKey);
+
+    [LibraryImport("user32.dll", EntryPoint = "MonitorFromPoint")]
+    public static partial IntPtr MonitorFromPoint(Point pt, uint dwFlags);
+
+    [LibraryImport("user32.dll", EntryPoint = "GetMonitorInfoW", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfo lpmi);
 
     // ---- DWM (rounded corners) ----
 
@@ -198,6 +216,24 @@ internal static partial class NativeMethods
     {
         public int X;
         public int Y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Rect
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MonitorInfo
+    {
+        public int cbSize;
+        public Rect rcMonitor;
+        public Rect rcWork;
+        public uint dwFlags;
     }
 
     [StructLayout(LayoutKind.Sequential)]

@@ -115,13 +115,20 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
 
     /// <summary>
     ///     Wayland ignores a client's requested position, so <c>MoveTo</c> is best-effort there and the
-    ///     compositor places the button instead.
+    ///     compositor places the button instead; the requested place is reported back either way.
     /// </summary>
-    public void ShowSelectionButton(PhotinoWindow window, int x, int y)
+    public System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y)
     {
         window.MoveTo(x, y);
         LinuxGtk.ShowOnTop(window.Title);
+        return new System.Drawing.Point(x, y);
     }
+
+    /// <summary>
+    ///     Wayland only tells a client about input aimed at its own surfaces, so this stays false there
+    ///     and the button simply falls back to its own timeout. X11 does report it.
+    /// </summary>
+    public bool PointerButtonPressed() => LinuxGtk.IsPointerButtonPressed();
 
     public bool TryGetCursorPosition(out int x, out int y) => LinuxGtk.TryGetPointerPosition(out x, out y);
 }

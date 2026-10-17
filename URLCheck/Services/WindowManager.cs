@@ -20,15 +20,20 @@ internal sealed class WindowManager
     private static readonly string WebViewDataPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name, "webview");
 
-    /// <summary>Size of the floating button's window, in physical pixels.</summary>
-    private const int ButtonWidth = 176;
-    private const int ButtonHeight = 44;
+    /// <summary>Side of the floating button's square window, in physical pixels.</summary>
+    private const int ButtonSize = 44;
 
     /// <summary>Offset from the pointer, so the button does not sit under the cursor.</summary>
-    private const int ButtonOffset = 18;
+    private const int ButtonOffset = 16;
+
+    /// <summary>Slack around the button, so a press on its edge still counts as a click on it.</summary>
+    private const int ButtonPressMargin = 8;
 
     /// <summary>How long the button stays on screen before it hides itself again.</summary>
-    private static readonly TimeSpan ButtonLifetime = TimeSpan.FromSeconds(8);
+    private static readonly TimeSpan ButtonLifetime = TimeSpan.FromSeconds(6);
+
+    /// <summary>How often the pointer is checked while the button is visible.</summary>
+    private static readonly TimeSpan PointerPollInterval = TimeSpan.FromMilliseconds(90);
 
     /// <summary>Longer than any sane URL; a clipboard value this big is never one.</summary>
     private const int MaxUrlLength = 2048;
@@ -39,11 +44,15 @@ internal sealed class WindowManager
     private readonly HistoryService _history;
     private readonly IClipboardWatcher _clipboard;
     private readonly Timer _buttonTimer;
+    private readonly Timer _pointerTimer;
     private bool _allowClose;
 
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
     private PhotinoWindow? _buttonWindow;
+
+    /// <summary>Where the button was really placed, so a press on it is told apart from a press away.</summary>
+    private System.Drawing.Point? _buttonAt;
 
     public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings, HistoryService history,
         IClipboardWatcher clipboard)
@@ -56,6 +65,7 @@ internal sealed class WindowManager
 
         _clipboard.TextCopied += OnTextCopied;
         _buttonTimer = new(_ => HideSelectionButton(), null, Timeout.Infinite, Timeout.Infinite);
+        _pointerTimer = new(_ => PollPointer(), null, Timeout.Infinite, Timeout.Infinite);
 
         SettingsService.Changed += payload =>
         {
@@ -144,14 +154,11 @@ internal sealed class WindowManager
             .SetUseOsDefaultSize(false)
             .SetSize(new(1024, 720))
             .SetMinSize(720, 480)
+            // Only here so that nothing flashes: the native show skips a minimised window, and the
+            // window is hidden outright below either way.
             .SetMinimized(!ShowMainWindowOnStartup)
             .RegisterWebMessageReceivedHandler((sender, message) =>
                 _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message))
-            .RegisterWindowCreatedHandler((_, _) =>
-            {
-                ApplyClipboardWatching();
-                MainWindowCreated?.Invoke();
-            })
             .RegisterWindowClosingHandler((_, _) =>
             {
                 // Stay resident: closing the host window hides it instead of shutting down.
@@ -169,6 +176,21 @@ internal sealed class WindowManager
         ApplyIcon(window);
         window.Load(_appUrl);
         _mainWindow = window;
+
+        window.RegisterWindowCreatedHandler((_, _) =>
+        {
+            ApplyClipboardWatching();
+
+            // Starting hidden means hiding the window outright: minimising would leave it in the
+            // taskbar, which is exactly what a resident tray application should not do.
+            if (!ShowMainWindowOnStartup)
+            {
+                Log.Information("Starting hidden; the main window stays closed to the tray");
+                _platform.Hide(window);
+            }
+
+            MainWindowCreated?.Invoke();
+        });
     }
 
     /// <summary>Starts the message loop; blocks until the host window is closed for real.</summary>
@@ -234,38 +256,66 @@ internal sealed class WindowManager
     {
         RunOnMainWindow(() =>
         {
+            // Wayland hides the global pointer, so the compositor places the window instead.
+            _platform.TryGetCursorPosition(out var cursorX, out var cursorY);
+            var x = cursorX + ButtonOffset;
+            var y = cursorY + ButtonOffset;
+
             // The first show loads the page with the URL in its fragment; later shows reuse the
             // already loaded page and push the new URL through an event.
             var created = _buttonWindow is null;
-            if (EnsureButtonWindow(url) is not { } button)
+            if (EnsureButtonWindow(url, x, y) is not { } button)
                 return;
 
             if (!created)
                 button.SendWebMessage(NativeProtocol.SerializeEvent("selection.show", new SelectionShowPayload(url)));
 
-            // Wayland hides the global pointer, so the compositor places the window there instead.
-            _platform.TryGetCursorPosition(out var x, out var y);
-            _platform.ShowSelectionButton(button, x + ButtonOffset, y + ButtonOffset);
+            _buttonAt = _platform.ShowSelectionButton(button, x, y);
 
             _buttonTimer.Change(ButtonLifetime, Timeout.InfiniteTimeSpan);
+            _pointerTimer.Change(PointerPollInterval, PointerPollInterval);
         });
+    }
+
+    /// <summary>
+    ///     Hides the button as soon as a mouse button goes down away from it, which is what clicking any
+    ///     other window looks like from here. The button itself acts on mouse-down, so its own click is
+    ///     never lost to this.
+    /// </summary>
+    private void PollPointer()
+    {
+        if (!_platform.PointerButtonPressed())
+            return;
+
+        // Without a pointer position (Wayland) any press counts, since the button cannot be located.
+        if (_buttonAt is { } at &&
+            _platform.TryGetCursorPosition(out var x, out var y) &&
+            x >= at.X - ButtonPressMargin && x <= at.X + ButtonSize + ButtonPressMargin &&
+            y >= at.Y - ButtonPressMargin && y <= at.Y + ButtonSize + ButtonPressMargin)
+            return;
+
+        HideSelectionButton();
     }
 
     private void HideSelectionButton()
     {
         _buttonTimer.Change(Timeout.Infinite, Timeout.Infinite);
+        _pointerTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
         var button = _buttonWindow;
-        if (button is not null)
-            RunOnMainWindow(() => _platform.Hide(button));
+        if (button is null)
+            return;
+
+        _buttonAt = null;
+        RunOnMainWindow(() => _platform.Hide(button));
     }
 
     /// <summary>
-    ///     Builds the button window on first use. It is created hidden and then reused, so copying a
-    ///     URL does not pay for a fresh WebView every time. The URL travels in the fragment because the
-    ///     page is not listening for events yet while it loads.
+    ///     Builds the button window on first use, already at the place it belongs. It is created hidden
+    ///     and then reused, so copying a URL does not pay for a fresh WebView every time. The URL
+    ///     travels in the fragment because the page is not listening for events yet while it loads.
     /// </summary>
-    private PhotinoWindow? EnsureButtonWindow(string url)
+    private PhotinoWindow? EnsureButtonWindow(string url, int x, int y)
     {
         if (_buttonWindow is not null)
             return _buttonWindow;
@@ -277,12 +327,10 @@ internal sealed class WindowManager
                 .SetTemporaryFilesPath(WebViewDataPath)
                 .SetUseOsDefaultSize(false)
                 .SetUseOsDefaultLocation(false)
-                // Created off-screen and hidden at once, so the very first copy does not flash a window
-                // at whatever place the OS would have picked.
-                .SetLocation(new System.Drawing.Point(-32000, -32000))
-                .SetSize(new(ButtonWidth, ButtonHeight))
-                .SetMinSize(ButtonWidth, ButtonHeight)
-                .SetMaxSize(ButtonWidth, ButtonHeight)
+                .SetLocation(new System.Drawing.Point(x, y))
+                .SetSize(new(ButtonSize, ButtonSize))
+                .SetMinSize(ButtonSize, ButtonSize)
+                .SetMaxSize(ButtonSize, ButtonSize)
                 .SetResizable(false)
                 .SetChromeless(true)
                 .SetTransparent(true)

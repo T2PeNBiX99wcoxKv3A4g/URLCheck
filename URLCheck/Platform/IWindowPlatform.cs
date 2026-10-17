@@ -37,8 +37,17 @@ internal interface IWindowPlatform
     /// <summary>Applies the button window's platform styling once its native window exists.</summary>
     void ConfigureSelectionButtonWindow(PhotinoWindow window);
 
-    /// <summary>Shows the button window at <paramref name="x" />,<paramref name="y" />, without stealing focus when possible.</summary>
-    void ShowSelectionButton(PhotinoWindow window, int x, int y);
+    /// <summary>
+    ///     Shows the button window near <paramref name="x" />,<paramref name="y" />, without stealing
+    ///     focus when possible, and returns the place it was really put.
+    /// </summary>
+    System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y);
+
+    /// <summary>
+    ///     True while a mouse button is down, so the floating button can be dismissed the moment the
+    ///     user clicks anywhere else: no window ever tells us that such a click happened.
+    /// </summary>
+    bool PointerButtonPressed();
 
     /// <summary>The pointer position in screen coordinates; false when the platform cannot report it.</summary>
     bool TryGetCursorPosition(out int x, out int y);

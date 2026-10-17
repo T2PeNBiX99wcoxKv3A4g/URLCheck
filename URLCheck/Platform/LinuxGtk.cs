@@ -234,6 +234,39 @@ internal static partial class LinuxGtk
     private static bool _clipboardConnected;
 
     /// <summary>
+    ///     Whether a mouse button is down. Wayland only reports input aimed at this client's own
+    ///     surfaces, so this is effectively X11-only; elsewhere it simply stays false.
+    /// </summary>
+    public static bool IsPointerButtonPressed()
+    {
+        try
+        {
+            var display = gdk_display_get_default();
+            if (display == IntPtr.Zero)
+                return false;
+
+            var seat = gdk_display_get_default_seat(display);
+            if (seat == IntPtr.Zero)
+                return false;
+
+            var pointer = gdk_seat_get_pointer(seat);
+            if (pointer == IntPtr.Zero)
+                return false;
+
+            gdk_device_get_state(pointer, IntPtr.Zero, IntPtr.Zero, out var mask);
+            return (mask & PointerButtonMask) != 0;
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Could not read the pointer state");
+            return false;
+        }
+    }
+
+    /// <summary>GDK_BUTTON1_MASK | GDK_BUTTON2_MASK | GDK_BUTTON3_MASK.</summary>
+    private const uint PointerButtonMask = (1u << 8) | (1u << 9) | (1u << 10);
+
+    /// <summary>
     ///     Watches the clipboard and reports every new text selection. The text is requested
     ///     asynchronously, so a busy or frozen clipboard owner can never block this process.
     /// </summary>
@@ -437,6 +470,9 @@ internal static partial class LinuxGtk
     [LibraryImport(GtkLibrary)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool gdk_device_get_position(IntPtr device, IntPtr screen, out int x, out int y);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial void gdk_device_get_state(IntPtr device, IntPtr window, IntPtr axes, out uint mask);
 
     [LibraryImport(GtkLibrary)]
     private static partial IntPtr gtk_widget_get_screen(IntPtr widget);

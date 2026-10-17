@@ -1,5 +1,7 @@
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Photino.NET;
+using Serilog;
 using URLCheck.Interop;
 
 namespace URLCheck.Platform;
@@ -89,16 +91,25 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         });
     }
 
-    public void ShowSelectionButton(PhotinoWindow window, int x, int y)
+    public System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y)
     {
-        window.MoveTo(x, y);
+        var placed = ClampToMonitor(window, x, y);
+
+        // Placed and shown in a single call: a separate move can be swallowed by the show, and
+        // Photino's own clamp mixes logical and physical pixels.
         UseHandle(window, handle =>
         {
             NativeMethods.ShowWindow(handle, NativeMethods.SwShowNoActivate);
-            NativeMethods.SetWindowPos(handle, NativeMethods.HwndTopMost, 0, 0, 0, 0,
-                NativeMethods.SwpNoMove | NativeMethods.SwpNoSize | NativeMethods.SwpNoActivate);
+            NativeMethods.SetWindowPos(handle, NativeMethods.HwndTopMost, placed.Left, placed.Top, 0, 0,
+                NativeMethods.SwpNoSize | NativeMethods.SwpNoActivate | NativeMethods.SwpShowWindow);
         });
+
+        Log.Debug("Selection button placed at {Left},{Top}", placed.Left, placed.Top);
+        return new System.Drawing.Point(placed.Left, placed.Top);
     }
+
+    public bool PointerButtonPressed() =>
+        IsPressed(NativeMethods.VkLButton) || IsPressed(NativeMethods.VkRButton) || IsPressed(NativeMethods.VkMButton);
 
     public bool TryGetCursorPosition(out int x, out int y)
     {
@@ -112,6 +123,23 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         x = 0;
         y = 0;
         return false;
+    }
+
+    private static bool IsPressed(int key) => (NativeMethods.GetAsyncKeyState(key) & 0x8000) != 0;
+
+    /// <summary>Keeps the button inside the work area of the monitor the pointer is on.</summary>
+    private static (int Left, int Top) ClampToMonitor(PhotinoWindow window, int x, int y)
+    {
+        var pointer = new NativeMethods.Point { X = x, Y = y };
+        var monitor = NativeMethods.MonitorFromPoint(pointer, NativeMethods.MonitorDefaultToNearest);
+        var info = new NativeMethods.MonitorInfo { cbSize = Marshal.SizeOf<NativeMethods.MonitorInfo>() };
+
+        if (monitor == IntPtr.Zero || !NativeMethods.GetMonitorInfo(monitor, ref info))
+            return (x, y);
+
+        var left = Math.Clamp(x, info.rcWork.Left, Math.Max(info.rcWork.Left, info.rcWork.Right - window.Width));
+        var top = Math.Clamp(y, info.rcWork.Top, Math.Max(info.rcWork.Top, info.rcWork.Bottom - window.Height));
+        return (left, top);
     }
 
     private static void UseHandle(PhotinoWindow window, Action<IntPtr> action)
