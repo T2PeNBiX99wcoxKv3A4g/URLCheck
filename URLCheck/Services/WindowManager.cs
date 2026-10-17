@@ -29,9 +29,6 @@ internal sealed class WindowManager
     /// <summary>Slack around the button, so a press on its edge still counts as a click on it.</summary>
     private const int ButtonPressMargin = 8;
 
-    /// <summary>How long the button stays on screen before it hides itself again.</summary>
-    private static readonly TimeSpan ButtonLifetime = TimeSpan.FromSeconds(6);
-
     /// <summary>How often the pointer is checked while the button is visible.</summary>
     private static readonly TimeSpan PointerPollInterval = TimeSpan.FromMilliseconds(90);
 
@@ -52,7 +49,6 @@ internal sealed class WindowManager
     private readonly SettingsService _settings;
     private readonly HistoryService _history;
     private readonly IClipboardWatcher _clipboard;
-    private readonly Timer _buttonTimer;
     private readonly Timer _pointerTimer;
     private bool _allowClose;
 
@@ -76,7 +72,6 @@ internal sealed class WindowManager
         _clipboard = clipboard;
 
         _clipboard.TextCopied += OnTextCopied;
-        _buttonTimer = new(_ => HideSelectionButton(), null, Timeout.Infinite, Timeout.Infinite);
         _pointerTimer = new(_ => PollPointer(), null, Timeout.Infinite, Timeout.Infinite);
 
         SettingsService.Changed += payload =>
@@ -273,6 +268,7 @@ internal sealed class WindowManager
 
         if (UrlFromText(text) is not { } url)
         {
+            Log.Debug("Copied text is not a URL; hiding the button");
             HideSelectionButton();
             return;
         }
@@ -317,7 +313,6 @@ internal sealed class WindowManager
             // up the right size under the pointer.
             _ = Task.Delay(PositionNudgeDelay).ContinueWith(_ => ReassertButtonPosition(button, x, y));
 
-            _buttonTimer.Change(ButtonLifetime, Timeout.InfiniteTimeSpan);
             _pointerTimer.Change(PointerPollInterval, PointerPollInterval);
         });
     }
@@ -352,12 +347,12 @@ internal sealed class WindowManager
             y >= at.Y - ButtonPressMargin && y <= at.Y + ButtonSize + ButtonPressMargin)
             return;
 
+        Log.Debug("Mouse pressed away from the button; hiding it");
         HideSelectionButton();
     }
 
     private void HideSelectionButton()
     {
-        _buttonTimer.Change(Timeout.Infinite, Timeout.Infinite);
         _pointerTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
         var button = _buttonWindow;

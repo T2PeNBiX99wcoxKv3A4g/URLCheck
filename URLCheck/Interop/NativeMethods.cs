@@ -110,6 +110,11 @@ internal static partial class NativeMethods
 
     public const int DwmwaWindowCornerPreference = 33;
     public const int DwmwcpRound = 2;
+    public const int DwmwcpDoNotRound = 1;
+
+    /// <summary>Border colour attribute (Windows 11). <see cref="DwmwaColorNone" /> removes the border.</summary>
+    public const int DwmwaBorderColor = 34;
+    public const int DwmwaColorNone = unchecked((int)0xFFFFFFFE);
 
     [LibraryImport("dwmapi.dll")]
     public static partial int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);

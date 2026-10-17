@@ -90,6 +90,15 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
             var style = (long)NativeMethods.GetWindowLongPtr(handle, NativeMethods.GwlExStyle);
             style |= NativeMethods.WsExNoActivate | NativeMethods.WsExToolWindow;
             NativeMethods.SetWindowLongPtr(handle, NativeMethods.GwlExStyle, new IntPtr(style));
+
+            // Windows 11 would otherwise draw its own light border and rounded corners around the
+            // window, which shows up as a frame sitting outside the round button.
+            var noBorder = NativeMethods.DwmwaColorNone;
+            NativeMethods.DwmSetWindowAttribute(handle, NativeMethods.DwmwaBorderColor, ref noBorder, sizeof(int));
+
+            var doNotRound = NativeMethods.DwmwcpDoNotRound;
+            NativeMethods.DwmSetWindowAttribute(handle, NativeMethods.DwmwaWindowCornerPreference, ref doNotRound,
+                sizeof(int));
         });
     }
 
