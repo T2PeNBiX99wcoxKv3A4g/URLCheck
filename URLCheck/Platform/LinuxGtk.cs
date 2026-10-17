@@ -11,9 +11,8 @@ namespace URLCheck.Platform;
 ///     app id.
 /// </summary>
 /// <remarks>
-///     Photino exposes no GTK widget handle and no hide call, and on Wayland minimising
-///     (<c>gtk_window_iconify</c>) leaves the window in the taskbar. The toplevel is therefore looked up
-///     by its unique, app-controlled title. Every call is best-effort and never throws.
+///     Photino exposes no GTK widget handle and no hide call. The toplevel is therefore looked up by
+///     its unique, app-controlled title. Every call is best-effort and never throws.
 /// </remarks>
 [SupportedOSPlatform("linux")]
 internal static partial class LinuxGtk
@@ -24,13 +23,23 @@ internal static partial class LinuxGtk
     private const string CairoLibrary = "libcairo.so.2";
     private const string WebKitLibrary = "libwebkit2gtk-4.1.so.0";
 
-    /// <summary>Hides a toplevel by title. Returns false when it could not be found.</summary>
-    public static bool Hide(string title) => WithWindow(title, gtk_widget_hide);
+    /// <summary>
+    ///     Takes a toplevel off the screen and out of the taskbar without unmapping it. Unmapping one
+    ///     that still has a web view to create leaves that view blank, so the window is iconified
+    ///     with the skip-taskbar hint set instead: GTK keeps it alive, the compositor hides it.
+    /// </summary>
+    public static bool Hide(string title) => WithWindow(title, window =>
+    {
+        gtk_window_set_skip_taskbar_hint(window, true);
+        gtk_window_iconify(window);
+    });
 
     /// <summary>Un-hides and raises a toplevel by title. Returns false when it could not be found.</summary>
     public static bool Present(string title) => WithWindow(title, window =>
     {
         gtk_widget_show(window);
+        gtk_window_deiconify(window);
+        gtk_window_set_skip_taskbar_hint(window, false);
         gtk_window_present(window);
     });
 
@@ -40,6 +49,7 @@ internal static partial class LinuxGtk
     /// </summary>
     public static bool ShowOnTop(string title) => WithWindow(title, window =>
     {
+        gtk_window_deiconify(window);
         gtk_widget_show(window);
         gtk_window_set_keep_above(window, true);
     });
@@ -448,6 +458,16 @@ internal static partial class LinuxGtk
 
     [LibraryImport(GtkLibrary)]
     private static partial void gtk_window_set_keep_above(IntPtr window, [MarshalAs(UnmanagedType.Bool)] bool setting);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial void gtk_window_set_skip_taskbar_hint(IntPtr window,
+        [MarshalAs(UnmanagedType.Bool)] bool setting);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial void gtk_window_iconify(IntPtr window);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial void gtk_window_deiconify(IntPtr window);
 
     [LibraryImport(GtkLibrary)]
     private static partial IntPtr gtk_clipboard_get(IntPtr selection);

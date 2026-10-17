@@ -10,11 +10,23 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("windows")]
 internal sealed class WindowsWindowPlatform : IWindowPlatform
 {
-    public void Hide(PhotinoWindow window) =>
-        UseHandle(window, handle => NativeMethods.ShowWindow(handle, NativeMethods.SwHide));
+    /// <summary>
+    ///     Takes the window off the user's radar without hiding it. Photino's windows host a web view
+    ///     that must be created while the window is visible; hiding one outright leaves it permanently
+    ///     blank, so it is cloaked instead — DWM stops drawing it and the shell drops it from the
+    ///     taskbar and Alt+Tab, while the window itself stays "visible" and keeps its web view alive.
+    ///     It is minimised too so nothing is ever painted in the split second before the cloak lands.
+    /// </summary>
+    public void Hide(PhotinoWindow window) => UseHandle(window, handle =>
+    {
+        Cloak(handle, true);
+        NativeMethods.ShowWindow(handle, NativeMethods.SwShowMinNoActive);
+    });
 
+    /// <summary>Brings the window back: uncloaked, restored and focused.</summary>
     public void Show(PhotinoWindow window) => UseHandle(window, handle =>
     {
+        Cloak(handle, false);
         NativeMethods.ShowWindow(handle, NativeMethods.SwRestore);
         NativeMethods.SetForegroundWindow(handle);
     });
@@ -95,13 +107,15 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
     {
         var placed = ClampToMonitor(window, x, y);
 
-        // Placed and shown in a single call: a separate move can be swallowed by the show, and
-        // Photino's own clamp mixes logical and physical pixels.
+        // Uncloaked, un-minimised and placed in one go: a separate move can be swallowed by the
+        // show, and Photino's own clamp mixes logical and physical pixels. SW_SHOWNOACTIVATE also
+        // restores a minimised window, but without pulling focus away from whatever has it.
         UseHandle(window, handle =>
         {
+            Cloak(handle, false);
             NativeMethods.ShowWindow(handle, NativeMethods.SwShowNoActivate);
             NativeMethods.SetWindowPos(handle, NativeMethods.HwndTopMost, placed.Left, placed.Top, 0, 0,
-                NativeMethods.SwpNoSize | NativeMethods.SwpNoActivate | NativeMethods.SwpShowWindow);
+                NativeMethods.SwpNoSize | NativeMethods.SwpNoActivate);
         });
 
         Log.Debug("Selection button placed at {Left},{Top}", placed.Left, placed.Top);
@@ -140,6 +154,13 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         var left = Math.Clamp(x, info.rcWork.Left, Math.Max(info.rcWork.Left, info.rcWork.Right - window.Width));
         var top = Math.Clamp(y, info.rcWork.Top, Math.Max(info.rcWork.Top, info.rcWork.Bottom - window.Height));
         return (left, top);
+    }
+
+    /// <summary>Cloaks or uncloaks a window through DWM. Best effort: older systems just ignore it.</summary>
+    private static void Cloak(IntPtr handle, bool cloaked)
+    {
+        var value = cloaked ? 1 : 0;
+        NativeMethods.DwmSetWindowAttribute(handle, NativeMethods.DwmwaCloak, ref value, sizeof(int));
     }
 
     private static void UseHandle(PhotinoWindow window, Action<IntPtr> action)

@@ -335,6 +335,9 @@ internal sealed class WindowManager
                 .SetChromeless(true)
                 .SetTransparent(true)
                 .SetTopMost(true)
+                // Created minimised so nothing paints before it is cloaked below: hiding it outright
+                // would leave its web view permanently blank.
+                .SetMinimized(true)
                 // Registering for notifications would drop a Start Menu shortcut named after the button.
                 .SetNotificationsEnabled(false)
                 .RegisterWebMessageReceivedHandler((sender, message) =>
