@@ -117,8 +117,9 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
     ///     Wayland ignores a client's requested position, so <c>MoveTo</c> is best-effort there and the
     ///     compositor places the button instead; the requested place is reported back either way.
     /// </summary>
-    public System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y)
+    public System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size)
     {
+        window.SetSize(size, size);
         window.MoveTo(x, y);
         LinuxGtk.ShowOnTop(window.Title);
         return new System.Drawing.Point(x, y);
@@ -129,6 +130,12 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
     ///     and the button simply falls back to its own timeout. X11 does report it.
     /// </summary>
     public bool PointerButtonPressed() => LinuxGtk.IsPointerButtonPressed();
+
+    /// <summary>
+    ///     GTK can keep a window out of the taskbar while it is iconified, so the button gets the same
+    ///     treatment as any other window here and never has to be unmapped.
+    /// </summary>
+    public void PrepareSelectionButton(PhotinoWindow window) => LinuxGtk.Hide(window.Title);
 
     public bool TryGetCursorPosition(out int x, out int y) => LinuxGtk.TryGetPointerPosition(out x, out y);
 }

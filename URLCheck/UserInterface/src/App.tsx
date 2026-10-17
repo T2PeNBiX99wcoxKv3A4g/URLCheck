@@ -44,6 +44,14 @@ export default function App() {
         });
     }, []);
 
+    // Tells the backend the interface is up and painting. A hidden start uses this to keep the window
+    // minimised — and its web view rendering — until the first frame has really been drawn, instead of
+    // hiding it while the web view is still starting up, which would leave it blank for good.
+    useEffect(() => {
+        const timer = window.setTimeout(() => Native.send({type: "app.ready"}), 250);
+        return () => window.clearTimeout(timer);
+    }, []);
+
     const CurrentPage = findTab(currentTab).page;
 
     return (

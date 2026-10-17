@@ -35,6 +35,12 @@ internal sealed class WindowManager
     /// <summary>How often the pointer is checked while the button is visible.</summary>
     private static readonly TimeSpan PointerPollInterval = TimeSpan.FromMilliseconds(90);
 
+    /// <summary>How long the interface is given to paint its first frame before the window is hidden.</summary>
+    private static readonly TimeSpan FirstRenderDelay = TimeSpan.FromMilliseconds(750);
+
+    /// <summary>How long a hidden start waits for the interface to report in before hiding anyway.</summary>
+    private static readonly TimeSpan StartupHideTimeout = TimeSpan.FromSeconds(10);
+
     /// <summary>Longer than any sane URL; a clipboard value this big is never one.</summary>
     private const int MaxUrlLength = 2048;
 
@@ -53,6 +59,12 @@ internal sealed class WindowManager
 
     /// <summary>Where the button was really placed, so a press on it is told apart from a press away.</summary>
     private System.Drawing.Point? _buttonAt;
+
+    /// <summary>Set while a hidden start is still waiting for the interface's first render.</summary>
+    private bool _hideWhenRendered;
+
+    /// <summary>Set while the button window is still starting up and has to stay minimised.</summary>
+    private bool _buttonWarming;
 
     public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings, HistoryService history,
         IClipboardWatcher clipboard)
@@ -132,6 +144,21 @@ internal sealed class WindowManager
                 HideSelectionButton();
                 return null;
 
+            case "app.ready":
+                HideWhenRendered();
+                return null;
+
+            case "selection.ready":
+                if (_buttonWarming)
+                {
+                    // The button has rendered, so hiding it now is safe and takes it out of the
+                    // window manager's hands while it waits for the next copied URL.
+                    _buttonWarming = false;
+                    HideSelectionButton();
+                }
+
+                return null;
+
             case "popup.resize":
             {
                 var height = context.Payload<PopupResizeRequest>()?.Height ?? 0;
@@ -181,14 +208,22 @@ internal sealed class WindowManager
         {
             ApplyClipboardWatching();
 
-            // Starting hidden means hiding the window outright: minimising would leave it in the
-            // taskbar, which is exactly what a resident tray application should not do.
-            if (!ShowMainWindowOnStartup)
+            // Starting hidden keeps the window minimised for now. Hiding a window while its web view
+            // is still starting up leaves that web view permanently blank, so the window stays
+            // minimised — which it renders fine from — until the interface has really rendered, and
+            // only then is hidden the way the close button hides it.
+            if (ShowMainWindowOnStartup)
             {
-                Log.Information("Starting hidden; the main window stays closed to the tray");
-                _platform.Hide(window);
+                MainWindowCreated?.Invoke();
+                return;
             }
 
+            _hideWhenRendered = true;
+            Log.Information("Starting hidden; the window stays minimised until its interface has rendered");
+
+            // The interface is expected to report in; this makes sure the window still ends up hidden
+            // when it cannot (a broken bundle, for instance) instead of sitting in the taskbar.
+            _ = Task.Delay(StartupHideTimeout).ContinueWith(_ => HideWhenRendered());
             MainWindowCreated?.Invoke();
         });
     }
@@ -211,6 +246,22 @@ internal sealed class WindowManager
 
     /// <summary>Runs an action on the UI thread, once the message loop is running.</summary>
     public void RunOnMainWindow(Action action) => Invoke(_mainWindow, _ => action());
+
+    /// <summary>
+    ///     Hides the main window the way the close button does, but only once the interface has really
+    ///     rendered. Hiding it any earlier — while the web view is still starting up — leaves that view
+    ///     blank for good, so a hidden start keeps the window minimised until then.
+    /// </summary>
+    private void HideWhenRendered()
+    {
+        if (!_hideWhenRendered)
+            return;
+
+        _hideWhenRendered = false;
+        Log.Information("The interface has rendered; hiding the main window to the tray");
+
+        _ = Task.Delay(FirstRenderDelay).ContinueWith(_ => HideMainWindow());
+    }
 
     /// <summary>Starts or stops clipboard watching so it always matches the setting.</summary>
     private void ApplyClipboardWatching() => RunOnMainWindow(() =>
@@ -270,7 +321,7 @@ internal sealed class WindowManager
             if (!created)
                 button.SendWebMessage(NativeProtocol.SerializeEvent("selection.show", new SelectionShowPayload(url)));
 
-            _buttonAt = _platform.ShowSelectionButton(button, x, y);
+            _buttonAt = _platform.ShowSelectionButton(button, x, y, ButtonSize);
 
             _buttonTimer.Change(ButtonLifetime, Timeout.InfiniteTimeSpan);
             _pointerTimer.Change(PointerPollInterval, PointerPollInterval);
@@ -343,11 +394,14 @@ internal sealed class WindowManager
                 .RegisterWebMessageReceivedHandler((sender, message) =>
                     _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message));
 
-            // The window exists from here on, which is when the platform can still shape it.
+            // The window exists from here on, which is when the platform can still shape it. It is
+            // kept minimised until its page reports that it has rendered; hiding it now would leave
+            // its web view blank for good.
+            _buttonWarming = true;
             button.RegisterWindowCreatedHandler((_, _) =>
             {
                 _platform.ConfigureSelectionButtonWindow(button);
-                _platform.Hide(button);
+                _platform.PrepareSelectionButton(button);
             });
 
             ApplyIcon(button);

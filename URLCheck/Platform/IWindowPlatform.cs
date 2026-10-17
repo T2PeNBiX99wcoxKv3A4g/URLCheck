@@ -38,10 +38,15 @@ internal interface IWindowPlatform
     void ConfigureSelectionButtonWindow(PhotinoWindow window);
 
     /// <summary>
-    ///     Shows the button window near <paramref name="x" />,<paramref name="y" />, without stealing
-    ///     focus when possible, and returns the place it was really put.
+    ///     Shows the button window at <paramref name="x" />,<paramref name="y" /> as an
+    ///     <paramref name="size" />-pixel square, without stealing focus when possible, and returns the
+    ///     place it was really put.
     /// </summary>
-    System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y);
+    System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size);
+
+    /// <summary>Shows the button window without revealing it, so its web view can start up. The window
+    ///     is minimised rather than hidden: a web view created in a hidden window would never render.</summary>
+    void PrepareSelectionButton(PhotinoWindow window);
 
     /// <summary>
     ///     True while a mouse button is down, so the floating button can be dismissed the moment the

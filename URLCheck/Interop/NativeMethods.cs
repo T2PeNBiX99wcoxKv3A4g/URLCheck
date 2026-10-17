@@ -14,6 +14,7 @@ internal static partial class NativeMethods
     public delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
     // ShowWindow commands
+    public const int SwHide = 0;
     public const int SwShowNoActivate = 4;
     public const int SwShowMinNoActive = 7;
     public const int SwRestore = 9;
@@ -108,13 +109,6 @@ internal static partial class NativeMethods
 
     public const int DwmwaWindowCornerPreference = 33;
     public const int DwmwcpRound = 2;
-
-    /// <summary>
-    ///     Makes DWM stop drawing the window without hiding it: the window stays "visible" — which is
-    ///     what the web view needs to keep rendering — but is gone from the screen, the taskbar and
-    ///     Alt+Tab, exactly like a window on another virtual desktop.
-    /// </summary>
-    public const int DwmwaCloak = 13;
 
     [LibraryImport("dwmapi.dll")]
     public static partial int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
