@@ -20,6 +20,11 @@ export function closePopup(): void {
     Native.send({type: "popup.close"});
 }
 
+/** Hides the floating button's window once the URL has been handed to the popup. */
+export function hideSelectionButton(): void {
+    Native.send({type: "selection.hide"});
+}
+
 /** Registers URLCheck as a candidate browser for http/https. */
 export async function registerProtocols(): Promise<{ executablePath: string }> {
     return await Native.request<{ executablePath: string }>("app.registerProtocols");

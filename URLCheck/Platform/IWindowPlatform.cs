@@ -30,4 +30,16 @@ internal interface IWindowPlatform
     ///     child of the host there.
     /// </summary>
     PhotinoWindow CreatePopupWindow(PhotinoWindow? parent);
+
+    /// <summary>Creates the small, chromeless window that hosts the floating selection button.</summary>
+    PhotinoWindow CreateSelectionButtonWindow(PhotinoWindow? parent);
+
+    /// <summary>Applies the button window's platform styling once its native window exists.</summary>
+    void ConfigureSelectionButtonWindow(PhotinoWindow window);
+
+    /// <summary>Shows the button window at <paramref name="x" />,<paramref name="y" />, without stealing focus when possible.</summary>
+    void ShowSelectionButton(PhotinoWindow window, int x, int y);
+
+    /// <summary>The pointer position in screen coordinates; false when the platform cannot report it.</summary>
+    bool TryGetCursorPosition(out int x, out int y);
 }

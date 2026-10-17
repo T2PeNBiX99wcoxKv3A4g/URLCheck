@@ -66,3 +66,6 @@ internal sealed record NavigatePayload(string Tab);
 
 /// <summary>Body for the <c>popup.navigate</c> event.</summary>
 internal sealed record PopupNavigatePayload(string Url);
+
+/// <summary>Body for the <c>selection.show</c> event: the URL the floating button should offer.</summary>
+internal sealed record SelectionShowPayload(string Url);

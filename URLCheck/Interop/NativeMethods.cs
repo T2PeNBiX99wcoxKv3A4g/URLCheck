@@ -15,7 +15,13 @@ internal static partial class NativeMethods
 
     // ShowWindow commands
     public const int SwHide = 0;
+    public const int SwShowNoActivate = 4;
     public const int SwRestore = 9;
+
+    // SetWindowLongPtr indices / extended styles
+    public const int GwlExStyle = -20;
+    public const long WsExNoActivate = 0x08000000;
+    public const long WsExToolWindow = 0x00000080;
 
     public const uint SwpNoSize = 0x0001;
     public const uint SwpNoMove = 0x0002;
@@ -35,6 +41,51 @@ internal static partial class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy,
         uint uFlags);
+
+    // ---- Clipboard ----
+
+    public const uint WmClipboardUpdate = 0x031D;
+    public const uint CfUnicodeText = 13;
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool AddClipboardFormatListener(IntPtr hWnd);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool RemoveClipboardFormatListener(IntPtr hWnd);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool OpenClipboard(IntPtr hWndNewOwner);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool CloseClipboard();
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    public static partial IntPtr GetClipboardData(uint uFormat);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    public static partial IntPtr GetClipboardOwner();
+
+    [LibraryImport("user32.dll")]
+    public static partial uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+    [LibraryImport("kernel32.dll", EntryPoint = "GlobalLock", SetLastError = true)]
+    public static partial IntPtr GlobalLock(IntPtr hMem);
+
+    [LibraryImport("kernel32.dll", EntryPoint = "GlobalUnlock", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GlobalUnlock(IntPtr hMem);
+
+    // ---- Window styles ----
+
+    [LibraryImport("user32.dll", EntryPoint = "GetWindowLongPtrW", SetLastError = true)]
+    public static partial IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
+
+    [LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
+    public static partial IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
     // ---- DWM (rounded corners) ----
 

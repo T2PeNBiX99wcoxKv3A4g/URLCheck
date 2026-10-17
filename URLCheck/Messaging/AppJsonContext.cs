@@ -50,6 +50,7 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(List<RemoveParamRule>))]
 [JsonSerializable(typeof(NavigatePayload))]
 [JsonSerializable(typeof(PopupNavigatePayload))]
+[JsonSerializable(typeof(SelectionShowPayload))]
 [JsonSerializable(typeof(Dictionary<string, string>))]
 internal sealed partial class AppJsonContext : JsonSerializerContext;
 

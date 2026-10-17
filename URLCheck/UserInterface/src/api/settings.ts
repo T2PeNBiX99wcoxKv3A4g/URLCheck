@@ -27,6 +27,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     borderlessPopup: true,
     autoStripTrackingParams: true,
     hideOnLaunch: false,
+    showUrlButton: true,
     selectedUserAgentId: "default",
 };
 
@@ -65,6 +66,7 @@ function normalize(settings: AppSettings): AppSettings {
         autoStripTrackingParams:
             settings.autoStripTrackingParams ?? DEFAULT_SETTINGS.autoStripTrackingParams,
         hideOnLaunch: settings.hideOnLaunch ?? DEFAULT_SETTINGS.hideOnLaunch,
+        showUrlButton: settings.showUrlButton ?? DEFAULT_SETTINGS.showUrlButton,
     };
 }
 

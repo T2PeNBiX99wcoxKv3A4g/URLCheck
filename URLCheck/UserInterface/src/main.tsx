@@ -13,21 +13,23 @@ import "@fontsource/jetbrains-mono/latin-600.css";
 import "@fontsource/jetbrains-mono/latin-700.css";
 import App from "./App";
 import {LocalizationProvider} from "./i18n";
-import {SelectionPopup} from "./components/SelectionPopup";
 import {PopupPage} from "./pages/PopupPage";
+import {SelectionButtonPage} from "./pages/SelectionButtonPage";
 
 const rootElement = document.getElementById("root");
 if (rootElement) {
-    // The popup window is loaded with a `#popup?url=...` fragment; everything else is the shell.
-    const isPopup = window.location.hash.startsWith("#popup");
+    // The popup and the floating button are their own windows, each loaded with its own fragment;
+    // everything else is the management shell.
+    const hash = window.location.hash;
+    const page = hash.startsWith("#popup")
+        ? <PopupPage/>
+        : hash.startsWith("#selection")
+                ? <SelectionButtonPage/>
+                : <App/>;
 
     createRoot(rootElement).render(
         <StrictMode>
-            <LocalizationProvider>
-                {isPopup ? <PopupPage/> : <App/>}
-                {/* Lives outside the pages so selecting a URL works in every window. */}
-                <SelectionPopup/>
-            </LocalizationProvider>
+            <LocalizationProvider>{page}</LocalizationProvider>
         </StrictMode>
     );
 }

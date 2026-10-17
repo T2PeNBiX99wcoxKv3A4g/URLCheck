@@ -98,6 +98,8 @@
   "settings.hideOnLaunchDescription": "啟動時不顯示主視窗；檢查彈窗仍會正常出現。需要系統匣圖示，且由連結啟動時一律不適用。",
   "settings.autoStripTracking": "開啟時自動清理追蹤參數",
   "settings.autoStripTrackingDescription": "彈窗開啟時自動移除已知的追蹤參數（utm_*、fbclid 等）。關閉後請改用彈窗中的「跟蹤」按鈕手動清理。",
+  "settings.showUrlButton": "複製連結時的懸浮按鈕",
+  "settings.showUrlButtonDescription": "監看剪貼簿，當複製的內容是 http(s) 連結時，在滑鼠指標旁顯示一個小按鈕，不必切換程式就能檢查該連結。",
   "settings.save": "儲存設定",
   "settings.saving": "儲存中...",
   "settings.loading": "載入中...",

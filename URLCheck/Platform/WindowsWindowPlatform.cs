@@ -65,6 +65,55 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
     /// </summary>
     public PhotinoWindow CreatePopupWindow(PhotinoWindow? parent) => new();
 
+    /// <summary>
+    ///     Like the popup, top-level and unowned: an owned window follows its owner to the tray, which
+    ///     must not happen to a button that appears over other applications.
+    /// </summary>
+    public PhotinoWindow CreateSelectionButtonWindow(PhotinoWindow? parent) => new();
+
+    /// <summary>
+    ///     A tool window that never activates: the button must not steal focus from whatever the user is
+    ///     working in when it pops up.
+    /// </summary>
+    public void ConfigureSelectionButtonWindow(PhotinoWindow window)
+    {
+        // GetWindowLongPtrW only exists on 64-bit Windows; the styles are a nicety, not a requirement.
+        if (!Environment.Is64BitProcess)
+            return;
+
+        UseHandle(window, handle =>
+        {
+            var style = (long)NativeMethods.GetWindowLongPtr(handle, NativeMethods.GwlExStyle);
+            style |= NativeMethods.WsExNoActivate | NativeMethods.WsExToolWindow;
+            NativeMethods.SetWindowLongPtr(handle, NativeMethods.GwlExStyle, new IntPtr(style));
+        });
+    }
+
+    public void ShowSelectionButton(PhotinoWindow window, int x, int y)
+    {
+        window.MoveTo(x, y);
+        UseHandle(window, handle =>
+        {
+            NativeMethods.ShowWindow(handle, NativeMethods.SwShowNoActivate);
+            NativeMethods.SetWindowPos(handle, NativeMethods.HwndTopMost, 0, 0, 0, 0,
+                NativeMethods.SwpNoMove | NativeMethods.SwpNoSize | NativeMethods.SwpNoActivate);
+        });
+    }
+
+    public bool TryGetCursorPosition(out int x, out int y)
+    {
+        if (NativeMethods.GetCursorPos(out var point))
+        {
+            x = point.X;
+            y = point.Y;
+            return true;
+        }
+
+        x = 0;
+        y = 0;
+        return false;
+    }
+
     private static void UseHandle(PhotinoWindow window, Action<IntPtr> action)
     {
         var handle = window.WindowHandle;

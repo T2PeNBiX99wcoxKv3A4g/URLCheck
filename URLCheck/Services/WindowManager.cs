@@ -20,23 +20,48 @@ internal sealed class WindowManager
     private static readonly string WebViewDataPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name, "webview");
 
+    /// <summary>Size of the floating button's window, in physical pixels.</summary>
+    private const int ButtonWidth = 176;
+    private const int ButtonHeight = 44;
+
+    /// <summary>Offset from the pointer, so the button does not sit under the cursor.</summary>
+    private const int ButtonOffset = 18;
+
+    /// <summary>How long the button stays on screen before it hides itself again.</summary>
+    private static readonly TimeSpan ButtonLifetime = TimeSpan.FromSeconds(8);
+
+    /// <summary>Longer than any sane URL; a clipboard value this big is never one.</summary>
+    private const int MaxUrlLength = 2048;
+
     private readonly string _appUrl;
     private readonly IWindowPlatform _platform;
     private readonly SettingsService _settings;
     private readonly HistoryService _history;
+    private readonly IClipboardWatcher _clipboard;
+    private readonly Timer _buttonTimer;
     private bool _allowClose;
 
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
+    private PhotinoWindow? _buttonWindow;
 
-    public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings, HistoryService history)
+    public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings, HistoryService history,
+        IClipboardWatcher clipboard)
     {
         _appUrl = appUrl;
         _platform = platform;
         _settings = settings;
         _history = history;
+        _clipboard = clipboard;
 
-        SettingsService.Changed += payload => BroadcastEvent("settings.changed", payload);
+        _clipboard.TextCopied += OnTextCopied;
+        _buttonTimer = new(_ => HideSelectionButton(), null, Timeout.Infinite, Timeout.Infinite);
+
+        SettingsService.Changed += payload =>
+        {
+            BroadcastEvent("settings.changed", payload);
+            ApplyClipboardWatching();
+        };
         NativeBridge.MessageReceived += HandleMessageAsync;
     }
 
@@ -93,6 +118,10 @@ internal sealed class WindowManager
                 CloseWindow(context.Window);
                 return null;
 
+            case "selection.hide":
+                HideSelectionButton();
+                return null;
+
             case "popup.resize":
             {
                 var height = context.Payload<PopupResizeRequest>()?.Height ?? 0;
@@ -118,7 +147,11 @@ internal sealed class WindowManager
             .SetMinimized(!ShowMainWindowOnStartup)
             .RegisterWebMessageReceivedHandler((sender, message) =>
                 _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message))
-            .RegisterWindowCreatedHandler((_, _) => MainWindowCreated?.Invoke())
+            .RegisterWindowCreatedHandler((_, _) =>
+            {
+                ApplyClipboardWatching();
+                MainWindowCreated?.Invoke();
+            })
             .RegisterWindowClosingHandler((_, _) =>
             {
                 // Stay resident: closing the host window hides it instead of shutting down.
@@ -157,6 +190,129 @@ internal sealed class WindowManager
     /// <summary>Runs an action on the UI thread, once the message loop is running.</summary>
     public void RunOnMainWindow(Action action) => Invoke(_mainWindow, _ => action());
 
+    /// <summary>Starts or stops clipboard watching so it always matches the setting.</summary>
+    private void ApplyClipboardWatching() => RunOnMainWindow(() =>
+    {
+        if (_settings.Current?.ShowUrlButton ?? false)
+        {
+            _clipboard.Start();
+            return;
+        }
+
+        _clipboard.Stop();
+        HideSelectionButton();
+    });
+
+    /// <summary>Shows the floating button when a copied text is a lone http(s) URL.</summary>
+    private void OnTextCopied(string text)
+    {
+        if ((_settings.Current?.ShowUrlButton ?? false) is false)
+            return;
+
+        if (UrlFromText(text) is not { } url)
+        {
+            HideSelectionButton();
+            return;
+        }
+
+        ShowSelectionButton(url);
+    }
+
+    /// <summary>The trimmed clipboard text when it is a lone http(s) URL; anything else is not a link.</summary>
+    private static string? UrlFromText(string text)
+    {
+        var value = text.Trim().Trim('<', '>', '"', '\'');
+        if (value.Length is 0 or > MaxUrlLength)
+            return null;
+
+        return Uri.TryCreate(value, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https"
+            ? uri.ToString()
+            : null;
+    }
+
+    private void ShowSelectionButton(string url)
+    {
+        RunOnMainWindow(() =>
+        {
+            // The first show loads the page with the URL in its fragment; later shows reuse the
+            // already loaded page and push the new URL through an event.
+            var created = _buttonWindow is null;
+            if (EnsureButtonWindow(url) is not { } button)
+                return;
+
+            if (!created)
+                button.SendWebMessage(NativeProtocol.SerializeEvent("selection.show", new SelectionShowPayload(url)));
+
+            // Wayland hides the global pointer, so the compositor places the window there instead.
+            _platform.TryGetCursorPosition(out var x, out var y);
+            _platform.ShowSelectionButton(button, x + ButtonOffset, y + ButtonOffset);
+
+            _buttonTimer.Change(ButtonLifetime, Timeout.InfiniteTimeSpan);
+        });
+    }
+
+    private void HideSelectionButton()
+    {
+        _buttonTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
+        var button = _buttonWindow;
+        if (button is not null)
+            RunOnMainWindow(() => _platform.Hide(button));
+    }
+
+    /// <summary>
+    ///     Builds the button window on first use. It is created hidden and then reused, so copying a
+    ///     URL does not pay for a fresh WebView every time. The URL travels in the fragment because the
+    ///     page is not listening for events yet while it loads.
+    /// </summary>
+    private PhotinoWindow? EnsureButtonWindow(string url)
+    {
+        if (_buttonWindow is not null)
+            return _buttonWindow;
+
+        try
+        {
+            var button = _platform.CreateSelectionButtonWindow(_mainWindow)
+                .SetTitle(Constants.SelectionButtonTitle)
+                .SetTemporaryFilesPath(WebViewDataPath)
+                .SetUseOsDefaultSize(false)
+                .SetUseOsDefaultLocation(false)
+                // Created off-screen and hidden at once, so the very first copy does not flash a window
+                // at whatever place the OS would have picked.
+                .SetLocation(new System.Drawing.Point(-32000, -32000))
+                .SetSize(new(ButtonWidth, ButtonHeight))
+                .SetMinSize(ButtonWidth, ButtonHeight)
+                .SetMaxSize(ButtonWidth, ButtonHeight)
+                .SetResizable(false)
+                .SetChromeless(true)
+                .SetTransparent(true)
+                .SetTopMost(true)
+                // Registering for notifications would drop a Start Menu shortcut named after the button.
+                .SetNotificationsEnabled(false)
+                .RegisterWebMessageReceivedHandler((sender, message) =>
+                    _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message));
+
+            // The window exists from here on, which is when the platform can still shape it.
+            button.RegisterWindowCreatedHandler((_, _) =>
+            {
+                _platform.ConfigureSelectionButtonWindow(button);
+                _platform.Hide(button);
+            });
+
+            ApplyIcon(button);
+            button.Load($"{_appUrl}#selection?url={Uri.EscapeDataString(url)}");
+            button.WaitForClose();
+
+            _buttonWindow = button;
+            return button;
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to create the selection button window");
+            return null;
+        }
+    }
+
     [PublicAPI]
     public void HideMainWindow()
     {
@@ -178,6 +334,9 @@ internal sealed class WindowManager
     {
         if (string.IsNullOrWhiteSpace(url))
             return;
+
+        // The popup replaces the button, so the button never lingers on top of it.
+        HideSelectionButton();
 
         // History keeps the URL that was clicked, not whatever the popup later edits it into.
         _history.Record(url);
@@ -284,6 +443,7 @@ internal sealed class WindowManager
     public void Exit()
     {
         _allowClose = true;
+        _clipboard.Stop();
         CloseWindow(_mainWindow);
     }
 

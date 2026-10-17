@@ -96,4 +96,32 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
     /// </summary>
     public PhotinoWindow CreatePopupWindow(PhotinoWindow? parent) =>
         parent is null ? new PhotinoWindow() : new PhotinoWindow(parent);
+
+    /// <summary>
+    ///     A transient child of the host, exactly like the popup: a top-level GTK window that closes
+    ///     would take the whole message loop down with it.
+    /// </summary>
+    public PhotinoWindow CreateSelectionButtonWindow(PhotinoWindow? parent) =>
+        parent is null ? new PhotinoWindow() : new PhotinoWindow(parent);
+
+    /// <summary>Reuses the popup's transparency treatment so the pill's rounded corners are not filled in.</summary>
+    public void ConfigureSelectionButtonWindow(PhotinoWindow window)
+    {
+        if (!LinuxGtk.MakeTransparent(window.Title))
+            return;
+
+        LinuxGtk.MakeWebViewTransparent(window.Title);
+    }
+
+    /// <summary>
+    ///     Wayland ignores a client's requested position, so <c>MoveTo</c> is best-effort there and the
+    ///     compositor places the button instead.
+    /// </summary>
+    public void ShowSelectionButton(PhotinoWindow window, int x, int y)
+    {
+        window.MoveTo(x, y);
+        LinuxGtk.ShowOnTop(window.Title);
+    }
+
+    public bool TryGetCursorPosition(out int x, out int y) => LinuxGtk.TryGetPointerPosition(out x, out y);
 }

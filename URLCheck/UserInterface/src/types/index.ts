@@ -18,6 +18,8 @@ export interface AppSettings {
     autoStripTrackingParams: boolean;
     /** Start with the management window hidden, like a link launch. Ignored without a tray icon. */
     hideOnLaunch: boolean;
+    /** Watch the clipboard and float a button over the pointer whenever a copied text is an http(s) URL. */
+    showUrlButton: boolean;
 }
 
 export interface UserAgentEntry {

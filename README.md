@@ -40,6 +40,9 @@ desktop version.
   The most-used browser becomes the default button.
 - **History** — every intercepted URL is recorded locally in SQLite and can be searched, and
   clicking an entry reopens the popup for it.
+- **Float a button over copied links** — copying an `http(s)` URL anywhere makes a small button
+  appear next to the pointer; one click opens the inspection popup without switching applications.
+  It can be turned off in the settings.
 
 ## Built with
 
@@ -67,9 +70,12 @@ installed for them. What the operating system still has to provide:
 
 1. The web view for GTK.
 2. An AppIndicator library, for the tray icon only.
-3. Only tested on **Fedora 44 with KDE Plasma on Wayland**. Every other distribution is untested, and the
+3. `wl-clipboard` 2.3 or newer, for the floating button over copied links only. Wayland hides the
+   clipboard from applications that are not focused, and `wl-paste --watch` is the way around it.
+   Without it the button simply never appears there.
+4. Only tested on **Fedora 44 with KDE Plasma on Wayland**. Every other distribution is untested, and the
   runtime libraries are the fiddly part, so start from the libraries rather than the package names.
-4. Only support Wayland right now. If you are a super nerd running something like an old window manager on X11, you
+5. Only support Wayland right now. If you are a super nerd running something like an old window manager on X11, you
    should fix any issues by yourself.
 
 | Distribution    | Packages                                                          |

@@ -93,7 +93,7 @@ internal static class Program
             _ = new StartupService();
             _ = new InspectService(settings);
             _ = new FilterService();
-            var manager = new WindowManager(appUrl, windowPlatform, settings, history)
+            var manager = new WindowManager(appUrl, windowPlatform, settings, history, CreateClipboardWatcher())
             {
                 ShowMainWindowOnStartup = showMainWindow,
                 IconPath = iconPath
@@ -138,6 +138,18 @@ internal static class Program
 
         if (OperatingSystem.IsLinux())
             return (new LinuxBrowserLocator(), new LinuxWindowPlatform(), new LinuxProtocolRegistrar());
+
+        throw new PlatformNotSupportedException("URLCheck supports Windows and Linux.");
+    }
+
+    /// <summary>Creates the clipboard watcher for the OS we are running on.</summary>
+    private static IClipboardWatcher CreateClipboardWatcher()
+    {
+        if (OperatingSystem.IsWindows())
+            return new WindowsClipboardWatcher();
+
+        if (OperatingSystem.IsLinux())
+            return new LinuxClipboardWatcher();
 
         throw new PlatformNotSupportedException("URLCheck supports Windows and Linux.");
     }

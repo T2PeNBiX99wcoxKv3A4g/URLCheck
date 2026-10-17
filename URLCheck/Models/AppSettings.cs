@@ -49,6 +49,12 @@ internal sealed class AppSettings
     /// </summary>
     public bool HideOnLaunch { get; set; }
 
+    /// <summary>
+    ///     Watch the system clipboard and show a floating button next to the pointer whenever the
+    ///     copied text is an http(s) URL, so it can be inspected without switching applications.
+    /// </summary>
+    public bool ShowUrlButton { get; set; } = true;
+
     public AppSettings Clone() => (AppSettings)MemberwiseClone();
 
     /// <summary>Clamps values into their supported ranges so invalid input can never be persisted.</summary>

@@ -98,6 +98,8 @@
   "settings.hideOnLaunchDescription": "启动时不显示主窗口；检查弹窗仍会正常出现。需要托盘图标，且由链接启动时一律不适用。",
   "settings.autoStripTracking": "打开时自动清理跟踪参数",
   "settings.autoStripTrackingDescription": "弹窗打开时自动移除已知的跟踪参数（utm_*、fbclid 等）。关闭后请改用弹窗中的“跟踪”按钮手动清理。",
+  "settings.showUrlButton": "复制链接时的悬浮按钮",
+  "settings.showUrlButtonDescription": "监视剪贴板，当复制的内容是 http(s) 链接时，在鼠标指针旁显示一个小按钮，无需切换程序即可检查该链接。",
   "settings.save": "保存设置",
   "settings.saving": "保存中...",
   "settings.loading": "加载中...",

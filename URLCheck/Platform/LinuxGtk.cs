@@ -34,6 +34,16 @@ internal static partial class LinuxGtk
         gtk_window_present(window);
     });
 
+    /// <summary>
+    ///     Shows a toplevel kept above the others without asking for focus, for overlays like the
+    ///     floating selection button that must not disturb whatever the user is typing into.
+    /// </summary>
+    public static bool ShowOnTop(string title) => WithWindow(title, window =>
+    {
+        gtk_widget_show(window);
+        gtk_window_set_keep_above(window, true);
+    });
+
     /// <summary>Sets the program name, which GTK reports as the Wayland app id.</summary>
     public static void SetProgramName(string name)
     {
@@ -190,6 +200,102 @@ internal static partial class LinuxGtk
         }
     }
 
+    /// <summary>
+    ///     The pointer position in screen coordinates. Wayland deliberately hides the global pointer, so
+    ///     this reports false there and the caller falls back to letting the compositor place the window.
+    /// </summary>
+    public static bool TryGetPointerPosition(out int x, out int y)
+    {
+        x = 0;
+        y = 0;
+
+        try
+        {
+            var display = gdk_display_get_default();
+            if (display == IntPtr.Zero)
+                return false;
+
+            var seat = gdk_display_get_default_seat(display);
+            if (seat == IntPtr.Zero)
+                return false;
+
+            var pointer = gdk_seat_get_pointer(seat);
+            return pointer != IntPtr.Zero && gdk_device_get_position(pointer, IntPtr.Zero, out x, out y);
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Could not read the pointer position");
+            return false;
+        }
+    }
+
+    private static Action<string>? _clipboardSink;
+    private static IntPtr _clipboard;
+    private static bool _clipboardConnected;
+
+    /// <summary>
+    ///     Watches the clipboard and reports every new text selection. The text is requested
+    ///     asynchronously, so a busy or frozen clipboard owner can never block this process.
+    /// </summary>
+    public static bool WatchClipboard(Action<string> onText)
+    {
+        try
+        {
+            _clipboardSink = onText;
+            if (_clipboardConnected)
+                return true;
+
+            _clipboard = gtk_clipboard_get(gdk_atom_intern_static_string("CLIPBOARD"));
+            if (_clipboard == IntPtr.Zero)
+            {
+                Log.Warning("The CLIPBOARD selection is unavailable");
+                return false;
+            }
+
+            Connect(_clipboard, "owner-change", ClipboardOwnerChanged, IntPtr.Zero);
+            _clipboardConnected = true;
+            Log.Information("Watching the clipboard for copied URLs");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Could not watch the clipboard");
+            return false;
+        }
+    }
+
+    /// <summary>Stops asking for the clipboard's text. The signal stays connected, it just does nothing.</summary>
+    public static void StopWatchingClipboard() => _clipboardSink = null;
+
+    private static void OnClipboardOwnerChanged(IntPtr clipboard, IntPtr @event, IntPtr data)
+    {
+        if (_clipboardSink is null)
+            return;
+
+        gtk_clipboard_request_text(clipboard, ClipboardTextReceivedPointer, IntPtr.Zero);
+    }
+
+    private static void OnClipboardTextReceived(IntPtr clipboard, IntPtr text, IntPtr data)
+    {
+        if (text == IntPtr.Zero)
+            return;
+
+        if (Marshal.PtrToStringUTF8(text) is { Length: > 0 } value)
+            _clipboardSink?.Invoke(value);
+    }
+
+    private static readonly ClipboardOwnerChangedCallback ClipboardOwnerChanged = OnClipboardOwnerChanged;
+    private static readonly ClipboardTextReceivedCallback ClipboardTextReceived = OnClipboardTextReceived;
+
+    private static readonly IntPtr ClipboardTextReceivedPointer =
+        Marshal.GetFunctionPointerForDelegate(ClipboardTextReceived);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void ClipboardOwnerChangedCallback(IntPtr clipboard, IntPtr @event, IntPtr data);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void ClipboardTextReceivedCallback(IntPtr clipboard, IntPtr text, IntPtr data);
+
     /// <summary>Depth-first search for the WebKitWebView inside a widget tree.</summary>
     private static IntPtr FindWebView(IntPtr widget)
     {
@@ -306,6 +412,31 @@ internal static partial class LinuxGtk
 
     [LibraryImport(GtkLibrary)]
     private static partial void gtk_window_present(IntPtr window);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial void gtk_window_set_keep_above(IntPtr window, [MarshalAs(UnmanagedType.Bool)] bool setting);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial IntPtr gtk_clipboard_get(IntPtr selection);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial void gtk_clipboard_request_text(IntPtr clipboard, IntPtr callback, IntPtr userData);
+
+    [LibraryImport(GtkLibrary, StringMarshalling = StringMarshalling.Utf8)]
+    private static partial IntPtr gdk_atom_intern_static_string(string atomName);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial IntPtr gdk_display_get_default();
+
+    [LibraryImport(GtkLibrary)]
+    private static partial IntPtr gdk_display_get_default_seat(IntPtr display);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial IntPtr gdk_seat_get_pointer(IntPtr seat);
+
+    [LibraryImport(GtkLibrary)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool gdk_device_get_position(IntPtr device, IntPtr screen, out int x, out int y);
 
     [LibraryImport(GtkLibrary)]
     private static partial IntPtr gtk_widget_get_screen(IntPtr widget);

@@ -98,6 +98,8 @@
   "settings.hideOnLaunchDescription": "起動時にメイン ウィンドウを表示しません。検査ポップアップは通常どおり表示されます。トレイ アイコンが必要で、リンクから起動した場合は適用されません。",
   "settings.autoStripTracking": "開いたときにトラッキング パラメーターを削除",
   "settings.autoStripTrackingDescription": "ポップアップを開いた時点で既知のトラッキング パラメーター（utm_*、fbclid など）を削除します。オフのときはポップアップの「トラッキング」ボタンで手動で削除します。",
+  "settings.showUrlButton": "コピーしたリンクのフローティング ボタン",
+  "settings.showUrlButtonDescription": "クリップボードを監視し、コピーしたテキストが http(s) URL のときはポインターの横に小さなボタンを表示します。アプリを切り替えずに検査できます。",
   "settings.save": "設定を保存",
   "settings.saving": "保存中...",
   "settings.loading": "読み込み中...",

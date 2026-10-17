@@ -1076,6 +1076,18 @@ export const SettingsPage: React.FC = () => {
                 onChange={(e) => update({autoStripTrackingParams: e.target.checked})}
             />
           </SettingRow>
+
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>{t("settings.showUrlButton")}</SettingLabel>
+              <SettingDescription>{t("settings.showUrlButtonDescription")}</SettingDescription>
+            </SettingInfo>
+            <Checkbox
+                disabled={busy}
+                checked={settings.showUrlButton}
+                onChange={(e) => update({showUrlButton: e.target.checked})}
+            />
+          </SettingRow>
         </StackCard>
 
         <StackCard>
