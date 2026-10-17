@@ -1,5 +1,58 @@
 # Changelog
 
+## [0.5.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.4.0..v0.5.0) - 2026-10-17
+
+### ⛰️  Features
+
+- *(filters)* Hash-based update checks and ClearURLs/Firefox parsing - ([f2a61fc](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f2a61fca9b433bf390b9e2c6663aaa89f3390f97))
+- *(filters)* Add AdGuard-style filter list management - ([cd9fa87](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cd9fa87747d1daf0e786768cbfece5c74fc7eca7))
+- *(popup)* Clean redirect targets and nudge the close button right - ([78963a9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/78963a909f3688331cd238ceced024720179a047))
+- *(popup)* Auto-follow redirects and make tracking cleanup optional - ([b146e80](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b146e807cd5ad89046ba43803206ec862d25d92f))
+- *(popup)* Merge redirect into the status check - ([49efeb0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/49efeb0e77b44be7f59aa3b0e42ee3216f897185))
+- *(settings)* Support autostart on Linux through XDG autostart - ([052eb1c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/052eb1cf8d089b2a74195d95a6110bfb32e420c2))
+- *(settings)* Add startup shortcut and start-hidden options - ([e437003](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e43700330aec79ea58e3dabbfbd3d7019102b571))
+- *(ui)* Float a button over copied links anywhere on the system - ([41ff48b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/41ff48bb29b5abf0d9e5d4035036a75405f058ef))
+- *(ui)* Open selected URLs in the popup from a floating button - ([bdbb09b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/bdbb09bc62aee0fbb9f600b55be19a9570bdbeb1))
+- *(ui)* Add an open source attribution page - ([64f9fc5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/64f9fc5e56db5885097d80401f870e200fc00f60))
+- *(ui)* Unify every dropdown on the browser menu style - ([e94e944](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e94e944e51b10cabcfbb190531781e4e54617743))
+
+### 🐛 Bug Fixes
+
+- *(attributions)* Resolve licence-url-only packages from their link - ([9eae623](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/9eae62371428439f5415f80f1a365557fd039667))
+- *(popup)* Record the redirect target before cleaning it - ([d16cca7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d16cca7b9b591d311fb16143102ceb7ce18a4da1))
+- *(popup)* Label a followed redirect instead of repeating its reason phrase - ([980ec89](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/980ec89d890bad3cab893d4ac73386b079716179))
+- *(ui)* Drop the frame around the floating button and its timed close - ([8fde531](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8fde531d0e283fb545a96bfabf90099a2a2981db))
+- *(ui)* Hide the main window only once it has rendered - ([da7a346](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/da7a3462bc918397bea9752bb240fbdb0e9602f2))
+- *(ui)* Keep the web view alive while a window is hidden - ([d8a5f52](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d8a5f522b495dafefadbc9c29952017e5e784ee9))
+- *(ui)* Refine the floating button and the start-hidden behaviour - ([576170d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/576170d486794138c9a1791c4492d8a1a0db5499))
+- *(ui)* Keep dropdown menus inside the window and drop native button styling - ([517b08c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/517b08cd8b1e15a9a71b869b1d6767fd0f93f448))
+- *(ui)* Wrap settings action buttons instead of clipping them - ([8146e0d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8146e0d7d9cddeed2ae62b4d390726295c822b4e))
+
+### 🚜 Refactor
+
+- *(filters)* Drop the redundant front-end fallback rules - ([8ca9a07](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8ca9a077eaf5ff196e07d5e21a9eea1fe6a66a4c))
+- *(filters)* Drop the hard-coded front-end fallback rules - ([d65db85](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d65db854a12d6339a15a50a182b51670c115c57d))
+- *(settings)* Build the startup shortcut with securifybv.ShellLink instead of COM - ([1f34ff7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1f34ff799317b55bc3d22eb533d38638a16960c4))
+
+### 📚 Documentation
+
+- Clarify support statement for Windows versions in README - ([62a2498](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/62a2498d7d1982238572b9f76a666f6eca3c8f06))
+- Clarify phrasing regarding Wayland support in README - ([4b200e8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4b200e8f05114ccd7a2cbe4cc29e80cbc3897bb8))
+
+### 🎨 Styling
+
+- *(settings)* Match the filter list switch to the shared accent colour - ([4b5f0db](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4b5f0db7ad364887cfb9e1725692196d9c8d4fe4))
+
+### ◀️ Revert
+
+- *(filters)* Restore the front-end fallback rules - ([331b249](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/331b24920ce9344776e83b0cf85c4b1dbe2ca733))
+- *(ui)* Put the floating button back on its previous logic - ([f863916](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f8639163233dd8b786ed721b09c0ee8c17015f44))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([3933482](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/393348264e82bb38cae6037eaff36cd9cc1ad4ff))
+
+
 ## [0.4.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.3.0..v0.4.0) - 2026-10-16
 
 ### ⛰️  Features
