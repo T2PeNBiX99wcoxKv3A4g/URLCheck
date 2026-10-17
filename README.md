@@ -65,6 +65,17 @@ installed for them. What the operating system still has to provide:
   [Microsoft's page](https://developer.microsoft.com/microsoft-edge/webview2/).
 2. Any Windows version lower than 11 is not officially supported.
    If you have any issues, You need to fix by yourself.
+3. A tiling window manager has to be told to leave the floating button alone: its web view needs the
+   window to be briefly visible to start up, so a window manager that tiles it leaves it the wrong
+   size and in the wrong place. For GlazeWM, this ignores both it and the popup:
+
+```yaml
+window_rules:
+  - commands: ['ignore']
+    match:
+      - window_process: { equals: 'URLCheck' }
+      - window_title: { regex: '^(Popup|SelectionButton)$' }
+```
 
 ### Linux
 
