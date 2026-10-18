@@ -9,7 +9,7 @@ namespace URLCheck.Interop;
 ///     independent of Photino's UI thread.
 /// </summary>
 [SupportedOSPlatform("windows")]
-internal sealed class TrayIcon(
+internal sealed class WindowsTrayIcon(
     string tooltip,
     string? iconPath,
     Func<string, string> localize,

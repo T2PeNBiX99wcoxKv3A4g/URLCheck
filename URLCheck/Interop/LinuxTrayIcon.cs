@@ -18,7 +18,14 @@ namespace URLCheck.Interop;
 ///     Every call must happen on the GTK thread, which is the one that created the first window.
 /// </remarks>
 [SupportedOSPlatform("linux")]
-internal sealed partial class LinuxTrayIcon : ITrayIcon
+internal sealed partial class LinuxTrayIcon(
+    string tooltip,
+    string? iconPath,
+    Func<string, string> localize,
+    Action onOpen,
+    Action onSettings,
+    Action onExit)
+    : ITrayIcon
 {
     private const string IndicatorLibrary = "libayatana-appindicator3.so.1";
     private const string GtkLibrary = "libgtk-3.so.0";
@@ -27,14 +34,10 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
     private const int StatusActive = 1;
     private const int CategoryApplicationStatus = 0;
 
-    private readonly Action[] _actions;
+    private readonly Action[] _actions = [onOpen, onSettings, onExit];
 
     /// <summary>Roots the signal callbacks: a delegate handed to GTK must never be collected.</summary>
     private readonly List<Delegate> _callbacks = [];
-
-    private readonly string? _iconPath;
-    private readonly Func<string, string> _localize;
-    private readonly string _tooltip;
 
     private IntPtr _indicator = IntPtr.Zero;
 
@@ -46,20 +49,6 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
         // GTK-free implementation with a different (GMenu) API, and is not packaged for Fedora, so the
         // message is kept in our log at debug level instead of being printed to stderr.
         LinuxGtk.RouteLogDomain("libayatana-appindicator", LogEventLevel.Debug);
-    }
-
-    public LinuxTrayIcon(
-        string tooltip,
-        string? iconPath,
-        Func<string, string> localize,
-        Action onOpen,
-        Action onSettings,
-        Action onExit)
-    {
-        _tooltip = tooltip;
-        _iconPath = iconPath;
-        _localize = localize;
-        _actions = [onOpen, onSettings, onExit];
     }
 
     /// <summary>
@@ -92,17 +81,17 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
 
         try
         {
-            _indicator = app_indicator_new(Constants.Name, _iconPath ?? "web-browser", CategoryApplicationStatus);
+            _indicator = app_indicator_new(Constants.Name, iconPath ?? "web-browser", CategoryApplicationStatus);
             if (_indicator == IntPtr.Zero)
             {
                 Log.Warning("AppIndicator could not be created; continuing without a tray icon");
                 return false;
             }
 
-            app_indicator_set_title(_indicator, _tooltip);
+            app_indicator_set_title(_indicator, tooltip);
 
-            if (_iconPath is { Length: > 0 })
-                app_indicator_set_icon_full(_indicator, _iconPath, _tooltip);
+            if (iconPath is { Length: > 0 })
+                app_indicator_set_icon_full(_indicator, iconPath, tooltip);
 
             app_indicator_set_menu(_indicator, BuildMenu());
             app_indicator_set_status(_indicator, StatusActive);
@@ -144,10 +133,10 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
     {
         var menu = gtk_menu_new();
 
-        AddItem(menu, _localize("tray.open"), 0);
-        AddItem(menu, _localize("tray.settings"), 1);
+        AddItem(menu, localize("tray.open"), 0);
+        AddItem(menu, localize("tray.settings"), 1);
         gtk_menu_shell_append(menu, gtk_separator_menu_item_new());
-        AddItem(menu, _localize("tray.exit"), 2);
+        AddItem(menu, localize("tray.exit"), 2);
 
         gtk_widget_show_all(menu);
         return menu;

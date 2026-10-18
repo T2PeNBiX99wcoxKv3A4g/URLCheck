@@ -15,7 +15,7 @@ namespace URLCheck.Forward;
 ///     with its name, port and public key. Discovery is only a hint: the keys are pinned for real when
 ///     the user pairs.
 /// </summary>
-internal sealed class ForwardDiscovery
+internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDiscovered)
 {
     /// <summary>A fixed link-local multicast group, so IPv6-only networks work as well as IPv4 ones.</summary>
     private static readonly IPAddress Group = IPAddress.Parse("ff02::5552:4c48");
@@ -27,20 +27,17 @@ internal sealed class ForwardDiscovery
 
     private readonly ConcurrentDictionary<string, (DeviceEntry Device, long SeenAt)> _found = new();
     private readonly Lock _gate = new();
-    private readonly Action<IReadOnlyList<DeviceEntry>> _onDiscovered;
 
     private string _deviceId = "";
     private string _deviceName = "";
-    private string _publicKey = "";
     private bool _enabled;
     private int _port;
+    private string _publicKey = "";
     private CancellationTokenSource? _queryCts;
     private CancellationTokenSource? _receiveCts;
     private bool _searching;
     private UdpClient? _v4;
     private UdpClient? _v6;
-
-    public ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDiscovered) => _onDiscovered = onDiscovered;
 
     /// <summary>Starts or stops the discovery socket so it always matches the setting.</summary>
     public void Apply(AppSettings settings, DeviceIdentity identity)
@@ -76,7 +73,7 @@ internal sealed class ForwardDiscovery
             _searching = true;
             _found.Clear();
             StopQuery();
-            _queryCts = new CancellationTokenSource();
+            _queryCts = new();
             _ = Task.Run(() => QueryLoopAsync(_queryCts.Token));
         }
     }
@@ -93,7 +90,7 @@ internal sealed class ForwardDiscovery
 
     private void StartSockets()
     {
-        _receiveCts = new CancellationTokenSource();
+        _receiveCts = new();
 
         try
         {
@@ -237,21 +234,21 @@ internal sealed class ForwardDiscovery
 
     private void SendQuery()
     {
-        var frame = JsonSerializer.SerializeToUtf8Bytes(new DiscoverMessage(ForwardProtocol.Discover),
+        var frame = JsonSerializer.SerializeToUtf8Bytes(new(ForwardProtocol.Discover),
             AppJsonContext.Default.DiscoverMessage);
 
         if (_v4 is { } v4)
         {
-            TrySend(v4, frame, new IPEndPoint(IPAddress.Broadcast, ForwardProtocol.DiscoveryPort));
+            TrySend(v4, frame, new(IPAddress.Broadcast, ForwardProtocol.DiscoveryPort));
             foreach (var address in BroadcastAddresses())
-                TrySend(v4, frame, new IPEndPoint(address, ForwardProtocol.DiscoveryPort));
+                TrySend(v4, frame, new(address, ForwardProtocol.DiscoveryPort));
         }
 
         if (_v6 is not { } v6)
             return;
 
         foreach (var nic in UpInterfaces(NetworkInterfaceComponent.IPv6))
-            TrySend(v6, frame, new IPEndPoint(new IPAddress(Group.GetAddressBytes(), Index6(nic)),
+            TrySend(v6, frame, new(new IPAddress(Group.GetAddressBytes(), Index6(nic)),
                 ForwardProtocol.DiscoveryPort));
     }
 
@@ -264,7 +261,7 @@ internal sealed class ForwardDiscovery
             .OrderBy(device => device.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        _onDiscovered(devices);
+        onDiscovered(devices);
     }
 
     /// <summary>Every interface's broadcast address, so all of them are probed and not just the default one.</summary>

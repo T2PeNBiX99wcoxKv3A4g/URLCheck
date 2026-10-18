@@ -41,7 +41,7 @@ internal sealed class ForwardService
         _windows = windows;
         _identity = identity;
 
-        _discovery = new ForwardDiscovery(devices => _windows.RunOnMainWindow(() =>
+        _discovery = new(devices => _windows.RunOnMainWindow(() =>
             _windows.BroadcastEvent("forward.discovered", new ForwardDiscoveredPayload(devices))));
 
         NativeBridge.MessageReceived += HandleMessageAsync;
@@ -349,7 +349,8 @@ internal sealed class ForwardService
         }
     }
 
-    private async Task HandlePairRequestAsync(NetworkStream stream, byte[] frame, TcpClient client, CancellationToken token)
+    private async Task HandlePairRequestAsync(NetworkStream stream, byte[] frame, TcpClient client,
+        CancellationToken token)
     {
         var request = Deserialize<PairRequestMessage>(frame);
         var peerKey = ForwardCrypto.FromBase64(request?.PublicKey);
@@ -378,7 +379,7 @@ internal sealed class ForwardService
         var requestId = Guid.NewGuid().ToString("N");
         var incoming = new IncomingPairing(requestId, request.DeviceId, request.DeviceName,
             ForwardCrypto.PairingCode(transcript),
-            new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously));
+            new(TaskCreationOptions.RunContinuationsAsynchronously));
 
         // Only one request is offered at a time, so the confirmation screen never has to choose.
         bool busy;

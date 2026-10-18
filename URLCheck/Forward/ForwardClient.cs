@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using URLCheck.Messaging;
@@ -130,7 +131,7 @@ internal static class ForwardClient
         var sessionKey = ForwardCrypto.DeriveKey(shared, [.. nonce, .. peerNonce], "URLCheck.Forward.v1");
 
         var payload = JsonSerializer.SerializeToUtf8Bytes(
-            new ForwardPayload(url, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
+            new(url, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
             AppJsonContext.Default.ForwardPayload);
 
         var frameNonce = ForwardCrypto.RandomBytes(ForwardCrypto.NonceSize);
@@ -146,7 +147,7 @@ internal static class ForwardClient
             throw new ForwardException(refused.Error ?? "error.forwardFailed");
     }
 
-    private static byte[] Utf8(string value) => System.Text.Encoding.UTF8.GetBytes(value);
+    private static byte[] Utf8(string value) => Encoding.UTF8.GetBytes(value);
 
     private static async Task WriteAsync<T>(NetworkStream stream, T message, CancellationToken token)
         where T : class

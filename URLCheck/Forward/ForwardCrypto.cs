@@ -130,7 +130,7 @@ internal static class ForwardCrypto
     public static byte[] Encrypt(byte[] key, byte[] nonce, byte[] plaintext, byte[] associatedData)
     {
         var cipher = new ChaCha20Poly1305();
-        cipher.Init(true, new AeadParameters(new KeyParameter(key), 128, nonce, associatedData));
+        cipher.Init(true, new AeadParameters(new(key), 128, nonce, associatedData));
 
         var output = new byte[cipher.GetOutputSize(plaintext.Length)];
         var length = cipher.ProcessBytes(plaintext, 0, plaintext.Length, output, 0);
@@ -144,7 +144,7 @@ internal static class ForwardCrypto
         try
         {
             var cipher = new ChaCha20Poly1305();
-            cipher.Init(false, new AeadParameters(new KeyParameter(key), 128, nonce, associatedData));
+            cipher.Init(false, new AeadParameters(new(key), 128, nonce, associatedData));
 
             var output = new byte[cipher.GetOutputSize(ciphertext.Length)];
             var length = cipher.ProcessBytes(ciphertext, 0, ciphertext.Length, output, 0);

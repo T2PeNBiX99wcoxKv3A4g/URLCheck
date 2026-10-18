@@ -210,7 +210,7 @@ internal static class Program
     private static ITrayIcon CreateTray(LocalizationService localization, WindowManager manager, string? iconPath)
     {
         if (OperatingSystem.IsWindows())
-            return new TrayIcon(
+            return new WindowsTrayIcon(
                 Constants.WindowTitle,
                 iconPath,
                 localization.Get,

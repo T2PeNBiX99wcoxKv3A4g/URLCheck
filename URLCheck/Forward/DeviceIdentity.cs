@@ -36,7 +36,7 @@ internal sealed class DeviceIdentity
         {
             var key = Read(path);
             if (key is not null)
-                return new DeviceIdentity(key);
+                return new(key);
 
             Log.Warning("The device key at {Path} is unusable; generating a new one", path);
         }
@@ -51,7 +51,7 @@ internal sealed class DeviceIdentity
             Log.Warning(ex, "Failed to save the device key at {Path}", path);
         }
 
-        return new DeviceIdentity(generated);
+        return new(generated);
     }
 
     private static byte[]? Read(string path)
