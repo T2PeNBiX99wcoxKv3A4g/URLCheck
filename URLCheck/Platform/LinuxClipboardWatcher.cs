@@ -84,7 +84,9 @@ internal sealed class LinuxClipboardWatcher : IClipboardWatcher
             startInfo.ArgumentList.Add("--watch");
             startInfo.ArgumentList.Add("sh");
             startInfo.ArgumentList.Add("-c");
-            startInfo.ArgumentList.Add("printf '\\001'; cat");
+            // The marker trails each value: with it in front, a value was only complete once the next
+            // copy arrived, so the button always offered the previous one.
+            startInfo.ArgumentList.Add("cat; printf '\\001'");
 
             var process = Process.Start(startInfo);
             if (process is null)
@@ -128,7 +130,7 @@ internal sealed class LinuxClipboardWatcher : IClipboardWatcher
 
                     if (value == Separator)
                     {
-                        // The marker opens the next value, so what came before it is complete.
+                        // The marker closes the value, so what came before it is complete.
                         Report(current);
                         current.Clear();
                     }
