@@ -1,5 +1,4 @@
 using Org.BouncyCastle.Crypto.Parameters;
-using Serilog;
 using URLCheck.Extensions;
 using URLCheck.Utils;
 

@@ -4,11 +4,10 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using Serilog;
+using URLCheck.Extensions;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Services;
-using URLCheck.Extensions;
 using URLCheck.Utils;
 
 namespace URLCheck.Forward;

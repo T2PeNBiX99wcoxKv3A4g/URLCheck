@@ -1,10 +1,9 @@
 using System.Text.Json;
 using JetBrains.Annotations;
-using Serilog;
+using URLCheck.Extensions;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Platform;
-using URLCheck.Extensions;
 using URLCheck.Utils;
 
 namespace URLCheck.Services;

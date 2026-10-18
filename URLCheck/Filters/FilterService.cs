@@ -3,10 +3,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using JetBrains.Annotations;
-using Serilog;
+using URLCheck.Extensions;
 using URLCheck.Messaging;
 using URLCheck.Models;
-using URLCheck.Extensions;
 using URLCheck.Utils;
 
 namespace URLCheck.Filters;

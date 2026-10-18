@@ -1,6 +1,5 @@
 using System.IO.Pipes;
 using JetBrains.Annotations;
-using Serilog;
 using URLCheck.Extensions;
 using URLCheck.Utils;
 

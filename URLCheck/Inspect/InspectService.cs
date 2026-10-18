@@ -1,7 +1,7 @@
+using URLCheck.Extensions;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Services;
-using URLCheck.Extensions;
 using URLCheck.Utils;
 
 namespace URLCheck.Inspect;
@@ -50,7 +50,7 @@ internal sealed class InspectService : Singleton<InspectService>
 
         // A failed request (DNS, TLS, timeout, ...) is reported as a non-OK status.
         return context.Reply("inspect.status.result", result.GetOrElse(ex =>
-            new InspectStatusPayload(0, ex is TaskCanceledException ? "error.timeout" : ex.Message, false, null)));
+            new(0, ex is TaskCanceledException ? "error.timeout" : ex.Message, false, null)));
     }
 
     /// <summary>

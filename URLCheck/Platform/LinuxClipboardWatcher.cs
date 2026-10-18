@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Text;
-using Serilog;
 using URLCheck.Extensions;
 using URLCheck.Utils;
 

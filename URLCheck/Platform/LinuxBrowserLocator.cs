@@ -1,7 +1,6 @@
 using System.Runtime.Versioning;
-using Serilog;
-using URLCheck.Models;
 using URLCheck.Extensions;
+using URLCheck.Models;
 using URLCheck.Utils;
 
 namespace URLCheck.Platform;

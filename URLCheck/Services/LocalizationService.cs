@@ -1,9 +1,8 @@
 using System.Globalization;
 using System.Text.Json;
 using JetBrains.Annotations;
-using Serilog;
-using URLCheck.Messaging;
 using URLCheck.Extensions;
+using URLCheck.Messaging;
 using URLCheck.Utils;
 
 namespace URLCheck.Services;
@@ -86,7 +85,7 @@ internal sealed class LocalizationService : Singleton<LocalizationService>
             return new();
 
         return Try.Run(() => JsonSerializer.Deserialize(stream, AppJsonContext.Default.DictionaryStringString)
-                              ?? new Dictionary<string, string>())
+                             ?? new Dictionary<string, string>())
             .GetOrElse(ex =>
             {
                 Log.Warning(ex, "Failed to read the translation file for {Locale}", locale);

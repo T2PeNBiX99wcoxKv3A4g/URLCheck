@@ -1,9 +1,8 @@
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using URLCheck.Data;
-using URLCheck.Messaging;
 using URLCheck.Extensions;
+using URLCheck.Messaging;
 using URLCheck.Utils;
 
 namespace URLCheck.Services;

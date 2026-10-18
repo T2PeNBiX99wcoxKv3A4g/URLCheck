@@ -1,7 +1,6 @@
 using System.Drawing;
 using System.Runtime.Versioning;
 using Photino.NET;
-using Serilog;
 using URLCheck.Utils;
 
 namespace URLCheck.Platform;

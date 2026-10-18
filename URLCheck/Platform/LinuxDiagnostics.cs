@@ -46,7 +46,7 @@ internal static class LinuxDiagnostics
                      "libayatana-appindicator3.so.1", "libappindicator3.so.1"
                  })
         {
-            var found = Try.Run<string?>(() => NativeLibrary.TryLoad(name, out _) ? name : null)
+            var found = Try.Run(() => NativeLibrary.TryLoad(name, out _) ? name : null)
                 .GetOrElse(ex =>
                 {
                     Log.Debug(ex, "Failed to probe {Library}", name);

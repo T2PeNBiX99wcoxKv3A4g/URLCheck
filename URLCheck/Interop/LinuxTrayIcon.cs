@@ -3,8 +3,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Serilog;
 using Serilog.Events;
-using URLCheck.Platform;
 using URLCheck.Extensions;
+using URLCheck.Platform;
 using URLCheck.Utils;
 
 namespace URLCheck.Interop;

@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using Serilog;
 using URLCheck.Extensions;
 using URLCheck.Utils;
 
@@ -136,7 +135,7 @@ internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>
 
     /// <summary>Reads the <c>Exec=</c> line of our desktop entry, if it exists.</summary>
     private string? ReadExecCommand() =>
-        Try.Run<string?>(() =>
+        Try.Run(() =>
         {
             if (!File.Exists(DesktopFilePath))
                 return null;
@@ -189,7 +188,7 @@ internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>
     {
         foreach (var file in MimeAppsFiles())
         {
-            var value = Try.Run<string?>(() =>
+            var value = Try.Run(() =>
             {
                 if (!File.Exists(file))
                     return null;

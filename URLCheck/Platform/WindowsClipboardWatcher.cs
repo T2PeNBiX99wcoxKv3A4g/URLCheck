@@ -1,8 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using Serilog;
-using URLCheck.Interop;
 using URLCheck.Extensions;
+using URLCheck.Interop;
 using URLCheck.Utils;
 
 namespace URLCheck.Platform;

@@ -2,7 +2,6 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Photino.NET;
-using Serilog;
 using URLCheck.Interop;
 using URLCheck.Utils;
 

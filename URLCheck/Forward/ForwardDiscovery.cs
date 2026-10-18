@@ -3,11 +3,10 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text.Json;
-using Serilog;
+using URLCheck.Extensions;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Services;
-using URLCheck.Extensions;
 using URLCheck.Utils;
 
 namespace URLCheck.Forward;
@@ -20,12 +19,6 @@ namespace URLCheck.Forward;
 /// </summary>
 internal sealed class ForwardDiscovery : Singleton<ForwardDiscovery>
 {
-    private readonly Action<IReadOnlyList<DeviceEntry>> _onDiscovered;
-
-    public ForwardDiscovery() =>
-        _onDiscovered = devices => WindowManager.Instance.RunOnMainWindow(() =>
-            WindowManager.Instance.BroadcastEvent("forward.discovered", new ForwardDiscoveredPayload(devices)));
-
     /// <summary>A fixed link-local multicast group, so IPv6-only networks work as well as IPv4 ones.</summary>
     private static readonly IPAddress Group = IPAddress.Parse("ff02::5552:4c48");
 
@@ -36,6 +29,7 @@ internal sealed class ForwardDiscovery : Singleton<ForwardDiscovery>
 
     private readonly ConcurrentDictionary<string, (DeviceEntry Device, long SeenAt)> _found = new();
     private readonly Lock _gate = new();
+    private readonly Action<IReadOnlyList<DeviceEntry>> _onDiscovered;
 
     private string _deviceId = "";
     private string _deviceName = "";
@@ -48,6 +42,10 @@ internal sealed class ForwardDiscovery : Singleton<ForwardDiscovery>
     private bool _searching;
     private UdpClient? _v4;
     private UdpClient? _v6;
+
+    public ForwardDiscovery() =>
+        _onDiscovered = devices => WindowManager.Instance.RunOnMainWindow(() =>
+            WindowManager.Instance.BroadcastEvent("forward.discovered", new ForwardDiscoveredPayload(devices)));
 
     /// <summary>Starts or stops the discovery socket so it always matches the setting.</summary>
     public void Apply(AppSettings settings, DeviceIdentity identity)
@@ -111,7 +109,7 @@ internal sealed class ForwardDiscovery : Singleton<ForwardDiscovery>
             v4.EnableBroadcast = true;
             v4.Client.Bind(new IPEndPoint(IPAddress.Any, ForwardProtocol.DiscoveryPort));
             _v4 = v4;
-            _ = Task.Run(() => ReceiveLoopAsync(v4, receiveCts.Token));
+            _ = Task.Run(() => ReceiveLoopAsync(v4, receiveCts.Token), receiveCts.Token);
         }).OnFailure(ex => Log.Warning(ex, "Failed to open the IPv4 discovery socket"));
 
         Try.Run(() =>
@@ -123,7 +121,7 @@ internal sealed class ForwardDiscovery : Singleton<ForwardDiscovery>
             v6.Client.Bind(new IPEndPoint(IPAddress.IPv6Any, ForwardProtocol.DiscoveryPort));
             JoinGroups(v6);
             _v6 = v6;
-            _ = Task.Run(() => ReceiveLoopAsync(v6, receiveCts.Token));
+            _ = Task.Run(() => ReceiveLoopAsync(v6, receiveCts.Token), receiveCts.Token);
         }).OnFailure(ex => Log.Warning(ex, "Failed to open the IPv6 discovery socket"));
 
         _enabled = _v4 is not null || _v6 is not null;
