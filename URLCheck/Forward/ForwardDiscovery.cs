@@ -73,6 +73,9 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
             StopQuery();
             _queryCts = new();
 
+            Log.Information("Device discovery is searching; broadcasting to {Targets}",
+                string.Join(", ", BroadcastTargets()));
+
             // Runs even when the UDP sockets could not be opened: the TCP sweep does not need them.
             _ = Task.Run(() => QueryLoopAsync(_queryCts.Token));
         }
@@ -425,6 +428,15 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
             // A window that cannot take the event must not stop the search loop.
             Log.Debug(ex, "Failed to publish discovered devices");
         }
+    }
+
+    /// <summary>The limited broadcast plus every interface's subnet broadcast.</summary>
+    private static IEnumerable<IPAddress> BroadcastTargets()
+    {
+        yield return IPAddress.Broadcast;
+
+        foreach (var address in BroadcastAddresses())
+            yield return address;
     }
 
     /// <summary>Every interface's broadcast address, so all of them are probed and not just the default one.</summary>
