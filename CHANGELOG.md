@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.5.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.2..v0.5.3) - 2026-10-18
+
+### 🐛 Bug Fixes
+
+- *(ui)* Stop an upgrade from serving the previous interface - ([b4d79b2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b4d79b2bb3be22c1bba686c573df334d6284d29f))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([7f1e668](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/7f1e668767618cacc43f3df2a9592d73472d55d7))
+
+
 ## [0.5.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.1..v0.5.2) - 2026-10-18
 
 ### 🐛 Bug Fixes
