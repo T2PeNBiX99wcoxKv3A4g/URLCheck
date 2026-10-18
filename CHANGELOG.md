@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.5.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.1..v0.5.2) - 2026-10-18
+
+### 🐛 Bug Fixes
+
+- *(settings)* Give the startup shortcut its icon and pin the checkbox size - ([760e42a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/760e42acbdb3c110454180e5f4c708168d896da4))
+
+### ⚙️ Miscellaneous Tasks
+
+- Revert hover transition - ([f5d5f17](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f5d5f1798546979af723c958732d6a0a1b20b278))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([cc5b7ae](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cc5b7aef370a9d3d45be6a811a8205d667af1b59))
+
+
 ## [0.5.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.0..v0.5.1) - 2026-10-18
 
 ### 🐛 Bug Fixes
