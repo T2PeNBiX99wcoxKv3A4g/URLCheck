@@ -15,6 +15,12 @@ internal sealed class AppInfoService
         OperatingSystem.IsWindows() ? "windows" :
         OperatingSystem.IsLinux() ? "linux" : "unknown";
 
+    /// <summary>
+    ///     Changes whenever this build does. The interface is always served from the same address, so
+    ///     this is what tells the web view that what it cached belongs to an older build.
+    /// </summary>
+    [PublicAPI] public static readonly string BuildToken = ResolveBuildToken();
+
     public AppInfoService() => NativeBridge.MessageReceived += HandleMessageAsync;
 
     private static Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
@@ -22,4 +28,13 @@ internal sealed class AppInfoService
             ? Task.FromResult<NativeResponse?>(context.Reply("app.info.result",
                 new AppInfoPayload(Version, Platform)))
             : Task.FromResult<NativeResponse?>(null);
+
+    /// <summary>The executable's write time, which a replacement binary always changes.</summary>
+    private static string ResolveBuildToken()
+    {
+        var executable = Environment.ProcessPath;
+        return string.IsNullOrEmpty(executable)
+            ? Version
+            : File.GetLastWriteTimeUtc(executable).Ticks.ToString();
+    }
 }

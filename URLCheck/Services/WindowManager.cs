@@ -162,6 +162,8 @@ internal sealed class WindowManager
 
     public void CreateMainWindow()
     {
+        PrepareWebViewData();
+
         var window = new PhotinoWindow()
             .SetTitle(Constants.WindowTitle)
             .SetTemporaryFilesPath(WebViewDataPath)
@@ -217,6 +219,33 @@ internal sealed class WindowManager
 
     /// <summary>Starts the message loop; blocks until the host window is closed for real.</summary>
     public void Run() => _mainWindow?.WaitForClose();
+
+    /// <summary>
+    ///     Drops the web view's data folder when this build is not the one that filled it. The static
+    ///     server advertises no caching policy, so a web view may keep serving the previous interface
+    ///     from its own cache — indefinitely on some engines — and that cache would otherwise grow
+    ///     with every upgrade. Only the profile folder goes; the marker that records the build lives
+    ///     beside it.
+    /// </summary>
+    private static void PrepareWebViewData()
+    {
+        var marker = Path.Combine(Path.GetDirectoryName(WebViewDataPath)!, "webview.build");
+
+        try
+        {
+            if (File.Exists(marker) && File.ReadAllText(marker) != AppInfoService.BuildToken)
+            {
+                Log.Information("This is a different build; clearing the web view's cache");
+                Directory.Delete(WebViewDataPath, true);
+            }
+
+            File.WriteAllText(marker, AppInfoService.BuildToken);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to prepare the web view's data folder");
+        }
+    }
 
     /// <summary>
     ///     Records that the platform could not deliver a borderless popup, so the setting stops claiming

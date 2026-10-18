@@ -67,7 +67,7 @@ internal static class Program
             // The version query is what keeps an upgrade from showing the previous interface: the
             // served page is always at the same address, so without it the web view would keep
             // returning its cached copy — along with the old asset names inside it.
-            var appUrl = $"{baseUrl}/index.html?v={BuildToken()}";
+            var appUrl = $"{baseUrl}/index.html?v={AppInfoService.BuildToken}";
 #else
             const string appUrl = "http://127.0.0.1:3000";
 #endif
@@ -123,19 +123,6 @@ internal static class Program
         {
             Logging.Shutdown();
         }
-    }
-
-    /// <summary>
-    ///     A token that changes whenever this build does. The interface is always served from the same
-    ///     address, so without it the web view keeps showing its cached copy after an upgrade — and
-    ///     the old asset names that copy refers to.
-    /// </summary>
-    private static string BuildToken()
-    {
-        var executable = Environment.ProcessPath;
-        return string.IsNullOrEmpty(executable)
-            ? Constants.Name
-            : File.GetLastWriteTimeUtc(executable).Ticks.ToString();
     }
 
     private static void DispatchUrls(WindowManager manager, IReadOnlyList<string> args)
