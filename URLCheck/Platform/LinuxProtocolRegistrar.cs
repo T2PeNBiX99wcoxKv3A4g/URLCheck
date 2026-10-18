@@ -119,6 +119,10 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
                        """;
 
         File.WriteAllText(DesktopFilePath, content + Environment.NewLine);
+
+        // A file manager refuses to launch an entry that is not marked executable, and a plain write
+        // leaves it at 0644.
+        File.SetUnixFileMode(DesktopFilePath, File.GetUnixFileMode(DesktopFilePath) | UnixFileMode.UserExecute);
     }
 
     private static void SetDefault(string mimeType)

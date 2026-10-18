@@ -1,4 +1,4 @@
-using System.Text;
+using System.Runtime.Versioning;
 using JetBrains.Annotations;
 using Serilog;
 using URLCheck.Messaging;
@@ -99,27 +99,42 @@ internal sealed class StartupService
             return;
         }
 
-        if (OperatingSystem.IsWindows())
+        if (OperatingSystem.IsLinux())
+            WriteDesktopEntry(executable);
+        else if (OperatingSystem.IsWindows())
             WindowsShortcut.Create(_entryPath, executable, "", Path.GetDirectoryName(executable) ?? "",
                 Constants.WindowTitle);
-        else
-            WriteDesktopEntry(executable);
     }
 
+    [SupportedOSPlatform("linux")]
     private void WriteDesktopEntry(string executable)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(_entryPath)!);
 
-        // Quoted because an installation path may contain spaces.
-        File.WriteAllText(_entryPath, $"""
-                                       [Desktop Entry]
-                                       Type=Application
-                                       Name={Constants.WindowTitle}
-                                       Comment={Constants.WindowTitle}
-                                       Exec="{executable}"
-                                       Terminal=false
-                                       X-GNOME-Autostart-enabled=true
-                                       """, Encoding.UTF8);
+        // Mirrors the desktop entry the protocol registrar writes: without an icon the session's
+        // autostart list shows a blank entry, and without the app id the window is not associated with
+        // that icon once it is up.
+        var icon = AppIcon.EnsureExtracted() ?? "web-browser";
+
+        // Built line by line rather than as one raw string, so that no source indentation can leak into
+        // the file, and written without a BOM: Encoding.UTF8 would prepend one, hiding the
+        // [Desktop Entry] group from the session's parser, which then reports a missing Type= line.
+        // The executable is quoted because an installation path may contain spaces.
+        File.WriteAllText(_entryPath, string.Join("\n",
+            "[Desktop Entry]",
+            "Type=Application",
+            $"Name={Constants.WindowTitle}",
+            $"Comment={Constants.WindowTitle} URL intermediary",
+            $"Exec=\"{executable}\"",
+            $"Icon={icon}",
+            $"StartupWMClass={LinuxProtocolRegistrar.ProcessName}",
+            "Terminal=false",
+            "X-GNOME-Autostart-enabled=true",
+            ""));
+
+        // The session only runs an entry it can execute, and a file manager refuses to launch one that
+        // is not marked executable, which is how a plain write (0644) leaves it.
+        File.SetUnixFileMode(_entryPath, File.GetUnixFileMode(_entryPath) | UnixFileMode.UserExecute);
     }
 
     /// <summary>The XDG config directory, which is where autostart entries live.</summary>
