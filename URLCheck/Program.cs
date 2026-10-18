@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
+using JetBrains.Annotations;
 using Serilog;
 using URLCheck.Filters;
 using URLCheck.Forward;
@@ -21,6 +22,7 @@ internal static class Program
     ///     A directory we own, used as the host's content root. The static server creates a <c>wwwroot</c>
     ///     web root under it when missing, which without this would land next to the executable.
     /// </summary>
+    [UsedImplicitly]
     private static string DataDirectory
     {
         get
