@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.7.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.6.0..v0.7.0) - 2026-10-18
+
+### ⛰️  Features
+
+- *(forward)* Add fallback addresses to paired devices - ([96e11ac](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/96e11acf6c6703aecc1fbe5504df1a526bada666))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([caf37f9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/caf37f9522bc51e3673b2a56b799f6ff7af1caae))
+
+
 ## [0.6.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.6..v0.6.0) - 2026-10-18
 
 ### ⛰️  Features
