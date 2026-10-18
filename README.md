@@ -74,7 +74,7 @@ window_rules:
   - commands: ['ignore']
     match:
       - window_process: { equals: 'URLCheck' }
-      - window_title: { regex: '^(Popup|SelectionButton)$' }
+        window_title: { regex: '^(Popup|SelectionButton)$' }
 ```
 
 ### Linux
