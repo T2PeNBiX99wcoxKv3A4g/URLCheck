@@ -60,6 +60,7 @@ function normalize(settings: AppSettings): AppSettings {
             host: device.host ?? "",
             port: device.port ?? DEFAULT_SETTINGS.forwardPort,
             publicKey: device.publicKey ?? "",
+            addresses: Array.isArray(device.addresses) ? device.addresses : [],
         })),
     };
 }

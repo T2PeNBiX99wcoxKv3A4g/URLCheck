@@ -51,6 +51,8 @@ internal sealed class ForwardService : Singleton<ForwardService>
         "forward.pairRespond" => RespondToPairingAsync(context),
         "forward.pendingPairing" => PendingPairingAsync(context),
         "forward.remove" => RemoveAsync(context),
+        "forward.addAddress" => AddAddressAsync(context),
+        "forward.removeAddress" => RemoveAddressAsync(context),
         "forward.discoverStart" => DiscoverAsync(context, true),
         "forward.discoverStop" => DiscoverAsync(context, false),
         _ => Task.FromResult<NativeResponse?>(null)
@@ -71,7 +73,9 @@ internal sealed class ForwardService : Singleton<ForwardService>
 
         try
         {
-            using var cts = new CancellationTokenSource(ForwardProtocol.ConnectionTimeout);
+            // Every address gets its own attempt budget, so the cap scales with how many there are.
+            using var cts = new CancellationTokenSource(
+                ForwardProtocol.AttemptTimeout * Math.Max(1, 1 + device.Addresses.Count));
             await ForwardClient.SendAsync(device, settings, _identity, url, cts.Token);
             Log.Information("Forwarded a URL to {Device}", device.Name);
             return context.Reply("forward.send.result", new ForwardSendPayload(true, device.Name));
@@ -155,6 +159,42 @@ internal sealed class ForwardService : Singleton<ForwardService>
             await _settings.SaveAndPublishAsync(settings);
 
         return context.Reply("forward.remove.result", new OkPayload());
+    }
+
+    /// <summary>Adds an extra address (IP or name) to a paired device, tried when its primary fails.</summary>
+    private async Task<NativeResponse?> AddAddressAsync(NativeContext context)
+    {
+        if (context.Payload<ForwardAddressRequest>() is not { DeviceId.Length: > 0 } request ||
+            request.Address?.Trim() is not { Length: > 0 } address ||
+            Uri.CheckHostName(address) is UriHostNameType.Unknown)
+            return context.Fail("forward.addAddress.result", "error.invalidAddress");
+
+        var settings = await _settings.GetAsync();
+        if (settings.Devices.FirstOrDefault(device => device.Id == request.DeviceId) is not { } device)
+            return context.Fail("forward.addAddress.result", "error.forwardNoDevice");
+
+        if (!address.Equals(device.Host, StringComparison.OrdinalIgnoreCase) &&
+            !device.Addresses.Contains(address, StringComparer.OrdinalIgnoreCase))
+        {
+            device.Addresses.Add(address);
+            await _settings.SaveAndPublishAsync(settings);
+        }
+
+        return context.Reply("forward.addAddress.result", new OkPayload());
+    }
+
+    private async Task<NativeResponse?> RemoveAddressAsync(NativeContext context)
+    {
+        if (context.Payload<ForwardAddressRequest>() is not { DeviceId.Length: > 0 } request ||
+            request.Address?.Trim() is not { Length: > 0 } address)
+            return context.Fail("forward.removeAddress.result", "error.invalidAddress");
+
+        var settings = await _settings.GetAsync();
+        if (settings.Devices.FirstOrDefault(device => device.Id == request.DeviceId) is { } device &&
+            device.Addresses.RemoveAll(candidate => candidate.Equals(address, StringComparison.OrdinalIgnoreCase)) > 0)
+            await _settings.SaveAndPublishAsync(settings);
+
+        return context.Reply("forward.removeAddress.result", new OkPayload());
     }
 
     private Task<NativeResponse?> DiscoverAsync(NativeContext context, bool start)

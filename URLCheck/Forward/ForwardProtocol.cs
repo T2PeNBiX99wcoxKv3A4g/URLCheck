@@ -33,6 +33,12 @@ internal static class ForwardProtocol
     /// <summary>How long a single connection may take before it is abandoned.</summary>
     public static readonly TimeSpan ConnectionTimeout = TimeSpan.FromSeconds(15);
 
+    /// <summary>
+    ///     How long one address is given when a device has several, so a stale address is skipped
+    ///     quickly and the fallback addresses are still tried.
+    /// </summary>
+    public static readonly TimeSpan AttemptTimeout = TimeSpan.FromSeconds(6);
+
     /// <summary>How long a forwarded URL stays valid, as a second line of defence against replay.</summary>
     public static readonly TimeSpan MaxMessageAge = TimeSpan.FromMinutes(5);
 

@@ -118,6 +118,10 @@
   "settings.forwardDevicesDescription": "Paired devices a URL can be forwarded to. The popup lists them as a dropdown and hides its button while this is empty.",
   "settings.forwardDevicesEmpty": "No devices paired yet.",
   "settings.removeDevice": "Forget this device",
+  "settings.forwardAddressesHint": "A device is reached at its paired address first. Add more addresses (an IP, or a name such as nas.lan on the same port) and they are tried in order when the first cannot be reached.",
+  "settings.deviceAddressPlaceholder": "nas.lan or 192.168.1.23",
+  "settings.addAddress": "Add",
+  "settings.removeAddress": "Remove this address",
   "settings.forwardSearch": "Search for devices",
   "settings.forwardSearchTitle": "Devices on your network",
   "settings.forwardSearchDescription": "Every URLCheck on the same network that has device forwarding on. Pairing asks the other device to confirm a code.",
@@ -210,5 +214,6 @@
   "error.forwardStale": "The device rejected the URL as too old.",
   "error.forwardUnpaired": "This device is not paired with the target; pair it again.",
   "error.forwardPairRejected": "The pairing was rejected, or the codes did not match.",
-  "error.forwardBusy": "Another pairing request is already waiting for confirmation."
+  "error.forwardBusy": "Another pairing request is already waiting for confirmation.",
+  "error.invalidAddress": "That is not a valid address."
 }

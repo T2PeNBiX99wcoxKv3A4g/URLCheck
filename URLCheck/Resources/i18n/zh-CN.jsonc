@@ -113,6 +113,10 @@
   "settings.forwardDevicesDescription": "已配对、可以转发网址的设备。弹窗会以下拉菜单列出，列表为空时隐藏按钮。",
   "settings.forwardDevicesEmpty": "尚未配对任何设备。",
   "settings.removeDevice": "忘记此设备",
+  "settings.forwardAddressesHint": "连接时先使用配对的地址。可再添加多个地址（IP，或类似 nas.lan 的名称，共用同一个端口）；第一个连不上时会依次尝试。",
+  "settings.deviceAddressPlaceholder": "nas.lan 或 192.168.1.23",
+  "settings.addAddress": "添加",
+  "settings.removeAddress": "移除此地址",
   "settings.forwardSearch": "搜索设备",
   "settings.forwardSearchTitle": "你的网络上的设备",
   "settings.forwardSearchDescription": "同一网络上所有开启设备互传的 URLCheck。配对时会请对方确认验证码。",
@@ -202,5 +206,6 @@
   "error.forwardStale": "设备以网址过旧为由拒绝。",
   "error.forwardUnpaired": "本机尚未与目标设备配对，请重新配对。",
   "error.forwardPairRejected": "配对被拒绝，或验证码不一致。",
-  "error.forwardBusy": "已有另一个配对请求正在等待确认。"
+  "error.forwardBusy": "已有另一个配对请求正在等待确认。",
+  "error.invalidAddress": "这不是有效的地址。"
 }

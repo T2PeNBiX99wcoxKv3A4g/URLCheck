@@ -135,6 +135,18 @@ internal sealed class AppSettings
                 device.Name = device.Host;
 
             device.Port = Math.Clamp(device.Port, 1_024, 65_535);
+
+            // Extra fallback addresses: trimmed, without blanks or repeats, and never the primary host.
+            device.Addresses ??= [];
+
+            device.Addresses =
+            [
+                .. device.Addresses
+                    .Select(address => address.Trim())
+                    .Where(address => address.Length > 0 &&
+                                      !address.Equals(device.Host, StringComparison.OrdinalIgnoreCase))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+            ];
         }
     }
 

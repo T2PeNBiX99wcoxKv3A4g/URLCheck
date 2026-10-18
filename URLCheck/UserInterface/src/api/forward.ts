@@ -69,6 +69,20 @@ export function removeDevice(deviceId: string): void {
     Native.send({type: "forward.remove", payload: {deviceId}});
 }
 
+/**
+ * Adds an extra address (host name or IP) to a paired device. It shares the device's port and is
+ * tried in order after the paired address when a URL is forwarded. Rejects when the address is not
+ * a valid host name or IP.
+ */
+export async function addDeviceAddress(deviceId: string, address: string): Promise<void> {
+    await Native.request("forward.addAddress", {deviceId, address});
+}
+
+/** Removes an extra address from a paired device. */
+export function removeDeviceAddress(deviceId: string, address: string): void {
+    Native.send({type: "forward.removeAddress", payload: {deviceId, address}});
+}
+
 export type PairState = "code" | "accepted" | "rejected" | "failed";
 
 /** Body of the `forward.pairState` event: progress of a pairing this device started. */

@@ -85,7 +85,11 @@ internal static class ForwardClient
         }
     }
 
-    /// <summary>Forwards one URL to a paired device over a fresh, authenticated session.</summary>
+    /// <summary>
+    ///     Forwards one URL to a paired device over a fresh, authenticated session. Every address the
+    ///     device has is tried in turn, so a stale primary address does not stop a name that still
+    ///     resolves from working.
+    /// </summary>
     public static async Task SendAsync(DeviceEntry device, AppSettings settings, DeviceIdentity identity, string url,
         CancellationToken token)
     {
@@ -93,9 +97,45 @@ internal static class ForwardClient
         if (peerPublicKey is not { Length: 32 })
             throw new ForwardException("error.forwardUnpaired");
 
+        ForwardException? failure = null;
+
+        foreach (var address in device.AllAddresses().Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            // Each address gets its own budget, so an unreachable one is left behind instead of using
+            // up the whole request before the fallback addresses are even tried.
+            using var attempt = CancellationTokenSource.CreateLinkedTokenSource(token);
+            attempt.CancelAfter(ForwardProtocol.AttemptTimeout);
+
+            try
+            {
+                await SendAttemptAsync(address, device, peerPublicKey, settings, identity, url, attempt.Token);
+                return;
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (ForwardException ex)
+            {
+                // A stale address can now belong to another device, which answers with the wrong
+                // identity; keep the first answer and still try the remaining addresses.
+                failure ??= ex;
+            }
+            catch (Exception)
+            {
+                // DNS, connection or handshake failure: fall through to the next address.
+            }
+        }
+
+        throw failure ?? new ForwardException("error.forwardFailed");
+    }
+
+    private static async Task SendAttemptAsync(string host, DeviceEntry device, byte[] peerPublicKey,
+        AppSettings settings, DeviceIdentity identity, string url, CancellationToken token)
+    {
         using var client = new TcpClient();
         client.NoDelay = true;
-        await client.ConnectAsync(device.Host, device.Port, token);
+        await client.ConnectAsync(host, device.Port, token);
         var stream = client.GetStream();
 
         var (ephemeralPrivate, ephemeralPublic) = ForwardCrypto.GenerateEphemeralKeyPair();

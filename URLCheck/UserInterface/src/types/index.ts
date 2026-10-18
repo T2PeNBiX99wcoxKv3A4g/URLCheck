@@ -41,6 +41,11 @@ export interface DeviceEntry {
     port: number;
     /** The peer's Ed25519 public key, base64. Empty until the device has been paired. */
     publicKey: string;
+    /**
+     * Extra addresses (host names or IPs) tried when the primary `host` cannot be reached, e.g. a
+     * private `.lan` name that survives an address change. All share `port`.
+     */
+    addresses: string[];
 }
 
 export interface UserAgentEntry {

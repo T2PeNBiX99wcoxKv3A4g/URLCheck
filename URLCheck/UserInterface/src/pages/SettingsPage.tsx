@@ -17,6 +17,8 @@ import {
   type PairStateEvent,
   pendingPairing,
   removeDevice,
+  addDeviceAddress,
+  removeDeviceAddress,
   respondToPairing,
   startDiscovery,
   stopDiscovery,
@@ -509,6 +511,30 @@ const FilterUrl = styled.span`
   word-break: break-all;
 `;
 
+/** One extra fallback address of a paired device, with its remove button. */
+const AddressRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-family: var(--font-mono);
+  word-break: break-all;
+
+  span {
+    flex: 1;
+    min-width: 0;
+  }
+`;
+
+/** The input + button that adds another address to a paired device. */
+const AddressAddRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+`;
+
 const FilterMeta = styled.span`
   display: flex;
   flex-wrap: wrap;
@@ -780,6 +806,8 @@ export const SettingsPage: React.FC = () => {
   const [incoming, setIncoming] = useState<PairRequestEvent | null>(null);
   const [manualHost, setManualHost] = useState("");
   const [manualPort, setManualPort] = useState(DEFAULT_SETTINGS.forwardPort);
+  /** Draft fallback address per paired device, keyed by device id. */
+  const [addressInputs, setAddressInputs] = useState<Record<string, string>>({});
 
   useEffect(() => {
     protocolStatus().then(setProtocols).catch(() => setProtocols(null));
@@ -1142,6 +1170,20 @@ export const SettingsPage: React.FC = () => {
     setIncoming(null);
   };
 
+  /** Adds the typed fallback address to a paired device, then clears its input. */
+  const handleAddAddress = (deviceId: string) => async () => {
+    const address = (addressInputs[deviceId] ?? "").trim();
+    if (!address) return;
+
+    try {
+      await addDeviceAddress(deviceId, address);
+      setError(null);
+      setAddressInputs((previous) => ({...previous, [deviceId]: ""}));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
   /** A short, readable fingerprint of this device's public key. */
   const fingerprint = (key: string) => (key ? `${key.slice(0, 16)}…` : "—");
 
@@ -1424,6 +1466,7 @@ export const SettingsPage: React.FC = () => {
 
           <SettingInfo>
             <SettingDescription>{t("settings.forwardDevicesDescription")}</SettingDescription>
+            <SettingDescription>{t("settings.forwardAddressesHint")}</SettingDescription>
           </SettingInfo>
 
           {settings.devices.length === 0 ? (
@@ -1435,6 +1478,39 @@ export const SettingsPage: React.FC = () => {
                       <FilterBody>
                         <FilterName>{device.name || device.host}</FilterName>
                         <FilterUrl>{device.host}:{device.port}</FilterUrl>
+
+                        {(device.addresses ?? []).map((address) => (
+                            <AddressRow key={address}>
+                              <span>+ {address}:{device.port}</span>
+                              <IconOnlyButton
+                                  type="button"
+                                  title={t("settings.removeAddress")}
+                                  onClick={() => removeDeviceAddress(device.id, address)}
+                              >
+                                <TrashIcon size={14}/>
+                              </IconOnlyButton>
+                            </AddressRow>
+                        ))}
+
+                        <AddressAddRow>
+                          <ListInput
+                              className="path"
+                              placeholder={t("settings.deviceAddressPlaceholder")}
+                              disabled={!forwardingActive}
+                              value={addressInputs[device.id] ?? ""}
+                              onChange={(event) => setAddressInputs((previous) => ({
+                                ...previous,
+                                [device.id]: event.target.value,
+                              }))}
+                          />
+                          <GhostButton
+                              type="button"
+                              disabled={!forwardingActive || !(addressInputs[device.id] ?? "").trim()}
+                              onClick={handleAddAddress(device.id)}
+                          >
+                            {t("settings.addAddress")}
+                          </GhostButton>
+                        </AddressAddRow>
                       </FilterBody>
                       <FilterActions>
                         <IconOnlyButton

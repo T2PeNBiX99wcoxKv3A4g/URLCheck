@@ -109,6 +109,9 @@ internal sealed record ForwardPairRespondRequest(string RequestId, bool Accept);
 /// <summary>Payload for <c>forward.remove</c>: the paired device to forget.</summary>
 internal sealed record ForwardRemoveRequest(string DeviceId);
 
+/// <summary>Payload for <c>forward.addAddress</c> and <c>forward.removeAddress</c>: an extra device address.</summary>
+internal sealed record ForwardAddressRequest(string DeviceId, string Address);
+
 /// <summary>
 ///     Payload for the <c>inspect.*</c> messages. The User-Agent is optional: the configured default is used when it
 ///     is empty.
