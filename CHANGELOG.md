@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.6.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.6..v0.6.0) - 2026-10-18
+
+### ⛰️  Features
+
+- *(forward)* Pair by discovery and encrypt with a handshake - ([e7c0de0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e7c0de0009171f0f9ac404b956bfcd7f65a239af))
+- *(forward)* Serve IPv6 peers with a dual-stack listener - ([11c9d2d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/11c9d2d57729806091992f26e2216fd3364b255f))
+- *(forward)* Send a URL from the popup to another device - ([6ba91c9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6ba91c943a59320aedac58dd6e5af778a912df0d))
+- *(logging)* Render SourceContext in console and file output - ([cf3b0cc](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cf3b0ccd688d1acc9aa2d9c141014e37d41ffa9c))
+- Introduce Result utility and related extensions for streamlined error handling - ([ff5d025](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ff5d025a727ba57164117ebcd80ca842a5aad877))
+- Add generic Singleton utility with logging support - ([520f601](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/520f6013f3b9a942face319ae1c959e029320e5f))
+
+### 🐛 Bug Fixes
+
+- *(forward)* Discover devices over TCP when UDP broadcast is blocked - ([4b3fa6b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4b3fa6b202b795c9f9f62570f358e54495229beb))
+
+### 🚜 Refactor
+
+- Remove redundant Serilog imports and improve import ordering throughout the project - ([23f7314](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/23f7314ac23675c5fc635df5a616b45eb08a8035))
+- Use Singleton base and Try for exception handling - ([a7c4ec3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a7c4ec33248e93a1fa47de48a2106ce9b7464f1e))
+- Adjust Singleton class visibility and nullability for internal consistency - ([69bc6ba](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/69bc6ba46db54feb4379492de95f54f25ecbf0c5))
+- Improve code readability and consistency across multiple files - ([d5af0ed](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d5af0edbcd21dd157b60929a4d7004ce2c9a7d2b))
+- Add Serilog logger to Constants class - ([ed626b5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ed626b5910934d75f5f1489d8d2f3f8cb505b397))
+- Add [UsedImplicitly] attribute to DataDirectory property - ([3f3e42f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/3f3e42f8a92a5c20df912bb38e9e8aec22194e4e))
+- Remove default user agents from settings configuration - ([343b6cb](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/343b6cbff074c0239af27ce3a1a8c2e6ed801d5f))
+- Simplify constructors and use target-typed new expressions throughout - ([418709e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/418709e361052c6601512f59789cfa65051c78c6))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(forward)* Log the discovery broadcast targets - ([53a7923](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/53a7923a98178dd180554e6359cd2180723d705d))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([029f6ab](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/029f6ab844cb15b71b2b80f3418248b8c6a138ef))
+
+
 ## [0.5.6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.5..v0.5.6) - 2026-10-18
 
 ### 🐛 Bug Fixes
