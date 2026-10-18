@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using Serilog;
 
 namespace URLCheck;
 
@@ -20,4 +21,6 @@ public static class Constants
     ///     title, so it has to be unique and stable.
     /// </summary>
     public const string SelectionButtonTitle = "SelectionButton";
+
+    internal static ILogger Logger = Log.ForContext("SourceContext", "Core");
 }
