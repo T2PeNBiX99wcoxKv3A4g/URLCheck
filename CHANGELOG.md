@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.4..v0.5.5) - 2026-10-18
+
+### 🚜 Refactor
+
+- Code refactoring - ([4044b12](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4044b1213b69d876b62728aa76c75cb4b9273d96))
+- Use target-typed new expressions for cleaner object instantiations - ([527f244](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/527f244ac61ad203eb961a2c2a39873037cd2399))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([15f7ae4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/15f7ae4eb75837edbd88a758a9a334526b9daae7))
+
+
 ## [0.5.4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.3..v0.5.4) - 2026-10-18
 
 ### 🐛 Bug Fixes
