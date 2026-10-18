@@ -89,6 +89,20 @@ internal static partial class NativeMethods
     [LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
     public static partial IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
+    // ---- Regions ----
+
+    [LibraryImport("gdi32.dll", SetLastError = true)]
+    public static partial IntPtr CreateEllipticRgn(int left, int top, int right, int bottom);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    public static partial int SetWindowRgn(IntPtr hWnd, IntPtr hRgn, [MarshalAs(UnmanagedType.Bool)] bool redraw);
+
+    /// <summary>Fills a rectangle with the window's client size.</summary>
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GetClientRect(IntPtr hWnd, out Rect rect);
+
+
     // ---- Pointer state and monitor work area ----
 
     public const int VkLButton = 0x01;

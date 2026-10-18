@@ -90,6 +90,9 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
             var style = (long)NativeMethods.GetWindowLongPtr(handle, NativeMethods.GwlExStyle);
             style |= NativeMethods.WsExNoActivate | NativeMethods.WsExToolWindow;
             NativeMethods.SetWindowLongPtr(handle, NativeMethods.GwlExStyle, new IntPtr(style));
+
+            if (NativeMethods.GetClientRect(handle, out var client))
+                ClipToCircle(handle, client.Right - client.Left);
         });
     }
 
@@ -104,6 +107,7 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
             NativeMethods.ShowWindow(handle, NativeMethods.SwShowNoActivate);
             NativeMethods.SetWindowPos(handle, NativeMethods.HwndTopMost, placed.Left, placed.Top, size, size,
                 NativeMethods.SwpNoActivate | NativeMethods.SwpShowWindow);
+            ClipToCircle(handle, size);
         });
 
         Log.Debug("Selection button placed at {Left},{Top}", placed.Left, placed.Top);
@@ -142,6 +146,20 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         var left = Math.Clamp(x, info.rcWork.Left, Math.Max(info.rcWork.Left, info.rcWork.Right - size));
         var top = Math.Clamp(y, info.rcWork.Top, Math.Max(info.rcWork.Top, info.rcWork.Bottom - size));
         return (left, top);
+    }
+
+    /// <summary>
+    ///     Clips a window to a circle. Photino paints its window class's background brush behind the
+    ///     transparent web view, which otherwise shows as a dark square around the round button.
+    /// </summary>
+    private static void ClipToCircle(IntPtr handle, int size)
+    {
+        if (size <= 0)
+            return;
+
+        var region = NativeMethods.CreateEllipticRgn(0, 0, size, size);
+        if (region != IntPtr.Zero)
+            NativeMethods.SetWindowRgn(handle, region, true);
     }
 
     private static void UseHandle(PhotinoWindow window, Action<IntPtr> action)

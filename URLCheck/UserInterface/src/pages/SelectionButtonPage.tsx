@@ -17,21 +17,37 @@ const popIn = keyframes`
 `;
 
 /**
- * Fills the whole (chromeless, transparent) window: an icon-only pill keeps the overlay out of the
- * way, and the app's own mark is what makes clear where a click leads.
+ * Centres the button in the window. A pixel of slack is left around it so the window's round region
+ * — which is clipped without antialiasing — trims that empty ring rather than the button's own
+ * smooth edge.
  */
-const Button = styled.button`
+const Root = styled.div`
     display: flex;
     width: 100%;
     height: 100%;
     align-items: center;
     justify-content: center;
+    background: transparent;
+`;
+
+/**
+ * The button itself: an icon-only circle carrying the app's own mark, so what a click leads to is
+ * obvious without a label.
+ */
+const Button = styled.button`
+    display: flex;
+    box-sizing: border-box;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    align-items: center;
+    justify-content: center;
     padding: 0;
-    border: 1px solid rgba(99, 102, 241, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.28);
     border-radius: 50%;
     background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), 0 0 16px rgba(99, 102, 241, 0.4);
+    /* Inset, because anything drawn outside the circle is clipped away by the window's region. */
+    box-shadow: inset 0 -2px 6px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3);
     animation: ${popIn} 0.16s cubic-bezier(0.22, 1, 0.36, 1);
     transition: filter 0.15s ease;
 
@@ -82,8 +98,10 @@ export const SelectionButtonPage: React.FC = () => {
 
     /* On mouse-down, so the click still counts when the backend hides the window as it opens. */
     return (
-        <Button type="button" title={t("selection.open")} onMouseDown={open}>
-            <LogoIcon size={26}/>
-        </Button>
+        <Root>
+            <Button type="button" title={t("selection.open")} onMouseDown={open}>
+                <LogoIcon size={26}/>
+            </Button>
+        </Root>
     );
 };
