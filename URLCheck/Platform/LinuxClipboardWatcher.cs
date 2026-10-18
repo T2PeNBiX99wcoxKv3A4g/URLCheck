@@ -19,8 +19,9 @@ internal sealed class LinuxClipboardWatcher : IClipboardWatcher
     /// <summary>Longer than any URL; a value past this is dropped rather than buffered forever.</summary>
     private const int MaxValueLength = 8192;
 
-    private Process? _process;
     private CancellationTokenSource? _cancellation;
+
+    private Process? _process;
 
     public event Action<string>? TextCopied;
 
@@ -90,7 +91,7 @@ internal sealed class LinuxClipboardWatcher : IClipboardWatcher
                 return false;
 
             _process = process;
-            _cancellation = new CancellationTokenSource();
+            _cancellation = new();
 
             // The pump swallows everything it can throw, so the task needs no observer.
             _ = Task.Run(() => PumpAsync(process, _cancellation.Token));
@@ -101,7 +102,7 @@ internal sealed class LinuxClipboardWatcher : IClipboardWatcher
         catch (Exception ex)
         {
             // No wl-paste installed, or no Wayland session after all.
-            Log.Information("Could not watch the clipboard through wl-paste: {Message}", ex.Message);
+            Log.Information(ex, "Could not watch the clipboard through wl-paste: {Message}", ex.Message);
             return false;
         }
     }

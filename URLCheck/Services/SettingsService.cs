@@ -118,7 +118,7 @@ internal sealed class SettingsService
     public async Task<AppSettings> SaveAndPublishAsync(AppSettings settings)
     {
         await SaveAsync(settings);
-        Changed?.Invoke(new SettingsPayload(settings, SettingsFilePath));
+        Changed?.Invoke(new(settings, SettingsFilePath));
         return settings;
     }
 
@@ -152,7 +152,7 @@ internal sealed class SettingsService
         {
             var json = await File.ReadAllTextAsync(SettingsFilePath);
             return JsonSerializer.Deserialize(json, SettingsFileOptions.GetTypeInfo(typeof(AppSettings)))
-                   as AppSettings ?? new AppSettings();
+                as AppSettings ?? new AppSettings();
         }
         catch (Exception ex)
         {

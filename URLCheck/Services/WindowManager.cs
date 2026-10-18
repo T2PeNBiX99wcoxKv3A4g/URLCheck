@@ -1,3 +1,4 @@
+using System.Drawing;
 using JetBrains.Annotations;
 using Photino.NET;
 using Serilog;
@@ -14,13 +15,6 @@ namespace URLCheck.Services;
 internal sealed class WindowManager
 {
     /// <summary>
-    ///     Per-app web view data folder. On Windows, Photino defaults to a WebView2 folder shared by
-    ///     every Photino app, which breaks when another app holds it, so keep URLCheck's separate.
-    /// </summary>
-    private static readonly string WebViewDataPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name, "webview");
-
-    /// <summary>
     ///     Side of the floating button's square window, in physical pixels. It is a little larger than
     ///     the button itself so the button's shadow has room inside the window's round clip.
     /// </summary>
@@ -31,6 +25,16 @@ internal sealed class WindowManager
 
     /// <summary>Slack around the button, so a press on its edge still counts as a click on it.</summary>
     private const int ButtonPressMargin = 8;
+
+    /// <summary>Longer than any sane URL; a clipboard value this big is never one.</summary>
+    private const int MaxUrlLength = 2048;
+
+    /// <summary>
+    ///     Per-app web view data folder. On Windows, Photino defaults to a WebView2 folder shared by
+    ///     every Photino app, which breaks when another app holds it, so keep URLCheck's separate.
+    /// </summary>
+    private static readonly string WebViewDataPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name, "webview");
 
     /// <summary>How often the pointer is checked while the button is visible.</summary>
     private static readonly TimeSpan PointerPollInterval = TimeSpan.FromMilliseconds(90);
@@ -44,26 +48,24 @@ internal sealed class WindowManager
     /// <summary>How long after showing the button its position is re-asserted, once everything settled.</summary>
     private static readonly TimeSpan PositionNudgeDelay = TimeSpan.FromMilliseconds(400);
 
-    /// <summary>Longer than any sane URL; a clipboard value this big is never one.</summary>
-    private const int MaxUrlLength = 2048;
-
     private readonly string _appUrl;
-    private readonly IWindowPlatform _platform;
-    private readonly SettingsService _settings;
-    private readonly HistoryService _history;
     private readonly IClipboardWatcher _clipboard;
+    private readonly HistoryService _history;
+    private readonly IWindowPlatform _platform;
     private readonly Timer _pointerTimer;
+    private readonly SettingsService _settings;
     private bool _allowClose;
 
-    private PhotinoWindow? _mainWindow;
-    private PhotinoWindow? _popupWindow;
-    private PhotinoWindow? _buttonWindow;
-
     /// <summary>Where the button was really placed, so a press on it is told apart from a press away.</summary>
-    private System.Drawing.Point? _buttonAt;
+    private Point? _buttonAt;
+
+    private PhotinoWindow? _buttonWindow;
 
     /// <summary>Set while a hidden start is still waiting for the interface's first render.</summary>
     private bool _hideWhenRendered;
+
+    private PhotinoWindow? _mainWindow;
+    private PhotinoWindow? _popupWindow;
 
     public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings, HistoryService history,
         IClipboardWatcher clipboard)
@@ -412,7 +414,7 @@ internal sealed class WindowManager
                 .SetTemporaryFilesPath(WebViewDataPath)
                 .SetUseOsDefaultSize(false)
                 .SetUseOsDefaultLocation(false)
-                .SetLocation(new System.Drawing.Point(x, y))
+                .SetLocation(new(x, y))
                 .SetSize(new(ButtonSize, ButtonSize))
                 .SetMinSize(ButtonSize, ButtonSize)
                 .SetMaxSize(ButtonSize, ButtonSize)

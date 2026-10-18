@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Runtime.Versioning;
 using Photino.NET;
 using Serilog;
@@ -95,14 +96,14 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
     ///     Wayland.
     /// </summary>
     public PhotinoWindow CreatePopupWindow(PhotinoWindow? parent) =>
-        parent is null ? new PhotinoWindow() : new PhotinoWindow(parent);
+        parent is null ? new() : new PhotinoWindow(parent);
 
     /// <summary>
     ///     A transient child of the host, exactly like the popup: a top-level GTK window that closes
     ///     would take the whole message loop down with it.
     /// </summary>
     public PhotinoWindow CreateSelectionButtonWindow(PhotinoWindow? parent) =>
-        parent is null ? new PhotinoWindow() : new PhotinoWindow(parent);
+        parent is null ? new() : new PhotinoWindow(parent);
 
     /// <summary>Reuses the popup's transparency treatment so the pill's rounded corners are not filled in.</summary>
     public void ConfigureSelectionButtonWindow(PhotinoWindow window)
@@ -117,12 +118,12 @@ internal sealed class LinuxWindowPlatform : IWindowPlatform
     ///     Wayland ignores a client's requested position, so <c>MoveTo</c> is best-effort there and the
     ///     compositor places the button instead; the requested place is reported back either way.
     /// </summary>
-    public System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size)
+    public Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size)
     {
         window.SetSize(size, size);
         window.MoveTo(x, y);
         LinuxGtk.ShowOnTop(window.Title);
-        return new System.Drawing.Point(x, y);
+        return new(x, y);
     }
 
     /// <summary>

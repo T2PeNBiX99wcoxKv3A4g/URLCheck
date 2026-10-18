@@ -131,7 +131,7 @@ internal static class FilterParser
         }
 
         var (source, isRegex) = SplitRegex(value);
-        rule = new RemoveParamRule(source, isRegex, Include: include.Count > 0 ? include : null,
+        rule = new(source, isRegex, Include: include.Count > 0 ? include : null,
             Exclude: exclude.Count > 0 ? exclude : null);
         return true;
     }
@@ -250,7 +250,7 @@ internal static class FilterParser
 
     private static void AddClearUrlsRule(List<RemoveParamRule> rules, string pattern, string urlPattern,
         List<string> exceptions) =>
-        rules.Add(new RemoveParamRule(pattern, true, urlPattern,
+        rules.Add(new(pattern, true, urlPattern,
             UrlExceptions: exceptions.Count > 0 ? exceptions : null));
 
     // -------------------------------------------------------------------------------- Firefox
@@ -270,7 +270,7 @@ internal static class FilterParser
 
             var allowList = ReadStrings(record, "allowList");
             foreach (var name in ReadStrings(record, "stripList"))
-                rules.Add(new RemoveParamRule(name, false, Exclude: allowList.Count > 0 ? allowList : null));
+                rules.Add(new(name, false, Exclude: allowList.Count > 0 ? allowList : null));
         }
 
         return rules;

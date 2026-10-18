@@ -79,7 +79,7 @@ internal sealed class ProtocolRegistrationService
             ? StringComparison.OrdinalIgnoreCase
             : StringComparison.Ordinal;
 
-        _status = new ProtocolStatusPayload(
+        _status = new(
             _registrar.IsDefaultBrowser(),
             _registrar.IsCustomSchemeRegistered(),
             registered is { Length: > 0 } && registered.Equals(_registrar.ExecutablePath, comparison),

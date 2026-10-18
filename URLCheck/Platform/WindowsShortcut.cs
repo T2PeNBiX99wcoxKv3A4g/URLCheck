@@ -1,6 +1,5 @@
 using System.Runtime.Versioning;
 using ShellLink;
-using ShellLink.Structures;
 
 namespace URLCheck.Platform;
 
@@ -21,14 +20,14 @@ internal static class WindowsShortcut
     {
         var shortcut = new Shortcut
         {
-            LinkTargetIDList = new LinkTargetIDList
+            LinkTargetIDList = new()
             {
                 Path = targetPath
             },
             // Without an explicit index the link stores -1, which points at no icon at all, so the
             // shortcut turns up blank in the Startup folder.
             IconIndex = 0,
-            StringData = new StringData
+            StringData = new()
             {
                 NameString = description,
                 WorkingDir = workingDirectory,

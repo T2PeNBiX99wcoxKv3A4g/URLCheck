@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Photino.NET;
@@ -89,14 +90,14 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         {
             var style = (long)NativeMethods.GetWindowLongPtr(handle, NativeMethods.GwlExStyle);
             style |= NativeMethods.WsExNoActivate | NativeMethods.WsExToolWindow;
-            NativeMethods.SetWindowLongPtr(handle, NativeMethods.GwlExStyle, new IntPtr(style));
+            NativeMethods.SetWindowLongPtr(handle, NativeMethods.GwlExStyle, new(style));
 
             if (NativeMethods.GetClientRect(handle, out var client))
                 ClipToCircle(handle, client.Right - client.Left);
         });
     }
 
-    public System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size)
+    public Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size)
     {
         var placed = ClampToMonitor(x, y, size);
 
@@ -111,7 +112,7 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
         });
 
         Log.Debug("Selection button placed at {Left},{Top}", placed.Left, placed.Top);
-        return new System.Drawing.Point(placed.Left, placed.Top);
+        return new(placed.Left, placed.Top);
     }
 
     public bool PointerButtonPressed() =>
@@ -136,9 +137,16 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
     /// <summary>Keeps the button inside the work area of the monitor the pointer is on.</summary>
     private static (int Left, int Top) ClampToMonitor(int x, int y, int size)
     {
-        var pointer = new NativeMethods.Point { X = x, Y = y };
+        var pointer = new NativeMethods.Point
+        {
+            X = x,
+            Y = y
+        };
         var monitor = NativeMethods.MonitorFromPoint(pointer, NativeMethods.MonitorDefaultToNearest);
-        var info = new NativeMethods.MonitorInfo { cbSize = Marshal.SizeOf<NativeMethods.MonitorInfo>() };
+        var info = new NativeMethods.MonitorInfo
+        {
+            cbSize = Marshal.SizeOf<NativeMethods.MonitorInfo>()
+        };
 
         if (monitor == IntPtr.Zero || !NativeMethods.GetMonitorInfo(monitor, ref info))
             return (x, y);

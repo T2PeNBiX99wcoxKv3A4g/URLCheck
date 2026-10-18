@@ -28,7 +28,7 @@ internal sealed class SingleInstance : IDisposable
 
         try
         {
-            _lockFile = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            _lockFile = new(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
             IsFirstInstance = true;
         }
         catch (IOException)
