@@ -3,25 +3,7 @@ import type {AppSettings} from "../types";
 
 export const DEFAULT_SETTINGS: AppSettings = {
     requestTimeoutMs: 5000,
-    userAgents: [
-        {id: "default", name: "Default (URLCheck)", value: "URLCheck Desktop Agent/1.0"},
-        {
-            id: "chrome",
-            name: "Chrome (Windows)",
-            value: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-        },
-        {
-            id: "safari",
-            name: "Safari (macOS)",
-            value: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
-        },
-        {id: "curl", name: "cURL", value: "curl/8.4.0"},
-        {
-            id: "bot",
-            name: "Googlebot",
-            value: "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-        },
-    ],
+    userAgents: [],
     browsers: [],
     language: "en",
     borderlessPopup: true,
@@ -48,10 +30,7 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function normalize(settings: AppSettings): AppSettings {
-    const userAgents =
-        Array.isArray(settings.userAgents) && settings.userAgents.length > 0
-            ? settings.userAgents
-            : DEFAULT_SETTINGS.userAgents;
+    const userAgents = Array.isArray(settings.userAgents) ? settings.userAgents : DEFAULT_SETTINGS.userAgents;
 
     return {
         ...settings,
