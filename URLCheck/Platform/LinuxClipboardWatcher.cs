@@ -133,13 +133,9 @@ internal sealed class LinuxClipboardWatcher : IClipboardWatcher
                         current.Clear();
                     }
                     else if (current.Count < MaxValueLength)
-                    {
                         current.Add(value);
-                    }
                     else
-                    {
                         current.Clear();
-                    }
                 }
             }
         }

@@ -108,6 +108,7 @@ const Table = styled.table`
     }
 
     /* Starting value for the accent bar so it slides in instead of popping. */
+
     td:first-child {
         box-shadow: inset 0 0 0 0 rgba(96, 165, 250, 0);
     }

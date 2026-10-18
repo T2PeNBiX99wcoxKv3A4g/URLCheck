@@ -12,7 +12,10 @@ internal sealed class InspectService
     ///     exact 3xx it is (301, 302, 303, 307, 308, ...) together with its Location. The popup then
     ///     reports that code and jumps to the target.
     /// </summary>
-    private static readonly HttpClient Client = new(new SocketsHttpHandler { AllowAutoRedirect = false });
+    private static readonly HttpClient Client = new(new SocketsHttpHandler
+    {
+        AllowAutoRedirect = false
+    });
 
     private readonly SettingsService _settings;
 

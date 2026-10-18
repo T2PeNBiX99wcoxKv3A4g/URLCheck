@@ -1,8 +1,8 @@
 namespace URLCheck.Models;
 
 /// <summary>
-/// A browser the user can open inspected URLs with. The first entry in
-/// <see cref="AppSettings.Browsers"/> acts as the default.
+///     A browser the user can open inspected URLs with. The first entry in
+///     <see cref="AppSettings.Browsers" /> acts as the default.
 /// </summary>
 internal sealed class BrowserEntry
 {

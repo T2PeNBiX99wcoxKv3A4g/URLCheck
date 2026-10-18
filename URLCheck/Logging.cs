@@ -91,12 +91,10 @@ internal sealed class TeeWriter(TextWriter inner, string source, LogEventLevel l
         inner.Write(value);
 
         lock (_sync)
-        {
             if (value == '\n')
                 EmitPending();
             else if (value != '\r')
                 _pending.Append(value);
-        }
     }
 
     public override void Write(string? value)
@@ -107,12 +105,10 @@ internal sealed class TeeWriter(TextWriter inner, string source, LogEventLevel l
 
         lock (_sync)
             foreach (var character in value)
-            {
                 if (character == '\n')
                     EmitPending();
                 else if (character != '\r')
                     _pending.Append(character);
-            }
     }
 
     public override void WriteLine(string? value) => Write(value + Environment.NewLine);

@@ -34,6 +34,11 @@ internal sealed class StartupService
         Refresh();
     }
 
+    /// <summary>True on the platforms that have a per-user autostart location we can write to.</summary>
+    public static bool IsSupported => OperatingSystem.IsWindows() || OperatingSystem.IsLinux();
+
+    private bool IsEnabled => IsSupported && File.Exists(_entryPath);
+
     /// <summary>
     ///     Rewrites an autostart entry that already exists, so one left by an older version picks up
     ///     fixes to it — its icon, or a moved executable — without the setting being toggled.
@@ -52,11 +57,6 @@ internal sealed class StartupService
             Log.Warning(ex, "Failed to refresh the autostart entry");
         }
     }
-
-    /// <summary>True on the platforms that have a per-user autostart location we can write to.</summary>
-    public static bool IsSupported => OperatingSystem.IsWindows() || OperatingSystem.IsLinux();
-
-    private bool IsEnabled => IsSupported && File.Exists(_entryPath);
 
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch
     {
@@ -112,14 +112,14 @@ internal sealed class StartupService
 
         // Quoted because an installation path may contain spaces.
         File.WriteAllText(_entryPath, $"""
-            [Desktop Entry]
-            Type=Application
-            Name={Constants.WindowTitle}
-            Comment={Constants.WindowTitle}
-            Exec="{executable}"
-            Terminal=false
-            X-GNOME-Autostart-enabled=true
-            """, Encoding.UTF8);
+                                       [Desktop Entry]
+                                       Type=Application
+                                       Name={Constants.WindowTitle}
+                                       Comment={Constants.WindowTitle}
+                                       Exec="{executable}"
+                                       Terminal=false
+                                       X-GNOME-Autostart-enabled=true
+                                       """, Encoding.UTF8);
     }
 
     /// <summary>The XDG config directory, which is where autostart entries live.</summary>

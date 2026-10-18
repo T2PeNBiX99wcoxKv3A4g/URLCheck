@@ -28,12 +28,13 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
     private const int CategoryApplicationStatus = 0;
 
     private readonly Action[] _actions;
-    private readonly string? _iconPath;
-    private readonly Func<string, string> _localize;
-    private readonly string _tooltip;
 
     /// <summary>Roots the signal callbacks: a delegate handed to GTK must never be collected.</summary>
     private readonly List<Delegate> _callbacks = [];
+
+    private readonly string? _iconPath;
+    private readonly Func<string, string> _localize;
+    private readonly string _tooltip;
 
     private IntPtr _indicator = IntPtr.Zero;
 
@@ -195,9 +196,6 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
         return NativeLibrary.TryLoad(available, out var handle) ? handle : IntPtr.Zero;
     }
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void ActivateCallback(IntPtr widget, IntPtr data);
-
     // ---- libayatana-appindicator3 ----
 
     [LibraryImport(IndicatorLibrary, StringMarshalling = StringMarshalling.Utf8)]
@@ -234,4 +232,7 @@ internal sealed partial class LinuxTrayIcon : ITrayIcon
 
     [LibraryImport(GtkLibrary)]
     private static partial void gtk_widget_show_all(IntPtr widget);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void ActivateCallback(IntPtr widget, IntPtr data);
 }

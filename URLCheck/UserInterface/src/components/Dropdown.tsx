@@ -125,8 +125,8 @@ const Trigger = styled.button<{ $variant: "compact" | "form" }>`
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.2s ease;
 
     ${(props) =>
-        props.$variant === "compact"
-            ? `
+            props.$variant === "compact"
+                    ? `
         height: 30px;
         max-width: 170px;
         padding: 0 8px;
@@ -137,7 +137,7 @@ const Trigger = styled.button<{ $variant: "compact" | "form" }>`
         font-size: 0.76rem;
         line-height: 1;
     `
-            : `
+                    : `
         min-width: 200px;
         padding: 8px 12px;
         border-radius: 8px;
@@ -146,12 +146,11 @@ const Trigger = styled.button<{ $variant: "compact" | "form" }>`
         color: #f9fafb;
         font-size: 0.875rem;
     `}
-
     &:hover:not(:disabled) {
         ${(props) =>
-            props.$variant === "compact"
-                ? "background: rgba(255, 255, 255, 0.12); color: #f9fafb;"
-                : "border-color: rgba(255, 255, 255, 0.24);"}
+                props.$variant === "compact"
+                        ? "background: rgba(255, 255, 255, 0.12); color: #f9fafb;"
+                        : "border-color: rgba(255, 255, 255, 0.24);"}
     }
 
     &:focus-visible {
@@ -193,14 +192,14 @@ interface DropdownProps {
 
 /** A drop-in replacement for a `<select>`, sharing the app's menu styling and animation. */
 export const Dropdown: React.FC<DropdownProps> = ({
-    value,
-    options,
-    onChange,
-    variant = "compact",
-    up,
-    disabled,
-    title,
-}) => {
+                                                      value,
+                                                      options,
+                                                      onChange,
+                                                      variant = "compact",
+                                                      up,
+                                                      disabled,
+                                                      title,
+                                                  }) => {
     const [open, setOpen] = useState(false);
     const root = useRef<HTMLDivElement>(null);
     const menuStyle = useMenuFit(open, up, root);

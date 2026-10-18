@@ -25,9 +25,7 @@ internal sealed class HistoryService
             .Options;
 
         using (var context = new HistoryContext(_options))
-        {
             context.Database.EnsureCreated();
-        }
 
         NativeBridge.MessageReceived += HandleMessageAsync;
     }

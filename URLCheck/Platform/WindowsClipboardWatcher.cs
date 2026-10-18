@@ -19,12 +19,12 @@ internal sealed class WindowsClipboardWatcher : IClipboardWatcher
 
     private readonly string _className = $"URLCheck.Clipboard.{Guid.NewGuid():N}";
     private readonly ManualResetEventSlim _ready = new();
+    private IntPtr _hwnd = IntPtr.Zero;
+    private string? _lastText;
+    private bool _listening;
 
     private Thread? _thread;
-    private IntPtr _hwnd = IntPtr.Zero;
     private NativeMethods.WndProcDelegate? _wndProc;
-    private bool _listening;
-    private string? _lastText;
 
     public event Action<string>? TextCopied;
 

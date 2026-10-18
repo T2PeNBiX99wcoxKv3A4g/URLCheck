@@ -1,3 +1,4 @@
+using System.Drawing;
 using Photino.NET;
 
 namespace URLCheck.Platform;
@@ -42,7 +43,7 @@ internal interface IWindowPlatform
     ///     <paramref name="size" />-pixel square, without stealing focus when possible, and returns the
     ///     place it was really put.
     /// </summary>
-    System.Drawing.Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size);
+    Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size);
 
     /// <summary>
     ///     True while a mouse button is down, so the floating button can be dismissed the moment the

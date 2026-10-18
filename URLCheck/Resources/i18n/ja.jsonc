@@ -1,7 +1,6 @@
 {
   "app.name": "URLCheck",
   "app.tagline": "リンク仲介",
-
   "tabs.home.label": "ホーム",
   "tabs.home.title": "ホーム",
   "tabs.home.subtitle": "URL を開いて、開く前に確認・整理できます",
@@ -11,7 +10,6 @@
   "tabs.settings.label": "設定",
   "tabs.settings.title": "環境設定",
   "tabs.settings.subtitle": "リクエストのタイムアウト、User-Agent、ブラウザを設定",
-
   "home.openTitle": "URL を開く",
   "home.openDescription": "リンクのクリックを再現します。URLCheck が URL を傍受し、検査ポップアップを開いて、クエリ パラメータを削除してからブラウザで開けます。",
   "home.open": "開く",
@@ -19,7 +17,6 @@
   "home.bannerTitle": "URLCheck は既定のブラウザではありません",
   "home.bannerBody": "http/https リンクを処理できないと動作しません。URLCheck を既定のブラウザに設定すると、リンクをクリックしたときにこのポップアップが開きます。",
   "home.openSettings": "設定を開く",
-
   "history.searchPlaceholder": "URL で履歴を検索...",
   "history.clearAll": "すべてのログを消去",
   "history.timestamp": "日時",
@@ -27,7 +24,6 @@
   "history.loading": "履歴を読み込み中...",
   "history.empty": "履歴はまだありません",
   "history.openTooltip": "検査ポップアップで開く",
-
   "settings.network": "ネットワークとリクエストの設定",
   "settings.requestTimeout": "リクエストのタイムアウト",
   "settings.requestTimeoutDescription": "1 つの URL 応答を待つ最大ミリ秒",
@@ -119,7 +115,6 @@
   "settings.unregistered": "URLCheck のレジストリ項目をすべて削除しました。",
   "settings.openedDefaultApps": "Windows の既定のアプリを開きました。http/https に URLCheck を選択してください。",
   "settings.noBrowsersDetected": "インストール済みのブラウザが見つかりませんでした。",
-
   "popup.close": "閉じる",
   "selection.open": "URLCheck で開く",
   "popup.history": "履歴",
@@ -157,11 +152,9 @@
   "popup.chooseBrowser": "ブラウザを選択",
   "popup.copy": "コピー",
   "popup.copied": "コピーしました！",
-
   "tray.open": "URLCheck を開く",
   "tray.settings": "設定",
   "tray.exit": "終了",
-
   "error.missingUrl": "URL がありません。",
   "error.noBrowser": "ブラウザが設定されていません。設定で追加してください。",
   "error.missingSettings": "設定の内容がありません。",

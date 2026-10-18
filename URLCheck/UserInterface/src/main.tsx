@@ -24,8 +24,8 @@ if (rootElement) {
     const page = hash.startsWith("#popup")
         ? <PopupPage/>
         : hash.startsWith("#selection")
-                ? <SelectionButtonPage/>
-                : <App/>;
+            ? <SelectionButtonPage/>
+            : <App/>;
 
     createRoot(rootElement).render(
         <StrictMode>

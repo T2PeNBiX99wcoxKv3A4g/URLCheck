@@ -22,7 +22,6 @@ internal sealed class SettingsService
 
     private readonly IBrowserLocator _browserLocator;
     private readonly SemaphoreSlim _gate = new(1, 1);
-    private AppSettings? _current;
 
     public SettingsService(IBrowserLocator browserLocator)
     {
@@ -38,10 +37,10 @@ internal sealed class SettingsService
     [PublicAPI] public string SettingsFilePath { get; }
 
     /// <summary>The language from the cached settings (falls back before the first load).</summary>
-    public string Language => _current?.Language ?? AppSettings.DefaultLanguage;
+    public string Language => Current?.Language ?? AppSettings.DefaultLanguage;
 
     /// <summary>The cached settings, for synchronous callers that cannot await a load.</summary>
-    public AppSettings? Current => _current;
+    public AppSettings? Current { get; private set; }
 
     /// <summary>Raised after the settings are saved or reset.</summary>
     public static event Action<SettingsPayload>? Changed;
@@ -76,18 +75,18 @@ internal sealed class SettingsService
     /// <summary>Returns the settings, loading them from disk on first use.</summary>
     public async Task<AppSettings> GetAsync()
     {
-        if (_current is not null)
-            return _current;
+        if (Current is not null)
+            return Current;
 
         await _gate.WaitAsync();
         try
         {
-            if (_current is not null)
-                return _current;
+            if (Current is not null)
+                return Current;
 
-            _current = await ReadAsync();
-            _current.Normalize();
-            return _current;
+            Current = await ReadAsync();
+            Current.Normalize();
+            return Current;
         }
         finally
         {
@@ -105,7 +104,7 @@ internal sealed class SettingsService
         {
             await File.WriteAllTextAsync(SettingsFilePath,
                 JsonSerializer.Serialize(settings, SettingsFileOptions.GetTypeInfo(typeof(AppSettings))));
-            _current = settings;
+            Current = settings;
             return settings;
         }
         finally

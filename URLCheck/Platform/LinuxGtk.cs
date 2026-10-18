@@ -23,6 +23,50 @@ internal static partial class LinuxGtk
     private const string CairoLibrary = "libcairo.so.2";
     private const string WebKitLibrary = "libwebkit2gtk-4.1.so.0";
 
+    // G_LOG_LEVEL_ERROR = 1 << 2, CRITICAL = 1 << 3, WARNING = 1 << 4.
+    private const int LogLevelError = 1 << 2;
+    private const int LogLevelCritical = 1 << 3;
+    private const int LogLevelWarning = 1 << 4;
+
+    /// <summary>GDK_BUTTON1_MASK | GDK_BUTTON2_MASK | GDK_BUTTON3_MASK.</summary>
+    private const uint PointerButtonMask = 1u << 8 | 1u << 9 | 1u << 10;
+
+    private const int CairoOperatorClear = 0;
+
+    private static readonly List<LogHandler> LogHandlers = [];
+
+    private static Action<string>? _clipboardSink;
+    private static IntPtr _clipboard;
+    private static bool _clipboardConnected;
+
+    private static readonly ClipboardOwnerChangedCallback ClipboardOwnerChanged = OnClipboardOwnerChanged;
+    private static readonly ClipboardTextReceivedCallback ClipboardTextReceived = OnClipboardTextReceived;
+
+    private static readonly IntPtr ClipboardTextReceivedPointer =
+        Marshal.GetFunctionPointerForDelegate(ClipboardTextReceived);
+
+    private static readonly DrawCallback DrawHandler = OnDraw;
+
+    /// <summary>
+    ///     Whether the screen supports RGBA visuals at all. This can be answered without a window, which
+    ///     matters because the decision has to be taken before the popup is created.
+    /// </summary>
+    public static bool CanBeTransparent
+    {
+        get
+        {
+            try
+            {
+                return gdk_screen_get_rgba_visual(gdk_screen_get_default()) != IntPtr.Zero;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Could not query the screen's RGBA visual");
+                return false;
+            }
+        }
+    }
+
     /// <summary>
     ///     Hides a toplevel by title. Returns false when it could not be found. Unmapping is what takes
     ///     a window out of the taskbar here: iconifying it only minimises it, which leaves it there.
@@ -106,36 +150,6 @@ internal static partial class LinuxGtk
         _ => LogEventLevel.Debug
     };
 
-    // G_LOG_LEVEL_ERROR = 1 << 2, CRITICAL = 1 << 3, WARNING = 1 << 4.
-    private const int LogLevelError = 1 << 2;
-    private const int LogLevelCritical = 1 << 3;
-    private const int LogLevelWarning = 1 << 4;
-
-    private static readonly List<LogHandler> LogHandlers = [];
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void LogHandler(IntPtr domain, int level, IntPtr message, IntPtr userData);
-
-    /// <summary>
-    ///     Whether the screen supports RGBA visuals at all. This can be answered without a window, which
-    ///     matters because the decision has to be taken before the popup is created.
-    /// </summary>
-    public static bool CanBeTransparent
-    {
-        get
-        {
-            try
-            {
-                return gdk_screen_get_rgba_visual(gdk_screen_get_default()) != IntPtr.Zero;
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex, "Could not query the screen's RGBA visual");
-                return false;
-            }
-        }
-    }
-
     /// <summary>
     ///     Makes a toplevel RGBA-transparent, so its CSS rounded corners are not filled in. GTK needs an
     ///     RGBA visual plus a draw handler that clears the background, and both have to be in place
@@ -189,7 +203,10 @@ internal static partial class LinuxGtk
                 return false;
             }
 
-            var clear = new GdkRgba { Alpha = 0 };
+            var clear = new GdkRgba
+            {
+                Alpha = 0
+            };
             webkit_web_view_set_background_color(webView, ref clear);
 
             Log.Information("Web view background cleared");
@@ -231,10 +248,6 @@ internal static partial class LinuxGtk
         }
     }
 
-    private static Action<string>? _clipboardSink;
-    private static IntPtr _clipboard;
-    private static bool _clipboardConnected;
-
     /// <summary>
     ///     Whether a mouse button is down. GDK insists on a window to ask about, so the query goes
     ///     through the root window; without one it is skipped rather than passed a null, which would
@@ -270,9 +283,6 @@ internal static partial class LinuxGtk
             return false;
         }
     }
-
-    /// <summary>GDK_BUTTON1_MASK | GDK_BUTTON2_MASK | GDK_BUTTON3_MASK.</summary>
-    private const uint PointerButtonMask = (1u << 8) | (1u << 9) | (1u << 10);
 
     /// <summary>
     ///     Watches the clipboard and reports every new text selection. The text is requested
@@ -325,18 +335,6 @@ internal static partial class LinuxGtk
             _clipboardSink?.Invoke(value);
     }
 
-    private static readonly ClipboardOwnerChangedCallback ClipboardOwnerChanged = OnClipboardOwnerChanged;
-    private static readonly ClipboardTextReceivedCallback ClipboardTextReceived = OnClipboardTextReceived;
-
-    private static readonly IntPtr ClipboardTextReceivedPointer =
-        Marshal.GetFunctionPointerForDelegate(ClipboardTextReceived);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void ClipboardOwnerChangedCallback(IntPtr clipboard, IntPtr @event, IntPtr data);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void ClipboardTextReceivedCallback(IntPtr clipboard, IntPtr text, IntPtr data);
-
     /// <summary>Depth-first search for the WebKitWebView inside a widget tree.</summary>
     private static IntPtr FindWebView(IntPtr widget)
     {
@@ -379,21 +377,6 @@ internal static partial class LinuxGtk
         // Let the default handler run too, so children still get drawn.
         return 0;
     }
-
-    private const int CairoOperatorClear = 0;
-    private static readonly DrawCallback DrawHandler = OnDraw;
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct GdkRgba
-    {
-        public double Red;
-        public double Green;
-        public double Blue;
-        public double Alpha;
-    }
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int DrawCallback(IntPtr widget, IntPtr cairo, IntPtr data);
 
     private static bool WithWindow(string title, Action<IntPtr> action)
     {
@@ -508,7 +491,8 @@ internal static partial class LinuxGtk
     private static partial void gtk_widget_set_visual(IntPtr widget, IntPtr visual);
 
     [LibraryImport(GtkLibrary)]
-    private static partial void gtk_widget_set_app_paintable(IntPtr widget, [MarshalAs(UnmanagedType.Bool)] bool paintable);
+    private static partial void gtk_widget_set_app_paintable(IntPtr widget,
+        [MarshalAs(UnmanagedType.Bool)] bool paintable);
 
     [LibraryImport(GlibLibrary)]
     private static partial void g_list_free(IntPtr list);
@@ -554,4 +538,25 @@ internal static partial class LinuxGtk
 
     [LibraryImport(WebKitLibrary)]
     private static partial void webkit_web_view_set_background_color(IntPtr webView, ref GdkRgba color);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void LogHandler(IntPtr domain, int level, IntPtr message, IntPtr userData);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void ClipboardOwnerChangedCallback(IntPtr clipboard, IntPtr @event, IntPtr data);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void ClipboardTextReceivedCallback(IntPtr clipboard, IntPtr text, IntPtr data);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct GdkRgba
+    {
+        public double Red;
+        public double Green;
+        public double Blue;
+        public double Alpha;
+    }
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int DrawCallback(IntPtr widget, IntPtr cairo, IntPtr data);
 }

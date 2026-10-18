@@ -699,7 +699,8 @@ const DialogInput = styled(ListInput)`
 `;
 
 /** Language names are always shown in their own language. */
-const LOCALE_NAMES: Record<string, string> = {  en: "English",
+const LOCALE_NAMES: Record<string, string> = {
+  en: "English",
   "zh-TW": "繁體中文",
   "zh-CN": "简体中文",
   ja: "日本語",
@@ -719,7 +720,10 @@ export const SettingsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [detecting, setDetecting] = useState(false);
   const [integrationBusy, setIntegrationBusy] = useState(false);
-  const [integrationMessage, setIntegrationMessage] = useState<{ key: string; params?: Record<string, string> } | null>(null);
+  const [integrationMessage, setIntegrationMessage] = useState<{
+    key: string;
+    params?: Record<string, string>
+  } | null>(null);
   const [protocols, setProtocols] = useState<ProtocolStatus | null>(null);
   const [platform, setPlatform] = useState("windows");
   const [filterLists, setFilterLists] = useState<FilterListEntry[]>([]);

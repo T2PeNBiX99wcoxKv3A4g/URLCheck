@@ -6,7 +6,7 @@ import {openWithBrowser} from "../api/browsers";
 import {checkStatus, type StatusResult} from "../api/inspect";
 import {closePopup, resizePopup} from "../api/system";
 import {loadFilterRules} from "../api/filters";
-import {compileRules, stripTrackingParams, trackingParamKeys, type CompiledRules} from "../data/filterRules";
+import {type CompiledRules, compileRules, stripTrackingParams, trackingParamKeys} from "../data/filterRules";
 import {useTranslation} from "../i18n";
 import {Native} from "../Native";
 import {
@@ -237,15 +237,15 @@ const StatusPill = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
     &:active:not(:disabled) {
         transform: translateY(0);
     }
-    border: 1px solid
-        ${(p) =>
-                p.$tone === "ok"
-                        ? "rgba(16, 185, 129, 0.3)"
-                        : p.$tone === "info"
-                                ? "rgba(59, 130, 246, 0.3)"
-                                : p.$tone === "error"
-                                        ? "rgba(239, 68, 68, 0.3)"
-                                        : "rgba(255, 255, 255, 0.1)"};
+
+    border: 1px solid ${(p) =>
+            p.$tone === "ok"
+                    ? "rgba(16, 185, 129, 0.3)"
+                    : p.$tone === "info"
+                            ? "rgba(59, 130, 246, 0.3)"
+                            : p.$tone === "error"
+                                    ? "rgba(239, 68, 68, 0.3)"
+                                    : "rgba(255, 255, 255, 0.1)"};
     background: ${(p) =>
             p.$tone === "ok"
                     ? "rgba(16, 185, 129, 0.12)"
@@ -282,8 +282,7 @@ const ActionButton = styled.button<{ $accent?: boolean }>`
     box-sizing: border-box;
     padding: 0 11px;
     border-radius: 7px;
-    border: 1px solid
-        ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.4)" : "rgba(255, 255, 255, 0.1)")};
+    border: 1px solid ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.4)" : "rgba(255, 255, 255, 0.1)")};
     background: ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.14)" : "rgba(255, 255, 255, 0.05)")};
     color: ${(p) => (p.$accent ? "#fbbf24" : "#d1d5db")};
     font-size: 0.76rem;
@@ -566,6 +565,7 @@ const GhostButton = styled(ActionButton)<{ $active?: boolean }>`
 
     /* ActionButton's hover rule knows nothing about $active, so it would flatten the active
        background back to the plain white wash. Keep the two states distinguishable. */
+
     &:hover:not(:disabled) {
         border-color: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.7)" : "rgba(255, 255, 255, 0.1)")};
         background: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.34)" : "rgba(255, 255, 255, 0.12)")};
@@ -876,23 +876,23 @@ export const PopupPage: React.FC = () => {
     const tone: "idle" | "ok" | "info" | "error" = !status
         ? "idle"
         : status.ok
-                ? "ok"
-                : status.statusCode >= 300 && status.statusCode < 400
-                        ? "info"
-                        : "error";
+            ? "ok"
+            : status.statusCode >= 300 && status.statusCode < 400
+                ? "info"
+                : "error";
 
     /* A followed redirect says so, rather than repeating the server's "Found"/"Moved Permanently". */
     const statusDetail = status?.location
         ? t("popup.redirected")
         : status?.statusText === "error.timeout"
-                ? t("error.timeout")
-                : status?.statusText;
+            ? t("error.timeout")
+            : status?.statusText;
 
     const statusText = statusBusy
         ? t("popup.checking")
         : status
-                ? `${status.statusCode || "!"} ${statusDetail ?? ""}`.trim()
-                : t("popup.checkStatus");
+            ? `${status.statusCode || "!"} ${statusDetail ?? ""}`.trim()
+            : t("popup.checkStatus");
 
     const StatusIcon = tone === "ok" ? CheckCircleIcon : tone === "error" ? XCircleIcon : AlertTriangleIcon;
 
@@ -923,42 +923,42 @@ export const PopupPage: React.FC = () => {
                 )}
 
                 {history.entries.length > 1 && (
-                <Toolbar ref={historyAnchor}>
-                    <SmallButton onClick={() => dispatch({type: "jump", index: 0})} disabled={history.index === 0}
-                                 title={t("popup.first")}>|◀
-                    </SmallButton>
-                    <SmallButton onClick={() => dispatch({type: "jump", index: history.index - 1})}
-                                 disabled={history.index === 0} title={t("popup.back")}>◀
-                    </SmallButton>
-                    <SmallButton onClick={() => setHistoryMenuOpen((open) => !open)}
-                                 title={t("popup.history")}>▾</SmallButton>
-                    <SmallButton onClick={() => dispatch({type: "jump", index: history.index + 1})}
-                                 disabled={history.index >= history.entries.length - 1}
-                                 title={t("popup.forward")}>▶
-                    </SmallButton>
-                    <SmallButton onClick={() => dispatch({type: "jump", index: history.entries.length - 1})}
-                                 disabled={history.index >= history.entries.length - 1}
-                                 title={t("popup.last")}>▶|
-                    </SmallButton>
+                    <Toolbar ref={historyAnchor}>
+                        <SmallButton onClick={() => dispatch({type: "jump", index: 0})} disabled={history.index === 0}
+                                     title={t("popup.first")}>|◀
+                        </SmallButton>
+                        <SmallButton onClick={() => dispatch({type: "jump", index: history.index - 1})}
+                                     disabled={history.index === 0} title={t("popup.back")}>◀
+                        </SmallButton>
+                        <SmallButton onClick={() => setHistoryMenuOpen((open) => !open)}
+                                     title={t("popup.history")}>▾</SmallButton>
+                        <SmallButton onClick={() => dispatch({type: "jump", index: history.index + 1})}
+                                     disabled={history.index >= history.entries.length - 1}
+                                     title={t("popup.forward")}>▶
+                        </SmallButton>
+                        <SmallButton onClick={() => dispatch({type: "jump", index: history.entries.length - 1})}
+                                     disabled={history.index >= history.entries.length - 1}
+                                     title={t("popup.last")}>▶|
+                        </SmallButton>
 
-                    {historyMenuOpen && (
-                        <DropdownMenu $stretch style={historyMenuStyle}>
-                            {history.entries.map((entry, index) => (
-                                <DropdownItem
-                                    key={`${index}-${entry}`}
-                                    $mono
-                                    $active={index === history.index}
-                                    onClick={() => {
-                                        dispatch({type: "jump", index});
-                                        setHistoryMenuOpen(false);
-                                    }}
-                                >
-                                    {entry}
-                                </DropdownItem>
-                            ))}
-                        </DropdownMenu>
-                    )}
-                </Toolbar>
+                        {historyMenuOpen && (
+                            <DropdownMenu $stretch style={historyMenuStyle}>
+                                {history.entries.map((entry, index) => (
+                                    <DropdownItem
+                                        key={`${index}-${entry}`}
+                                        $mono
+                                        $active={index === history.index}
+                                        onClick={() => {
+                                            dispatch({type: "jump", index});
+                                            setHistoryMenuOpen(false);
+                                        }}
+                                    >
+                                        {entry}
+                                    </DropdownItem>
+                                ))}
+                            </DropdownMenu>
+                        )}
+                    </Toolbar>
                 )}
 
                 <Actions>
@@ -973,7 +973,7 @@ export const PopupPage: React.FC = () => {
                     )}
 
                     <StatusPill $tone={tone} onClick={handleCheckStatus} disabled={statusBusy}
-                                 title={t("popup.checkStatus")}>
+                                title={t("popup.checkStatus")}>
                         <StatusIcon size={13}/>
                         <span>{statusText}</span>
                     </StatusPill>

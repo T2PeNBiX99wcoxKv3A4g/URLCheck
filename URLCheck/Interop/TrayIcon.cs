@@ -42,9 +42,9 @@ internal sealed class TrayIcon(
     private const int MenuExit = 3;
     private const int IdiApplication = 32512;
     private readonly string _className = $"URLCheck.TrayIcon.{Guid.NewGuid():N}";
+    private IntPtr _hIcon = IntPtr.Zero;
 
     private IntPtr _hwnd = IntPtr.Zero;
-    private IntPtr _hIcon = IntPtr.Zero;
     private uint _taskbarCreatedMessage;
 
     private Thread? _thread;

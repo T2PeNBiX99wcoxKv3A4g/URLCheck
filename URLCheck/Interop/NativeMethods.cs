@@ -29,6 +29,29 @@ internal static partial class NativeMethods
     public const uint SwpNoZOrder = 0x0004;
     public const uint SwpNoActivate = 0x0010;
     public const uint SwpShowWindow = 0x0040;
+
+    // ---- Clipboard ----
+
+    public const uint WmClipboardUpdate = 0x031D;
+    public const uint CfUnicodeText = 13;
+
+
+    // ---- Pointer state and monitor work area ----
+
+    public const int VkLButton = 0x01;
+    public const int VkRButton = 0x02;
+    public const int VkMButton = 0x04;
+    public const uint MonitorDefaultToNearest = 2;
+
+    // ---- DWM (rounded corners) ----
+
+    public const int DwmwaWindowCornerPreference = 33;
+    public const int DwmwcpRound = 2;
+
+    public const uint ImageIcon = 1;
+    public const uint LrLoadFromFile = 0x0010;
+    public const int SmCxSmIcon = 49;
+    public const int SmCySmIcon = 50;
     public static readonly IntPtr HwndTopMost = new(-1);
 
     [LibraryImport("user32.dll", EntryPoint = "ShowWindow")]
@@ -43,11 +66,6 @@ internal static partial class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy,
         uint uFlags);
-
-    // ---- Clipboard ----
-
-    public const uint WmClipboardUpdate = 0x031D;
-    public const uint CfUnicodeText = 13;
 
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -102,14 +120,6 @@ internal static partial class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool GetClientRect(IntPtr hWnd, out Rect rect);
 
-
-    // ---- Pointer state and monitor work area ----
-
-    public const int VkLButton = 0x01;
-    public const int VkRButton = 0x02;
-    public const int VkMButton = 0x04;
-    public const uint MonitorDefaultToNearest = 2;
-
     [LibraryImport("user32.dll")]
     public static partial short GetAsyncKeyState(int vKey);
 
@@ -119,11 +129,6 @@ internal static partial class NativeMethods
     [LibraryImport("user32.dll", EntryPoint = "GetMonitorInfoW", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfo lpmi);
-
-    // ---- DWM (rounded corners) ----
-
-    public const int DwmwaWindowCornerPreference = 33;
-    public const int DwmwcpRound = 2;
 
     [LibraryImport("dwmapi.dll")]
     public static partial int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
@@ -184,11 +189,6 @@ internal static partial class NativeMethods
 
     [LibraryImport("user32.dll", EntryPoint = "LoadIconW")]
     public static partial IntPtr LoadIcon(IntPtr hInstance, IntPtr lpIconName);
-
-    public const uint ImageIcon = 1;
-    public const uint LrLoadFromFile = 0x0010;
-    public const int SmCxSmIcon = 49;
-    public const int SmCySmIcon = 50;
 
     [LibraryImport("user32.dll", EntryPoint = "LoadImageW", StringMarshalling = StringMarshalling.Utf16,
         SetLastError = true)]

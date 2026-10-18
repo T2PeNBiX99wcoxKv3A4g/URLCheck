@@ -141,6 +141,7 @@ Error generating stack: `+e.message+`
     }
 
     /* Starting value for the accent bar so it slides in instead of popping. */
+
     td:first-child {
         box-shadow: inset 0 0 0 0 rgba(96, 165, 250, 0);
     }
@@ -249,6 +250,7 @@ Error generating stack: `+e.message+`
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 
     /* Gradients cannot be interpolated, so the hover motion lives in the glow and lift. */
+
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
         box-shadow: 0 0 28px rgba(99, 102, 241, 0.55);
@@ -433,7 +435,6 @@ Error generating stack: `+e.message+`
         color: #f9fafb;
         font-size: 0.875rem;
     `}
-
     &:hover:not(:disabled) {
         ${e=>e.$variant===`compact`?`background: rgba(255, 255, 255, 0.12); color: #f9fafb;`:`border-color: rgba(255, 255, 255, 0.24);`}
     }
@@ -457,550 +458,550 @@ Error generating stack: `+e.message+`
     opacity: 0.75;
     transition: transform 0.18s ease;
     transform: rotate(${e=>e.$open?`180deg`:`0`});
-`,Hi=({value:e,options:t,onChange:n,variant:r=`compact`,up:i,disabled:a,title:o})=>{let[s,c]=(0,_.useState)(!1),l=(0,_.useRef)(null),u=Ri(s,i,l);(0,_.useEffect)(()=>{if(!s)return;let e=e=>{l.current?.contains(e.target)||c(!1)},t=e=>{e.key===`Escape`&&c(!1)};return document.addEventListener(`mousedown`,e),document.addEventListener(`keydown`,t),()=>{document.removeEventListener(`mousedown`,e),document.removeEventListener(`keydown`,t)}},[s]);let d=t.find(t=>t.value===e)?.label??e;return(0,L.jsxs)(Li,{ref:l,children:[(0,L.jsxs)(zi,{type:`button`,$variant:r,disabled:a,title:o,"aria-haspopup":`listbox`,"aria-expanded":s,onClick:()=>c(e=>!e),children:[(0,L.jsx)(Bi,{children:d}),(0,L.jsx)(Vi,{$open:s,children:`▾`})]}),s&&(0,L.jsx)(Fi,{$up:i,role:`listbox`,style:u,children:t.map(t=>(0,L.jsx)(Ii,{type:`button`,role:`option`,"aria-selected":t.value===e,$active:t.value===e,onClick:()=>{c(!1),n(t.value)},children:t.label},t.value))})]})},Ui={requestTimeoutMs:5e3,userAgents:[{id:`default`,name:`Default (URLCheck)`,value:`URLCheck Desktop Agent/1.0`},{id:`chrome`,name:`Chrome (Windows)`,value:`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36`},{id:`safari`,name:`Safari (macOS)`,value:`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15`},{id:`curl`,name:`cURL`,value:`curl/8.4.0`},{id:`bot`,name:`Googlebot`,value:`Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)`}],browsers:[],language:`en`,borderlessPopup:!0,autoStripTrackingParams:!0,hideOnLaunch:!1,showUrlButton:!0,selectedUserAgentId:`default`},Wi=`urlcheck.settings`;function Gi(e,t,n){return Math.min(Math.max(e,t),n)}function Ki(e){let t=Array.isArray(e.userAgents)&&e.userAgents.length>0?e.userAgents:Ui.userAgents;return{...e,requestTimeoutMs:Gi(e.requestTimeoutMs,1e3,15e3),userAgents:t,selectedUserAgentId:t.some(t=>t.id===e.selectedUserAgentId)?e.selectedUserAgentId:t[0].id,browsers:(Array.isArray(e.browsers)?e.browsers:[]).map(e=>({...e,arguments:e.arguments??``,useCount:e.useCount??0})),language:e.language||Ui.language,borderlessPopup:e.borderlessPopup??Ui.borderlessPopup,autoStripTrackingParams:e.autoStripTrackingParams??Ui.autoStripTrackingParams,hideOnLaunch:e.hideOnLaunch??Ui.hideOnLaunch,showUrlButton:e.showUrlButton??Ui.showUrlButton}}function qi(){try{let e=window.localStorage.getItem(Wi);if(e)return Ki({...Ui,...JSON.parse(e)})}catch(e){console.warn(`[settings] Failed to read local settings:`,e)}return{...Ui}}async function Ji(){return R.available?await R.request(`settings.get`):{settings:qi(),settingsFilePath:`(browser localStorage)`}}async function Yi(e){let t=Ki(e);return R.available?await R.request(`settings.save`,t):(window.localStorage.setItem(Wi,JSON.stringify(t)),{settings:t,settingsFilePath:`(browser localStorage)`})}async function Xi(){return R.available?await R.request(`settings.reset`):(window.localStorage.removeItem(Wi),{settings:{...Ui},settingsFilePath:`(browser localStorage)`})}async function Zi(){return R.available?(await R.request(`browsers.detect`)).browsers??[]:[]}async function Qi(e,t,n=!1){R.available?await R.request(`popup.open`,{url:e,browserId:t,private:n}):window.open(e,`_blank`,`noopener,noreferrer`)}var $i={lists:[],builtinRuleCount:0};async function ea(){return R.available?await R.request(`filters.get`):$i}async function ta(e,t){return await R.request(`filters.add`,{name:e,url:t})}async function na(e){return await R.request(`filters.remove`,{id:e})}async function ra(e,t){return await R.request(`filters.setEnabled`,{id:e,enabled:t})}async function ia(e){return await R.request(`filters.update`,{id:e??``})}async function z(){return R.available?(await R.request(`filters.rules`)).rules:[]}var B=[{name:`AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_17_TrackParam/filter.txt`,descriptionKey:`filters.catalog.adguardUrlTracking`},{name:`uBlock Origin – AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt`,descriptionKey:`filters.catalog.uboUrlTracking`},{name:`ClearURLs`,url:`https://rules1.clearurls.xyz/data.minify.json`,descriptionKey:`filters.catalog.clearUrls`},{name:`Firefox – Query Parameter Stripping`,url:`https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/query-stripping/records`,descriptionKey:`filters.catalog.firefox`}],aa=`modulepreload`,oa=function(e){return`/`+e},sa={},ca=function(e){return e.pathname.endsWith(`.css`)},la=function(e,t,n){if(t in e)return e[t];let r=n();if(!r){e[t]=void 0;return}let i=r.then(()=>{e[t]=void 0},n=>{throw e[t]=void 0,n});return e[t]=i,i},ua=function(e,t,n){let r=Promise.resolve();if(t&&t.length>0){let e,i=document.querySelector(`meta[property=csp-nonce]`),a=i?.nonce||i?.getAttribute(`nonce`);function o(e){return Promise.all(e.map(e=>Promise.resolve(e).then(e=>({status:`fulfilled`,value:e}),e=>({status:`rejected`,reason:e}))))}function s(e){return import.meta.resolve?new URL(import.meta.resolve(e)):new URL(e,import.meta.url)}r=o(t.map(t=>{t=oa(t,n);let r=s(t),i=ca(r);return la(sa,r.href,()=>{if(e===void 0){e={all:new Set,styles:new Set};let t=document.getElementsByTagName(`link`);for(let n=t.length-1;n>=0;n--){let r=t[n];e.all.add(r.href),r.rel===`stylesheet`&&e.styles.add(r.href)}}if((i?e.styles:e.all).has(r.href))return;let t=document.createElement(`link`);if(t.rel=i?`stylesheet`:aa,i||(t.as=`script`),t.crossOrigin=``,t.href=r.href,a&&t.setAttribute(`nonce`,a),document.head.appendChild(t),i)return new Promise((e,n)=>{t.addEventListener(`load`,e),t.addEventListener(`error`,()=>n(Error(`Unable to preload CSS for ${r}`)))})})}).filter(e=>e!==void 0))}function i(e){let t=new Event(`vite:preloadError`,{cancelable:!0});if(t.payload=e,window.dispatchEvent(t),!t.defaultPrevented)throw e}return r.then(t=>{for(let e of t||[])e.status===`rejected`&&i(e.reason);return e().catch(i)})},da=_.lazy(()=>ua(()=>import(`./AttributionPage-BtuoLV9c.js`).then(e=>({default:e.AttributionPage})),[])),fa=I.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+`,Hi=({value:e,options:t,onChange:n,variant:r=`compact`,up:i,disabled:a,title:o})=>{let[s,c]=(0,_.useState)(!1),l=(0,_.useRef)(null),u=Ri(s,i,l);(0,_.useEffect)(()=>{if(!s)return;let e=e=>{l.current?.contains(e.target)||c(!1)},t=e=>{e.key===`Escape`&&c(!1)};return document.addEventListener(`mousedown`,e),document.addEventListener(`keydown`,t),()=>{document.removeEventListener(`mousedown`,e),document.removeEventListener(`keydown`,t)}},[s]);let d=t.find(t=>t.value===e)?.label??e;return(0,L.jsxs)(Li,{ref:l,children:[(0,L.jsxs)(zi,{type:`button`,$variant:r,disabled:a,title:o,"aria-haspopup":`listbox`,"aria-expanded":s,onClick:()=>c(e=>!e),children:[(0,L.jsx)(Bi,{children:d}),(0,L.jsx)(Vi,{$open:s,children:`▾`})]}),s&&(0,L.jsx)(Fi,{$up:i,role:`listbox`,style:u,children:t.map(t=>(0,L.jsx)(Ii,{type:`button`,role:`option`,"aria-selected":t.value===e,$active:t.value===e,onClick:()=>{c(!1),n(t.value)},children:t.label},t.value))})]})},Ui={requestTimeoutMs:5e3,userAgents:[{id:`default`,name:`Default (URLCheck)`,value:`URLCheck Desktop Agent/1.0`},{id:`chrome`,name:`Chrome (Windows)`,value:`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36`},{id:`safari`,name:`Safari (macOS)`,value:`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15`},{id:`curl`,name:`cURL`,value:`curl/8.4.0`},{id:`bot`,name:`Googlebot`,value:`Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)`}],browsers:[],language:`en`,borderlessPopup:!0,autoStripTrackingParams:!0,hideOnLaunch:!1,showUrlButton:!0,selectedUserAgentId:`default`},Wi=`urlcheck.settings`;function Gi(e,t,n){return Math.min(Math.max(e,t),n)}function Ki(e){let t=Array.isArray(e.userAgents)&&e.userAgents.length>0?e.userAgents:Ui.userAgents;return{...e,requestTimeoutMs:Gi(e.requestTimeoutMs,1e3,15e3),userAgents:t,selectedUserAgentId:t.some(t=>t.id===e.selectedUserAgentId)?e.selectedUserAgentId:t[0].id,browsers:(Array.isArray(e.browsers)?e.browsers:[]).map(e=>({...e,arguments:e.arguments??``,useCount:e.useCount??0})),language:e.language||Ui.language,borderlessPopup:e.borderlessPopup??Ui.borderlessPopup,autoStripTrackingParams:e.autoStripTrackingParams??Ui.autoStripTrackingParams,hideOnLaunch:e.hideOnLaunch??Ui.hideOnLaunch,showUrlButton:e.showUrlButton??Ui.showUrlButton}}function qi(){try{let e=window.localStorage.getItem(Wi);if(e)return Ki({...Ui,...JSON.parse(e)})}catch(e){console.warn(`[settings] Failed to read local settings:`,e)}return{...Ui}}async function Ji(){return R.available?await R.request(`settings.get`):{settings:qi(),settingsFilePath:`(browser localStorage)`}}async function Yi(e){let t=Ki(e);return R.available?await R.request(`settings.save`,t):(window.localStorage.setItem(Wi,JSON.stringify(t)),{settings:t,settingsFilePath:`(browser localStorage)`})}async function Xi(){return R.available?await R.request(`settings.reset`):(window.localStorage.removeItem(Wi),{settings:{...Ui},settingsFilePath:`(browser localStorage)`})}async function Zi(){return R.available?(await R.request(`browsers.detect`)).browsers??[]:[]}async function Qi(e,t,n=!1){R.available?await R.request(`popup.open`,{url:e,browserId:t,private:n}):window.open(e,`_blank`,`noopener,noreferrer`)}var $i={lists:[],builtinRuleCount:0};async function ea(){return R.available?await R.request(`filters.get`):$i}async function ta(e,t){return await R.request(`filters.add`,{name:e,url:t})}async function na(e){return await R.request(`filters.remove`,{id:e})}async function ra(e,t){return await R.request(`filters.setEnabled`,{id:e,enabled:t})}async function ia(e){return await R.request(`filters.update`,{id:e??``})}async function z(){return R.available?(await R.request(`filters.rules`)).rules:[]}var B=[{name:`AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_17_TrackParam/filter.txt`,descriptionKey:`filters.catalog.adguardUrlTracking`},{name:`uBlock Origin – AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt`,descriptionKey:`filters.catalog.uboUrlTracking`},{name:`ClearURLs`,url:`https://rules1.clearurls.xyz/data.minify.json`,descriptionKey:`filters.catalog.clearUrls`},{name:`Firefox – Query Parameter Stripping`,url:`https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/query-stripping/records`,descriptionKey:`filters.catalog.firefox`}],aa=`modulepreload`,oa=function(e){return`/`+e},sa={},ca=function(e){return e.pathname.endsWith(`.css`)},la=function(e,t,n){if(t in e)return e[t];let r=n();if(!r){e[t]=void 0;return}let i=r.then(()=>{e[t]=void 0},n=>{throw e[t]=void 0,n});return e[t]=i,i},ua=function(e,t,n){let r=Promise.resolve();if(t&&t.length>0){let e,i=document.querySelector(`meta[property=csp-nonce]`),a=i?.nonce||i?.getAttribute(`nonce`);function o(e){return Promise.all(e.map(e=>Promise.resolve(e).then(e=>({status:`fulfilled`,value:e}),e=>({status:`rejected`,reason:e}))))}function s(e){return import.meta.resolve?new URL(import.meta.resolve(e)):new URL(e,import.meta.url)}r=o(t.map(t=>{t=oa(t,n);let r=s(t),i=ca(r);return la(sa,r.href,()=>{if(e===void 0){e={all:new Set,styles:new Set};let t=document.getElementsByTagName(`link`);for(let n=t.length-1;n>=0;n--){let r=t[n];e.all.add(r.href),r.rel===`stylesheet`&&e.styles.add(r.href)}}if((i?e.styles:e.all).has(r.href))return;let t=document.createElement(`link`);if(t.rel=i?`stylesheet`:aa,i||(t.as=`script`),t.crossOrigin=``,t.href=r.href,a&&t.setAttribute(`nonce`,a),document.head.appendChild(t),i)return new Promise((e,n)=>{t.addEventListener(`load`,e),t.addEventListener(`error`,()=>n(Error(`Unable to preload CSS for ${r}`)))})})}).filter(e=>e!==void 0))}function i(e){let t=new Event(`vite:preloadError`,{cancelable:!0});if(t.payload=e,window.dispatchEvent(t),!t.defaultPrevented)throw e}return r.then(t=>{for(let e of t||[])e.status===`rejected`&&i(e.reason);return e().catch(i)})},da=_.lazy(()=>ua(()=>import(`./AttributionPage-Bt-boRS8.js`).then(e=>({default:e.AttributionPage})),[])),fa=I.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
 
-  @media (max-width: 640px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+    @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 `,pa=I.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 `,ma=I.span`
-  font-size: 0.925rem;
-  font-weight: 600;
-  color: #f9fafb;
-`,ha=I.span`
-  font-size: 0.8rem;
-  color: #9ca3af;
-`,ga=I.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 220px;
-
-  input {
-    flex: 1;
-    accent-color: #6366f1;
-    cursor: pointer;
-  }
-
-  input:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  span {
-    font-size: 0.85rem;
+    font-size: 0.925rem;
     font-weight: 600;
-    color: #60a5fa;
-    min-width: 50px;
-    text-align: right;
-    font-family: var(--font-mono);
-  }
+    color: #f9fafb;
+`,ha=I.span`
+    font-size: 0.8rem;
+    color: #9ca3af;
+`,ga=I.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 220px;
+
+    input {
+        flex: 1;
+        accent-color: #6366f1;
+        cursor: pointer;
+    }
+
+    input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    span {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #60a5fa;
+        min-width: 50px;
+        text-align: right;
+        font-family: var(--font-mono);
+    }
 `,_a=I.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  /* On a narrow window (or a high display scale) the buttons wrap instead of being clipped. */
-  flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    /* On a narrow window (or a high display scale) the buttons wrap instead of being clipped. */
+    flex-wrap: wrap;
 `,va=I.button`
-  padding: 10px 24px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  /* Keep the label on one line and let the row wrap rather than squeezing the button. */
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    /* Keep the label on one line and let the row wrap rather than squeezing the button. */
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
 
-  &:active:not(:disabled) {
-    transform: translateY(1px);
-  }
+    &:active:not(:disabled) {
+        transform: translateY(1px);
+    }
 
-  &:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
+    &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
 `,ya=I(va)`
-  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
-  color: #ffffff;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 
-  &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
-    box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
-  }
+    &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+        box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
+    }
 `,ba=Ln`
-  background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
 
-  &:hover:not(:disabled) {
-    background: rgba(239, 68, 68, 0.24);
-    color: #fca5a5;
-    border-color: rgba(239, 68, 68, 0.5);
-  }
+    &:hover:not(:disabled) {
+        background: rgba(239, 68, 68, 0.24);
+        color: #fca5a5;
+        border-color: rgba(239, 68, 68, 0.5);
+    }
 `,xa=I(va)`
-  ${ba}
+    ${ba}
 `,Sa=I(va)`
-  ${ba}
-  overflow: hidden;
-  transform-origin: left center;
+    ${ba}
+    overflow: hidden;
+    transform-origin: left center;
 
-  &:disabled {
-    opacity: ${e=>e.$visible?.55:0};
-  }
+    &:disabled {
+        opacity: ${e=>e.$visible?.55:0};
+    }
 
-  max-width: ${e=>e.$visible?`240px`:`0`};
-  padding: ${e=>e.$visible?`10px 24px`:`0`};
-  border-width: ${e=>e.$visible?`1px`:`0`};
-  /* Collapsed, the item still sits between two 12px gaps; cancel one so the pair looks like one. */
-  margin-left: ${e=>e.$visible?`0`:`-12px`};
-  opacity: ${e=>+!!e.$visible};
-  transform: ${e=>e.$visible?`translateX(0)`:`translateX(-8px)`};
-  pointer-events: ${e=>e.$visible?`auto`:`none`};
-  transition: max-width 0.28s ease, padding 0.28s ease, border-width 0.28s ease,
+    max-width: ${e=>e.$visible?`240px`:`0`};
+    padding: ${e=>e.$visible?`10px 24px`:`0`};
+    border-width: ${e=>e.$visible?`1px`:`0`};
+    /* Collapsed, the item still sits between two 12px gaps; cancel one so the pair looks like one. */
+    margin-left: ${e=>e.$visible?`0`:`-12px`};
+    opacity: ${e=>+!!e.$visible};
+    transform: ${e=>e.$visible?`translateX(0)`:`translateX(-8px)`};
+    pointer-events: ${e=>e.$visible?`auto`:`none`};
+    transition: max-width 0.28s ease, padding 0.28s ease, border-width 0.28s ease,
     margin-left 0.28s ease, opacity 0.28s ease, transform 0.28s ease, background 0.15s ease,
     color 0.15s ease, border-color 0.15s ease;
 `,Ca=I.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #34d399;
-  font-size: 0.85rem;
-  font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #34d399;
+    font-size: 0.85rem;
+    font-weight: 500;
 `,wa=I.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #f87171;
-  font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    font-size: 0.85rem;
 `,Ta=I.div`
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow: hidden;
-  border-radius: 10px;
-  border: solid rgba(251, 191, 36, 0.35);
-  background: rgba(30, 27, 17, 0.92);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  color: #fbbf24;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transform-origin: top;
-  transition: opacity 0.28s ease, transform 0.28s ease, max-height 0.28s ease,
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+    border-radius: 10px;
+    border: solid rgba(251, 191, 36, 0.35);
+    background: rgba(30, 27, 17, 0.92);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    color: #fbbf24;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transform-origin: top;
+    transition: opacity 0.28s ease, transform 0.28s ease, max-height 0.28s ease,
     padding 0.28s ease, border-width 0.28s ease, margin-bottom 0.28s ease;
 
-  max-height: ${e=>e.$visible?`120px`:`0`};
-  opacity: ${e=>+!!e.$visible};
-  transform: ${e=>e.$visible?`translateY(0)`:`translateY(-8px)`};
-  padding: ${e=>e.$visible?`10px 16px`:`0 16px`};
-  border-width: ${e=>e.$visible?`1px`:`0`};
-  margin-bottom: ${e=>e.$visible?`0`:`-24px`};
-  pointer-events: ${e=>e.$visible?`auto`:`none`};
+    max-height: ${e=>e.$visible?`120px`:`0`};
+    opacity: ${e=>+!!e.$visible};
+    transform: ${e=>e.$visible?`translateY(0)`:`translateY(-8px)`};
+    padding: ${e=>e.$visible?`10px 16px`:`0 16px`};
+    border-width: ${e=>e.$visible?`1px`:`0`};
+    margin-bottom: ${e=>e.$visible?`0`:`-24px`};
+    pointer-events: ${e=>e.$visible?`auto`:`none`};
 `,Ea=I.span`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #fbbf24;
-  flex-shrink: 0;
-  animation: unsavedPulse 1.8s ease-out infinite;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fbbf24;
+    flex-shrink: 0;
+    animation: unsavedPulse 1.8s ease-out infinite;
 
-  @keyframes unsavedPulse {
-    0% {
-      box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.5);
+    @keyframes unsavedPulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.5);
+        }
+        70% {
+            box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+        }
     }
-    70% {
-      box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
-    }
-  }
 `,Da=I.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.75rem;
-  color: #6b7280;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: #6b7280;
 
-  code {
+    code {
+        color: #9ca3af;
+        font-family: var(--font-mono);
+        word-break: break-all;
+    }
+`,Oa=I.button`
+    align-self: flex-start;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #6b7280;
+    font-size: 0.78rem;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+
+    &:hover {
+        color: #9ca3af;
+    }
+`,ka=I.div`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+`,Aa=I.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`,V=I.input`
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.75);
+    color: #f9fafb;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+        border-color: #3b82f6;
+        background: rgba(15, 23, 42, 0.95);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+
+    &.name {
+        width: 150px;
+        flex-shrink: 0;
+    }
+
+    &.path {
+        flex: 1;
+        font-family: var(--font-mono);
+    }
+
+    &.args {
+        flex: 0 0 160px;
+        font-family: var(--font-mono);
+    }
+`,ja=I.button`
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    color: #d1d5db;
+    font-weight: 500;
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+    &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.12);
+        color: #f9fafb;
+    }
+
+    &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+`,Ma=I(ja)`
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+
+    &:hover:not(:disabled) {
+        background: rgba(239, 68, 68, 0.24);
+        color: #fca5a5;
+    }
+`,Na=I.button`
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    padding: 6px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+        color: #f87171;
+        background: rgba(239, 68, 68, 0.12);
+        transform: scale(1.08);
+    }
+
+    &:active {
+        transform: scale(0.94);
+    }
+`,Pa=I.div`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+`,Fa=I.span`
+    font-size: 0.78rem;
     color: #9ca3af;
+`,Ia=I.div`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: #fbbf24;
+`,La=I.input.attrs({type:`checkbox`})`
+    /* A fixed size: as a flex item it would otherwise be squeezed by however long the label is. */
+    flex: none;
+    width: 18px;
+    height: 18px;
+    accent-color: #6366f1;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.2s ease;
+
+    &:hover:not(:disabled) {
+        transform: scale(1.12);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+`,Ra=I.div`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+`,za=I.div`
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.5);
+    transition: border-color 0.2s ease, background 0.2s ease;
+
+    &:hover {
+        border-color: rgba(255, 255, 255, 0.16);
+        background: rgba(15, 23, 42, 0.72);
+    }
+`,Ba=I.div`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+`,Va=I.span`
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f9fafb;
+    word-break: break-word;
+`,Ha=I.span`
+    font-size: 0.75rem;
+    color: #6b7280;
     font-family: var(--font-mono);
     word-break: break-all;
-  }
-`,Oa=I.button`
-  align-self: flex-start;
-  padding: 0;
-  border: none;
-  background: none;
-  color: #6b7280;
-  font-size: 0.78rem;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color 0.15s ease;
-
-  &:hover {
-    color: #9ca3af;
-  }
-`,ka=I.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`,Aa=I.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`,V=I.input`
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(15, 23, 42, 0.75);
-  color: #f9fafb;
-  font-size: 0.82rem;
-  outline: none;
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-
-  &:focus {
-    border-color: #3b82f6;
-    background: rgba(15, 23, 42, 0.95);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-  }
-
-  &.name {
-    width: 150px;
-    flex-shrink: 0;
-  }
-
-  &.path {
-    flex: 1;
-    font-family: var(--font-mono);
-  }
-
-  &.args {
-    flex: 0 0 160px;
-    font-family: var(--font-mono);
-  }
-`,ja=I.button`
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
-  color: #d1d5db;
-  font-weight: 500;
-  font-size: 0.82rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-
-  &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.12);
-    color: #f9fafb;
-  }
-
-  &:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
-`,Ma=I(ja)`
-  border-color: rgba(239, 68, 68, 0.35);
-  background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
-
-  &:hover:not(:disabled) {
-    background: rgba(239, 68, 68, 0.24);
-    color: #fca5a5;
-  }
-`,Na=I.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-  padding: 6px;
-  border-radius: 6px;
-  flex-shrink: 0;
-  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
-
-  &:hover {
-    color: #f87171;
-    background: rgba(239, 68, 68, 0.12);
-    transform: scale(1.08);
-  }
-
-  &:active {
-    transform: scale(0.94);
-  }
-`,Pa=I.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-`,Fa=I.span`
-  font-size: 0.78rem;
-  color: #9ca3af;
-`,Ia=I.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.78rem;
-  line-height: 1.4;
-  color: #fbbf24;
-`,La=I.input.attrs({type:`checkbox`})`
-  /* A fixed size: as a flex item it would otherwise be squeezed by however long the label is. */
-  flex: none;
-  width: 18px;
-  height: 18px;
-  accent-color: #6366f1;
-  cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.2s ease;
-
-  &:hover:not(:disabled) {
-    transform: scale(1.12);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`,Ra=I.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`,za=I.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  background: rgba(15, 23, 42, 0.5);
-  transition: border-color 0.2s ease, background 0.2s ease;
-
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.16);
-    background: rgba(15, 23, 42, 0.72);
-  }
-`,Ba=I.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-  min-width: 0;
-`,Va=I.span`
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #f9fafb;
-  word-break: break-word;
-`,Ha=I.span`
-  font-size: 0.75rem;
-  color: #6b7280;
-  font-family: var(--font-mono);
-  word-break: break-all;
 `,Ua=I.span`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-size: 0.75rem;
-  color: #9ca3af;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: #9ca3af;
 `,Wa=I.span`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  color: #f87171;
-  word-break: break-word;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: #f87171;
+    word-break: break-word;
 `,Ga=I.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
 `,Ka=I.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #34d399;
-`,qa=I.button`
-  position: relative;
-  width: 38px;
-  height: 22px;
-  padding: 0;
-  flex-shrink: 0;
-  border-radius: 999px;
-  border: 1px solid ${e=>e.$on?`#6366f1`:`rgba(255, 255, 255, 0.15)`};
-  background: ${e=>e.$on?`#6366f1`:`rgba(255, 255, 255, 0.06)`};
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 2px;
-    left: ${e=>e.$on?`18px`:`2px`};
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: ${e=>e.$on?`#ffffff`:`#9ca3af`};
-    transition: left 0.2s ease, background 0.2s ease;
-  }
-
-  &:hover:not(:disabled) {
-    background: ${e=>e.$on?`#4f46e5`:`rgba(255, 255, 255, 0.12)`};
-    border-color: ${e=>e.$on?`#4f46e5`:`rgba(255, 255, 255, 0.24)`};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`,Ja=I.div`
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(3, 7, 18, 0.72);
-  backdrop-filter: blur(4px);
-  animation: overlayIn 0.2s ease;
-
-  @keyframes overlayIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-`,Ya=I.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;
-  max-width: 560px;
-  max-height: 100%;
-  overflow-y: auto;
-  padding: 22px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #111827;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
-  animation: dialogIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-
-  @keyframes dialogIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px) scale(0.98);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-`,Xa=I.h3`
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #f9fafb;
-`,Za=I.div`
-  display: flex;
-  gap: 6px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-`,Qa=I.button`
-  padding: 8px 14px;
-  border: none;
-  border-radius: 8px;
-  background: ${e=>e.$active?`rgba(59, 130, 246, 0.18)`:`transparent`};
-  color: ${e=>e.$active?`#93c5fd`:`#9ca3af`};
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-
-  &:hover {
-    background: ${e=>e.$active?`rgba(59, 130, 246, 0.24)`:`rgba(255, 255, 255, 0.06)`};
-    color: #f9fafb;
-  }
-`,$a=I.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 320px;
-  overflow-y: auto;
-  padding-right: 4px;
-`,eo=I.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(15, 23, 42, 0.6);
-`,to=I.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-`,no=I.span`
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #f9fafb;
-`,ro=I.span`
-  font-size: 0.78rem;
-  line-height: 1.5;
-  color: #9ca3af;
-`,io=I.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(59, 130, 246, 0.25);
-  background: rgba(59, 130, 246, 0.08);
-  font-size: 0.78rem;
-  line-height: 1.55;
-  color: #cbd5e1;
-
-  strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: #93c5fd;
-  }
+    color: #34d399;
+`,qa=I.button`
+    position: relative;
+    width: 38px;
+    height: 22px;
+    padding: 0;
+    flex-shrink: 0;
+    border-radius: 999px;
+    border: 1px solid ${e=>e.$on?`#6366f1`:`rgba(255, 255, 255, 0.15)`};
+    background: ${e=>e.$on?`#6366f1`:`rgba(255, 255, 255, 0.06)`};
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: ${e=>e.$on?`18px`:`2px`};
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: ${e=>e.$on?`#ffffff`:`#9ca3af`};
+        transition: left 0.2s ease, background 0.2s ease;
+    }
+
+    &:hover:not(:disabled) {
+        background: ${e=>e.$on?`#4f46e5`:`rgba(255, 255, 255, 0.12)`};
+        border-color: ${e=>e.$on?`#4f46e5`:`rgba(255, 255, 255, 0.24)`};
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+`,Ja=I.div`
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(3, 7, 18, 0.72);
+    backdrop-filter: blur(4px);
+    animation: overlayIn 0.2s ease;
+
+    @keyframes overlayIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+`,Ya=I.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 22px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #111827;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    animation: dialogIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+
+    @keyframes dialogIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+`,Xa=I.h3`
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #f9fafb;
+`,Za=I.div`
+    display: flex;
+    gap: 6px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+`,Qa=I.button`
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: ${e=>e.$active?`rgba(59, 130, 246, 0.18)`:`transparent`};
+    color: ${e=>e.$active?`#93c5fd`:`#9ca3af`};
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: ${e=>e.$active?`rgba(59, 130, 246, 0.24)`:`rgba(255, 255, 255, 0.06)`};
+        color: #f9fafb;
+    }
+`,$a=I.div`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 4px;
+`,eo=I.div`
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.6);
+`,to=I.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+`,no=I.span`
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #f9fafb;
+`,ro=I.span`
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: #9ca3af;
+`,io=I.div`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    background: rgba(59, 130, 246, 0.08);
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: #cbd5e1;
+
+    strong {
+        font-weight: 600;
+        color: #93c5fd;
+    }
 `,ao=I.label`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.8rem;
-  color: #9ca3af;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #9ca3af;
 `,oo=I(V)`
-  width: 100%;
+    width: 100%;
 `,so={en:`English`,"zh-TW":`繁體中文`,"zh-CN":`简体中文`,ja:`日本語`},co=[{id:`home`,labelKey:`tabs.home.label`,titleKey:`tabs.home.title`,subtitleKey:`tabs.home.subtitle`,icon:dr,page:Mi},{id:`history`,labelKey:`tabs.history.label`,titleKey:`tabs.history.title`,subtitleKey:`tabs.history.subtitle`,icon:fr,page:pi},{id:`settings`,labelKey:`tabs.settings.label`,titleKey:`tabs.settings.title`,subtitleKey:`tabs.settings.subtitle`,icon:pr,page:()=>{let e=zr(),t=Br(),[n,r]=(0,_.useState)(Ui),[i,a]=(0,_.useState)(Ui),[o,s]=(0,_.useState)(``),[c,l]=(0,_.useState)([]),[u,d]=(0,_.useState)(!0),[f,p]=(0,_.useState)(!1),[m,h]=(0,_.useState)(!1),[g,v]=(0,_.useState)(null),[y,b]=(0,_.useState)(!1),[x,S]=(0,_.useState)(!1),[C,ee]=(0,_.useState)(null),[w,te]=(0,_.useState)(null),[T,ne]=(0,_.useState)(`windows`),[re,ie]=(0,_.useState)([]),[ae,oe]=(0,_.useState)(0),[se,ce]=(0,_.useState)(!1),[E,le]=(0,_.useState)(!1),[D,ue]=(0,_.useState)(`catalog`),[de,O]=(0,_.useState)(``),[fe,pe]=(0,_.useState)(``),[me,he]=(0,_.useState)(!1),[ge,_e]=(0,_.useState)(!1),[k,A]=(0,_.useState)(null),[ve,ye]=(0,_.useState)(!1);(0,_.useEffect)(()=>{Xr().then(te).catch(()=>te(null))},[]),(0,_.useEffect)(()=>{ti().then(e=>ne(e.platform)).catch(()=>void 0)},[]),(0,_.useEffect)(()=>{Zr().then(A).catch(()=>A(null))},[]),(0,_.useEffect)(()=>{Fr().then(e=>l(e.available)).catch(()=>l([]))},[]),(0,_.useEffect)(()=>{let e=!1;return ea().then(t=>{e||j(t)}).catch(()=>void 0),()=>{e=!0}},[]);let j=e=>{ie(e.lists),oe(e.builtinRuleCount)},M=e=>re.some(t=>t.url.trim().toLowerCase()===e.trim().toLowerCase()),be=e=>{r(e.settings),a(e.settings),s(e.settingsFilePath)};(0,_.useEffect)(()=>{let e=!1;return(async()=>{try{let t=await Ji();if(e)return;be(t),v(null)}catch(t){if(e)return;v(t instanceof Error?t.message:String(t))}finally{e||d(!1)}})(),()=>{e=!0}},[]),(0,_.useEffect)(()=>R.on(e=>{let t=e;t.type===`settings.changed`&&t.data&&be(t.data)}),[]);let xe=e=>{r(t=>({...t,...e}))},Se=()=>{h(!0),setTimeout(()=>h(!1),2500)},Ce=async()=>{p(!0),v(null);try{let e=await Yi(n);be(e),Se()}catch(e){v(e instanceof Error?e.message:String(e))}finally{p(!1)}},we=()=>{r(i),v(null)},N=async()=>{p(!0),v(null);try{let e=await Xi();be(e),Se()}catch(e){v(e instanceof Error?e.message:String(e))}finally{p(!1)}},P=u||f,Te=(0,_.useMemo)(()=>!u&&JSON.stringify(n)!==JSON.stringify(i),[n,i,u]),Ee=(e,t)=>{r(n=>({...n,browsers:n.browsers.map(n=>n.id===e?{...n,...t}:n)}))},De=()=>{let e=Math.random().toString(36).slice(2,10);r(t=>({...t,browsers:[...t.browsers,{id:e,name:``,executablePath:``,arguments:``,useCount:0}]}))},Oe=e=>{r(t=>({...t,browsers:t.browsers.filter(t=>t.id!==e)}))},ke=(e,t)=>{r(n=>({...n,userAgents:n.userAgents.map(n=>n.id===e?{...n,...t}:n)}))},Ae=()=>{let e=Math.random().toString(36).slice(2,10);r(t=>({...t,userAgents:[...t.userAgents,{id:e,name:`Custom`,value:``}]}))},je=e=>{r(t=>({...t,userAgents:t.userAgents.filter(t=>t.id!==e)}))},Me=async()=>{b(!0),v(null);try{let e=await Zi();r(t=>{let n=new Set(t.browsers.map(e=>e.executablePath.toLowerCase())),r=e.filter(e=>!n.has(e.executablePath.toLowerCase()));return{...t,browsers:[...t.browsers,...r]}}),e.length===0&&ee({key:`settings.noBrowsersDetected`})}catch(e){v(e instanceof Error?e.message:String(e))}finally{b(!1)}},Ne=async()=>{S(!0),ee(null);try{let e=await qr();ee({key:`settings.registeredHttp`,params:{path:e.executablePath}}),te(await Xr())}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},Pe=async()=>{S(!0),ee(null);try{let e=await Jr();ee({key:`settings.registeredUrlcheck`,params:{path:e.executablePath}}),te(await Xr())}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},Fe=async()=>{S(!0),ee(null);try{await Yr(),ee({key:`settings.unregistered`}),te(await Xr())}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},Ie=async()=>{S(!0);try{await $r(),ee({key:`settings.openedDefaultApps`})}catch(e){v(e instanceof Error?e.message:String(e))}finally{S(!1)}},Le=async e=>{let t={...n,language:e};r(t),v(null);try{let e=await Yi(t);be(e)}catch(e){v(e instanceof Error?e.message:String(e))}},Re=async(e,t)=>{t(!0),v(null);try{return j(await e()),!0}catch(e){return v(e instanceof Error?e.message:String(e)),!1}finally{t(!1)}},ze=async(e,t)=>{await Re(()=>ta(e,t),he)&&(O(``),pe(``))},Be=e=>Re(()=>na(e),ce),Ve=(e,t)=>Re(()=>ra(e,t),ce),He=()=>Re(()=>ia(),ce),Ue=async e=>{ye(!0),v(null);try{A(await Qr(e))}catch(e){v(e instanceof Error?e.message:String(e))}finally{ye(!1)}};return(0,L.jsxs)(Cr,{$maxWidth:800,children:[(0,L.jsxs)(Ta,{$visible:Te,children:[(0,L.jsx)(Ea,{}),(0,L.jsx)(`span`,{children:e(`settings.unsaved`)})]}),g&&(0,L.jsxs)(wa,{children:[(0,L.jsx)(hr,{size:16}),(0,L.jsx)(`span`,{children:e(g)})]}),(0,L.jsxs)(Tr,{children:[(0,L.jsx)(Er,{children:e(`settings.network`)}),(0,L.jsxs)(fa,{children:[(0,L.jsxs)(pa,{children:[(0,L.jsx)(ma,{children:e(`settings.requestTimeout`)}),(0,L.jsx)(ha,{children:e(`settings.requestTimeoutDescription`)})]}),(0,L.jsxs)(ga,{children:[(0,L.jsx)(`input`,{type:`range`,min:`1000`,max:`15000`,step:`500`,disabled:P,value:n.requestTimeoutMs,onChange:e=>xe({requestTimeoutMs:Number(e.target.value)})}),(0,L.jsxs)(`span`,{children:[n.requestTimeoutMs/1e3,`s`]})]})]}),(0,L.jsxs)(fa,{children:[(0,L.jsxs)(pa,{children:[(0,L.jsx)(ma,{children:e(`settings.language`)}),(0,L.jsx)(ha,{children:e(`settings.languageDescription`)})]}),(0,L.jsx)(Hi,{variant:`form`,disabled:P||c.length===0,value:n.language,options:c.map(e=>({value:e,label:so[e]??e})),onChange:Le})]}),(0,L.jsxs)(fa,{children:[(0,L.jsxs)(pa,{children:[(0,L.jsx)(ma,{children:e(`settings.borderlessPopup`)}),(0,L.jsx)(ha,{children:e(`settings.borderlessPopupDescription`)})]}),(0,L.jsx)(La,{disabled:P,checked:n.borderlessPopup,onChange:e=>xe({borderlessPopup:e.target.checked})})]}),(0,L.jsxs)(fa,{children:[(0,L.jsxs)(pa,{children:[(0,L.jsx)(ma,{children:e(`settings.autoStripTracking`)}),(0,L.jsx)(ha,{children:e(`settings.autoStripTrackingDescription`)})]}),(0,L.jsx)(La,{disabled:P,checked:n.autoStripTrackingParams,onChange:e=>xe({autoStripTrackingParams:e.target.checked})})]}),(0,L.jsxs)(fa,{children:[(0,L.jsxs)(pa,{children:[(0,L.jsx)(ma,{children:e(`settings.showUrlButton`)}),(0,L.jsx)(ha,{children:e(`settings.showUrlButtonDescription`)})]}),(0,L.jsx)(La,{disabled:P,checked:n.showUrlButton,onChange:e=>xe({showUrlButton:e.target.checked})})]})]}),(0,L.jsxs)(Tr,{children:[(0,L.jsx)(Er,{children:e(`settings.userAgent`)}),(0,L.jsx)(pa,{children:(0,L.jsx)(ha,{children:e(`settings.userAgentDescription`)})}),(0,L.jsxs)(fa,{children:[(0,L.jsx)(pa,{children:(0,L.jsx)(ma,{children:e(`settings.userAgentDefault`)})}),(0,L.jsx)(Hi,{variant:`form`,disabled:P||n.userAgents.length===0,value:n.selectedUserAgentId,options:n.userAgents.map(e=>({value:e.id,label:e.name})),onChange:e=>xe({selectedUserAgentId:e})})]}),(0,L.jsx)(ka,{children:n.userAgents.map(t=>(0,L.jsxs)(Aa,{children:[(0,L.jsx)(V,{className:`name`,placeholder:e(`settings.browserNamePlaceholder`),disabled:P,value:t.name,onChange:e=>ke(t.id,{name:e.target.value})}),(0,L.jsx)(V,{className:`path`,placeholder:e(`settings.userAgentValuePlaceholder`),disabled:P,value:t.value,onChange:e=>ke(t.id,{value:e.target.value})}),(0,L.jsx)(Na,{type:`button`,title:e(`settings.removeUserAgent`),onClick:()=>je(t.id),children:(0,L.jsx)(Sr,{size:16})})]},t.id))}),(0,L.jsx)(Pa,{children:(0,L.jsx)(ja,{type:`button`,onClick:Ae,disabled:P,children:e(`settings.addUserAgent`)})})]}),(0,L.jsxs)(Tr,{children:[(0,L.jsx)(Er,{children:e(`settings.browsers`)}),(0,L.jsx)(pa,{children:(0,L.jsx)(ha,{children:e(`settings.browsersDescription`)})}),(0,L.jsx)(ka,{children:n.browsers.map(t=>(0,L.jsxs)(Aa,{children:[(0,L.jsx)(V,{className:`name`,placeholder:e(`settings.browserNamePlaceholder`),disabled:P,value:t.name,onChange:e=>Ee(t.id,{name:e.target.value})}),(0,L.jsx)(V,{className:`path`,placeholder:e(`settings.browserPathPlaceholder`),disabled:P,value:t.executablePath,onChange:e=>Ee(t.id,{executablePath:e.target.value})}),(0,L.jsx)(V,{className:`args`,placeholder:e(`settings.browserArgsPlaceholder`),title:e(`settings.browserArgsTitle`),disabled:P,value:t.arguments,onChange:e=>Ee(t.id,{arguments:e.target.value})}),(0,L.jsx)(Na,{type:`button`,title:e(`settings.removeBrowser`),onClick:()=>Oe(t.id),children:(0,L.jsx)(Sr,{size:16})})]},t.id))}),(0,L.jsxs)(Pa,{children:[(0,L.jsx)(ja,{type:`button`,onClick:De,disabled:P,children:e(`settings.addBrowser`)}),(0,L.jsx)(ja,{type:`button`,onClick:Me,disabled:P||y,children:e(y?`settings.detecting`:`settings.detectInstalled`)})]})]}),(0,L.jsxs)(Tr,{children:[(0,L.jsx)(Er,{children:e(`settings.systemIntegration`)}),(0,L.jsx)(pa,{children:(0,L.jsx)(ha,{children:e(T===`windows`?`settings.systemIntegrationDescription`:`settings.systemIntegrationDescriptionLinux`)})}),(0,L.jsxs)(Pa,{children:[(0,L.jsxs)(ja,{type:`button`,onClick:Ne,disabled:x,children:[(0,L.jsx)(lr,{size:15}),e(`settings.registerHttp`)]}),(0,L.jsxs)(ja,{type:`button`,onClick:Pe,disabled:x,children:[(0,L.jsx)(lr,{size:15}),e(`settings.registerUrlcheck`)]}),T===`windows`&&(0,L.jsx)(ja,{type:`button`,onClick:Ie,disabled:x,children:e(`settings.openDefaultApps`)}),(0,L.jsxs)(Ma,{type:`button`,onClick:Fe,disabled:x,children:[(0,L.jsx)(Sr,{size:15}),e(`settings.unregister`)]})]}),w&&(0,L.jsx)(Fa,{children:e(`settings.protocolStatus`,{isDefault:w.isDefault&&w.pathMatches?e(`settings.yes`):e(`settings.no`),scheme:w.customSchemeRegistered?e(`settings.yes`):e(`settings.no`)})}),w?.isDefault&&!w.pathMatches&&(0,L.jsxs)(Ia,{children:[(0,L.jsx)(hr,{size:14}),(0,L.jsx)(`span`,{children:e(`settings.pathMismatch`,{path:w.registeredPath??`?`})})]}),C&&(0,L.jsx)(Fa,{children:e(C.key,C.params)})]}),(0,L.jsxs)(Tr,{children:[(0,L.jsx)(Er,{children:e(`settings.filterLists`)}),(0,L.jsx)(pa,{children:(0,L.jsx)(ha,{children:e(`settings.filterListsDescription`,{count:ae})})}),re.length===0?(0,L.jsx)(Fa,{children:e(`settings.filterListsEmpty`)}):(0,L.jsx)(Ra,{children:re.map(n=>(0,L.jsxs)(za,{children:[(0,L.jsxs)(Ba,{children:[(0,L.jsx)(Va,{children:n.name}),(0,L.jsx)(Ha,{children:n.url}),(0,L.jsxs)(Ua,{children:[(0,L.jsx)(`span`,{children:e(`settings.filterRules`,{count:n.ruleCount})}),(0,L.jsx)(`span`,{children:n.lastUpdated?e(`settings.filterUpdated`,{date:new Date(n.lastUpdated).toLocaleString(t)}):e(`settings.filterNeverUpdated`)})]}),n.error&&(0,L.jsxs)(Wa,{children:[(0,L.jsx)(hr,{size:13}),(0,L.jsx)(`span`,{children:e(n.error)})]})]}),(0,L.jsxs)(Ga,{children:[(0,L.jsx)(qa,{type:`button`,$on:n.enabled,disabled:se,"aria-pressed":n.enabled,title:e(n.enabled?`settings.filterDisable`:`settings.filterEnable`),onClick:()=>Ve(n.id,!n.enabled)}),(0,L.jsx)(Na,{type:`button`,disabled:se,title:e(`settings.removeFilterList`),onClick:()=>Be(n.id),children:(0,L.jsx)(Sr,{size:16})})]})]},n.id))}),(0,L.jsxs)(Pa,{children:[(0,L.jsx)(ja,{type:`button`,disabled:se,onClick:()=>le(!0),children:e(`settings.addFilterList`)}),(0,L.jsx)(ja,{type:`button`,disabled:se||re.length===0,onClick:He,children:e(se?`settings.filterUpdating`:`settings.checkFilterUpdates`)})]})]}),(0,L.jsxs)(Tr,{children:[(0,L.jsx)(Er,{children:e(`settings.startup`)}),(0,L.jsx)(pa,{children:(0,L.jsx)(ha,{children:e(`settings.startupDescription`)})}),k?.supported&&(0,L.jsxs)(fa,{children:[(0,L.jsxs)(pa,{children:[(0,L.jsx)(ma,{children:e(`settings.startWithSession`)}),(0,L.jsx)(ha,{children:e(`settings.startWithSessionDescription`)})]}),(0,L.jsx)(La,{disabled:ve,checked:k.enabled,onChange:e=>Ue(e.target.checked)})]}),(0,L.jsxs)(fa,{children:[(0,L.jsxs)(pa,{children:[(0,L.jsx)(ma,{children:e(`settings.hideOnLaunch`)}),(0,L.jsx)(ha,{children:e(`settings.hideOnLaunchDescription`)})]}),(0,L.jsx)(La,{disabled:P,checked:n.hideOnLaunch,onChange:e=>xe({hideOnLaunch:e.target.checked})})]})]}),(0,L.jsxs)(_a,{children:[(0,L.jsx)(ya,{onClick:Ce,disabled:P,children:e(u?`settings.loading`:f?`settings.saving`:`settings.save`)}),(0,L.jsx)(Sa,{$visible:Te,type:`button`,onClick:we,disabled:P,children:e(`settings.discard`)}),(0,L.jsx)(xa,{onClick:N,disabled:P,children:e(`settings.reset`)}),m&&(0,L.jsxs)(Ca,{children:[(0,L.jsx)(mr,{size:16}),(0,L.jsx)(`span`,{children:e(`settings.saved`)})]})]}),(0,L.jsxs)(Da,{children:[(0,L.jsx)(`span`,{children:e(`settings.fileInfo`)}),(0,L.jsx)(`code`,{children:o||`...`})]}),(0,L.jsx)(Oa,{type:`button`,onClick:()=>_e(!0),children:e(`attribution.title`)}),ge&&(0,L.jsx)(_.Suspense,{fallback:null,children:(0,L.jsx)(da,{onClose:()=>_e(!1)})}),E&&(0,L.jsx)(Ja,{onClick:()=>!me&&le(!1),children:(0,L.jsxs)(Ya,{onClick:e=>e.stopPropagation(),children:[(0,L.jsx)(Xa,{children:e(`settings.filterAddTitle`)}),(0,L.jsxs)(Za,{children:[(0,L.jsx)(Qa,{type:`button`,$active:D===`catalog`,onClick:()=>ue(`catalog`),children:e(`settings.filterAddFromCatalog`)}),(0,L.jsx)(Qa,{type:`button`,$active:D===`custom`,onClick:()=>ue(`custom`),children:e(`settings.filterAddCustom`)})]}),D===`catalog`?(0,L.jsx)($a,{children:B.map(t=>(0,L.jsxs)(eo,{children:[(0,L.jsxs)(to,{children:[(0,L.jsx)(no,{children:t.name}),M(t.url)?(0,L.jsxs)(Ka,{children:[(0,L.jsx)(mr,{size:14}),e(`settings.filterAdded`)]}):(0,L.jsx)(ja,{type:`button`,disabled:me,onClick:()=>ze(t.name,t.url),children:e(me?`settings.filterAdding`:`settings.filterAdd`)})]}),(0,L.jsx)(ro,{children:e(t.descriptionKey)}),(0,L.jsx)(Ha,{children:t.url})]},t.url))}):(0,L.jsxs)(L.Fragment,{children:[(0,L.jsxs)(ao,{children:[e(`settings.filterName`),(0,L.jsx)(oo,{value:de,placeholder:e(`settings.filterNamePlaceholder`),onChange:e=>O(e.target.value)})]}),(0,L.jsxs)(ao,{children:[e(`settings.filterUrl`),(0,L.jsx)(oo,{value:fe,placeholder:e(`settings.filterUrlPlaceholder`),onChange:e=>pe(e.target.value)})]}),(0,L.jsx)(Pa,{children:M(fe)?(0,L.jsxs)(Ka,{children:[(0,L.jsx)(mr,{size:14}),e(`settings.filterAdded`)]}):(0,L.jsx)(ja,{type:`button`,disabled:me||!de.trim()||!fe.trim(),onClick:()=>ze(de,fe),children:e(me?`settings.filterAdding`:`settings.filterAdd`)})})]}),(0,L.jsxs)(io,{children:[(0,L.jsx)(`strong`,{children:e(`settings.filterFormatTitle`)}),(0,L.jsx)(`span`,{children:e(`settings.filterFormatBody`)})]}),(0,L.jsx)(Pa,{children:(0,L.jsx)(ja,{type:`button`,disabled:me,onClick:()=>le(!1),children:e(`settings.filterCancel`)})})]})})]})}}],lo=co[0].id;function uo(e){return co.find(t=>t.id===e)??co[0]}var fo=I.aside`
     width: 260px;
     background: rgba(17, 24, 39, 0.85);
@@ -1085,38 +1086,38 @@ Error generating stack: `+e.message+`
     color: #6b7280;
     font-family: var(--font-mono);
 `,So=({currentTab:e,onSelectTab:t})=>{let n=zr(),[r,i]=(0,_.useState)(null);return(0,_.useEffect)(()=>{ti().then(e=>i(e.version)).catch(()=>i(null))},[]),(0,L.jsxs)(fo,{children:[(0,L.jsxs)(po,{children:[(0,L.jsx)(mo,{children:(0,L.jsx)(ur,{size:40})}),(0,L.jsxs)(ho,{children:[(0,L.jsx)(go,{children:`URLCheck`}),(0,L.jsx)(_o,{children:n(`app.tagline`)})]})]}),(0,L.jsx)(vo,{children:co.map(r=>{let i=r.icon;return(0,L.jsxs)(yo,{$active:e===r.id,onClick:()=>t(r.id),children:[(0,L.jsx)(i,{size:18}),(0,L.jsx)(`span`,{children:n(r.labelKey)})]},r.id)})}),(0,L.jsx)(bo,{children:(0,L.jsx)(xo,{children:r?`v${r}`:`…`})})]})},Co=I.header`
-  height: 64px;
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 32px;
-  flex-shrink: 0;
+    height: 64px;
+    background: rgba(17, 24, 39, 0.75);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    flex-shrink: 0;
 `,wo=I.div`
-  display: flex;
-  flex-direction: column;
-  animation: headerEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    animation: headerEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 
-  @keyframes headerEnter {
-    from {
-      opacity: 0;
-      transform: translateY(-6px);
+    @keyframes headerEnter {
+        from {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
 `,To=I.h1`
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #f9fafb;
-  letter-spacing: -0.01em;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #f9fafb;
+    letter-spacing: -0.01em;
 `,Eo=I.span`
-  font-size: 0.8rem;
-  color: #9ca3af;
+    font-size: 0.8rem;
+    color: #9ca3af;
 `,Do=({currentTab:e})=>{let t=zr(),n=uo(e);return(0,L.jsx)(Co,{children:(0,L.jsxs)(wo,{children:[(0,L.jsx)(To,{children:t(n.titleKey)}),(0,L.jsx)(Eo,{children:t(n.subtitleKey)})]},e)})},Oo=I.div`
     display: flex;
     width: 100vw;
@@ -1261,8 +1262,8 @@ Error generating stack: `+e.message+`
     &:active:not(:disabled) {
         transform: translateY(0);
     }
-    border: 1px solid
-        ${e=>e.$tone===`ok`?`rgba(16, 185, 129, 0.3)`:e.$tone===`info`?`rgba(59, 130, 246, 0.3)`:e.$tone===`error`?`rgba(239, 68, 68, 0.3)`:`rgba(255, 255, 255, 0.1)`};
+
+    border: 1px solid ${e=>e.$tone===`ok`?`rgba(16, 185, 129, 0.3)`:e.$tone===`info`?`rgba(59, 130, 246, 0.3)`:e.$tone===`error`?`rgba(239, 68, 68, 0.3)`:`rgba(255, 255, 255, 0.1)`};
     background: ${e=>e.$tone===`ok`?`rgba(16, 185, 129, 0.12)`:e.$tone===`info`?`rgba(59, 130, 246, 0.12)`:e.$tone===`error`?`rgba(239, 68, 68, 0.12)`:`rgba(255, 255, 255, 0.04)`};
     color: ${e=>e.$tone===`ok`?`#34d399`:e.$tone===`info`?`#60a5fa`:e.$tone===`error`?`#f87171`:`#9ca3af`};
 `,$o=I.div`
@@ -1281,8 +1282,7 @@ Error generating stack: `+e.message+`
     box-sizing: border-box;
     padding: 0 11px;
     border-radius: 7px;
-    border: 1px solid
-        ${e=>e.$accent?`rgba(245, 158, 11, 0.4)`:`rgba(255, 255, 255, 0.1)`};
+    border: 1px solid ${e=>e.$accent?`rgba(245, 158, 11, 0.4)`:`rgba(255, 255, 255, 0.1)`};
     background: ${e=>e.$accent?`rgba(245, 158, 11, 0.14)`:`rgba(255, 255, 255, 0.05)`};
     color: ${e=>e.$accent?`#fbbf24`:`#d1d5db`};
     font-size: 0.76rem;
@@ -1525,6 +1525,7 @@ Error generating stack: `+e.message+`
 
     /* ActionButton's hover rule knows nothing about $active, so it would flatten the active
        background back to the plain white wash. Keep the two states distinguishable. */
+
     &:hover:not(:disabled) {
         border-color: ${e=>e.$active?`rgba(99, 102, 241, 0.7)`:`rgba(255, 255, 255, 0.1)`};
         background: ${e=>e.$active?`rgba(99, 102, 241, 0.34)`:`rgba(255, 255, 255, 0.12)`};

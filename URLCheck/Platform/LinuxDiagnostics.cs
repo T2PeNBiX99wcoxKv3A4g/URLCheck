@@ -39,7 +39,10 @@ internal static class LinuxDiagnostics
     private static string? ProbeAppIndicator()
     {
         // The Ayatana fork is the maintained one; distributions may still ship the original.
-        foreach (var name in new[] { "libayatana-appindicator3.so.1", "libappindicator3.so.1" })
+        foreach (var name in new[]
+                 {
+                     "libayatana-appindicator3.so.1", "libappindicator3.so.1"
+                 })
             try
             {
                 if (NativeLibrary.TryLoad(name, out _))

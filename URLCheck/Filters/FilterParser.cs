@@ -33,7 +33,6 @@ internal static class FilterParser
     {
         var trimmed = text.TrimStart();
         if (trimmed.StartsWith('{') || trimmed.StartsWith('['))
-        {
             try
             {
                 using var document = JsonDocument.Parse(text);
@@ -48,7 +47,6 @@ internal static class FilterParser
             {
                 // Not JSON after all; fall through to the line-based parser.
             }
-        }
 
         return ParseAdGuard(text);
     }
@@ -151,12 +149,10 @@ internal static class FilterParser
     private static void ClassifyDomains(string argument, List<string> include, List<string> exclude)
     {
         foreach (var domain in SplitDomains(argument))
-        {
             if (domain.StartsWith('~'))
                 exclude.Add(domain[1..]);
             else
                 include.Add(domain);
-        }
     }
 
     private static IEnumerable<string> SplitDomains(string argument) =>

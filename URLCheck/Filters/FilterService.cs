@@ -23,7 +23,10 @@ internal sealed class FilterService
         TypeInfoResolver = AppJsonContext.Default
     };
 
-    private static readonly HttpClient Client = new() { Timeout = TimeSpan.FromSeconds(30) };
+    private static readonly HttpClient Client = new()
+    {
+        Timeout = TimeSpan.FromSeconds(30)
+    };
 
     private readonly List<RemoveParamRule> _builtinRules;
     private readonly string _directory;
@@ -59,7 +62,8 @@ internal sealed class FilterService
         await _gate.WaitAsync();
         try
         {
-            return context.Reply("filters.get.result", new FilterListPayload(await LoadListsAsync(), _builtinRules.Count));
+            return context.Reply("filters.get.result",
+                new FilterListPayload(await LoadListsAsync(), _builtinRules.Count));
         }
         finally
         {

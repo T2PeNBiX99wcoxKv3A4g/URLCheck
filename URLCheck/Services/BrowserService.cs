@@ -24,7 +24,10 @@ internal sealed class BrowserService
 
         var flag = privateMode ? PrivateModeFlag(browser.ExecutablePath) : null;
         var arguments = string.Join(' ',
-            new[] { flag, $"\"{url}\"", browser.Arguments }.Where(part => !string.IsNullOrWhiteSpace(part)));
+            new[]
+            {
+                flag, $"\"{url}\"", browser.Arguments
+            }.Where(part => !string.IsNullOrWhiteSpace(part)));
 
         Process.Start(new ProcessStartInfo
         {

@@ -2,7 +2,6 @@
   // ------------------------------------------------------------------ app
   "app.name": "URLCheck",
   "app.tagline": "Link intermediary",
-
   // ------------------------------------------------------- navigation/tabs
   "tabs.home.label": "Home",
   "tabs.home.title": "Home",
@@ -13,7 +12,6 @@
   "tabs.settings.label": "Settings",
   "tabs.settings.title": "Preferences & Settings",
   "tabs.settings.subtitle": "Configure the request timeout, User-Agent header, and browsers",
-
   // ------------------------------------------------------------------ home
   "home.openTitle": "Open a URL",
   "home.openDescription": "Simulate clicking a link. URLCheck intercepts the URL, opens the inspection popup, and lets you strip query parameters before opening it in a browser.",
@@ -22,7 +20,6 @@
   "home.bannerTitle": "URLCheck is not your default browser",
   "home.bannerBody": "It only works when it handles http/https links. Set URLCheck as the default browser so clicking a link opens this popup.",
   "home.openSettings": "Open Settings",
-
   // --------------------------------------------------------------- history
   "history.searchPlaceholder": "Search history by URL...",
   "history.clearAll": "Clear All Logs",
@@ -31,7 +28,6 @@
   "history.loading": "Loading history...",
   "history.empty": "No history recorded yet",
   "history.openTooltip": "Open in the inspection popup",
-
   // -------------------------------------------------------------- settings
   "settings.network": "Network & Request Settings",
   "settings.requestTimeout": "Request Timeout",
@@ -124,7 +120,6 @@
   "settings.unregistered": "Removed every URLCheck registry entry.",
   "settings.openedDefaultApps": "Opened Windows Default apps. Select URLCheck for http/https.",
   "settings.noBrowsersDetected": "No installed browsers were detected.",
-
   // ----------------------------------------------------------------- popup
   "popup.close": "Close",
   "selection.open": "Open in URLCheck",
@@ -163,12 +158,10 @@
   "popup.chooseBrowser": "Choose browser",
   "popup.copy": "Copy",
   "popup.copied": "Copied!",
-
   // ------------------------------------------------------------------ tray
   "tray.open": "Open URLCheck",
   "tray.settings": "Settings",
   "tray.exit": "Exit",
-
   // ---------------------------------------------------------------- errors
   "error.missingUrl": "Missing URL.",
   "error.noBrowser": "No browser configured. Add one in Settings.",

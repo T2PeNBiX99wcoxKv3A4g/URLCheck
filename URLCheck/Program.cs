@@ -16,6 +16,21 @@ namespace URLCheck;
 
 internal static class Program
 {
+    /// <summary>
+    ///     A directory we own, used as the host's content root. The static server creates a <c>wwwroot</c>
+    ///     web root under it when missing, which without this would land next to the executable.
+    /// </summary>
+    private static string DataDirectory
+    {
+        get
+        {
+            var path = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name);
+            Directory.CreateDirectory(path);
+            return path;
+        }
+    }
+
     [STAThread]
     [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
     private static void Main(string[] args)
@@ -45,7 +60,7 @@ internal static class Program
 
             // Without a tray the window is the only way back into the app, so always show it there.
             var hasTray = OperatingSystem.IsWindows() ||
-                          (OperatingSystem.IsLinux() && LinuxDiagnostics.AppIndicatorLibrary is not null);
+                          OperatingSystem.IsLinux() && LinuxDiagnostics.AppIndicatorLibrary is not null;
 
             // Only one instance may run; later launches hand their URLs to it and exit.
             using var singleInstance = new SingleInstance();
@@ -210,23 +225,9 @@ internal static class Program
         return new NullTrayIcon();
     }
 
-    /// <summary>
-    ///     A directory we own, used as the host's content root. The static server creates a <c>wwwroot</c>
-    ///     web root under it when missing, which without this would land next to the executable.
-    /// </summary>
-    private static string DataDirectory
-    {
-        get
-        {
-            var path = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name);
-            Directory.CreateDirectory(path);
-            return path;
-        }
-    }
-
     /// <summary>Pulls the http/https/urlcheck URLs out of a raw argument list.</summary>
-    private static List<string> ExtractUrls(IEnumerable<string> args) =>    [
+    private static List<string> ExtractUrls(IEnumerable<string> args) =>
+    [
         .. args.Where(arg =>
             Uri.TryCreate(arg, UriKind.Absolute, out var uri) &&
             uri.Scheme is "http" or "https" or "urlcheck")
