@@ -9,7 +9,18 @@ import {AppSettings, BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
 import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
-import {getForwardInfo, type ForwardInfo} from "../api/forward";
+import {
+  getForwardInfo,
+  type ForwardInfo,
+  pairWith,
+  type PairRequestEvent,
+  type PairStateEvent,
+  pendingPairing,
+  removeDevice,
+  respondToPairing,
+  startDiscovery,
+  stopDiscovery,
+} from "../api/forward";
 import {
   addFilterList,
   type FilterListEntry,
@@ -421,6 +432,20 @@ const WarnText = styled.div`
   color: #fbbf24;
 `;
 
+/** The short verification code both devices show while pairing. */
+const PairCode = styled.div`
+  align-self: center;
+  padding: 10px 22px;
+  border-radius: 10px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.12);
+  color: #c7d2fe;
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+`;
+
 const Checkbox = styled.input.attrs({type: "checkbox"})`
   /* A fixed size: as a flex item it would otherwise be squeezed by however long the label is. */
   flex: none;
@@ -746,6 +771,15 @@ export const SettingsPage: React.FC = () => {
   const [startupBusy, setStartupBusy] = useState(false);
   /** How this device can be reached; its addresses do not live in the settings. */
   const [forwardInfo, setForwardInfo] = useState<ForwardInfo | null>(null);
+  /** Devices found by the search dialog, live-updated while it is open. */
+  const [discovered, setDiscovered] = useState<DeviceEntry[]>([]);
+  const [searchOpen, setSearchOpen] = useState(false);
+  /** A pairing this device started, while it waits for the other side to confirm. */
+  const [pairing, setPairing] = useState<{ name: string; code: string | null; error: string | null } | null>(null);
+  /** A pairing request from another device, waiting for this user to accept or reject it. */
+  const [incoming, setIncoming] = useState<PairRequestEvent | null>(null);
+  const [manualHost, setManualHost] = useState("");
+  const [manualPort, setManualPort] = useState(DEFAULT_SETTINGS.forwardPort);
 
   useEffect(() => {
     protocolStatus().then(setProtocols).catch(() => setProtocols(null));
@@ -753,6 +787,34 @@ export const SettingsPage: React.FC = () => {
 
   useEffect(() => {
     getForwardInfo().then(setForwardInfo).catch(() => setForwardInfo(null));
+    pendingPairing().then(setIncoming).catch(() => undefined);
+  }, []);
+
+  /* Pairing and discovery all report through events, so the page never has to poll. */
+  useEffect(() => {
+    return Native.on((message) => {
+      const event = message as { type?: string; data?: unknown };
+
+      if (event.type === "forward.discovered") {
+        setDiscovered(((event.data as { devices?: DeviceEntry[] })?.devices ?? []));
+        return;
+      }
+
+      if (event.type === "forward.pairState") {
+        const state = event.data as PairStateEvent;
+        if (state.state === "code") {
+          setPairing({name: state.device?.name || state.device?.host || "", code: state.code, error: null});
+        } else if (state.state === "accepted") {
+          setPairing({name: state.device?.name ?? "", code: null, error: null});
+          setTimeout(() => setPairing(null), 1500);
+        } else {
+          setPairing((previous) => ({name: previous?.name ?? "", code: null, error: state.error ?? "error.forwardFailed"}));
+        }
+        return;
+      }
+
+      if (event.type === "forward.pairRequest") setIncoming(event.data as PairRequestEvent);
+    });
   }, []);
 
   useEffect(() => {
@@ -902,25 +964,6 @@ export const SettingsPage: React.FC = () => {
     setSettings((prev) => ({...prev, browsers: prev.browsers.filter((browser) => browser.id !== id)}));
   };
 
-  const updateDevice = (id: string, patch: Partial<DeviceEntry>) => {
-    setSettings((prev) => ({
-      ...prev,
-      devices: prev.devices.map((device) => (device.id === id ? {...device, ...patch} : device)),
-    }));
-  };
-
-  const addDevice = () => {
-    const id = Math.random().toString(36).slice(2, 10);
-    setSettings((prev) => ({
-      ...prev,
-      devices: [...prev.devices, {id, name: "", host: "", port: DEFAULT_SETTINGS.forwardPort}],
-    }));
-  };
-
-  const removeDevice = (id: string) => {
-    setSettings((prev) => ({...prev, devices: prev.devices.filter((device) => device.id !== id)}));
-  };
-
   const updateUserAgent = (id: string, patch: Partial<UserAgentEntry>) => {
     setSettings((prev) => ({
       ...prev,
@@ -1068,6 +1111,39 @@ export const SettingsPage: React.FC = () => {
       setStartupBusy(false);
     }
   };
+
+  /* Device forwarding: search, pairing and the paired list. */
+  const forwardingActive = forwardInfo?.enabled ?? false;
+
+  const handleSearchOpen = () => {
+    setDiscovered([]);
+    setSearchOpen(true);
+    startDiscovery();
+  };
+
+  const handleSearchClose = () => {
+    setSearchOpen(false);
+    stopDiscovery();
+  };
+
+  const handlePair = (host: string, port: number) => {
+    setPairing({name: host, code: null, error: null});
+    pairWith(host, port);
+  };
+
+  const handleManualPair = () => {
+    if (manualHost.trim()) handlePair(manualHost.trim(), manualPort);
+  };
+
+  const handlePairRespond = (accept: boolean) => {
+    if (!incoming) return;
+
+    respondToPairing(incoming.requestId, accept);
+    setIncoming(null);
+  };
+
+  /** A short, readable fingerprint of this device's public key. */
+  const fingerprint = (key: string) => (key ? `${key.slice(0, 16)}…` : "—");
 
   return (
       <PageContainer $maxWidth={800}>
@@ -1277,64 +1353,73 @@ export const SettingsPage: React.FC = () => {
 
           <SettingRow>
             <SettingInfo>
-              <SettingLabel>{t("settings.deviceName")}</SettingLabel>
-              <SettingDescription>{t("settings.deviceNameDescription")}</SettingDescription>
+              <SettingLabel>{t("settings.forwardingEnabled")}</SettingLabel>
+              <SettingDescription>{t("settings.forwardingEnabledDescription")}</SettingDescription>
             </SettingInfo>
-            <ListInput
-                className="name"
+            <Checkbox
                 disabled={busy}
-                value={settings.deviceName}
-                onChange={(event) => update({deviceName: event.target.value})}
+                checked={settings.forwardingEnabled}
+                onChange={(event) => update({forwardingEnabled: event.target.checked})}
             />
           </SettingRow>
 
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.pairingCode")}</SettingLabel>
-              <SettingDescription>{t("settings.pairingCodeDescription")}</SettingDescription>
-            </SettingInfo>
-            <ListInput
-                className="path"
-                disabled={busy}
-                value={settings.pairingCode}
-                onChange={(event) => update({pairingCode: event.target.value})}
-            />
-          </SettingRow>
+          {settings.forwardingEnabled && (
+              <>
+                <SettingRow>
+                  <SettingInfo>
+                    <SettingLabel>{t("settings.deviceName")}</SettingLabel>
+                    <SettingDescription>{t("settings.deviceNameDescription")}</SettingDescription>
+                  </SettingInfo>
+                  <ListInput
+                      className="name"
+                      disabled={busy}
+                      value={settings.deviceName}
+                      onChange={(event) => update({deviceName: event.target.value})}
+                  />
+                </SettingRow>
 
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.forwardPort")}</SettingLabel>
-              <SettingDescription>{t("settings.forwardPortDescription")}</SettingDescription>
-            </SettingInfo>
-            <ListInput
-                className="port"
-                type="number"
-                disabled={busy}
-                value={String(settings.forwardPort)}
-                onChange={(event) => update({forwardPort: Number(event.target.value) || 0})}
-            />
-          </SettingRow>
+                <SettingRow>
+                  <SettingInfo>
+                    <SettingLabel>{t("settings.forwardPort")}</SettingLabel>
+                    <SettingDescription>{t("settings.forwardPortDescription")}</SettingDescription>
+                  </SettingInfo>
+                  <ListInput
+                      className="port"
+                      type="number"
+                      disabled={busy}
+                      value={String(settings.forwardPort)}
+                      onChange={(event) => update({forwardPort: Number(event.target.value) || 0})}
+                  />
+                </SettingRow>
 
-          {forwardInfo && forwardInfo.addresses.length > 0 && (
-              <InfoText>
-                {t("settings.forwardAddresses", {
-                  port: settings.forwardPort,
-                  addresses: forwardInfo.addresses.join(", "),
-                })}
-              </InfoText>
+                {forwardInfo && forwardInfo.addresses.length > 0 && (
+                    <InfoText>
+                      {t("settings.forwardAddresses", {
+                        port: settings.forwardPort,
+                        addresses: forwardInfo.addresses.join(", "),
+                      })}
+                    </InfoText>
+                )}
+
+                {forwardInfo && (
+                    <InfoText>{t("settings.forwardKey", {key: fingerprint(forwardInfo.publicKey)})}</InfoText>
+                )}
+
+                {forwardInfo?.enabled && !forwardInfo.listening && (
+                    <WarnText>
+                      <AlertTriangleIcon size={14}/>
+                      <span>{t("settings.forwardNotListening")}</span>
+                    </WarnText>
+                )}
+              </>
           )}
 
-          <InfoText>
-            {t(forwardInfo?.listening ? "settings.forwardListening" : "settings.forwardNotListening")}
-          </InfoText>
-
-          {settings.devices.length > 0 && !settings.pairingCode.trim() && (
-              <WarnText>
-                <AlertTriangleIcon size={14}/>
-                <span>{t("settings.forwardNoCode")}</span>
-              </WarnText>
+          {settings.forwardingEnabled !== forwardingActive && (
+              <InfoText>{t("settings.forwardSaveFirst")}</InfoText>
           )}
+        </StackCard>
 
+        <StackCard>
           <SectionTitle>{t("settings.forwardDevices")}</SectionTitle>
 
           <SettingInfo>
@@ -1344,48 +1429,62 @@ export const SettingsPage: React.FC = () => {
           {settings.devices.length === 0 ? (
               <InfoText>{t("settings.forwardDevicesEmpty")}</InfoText>
           ) : (
-              <ListEditor>
+              <FilterList>
                 {settings.devices.map((device) => (
-                    <ListRow key={device.id}>
-                      <ListInput
-                          className="name"
-                          placeholder={t("settings.browserNamePlaceholder")}
-                          disabled={busy}
-                          value={device.name}
-                          onChange={(event) => updateDevice(device.id, {name: event.target.value})}
-                      />
-                      <ListInput
-                          className="path"
-                          placeholder={t("settings.deviceHostPlaceholder")}
-                          disabled={busy}
-                          value={device.host}
-                          onChange={(event) => updateDevice(device.id, {host: event.target.value})}
-                      />
-                      <ListInput
-                          className="port"
-                          type="number"
-                          placeholder={t("settings.devicePortPlaceholder")}
-                          disabled={busy}
-                          value={String(device.port)}
-                          onChange={(event) => updateDevice(device.id, {port: Number(event.target.value) || 0})}
-                      />
-                      <IconOnlyButton
-                          type="button"
-                          title={t("settings.removeDevice")}
-                          onClick={() => removeDevice(device.id)}
-                      >
-                        <TrashIcon size={16}/>
-                      </IconOnlyButton>
-                    </ListRow>
+                    <FilterRow key={device.id}>
+                      <FilterBody>
+                        <FilterName>{device.name || device.host}</FilterName>
+                        <FilterUrl>{device.host}:{device.port}</FilterUrl>
+                      </FilterBody>
+                      <FilterActions>
+                        <IconOnlyButton
+                            type="button"
+                            title={t("settings.removeDevice")}
+                            onClick={() => removeDevice(device.id)}
+                        >
+                          <TrashIcon size={16}/>
+                        </IconOnlyButton>
+                      </FilterActions>
+                    </FilterRow>
                 ))}
-              </ListEditor>
+              </FilterList>
           )}
 
           <ButtonRow>
-            <GhostButton type="button" onClick={addDevice} disabled={busy}>
-              {t("settings.addDevice")}
+            <GhostButton type="button" disabled={!forwardingActive} onClick={handleSearchOpen}>
+              {t("settings.forwardSearch")}
             </GhostButton>
           </ButtonRow>
+
+          <SettingRow>
+            <SettingInfo>
+              <SettingLabel>{t("settings.forwardManual")}</SettingLabel>
+              <SettingDescription>{t("settings.forwardManualDescription")}</SettingDescription>
+            </SettingInfo>
+            <ButtonRow>
+              <ListInput
+                  className="path"
+                  placeholder={t("settings.deviceHostPlaceholder")}
+                  disabled={!forwardingActive}
+                  value={manualHost}
+                  onChange={(event) => setManualHost(event.target.value)}
+              />
+              <ListInput
+                  className="port"
+                  type="number"
+                  disabled={!forwardingActive}
+                  value={String(manualPort)}
+                  onChange={(event) => setManualPort(Number(event.target.value) || 0)}
+              />
+              <GhostButton
+                  type="button"
+                  disabled={!forwardingActive || !manualHost.trim()}
+                  onClick={handleManualPair}
+              >
+                {t("settings.forwardPair")}
+              </GhostButton>
+            </ButtonRow>
+          </SettingRow>
         </StackCard>
 
         <StackCard>
@@ -1648,6 +1747,90 @@ export const SettingsPage: React.FC = () => {
                   <GhostButton type="button" disabled={adding} onClick={() => setAddOpen(false)}>
                     {t("settings.filterCancel")}
                   </GhostButton>
+                </ButtonRow>
+              </Dialog>
+            </Overlay>
+        )}
+
+        {searchOpen && (
+            <Overlay onClick={handleSearchClose}>
+              <Dialog onClick={(event) => event.stopPropagation()}>
+                <DialogTitle>{t("settings.forwardSearchTitle")}</DialogTitle>
+                <SettingDescription>{t("settings.forwardSearchDescription")}</SettingDescription>
+
+                {discovered.length === 0 ? (
+                    <InfoText>{t("settings.forwardSearching")}</InfoText>
+                ) : (
+                    <CatalogList>
+                      {discovered.map((device) => (
+                          <CatalogItem key={device.id}>
+                            <CatalogItemHead>
+                              <CatalogName>{device.name || device.host}</CatalogName>
+                              <GhostButton type="button" onClick={() => handlePair(device.host, device.port)}>
+                                {t("settings.forwardPair")}
+                              </GhostButton>
+                            </CatalogItemHead>
+                            <FilterUrl>{device.host}:{device.port}</FilterUrl>
+                          </CatalogItem>
+                      ))}
+                    </CatalogList>
+                )}
+
+                <ButtonRow>
+                  <GhostButton type="button" onClick={handleSearchClose}>
+                    {t("settings.filterCancel")}
+                  </GhostButton>
+                </ButtonRow>
+              </Dialog>
+            </Overlay>
+        )}
+
+        {pairing && (
+            <Overlay>
+              <Dialog>
+                <DialogTitle>{t("settings.forwardPairingTitle", {name: pairing.name})}</DialogTitle>
+
+                {pairing.error ? (
+                    <ErrorBanner>
+                      <AlertTriangleIcon size={16}/>
+                      <span>{t(pairing.error)}</span>
+                    </ErrorBanner>
+                ) : pairing.code ? (
+                    <>
+                      <SettingDescription>{t("settings.forwardPairingCodeHint")}</SettingDescription>
+                      <PairCode>{pairing.code}</PairCode>
+                      <InfoText>{t("settings.forwardPairingWaiting")}</InfoText>
+                    </>
+                ) : (
+                    <InfoText>{t("settings.forwardPairingDone")}</InfoText>
+                )}
+
+                <ButtonRow>
+                  <GhostButton type="button" onClick={() => setPairing(null)}>
+                    {t("settings.filterCancel")}
+                  </GhostButton>
+                </ButtonRow>
+              </Dialog>
+            </Overlay>
+        )}
+
+        {incoming && (
+            <Overlay>
+              <Dialog>
+                <DialogTitle>{t("settings.forwardIncomingTitle")}</DialogTitle>
+                <SettingDescription>
+                  {t("settings.forwardIncomingDescription", {name: incoming.deviceName})}
+                </SettingDescription>
+                <SettingDescription>{t("settings.forwardPairingCodeHint")}</SettingDescription>
+                <PairCode>{incoming.code}</PairCode>
+
+                <ButtonRow>
+                  <DangerGhostButton type="button" onClick={() => handlePairRespond(false)}>
+                    {t("settings.forwardReject")}
+                  </DangerGhostButton>
+                  <SaveButton type="button" onClick={() => handlePairRespond(true)}>
+                    {t("settings.forwardAccept")}
+                  </SaveButton>
                 </ButtonRow>
               </Dialog>
             </Overlay>

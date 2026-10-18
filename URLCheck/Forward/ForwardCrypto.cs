@@ -1,58 +1,171 @@
-using System.Security.Cryptography;
+using System.Text;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Agreement;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Signers;
+using Org.BouncyCastle.Security;
 
 namespace URLCheck.Forward;
 
 /// <summary>
-///     Encrypts forwarded URLs with a key derived from the shared pairing code, so the traffic on the
-///     local network is unreadable without that code. AES-GCM also authenticates the frame, which is
-///     what turns the pairing code into an access check as well as a key.
+///     The cryptographic primitives behind device forwarding: Ed25519 identities, X25519 ephemeral key
+///     agreement, HKDF-SHA256 key derivation and ChaCha20-Poly1305 authenticated encryption. A pairing
+///     code the user types is never involved — the two devices prove who they are with signatures.
 /// </summary>
 internal static class ForwardCrypto
 {
-    private const int KeySize = 32;
-    private const int NonceSize = 12;
-    private const int TagSize = 16;
-    private const int Iterations = 100_000;
+    public const int KeySize = 32;
+
+    /// <summary>Nonce length ChaCha20-Poly1305 uses.</summary>
+    public const int NonceSize = 12;
+
+    /// <summary>Length of the random nonces exchanged during a handshake.</summary>
+    public const int HandshakeNonceSize = 16;
+
+    private static readonly SecureRandom Random = new();
+
+    public static byte[] RandomBytes(int length)
+    {
+        var bytes = new byte[length];
+        Random.NextBytes(bytes);
+        return bytes;
+    }
+
+    public static string ToBase64(byte[] value) => Convert.ToBase64String(value);
+
+    public static byte[]? FromBase64(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+
+        try
+        {
+            return Convert.FromBase64String(value);
+        }
+        catch (FormatException)
+        {
+            return null;
+        }
+    }
 
     /// <summary>
-    ///     A fixed salt is deliberate: both ends must derive the same key from the same code, and the
-    ///     pairing code — not the salt — is the secret.
+    ///     Builds the byte string a signature covers. Every part is length-prefixed so two different
+    ///     groupings can never produce the same transcript.
     /// </summary>
-    private static readonly byte[] Salt = "URLCheck.Forward.v1"u8.ToArray();
-
-    public static byte[] DeriveKey(string pairingCode) =>
-        Rfc2898DeriveBytes.Pbkdf2(pairingCode, Salt, Iterations, HashAlgorithmName.SHA256, KeySize);
-
-    /// <summary>Returns <c>nonce || ciphertext || tag</c>.</summary>
-    public static byte[] Encrypt(byte[] key, ReadOnlySpan<byte> plaintext)
+    public static byte[] Transcript(string label, params byte[][] parts)
     {
-        var nonce = RandomNumberGenerator.GetBytes(NonceSize);
-        var output = new byte[NonceSize + plaintext.Length + TagSize];
+        using var buffer = new MemoryStream();
+        var labelBytes = Encoding.UTF8.GetBytes(label);
+        buffer.Write(labelBytes);
+        foreach (var part in parts)
+        {
+            buffer.WriteByte((byte)(part.Length >> 24));
+            buffer.WriteByte((byte)(part.Length >> 16));
+            buffer.WriteByte((byte)(part.Length >> 8));
+            buffer.WriteByte((byte)part.Length);
+            buffer.Write(part);
+        }
 
-        using var aes = new AesGcm(key, TagSize);
-        aes.Encrypt(nonce, plaintext, output.AsSpan(NonceSize, plaintext.Length),
-            output.AsSpan(NonceSize + plaintext.Length));
+        return buffer.ToArray();
+    }
 
-        nonce.CopyTo(output, 0);
+    public static byte[] Sign(byte[] privateKey, byte[] message)
+    {
+        var signer = new Ed25519Signer();
+        signer.Init(true, new Ed25519PrivateKeyParameters(privateKey, 0));
+        signer.BlockUpdate(message, 0, message.Length);
+        return signer.GenerateSignature();
+    }
+
+    public static bool Verify(byte[] publicKey, byte[] message, byte[] signature)
+    {
+        try
+        {
+            var verifier = new Ed25519Signer();
+            verifier.Init(false, new Ed25519PublicKeyParameters(publicKey, 0));
+            verifier.BlockUpdate(message, 0, message.Length);
+            return verifier.VerifySignature(signature);
+        }
+        catch (Exception)
+        {
+            // A malformed key or signature is a failed verification, never a crash.
+            return false;
+        }
+    }
+
+    /// <summary>A fresh X25519 key pair, used once per connection so every session has its own key.</summary>
+    public static (byte[] PrivateKey, byte[] PublicKey) GenerateEphemeralKeyPair()
+    {
+        var generator = new X25519KeyPairGenerator();
+        generator.Init(new X25519KeyGenerationParameters(Random));
+        var pair = generator.GenerateKeyPair();
+
+        return (((X25519PrivateKeyParameters)pair.Private).GetEncoded(),
+            ((X25519PublicKeyParameters)pair.Public).GetEncoded());
+    }
+
+    public static byte[] SharedSecret(byte[] privateKey, byte[] peerPublicKey)
+    {
+        var agreement = new X25519Agreement();
+        agreement.Init(new X25519PrivateKeyParameters(privateKey, 0));
+
+        var shared = new byte[agreement.AgreementSize];
+        agreement.CalculateAgreement(new X25519PublicKeyParameters(peerPublicKey, 0), shared, 0);
+        return shared;
+    }
+
+    public static byte[] DeriveKey(byte[] sharedSecret, byte[] salt, string info)
+    {
+        var hkdf = new HkdfBytesGenerator(new Sha256Digest());
+        hkdf.Init(new HkdfParameters(sharedSecret, salt, Encoding.UTF8.GetBytes(info)));
+
+        var key = new byte[KeySize];
+        hkdf.GenerateBytes(key, 0, key.Length);
+        return key;
+    }
+
+    public static byte[] Encrypt(byte[] key, byte[] nonce, byte[] plaintext, byte[] associatedData)
+    {
+        var cipher = new ChaCha20Poly1305();
+        cipher.Init(true, new AeadParameters(new KeyParameter(key), 128, nonce, associatedData));
+
+        var output = new byte[cipher.GetOutputSize(plaintext.Length)];
+        var length = cipher.ProcessBytes(plaintext, 0, plaintext.Length, output, 0);
+        cipher.DoFinal(output, length);
         return output;
     }
 
-    /// <summary>Decrypts a frame, or returns <c>null</c> when it was tampered with or the key is wrong.</summary>
-    public static byte[]? TryDecrypt(byte[] key, ReadOnlySpan<byte> frame)
+    /// <summary>Decrypts a frame, or returns <c>null</c> when the key is wrong or the frame was tampered with.</summary>
+    public static byte[]? TryDecrypt(byte[] key, byte[] nonce, byte[] ciphertext, byte[] associatedData)
     {
-        if (frame.Length < NonceSize + TagSize)
-            return null;
-
-        var plaintext = new byte[frame.Length - NonceSize - TagSize];
         try
         {
-            using var aes = new AesGcm(key, TagSize);
-            aes.Decrypt(frame[..NonceSize], frame[NonceSize..^TagSize], frame[^TagSize..], plaintext);
-            return plaintext;
+            var cipher = new ChaCha20Poly1305();
+            cipher.Init(false, new AeadParameters(new KeyParameter(key), 128, nonce, associatedData));
+
+            var output = new byte[cipher.GetOutputSize(ciphertext.Length)];
+            var length = cipher.ProcessBytes(ciphertext, 0, ciphertext.Length, output, 0);
+            cipher.DoFinal(output, length);
+            return output;
         }
-        catch (CryptographicException)
+        catch (InvalidCipherTextException)
         {
             return null;
         }
+    }
+
+    /// <summary>The short code both devices show while pairing, derived from the shared transcript.</summary>
+    public static string PairingCode(byte[] transcript)
+    {
+        var digest = new Sha256Digest();
+        var hash = new byte[digest.GetDigestSize()];
+        digest.BlockUpdate(transcript, 0, transcript.Length);
+        digest.DoFinal(hash, 0);
+
+        var code = Convert.ToHexString(hash, 0, 4);
+        return $"{code[..4]}-{code[4..]}";
     }
 }

@@ -1,49 +1,177 @@
-using System.Buffers.Binary;
 using System.Net.Sockets;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using URLCheck.Messaging;
 using URLCheck.Models;
 
 namespace URLCheck.Forward;
 
 /// <summary>
-///     Raised when the peer refused the URL. The message is a translation key, so the popup can show
-///     the exact reason instead of a generic failure.
+///     Raised when the peer refused or could not complete a request. The message is a translation key,
+///     so the popup can show the exact reason instead of a generic failure.
 /// </summary>
 internal sealed class ForwardException(string message) : Exception(message);
 
-/// <summary>Sends one encrypted URL to a peer device over a short-lived TCP connection.</summary>
+/// <summary>The initiating half of the protocol: pairing with a device and forwarding a URL to it.</summary>
 internal static class ForwardClient
 {
-    public static async Task SendAsync(DeviceEntry device, AppSettings settings, string url, CancellationToken token)
+    /// <summary>
+    ///     Pairs with the device listening at <paramref name="host" />:<paramref name="port" />. The
+    ///     callback runs as soon as the peer introduces itself, so the user can compare the code while
+    ///     the other side is still deciding.
+    /// </summary>
+    public static async Task<DeviceEntry> PairAsync(string host, int port, AppSettings settings, DeviceIdentity identity,
+        Func<string, DeviceEntry, Task> onChallenge, CancellationToken token)
     {
-        var envelope = new ForwardEnvelope(1, settings.DeviceId, settings.DeviceName, url,
-            DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        using var client = new TcpClient();
+        client.NoDelay = true;
+        await client.ConnectAsync(host, port, token);
+        var stream = client.GetStream();
 
-        var plaintext = JsonSerializer.SerializeToUtf8Bytes(envelope, AppJsonContext.Default.ForwardEnvelope);
-        var frame = ForwardCrypto.Encrypt(ForwardCrypto.DeriveKey(settings.PairingCode), plaintext);
+        var nonce = ForwardCrypto.RandomBytes(ForwardCrypto.HandshakeNonceSize);
+        var requestSignature = ForwardCrypto.Sign(identity.PrivateKey, ForwardCrypto.Transcript(
+            "URLCheck.Pair.Request.v1", identity.PublicKey, Utf8(settings.DeviceId), nonce));
+
+        await WriteAsync(stream, new PairRequestMessage(ForwardProtocol.PairRequest, settings.DeviceId,
+            settings.DeviceName, settings.ForwardPort, identity.PublicKeyBase64,
+            ForwardCrypto.ToBase64(nonce), ForwardCrypto.ToBase64(requestSignature)), token);
+
+        var reply = await ReadAsync(stream, token) ?? throw new ForwardException("error.forwardFailed");
+
+        if (reply is StatusMessage { Ok: false } status)
+            throw new ForwardException(status.Error ?? "error.forwardFailed");
+
+        if (reply is not PairChallengeMessage challenge)
+            throw new ForwardException("error.forwardFailed");
+
+        var peerPublicKey = ForwardCrypto.FromBase64(challenge.PublicKey);
+        if (peerPublicKey is not { Length: 32 })
+            throw new ForwardException("error.forwardFailed");
+
+        // Both devices hash the same transcript, so a matching code means nobody sits in the middle.
+        var transcript = ForwardCrypto.Transcript("URLCheck.Pair.v1",
+            identity.PublicKey, Utf8(settings.DeviceId), peerPublicKey, Utf8(challenge.DeviceId), nonce);
+
+        var peer = new DeviceEntry
+        {
+            Id = challenge.DeviceId,
+            Name = challenge.DeviceName,
+            Host = host,
+            Port = challenge.Port,
+            PublicKey = challenge.PublicKey
+        };
+
+        await onChallenge(ForwardCrypto.PairingCode(transcript), peer);
+
+        var decision = await ReadAsync(stream, token) ?? throw new ForwardException("error.forwardFailed");
+        switch (decision)
+        {
+            case PairRejectMessage:
+                throw new ForwardException("error.forwardPairRejected");
+            case StatusMessage { Ok: false } failure:
+                throw new ForwardException(failure.Error ?? "error.forwardFailed");
+            case PairAcceptMessage accept:
+            {
+                var signature = ForwardCrypto.FromBase64(accept.Signature);
+                var expected = ForwardCrypto.Transcript("URLCheck.Pair.Accept.v1", transcript);
+                if (signature is null || !ForwardCrypto.Verify(peerPublicKey, expected, signature))
+                    throw new ForwardException("error.forwardPairRejected");
+
+                return peer;
+            }
+            default:
+                throw new ForwardException("error.forwardFailed");
+        }
+    }
+
+    /// <summary>Forwards one URL to a paired device over a fresh, authenticated session.</summary>
+    public static async Task SendAsync(DeviceEntry device, AppSettings settings, DeviceIdentity identity, string url,
+        CancellationToken token)
+    {
+        var peerPublicKey = ForwardCrypto.FromBase64(device.PublicKey);
+        if (peerPublicKey is not { Length: 32 })
+            throw new ForwardException("error.forwardUnpaired");
 
         using var client = new TcpClient();
         client.NoDelay = true;
         await client.ConnectAsync(device.Host, device.Port, token);
-
         var stream = client.GetStream();
 
-        var header = new byte[4];
-        BinaryPrimitives.WriteUInt32BigEndian(header, (uint)frame.Length);
-        await stream.WriteAsync(header, token);
-        await stream.WriteAsync(frame, token);
-        await stream.FlushAsync(token);
+        var (ephemeralPrivate, ephemeralPublic) = ForwardCrypto.GenerateEphemeralKeyPair();
+        var nonce = ForwardCrypto.RandomBytes(ForwardCrypto.HandshakeNonceSize);
 
-        var status = new byte[1];
-        await stream.ReadExactlyAsync(status, token);
+        var helloSignature = ForwardCrypto.Sign(identity.PrivateKey, ForwardCrypto.Transcript(
+            "URLCheck.Forward.Hello.v1", identity.PublicKey, Utf8(settings.DeviceId), peerPublicKey,
+            Utf8(device.Id), ephemeralPublic, nonce));
 
-        if (status[0] != (byte)ForwardStatus.Accepted)
-            throw new ForwardException(status[0] switch
-            {
-                (byte)ForwardStatus.Unauthorized => "error.forwardRejected",
-                (byte)ForwardStatus.Stale => "error.forwardStale",
-                _ => "error.forwardFailed"
-            });
+        await WriteAsync(stream, new ForwardHelloMessage(ForwardProtocol.ForwardHello, settings.DeviceId,
+            ForwardCrypto.ToBase64(ephemeralPublic), ForwardCrypto.ToBase64(nonce),
+            ForwardCrypto.ToBase64(helloSignature)), token);
+
+        var reply = await ReadAsync(stream, token) ?? throw new ForwardException("error.forwardFailed");
+        if (reply is StatusMessage { Ok: false } failure)
+            throw new ForwardException(failure.Error ?? "error.forwardFailed");
+        if (reply is not ForwardReplyMessage handshake)
+            throw new ForwardException("error.forwardFailed");
+
+        var peerEphemeral = ForwardCrypto.FromBase64(handshake.EphemeralKey);
+        var peerNonce = ForwardCrypto.FromBase64(handshake.Nonce);
+        var peerSignature = ForwardCrypto.FromBase64(handshake.Signature);
+        if (peerEphemeral is not { Length: 32 } || peerNonce is not { Length: ForwardCrypto.HandshakeNonceSize } ||
+            peerSignature is null)
+            throw new ForwardException("error.forwardFailed");
+
+        var expected = ForwardCrypto.Transcript("URLCheck.Forward.Reply.v1", peerPublicKey, Utf8(device.Id),
+            identity.PublicKey, Utf8(settings.DeviceId), ephemeralPublic, peerEphemeral, nonce, peerNonce);
+        if (!ForwardCrypto.Verify(peerPublicKey, expected, peerSignature))
+            throw new ForwardException("error.forwardRejected");
+
+        var shared = ForwardCrypto.SharedSecret(ephemeralPrivate, peerEphemeral);
+        var sessionKey = ForwardCrypto.DeriveKey(shared, [.. nonce, .. peerNonce], "URLCheck.Forward.v1");
+
+        var payload = JsonSerializer.SerializeToUtf8Bytes(
+            new ForwardPayload(url, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
+            AppJsonContext.Default.ForwardPayload);
+
+        var frameNonce = ForwardCrypto.RandomBytes(ForwardCrypto.NonceSize);
+        var associatedData = ForwardCrypto.Transcript("URLCheck.Forward.Data.v1",
+            ephemeralPublic, peerEphemeral, nonce, peerNonce);
+        var ciphertext = ForwardCrypto.Encrypt(sessionKey, frameNonce, payload, associatedData);
+
+        await WriteAsync(stream, new ForwardDataMessage(ForwardProtocol.ForwardData,
+            ForwardCrypto.ToBase64(frameNonce), ForwardCrypto.ToBase64(ciphertext)), token);
+
+        var status = await ReadAsync(stream, token);
+        if (status is StatusMessage { Ok: false } refused)
+            throw new ForwardException(refused.Error ?? "error.forwardFailed");
     }
+
+    private static byte[] Utf8(string value) => System.Text.Encoding.UTF8.GetBytes(value);
+
+    private static async Task WriteAsync<T>(NetworkStream stream, T message, CancellationToken token)
+        where T : class
+    {
+        var typeInfo = (JsonTypeInfo<T>)NativeJson.TypeInfo(typeof(T));
+        var frame = JsonSerializer.SerializeToUtf8Bytes(message, typeInfo);
+        await ForwardProtocol.WriteFrameAsync(stream, frame, token);
+    }
+
+    private static async Task<object?> ReadAsync(NetworkStream stream, CancellationToken token)
+    {
+        var frame = await ForwardProtocol.ReadFrameAsync(stream, token);
+        var type = frame is null ? null : ForwardProtocol.ReadType(frame);
+
+        return type switch
+        {
+            ForwardProtocol.PairChallenge => Deserialize<PairChallengeMessage>(frame),
+            ForwardProtocol.PairAccept => Deserialize<PairAcceptMessage>(frame),
+            ForwardProtocol.PairReject => Deserialize<PairRejectMessage>(frame),
+            ForwardProtocol.ForwardReply => Deserialize<ForwardReplyMessage>(frame),
+            ForwardProtocol.Status => Deserialize<StatusMessage>(frame),
+            _ => null
+        };
+    }
+
+    private static T? Deserialize<T>(byte[]? frame) where T : class =>
+        frame is null ? null : JsonSerializer.Deserialize(frame, (JsonTypeInfo<T>)NativeJson.TypeInfo(typeof(T)));
 }

@@ -1,8 +1,8 @@
 namespace URLCheck.Models;
 
 /// <summary>
-///     A peer device that URLs can be forwarded to. It is located by host and port; the shared pairing
-///     code authenticates the two ends to each other.
+///     A device that has been paired with this one. The public key is pinned when the pairing is
+///     confirmed, and every handshake from then on is verified against it.
 /// </summary>
 internal sealed class DeviceEntry
 {
@@ -13,6 +13,9 @@ internal sealed class DeviceEntry
     /// <summary>Host name or IP address of the peer on the local network.</summary>
     public string Host { get; set; } = string.Empty;
 
-    /// <summary>Port the peer's forwarding listener is bound to.</summary>
+    /// <summary>Port the peer's listener is bound to.</summary>
     public int Port { get; set; } = AppSettings.DefaultForwardPort;
+
+    /// <summary>The peer's Ed25519 public key, base64. Empty until the device has been paired.</summary>
+    public string PublicKey { get; set; } = string.Empty;
 }

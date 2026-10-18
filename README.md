@@ -44,8 +44,9 @@ desktop version.
   appear next to the pointer; one click opens the inspection popup without switching applications.
   It can be turned off in the settings.
 - **Forward to another device** — send a URL from the popup to another URLCheck on the local
-  network, where it opens in its own inspection popup. Devices are paired with a shared code and
-  the transfer is encrypted, and nothing ever leaves the network.
+  network, where it opens in its own inspection popup. Devices find each other automatically and
+  pair by confirming a one-time code, and every transfer is end-to-end encrypted; nothing leaves
+  the network.
 
 ## Built with
 
@@ -159,6 +160,7 @@ That produces a single self-contained executable per platform under
 |----------|------------------------------------------|------------------------------------------|
 | Settings | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
 | History  | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
+| Device key | `%APPDATA%\URLCheck\device.key`        | `~/.config/URLCheck/device.key`          |
 | Logs     | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
 
 Logs are written to the file and mirrored to the console, so a log file is enough to report a

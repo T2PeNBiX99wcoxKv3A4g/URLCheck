@@ -74,12 +74,26 @@ internal sealed record SelectionShowPayload(string Url);
 internal sealed record ForwardSendPayload(bool Ok, string Device);
 
 /// <summary>
-///     Body for <c>forward.info</c>: how this device can be reached, plus whether the listener is
-///     currently accepting forwarded URLs.
+///     Body for <c>forward.info</c>: how this device can be reached, whether it is listening, and the
+///     public key that identifies it.
 /// </summary>
 internal sealed record ForwardInfoPayload(
     string DeviceId,
     string DeviceName,
     int Port,
     IReadOnlyList<string> Addresses,
-    bool Listening);
+    bool Enabled,
+    bool Listening,
+    string PublicKey);
+
+/// <summary>Body for the <c>forward.discovered</c> event: devices found on the local network.</summary>
+internal sealed record ForwardDiscoveredPayload(IReadOnlyList<DeviceEntry> Devices);
+
+/// <summary>
+///     Body for the <c>forward.pairState</c> event: progress of a pairing this device started.
+///     <paramref name="State" /> is <c>code</c>, <c>accepted</c>, <c>rejected</c> or <c>failed</c>.
+/// </summary>
+internal sealed record ForwardPairStatePayload(string State, string? Code, DeviceEntry? Device, string? Error);
+
+/// <summary>Body for the <c>forward.pairRequest</c> event: a peer asking to pair, for the user to confirm.</summary>
+internal sealed record ForwardPairRequestPayload(string RequestId, string DeviceId, string DeviceName, string Code);

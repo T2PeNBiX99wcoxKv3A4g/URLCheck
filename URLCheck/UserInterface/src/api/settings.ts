@@ -31,7 +31,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     selectedUserAgentId: "default",
     deviceName: "",
     deviceId: "",
-    pairingCode: "",
+    forwardingEnabled: false,
     forwardPort: 45454,
     devices: [],
 };
@@ -74,12 +74,13 @@ function normalize(settings: AppSettings): AppSettings {
         showUrlButton: settings.showUrlButton ?? DEFAULT_SETTINGS.showUrlButton,
         deviceName: settings.deviceName ?? DEFAULT_SETTINGS.deviceName,
         deviceId: settings.deviceId ?? DEFAULT_SETTINGS.deviceId,
-        pairingCode: settings.pairingCode ?? DEFAULT_SETTINGS.pairingCode,
+        forwardingEnabled: settings.forwardingEnabled ?? DEFAULT_SETTINGS.forwardingEnabled,
         forwardPort: settings.forwardPort ?? DEFAULT_SETTINGS.forwardPort,
         devices: (Array.isArray(settings.devices) ? settings.devices : []).map((device) => ({
             ...device,
             host: device.host ?? "",
             port: device.port ?? DEFAULT_SETTINGS.forwardPort,
+            publicKey: device.publicKey ?? "",
         })),
     };
 }

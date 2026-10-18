@@ -65,15 +65,15 @@ internal sealed class AppSettings
     public string DeviceId { get; set; } = "";
 
     /// <summary>
-    ///     Shared secret for device forwarding. It authenticates peers and encrypts the URLs on the
-    ///     wire; the listener only runs while it is set.
+    ///     Accept pairing requests and forwarded URLs: opens the listener and answers discovery queries.
+    ///     Off by default, so nothing is reachable until the user turns it on.
     /// </summary>
-    public string PairingCode { get; set; } = "";
+    public bool ForwardingEnabled { get; set; }
 
-    /// <summary>Port this device listens on for incoming forwarded URLs.</summary>
+    /// <summary>Port this device listens on for pairing and incoming forwarded URLs.</summary>
     public int ForwardPort { get; set; } = DefaultForwardPort;
 
-    /// <summary>Peer devices URLs can be forwarded to; the popup hides its button while this is empty.</summary>
+    /// <summary>Paired devices URLs can be forwarded to; the popup hides its button while this is empty.</summary>
     public List<DeviceEntry> Devices { get; set; } = [];
 
     public AppSettings Clone() => (AppSettings)MemberwiseClone();

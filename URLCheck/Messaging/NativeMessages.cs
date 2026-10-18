@@ -100,6 +100,15 @@ internal sealed record PopupResizeRequest(int Height);
 /// <summary>Payload for <c>forward.send</c>: the URL to forward and the target device.</summary>
 internal sealed record ForwardSendRequest(string Url, string? DeviceId);
 
+/// <summary>Payload for <c>forward.pair</c>: the address of the device to pair with.</summary>
+internal sealed record ForwardPairStartRequest(string Host, int Port);
+
+/// <summary>Payload for <c>forward.pairRespond</c>: the user's answer to an incoming pairing request.</summary>
+internal sealed record ForwardPairRespondRequest(string RequestId, bool Accept);
+
+/// <summary>Payload for <c>forward.remove</c>: the paired device to forget.</summary>
+internal sealed record ForwardRemoveRequest(string DeviceId);
+
 /// <summary>
 ///     Payload for the <c>inspect.*</c> messages. The User-Agent is optional: the configured default is used when it
 ///     is empty.

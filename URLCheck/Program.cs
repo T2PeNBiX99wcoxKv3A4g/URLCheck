@@ -131,7 +131,7 @@ internal static class Program
             manager.CreateMainWindow();
 
             // Needs the window manager: a forwarded URL is opened in the inspection popup.
-            _ = new ForwardService(settings, manager);
+            _ = new ForwardService(settings, manager, DeviceIdentity.LoadOrCreate());
 
             StartTray(tray, manager);
 
