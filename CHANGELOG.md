@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.5..v0.5.6) - 2026-10-18
+
+### 🐛 Bug Fixes
+
+- *(linux)* Let the selection button window take its size - ([0351f3b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0351f3b1a8ed4e426bccec85918867c0ae1cd45a))
+- *(linux)* Report a copied value as soon as it arrives - ([52ac507](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/52ac507cbae8eab70dee37e423712fd5b6860467))
+- *(linux)* Write an autostart entry the session can actually run - ([f5a948d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f5a948d4f597e7089ae194870a7ce59dd8700d7f))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([54612af](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/54612af47dd58b3546f371a82d694b632fe9fd9b))
+
+
 ## [0.5.5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.4..v0.5.5) - 2026-10-18
 
 ### 🚜 Refactor
