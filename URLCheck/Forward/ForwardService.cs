@@ -549,9 +549,7 @@ internal sealed class ForwardService
         var existing = settings.Devices.FirstOrDefault(device => device.Id == peer.Id);
 
         if (existing is null)
-        {
             settings.Devices.Add(peer);
-        }
         else
         {
             existing.Name = peer.Name;

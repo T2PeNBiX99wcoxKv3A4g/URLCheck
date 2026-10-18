@@ -194,7 +194,7 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
             {
                 var announce = new AnnounceMessage(ForwardProtocol.Announce, _deviceId, _deviceName, _port, _publicKey);
                 var frame = JsonSerializer.SerializeToUtf8Bytes(announce, AppJsonContext.Default.AnnounceMessage);
-                await client.SendAsync(frame, result.RemoteEndPoint);
+                await client.SendAsync(frame, result.RemoteEndPoint, token);
                 return;
             }
 
@@ -276,8 +276,14 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
     private async Task ScanAsync(CancellationToken token)
     {
         var ports = _port == AppSettings.DefaultForwardPort
-            ? new[] { _port }
-            : new[] { _port, AppSettings.DefaultForwardPort };
+            ? new[]
+            {
+                _port
+            }
+            : new[]
+            {
+                _port, AppSettings.DefaultForwardPort
+            };
 
         var networks = LocalNetworks();
         var targets = CandidateAddresses(networks);
@@ -307,7 +313,7 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
             await client.ConnectAsync(address, port, cts.Token);
 
             var stream = client.GetStream();
-            var query = JsonSerializer.SerializeToUtf8Bytes(new DiscoverMessage(ForwardProtocol.Discover),
+            var query = JsonSerializer.SerializeToUtf8Bytes(new(ForwardProtocol.Discover),
                 AppJsonContext.Default.DiscoverMessage);
             await ForwardProtocol.WriteFrameAsync(stream, query, cts.Token);
 
@@ -449,7 +455,7 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
                 continue;
 
             var address = unicast.Address.GetAddressBytes();
-            var mask = unicast.IPv4Mask?.GetAddressBytes() ?? new byte[4];
+            var mask = unicast.IPv4Mask.GetAddressBytes();
             var broadcast = new byte[4];
             for (var i = 0; i < 4; i++)
                 broadcast[i] = (byte)(address[i] | ~mask[i]);

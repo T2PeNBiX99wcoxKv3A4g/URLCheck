@@ -1,5 +1,6 @@
 using System.Buffers.Binary;
 using System.Text.Json;
+using JetBrains.Annotations;
 
 namespace URLCheck.Forward;
 
@@ -13,16 +14,7 @@ internal static class ForwardProtocol
     public const int DiscoveryPort = 45_455;
 
     /// <summary>Largest frame accepted; a forwarded URL is bounded well below this.</summary>
-    public const int MaxFrame = 64 * 1024;
-
-    /// <summary>How long a pairing request waits for the user to confirm it.</summary>
-    public static readonly TimeSpan PairTimeout = TimeSpan.FromMinutes(2);
-
-    /// <summary>How long a single connection may take before it is abandoned.</summary>
-    public static readonly TimeSpan ConnectionTimeout = TimeSpan.FromSeconds(15);
-
-    /// <summary>How long a forwarded URL stays valid, as a second line of defence against replay.</summary>
-    public static readonly TimeSpan MaxMessageAge = TimeSpan.FromMinutes(5);
+    [PublicAPI] public const int MaxFrame = 64 * 1024;
 
     public const string Discover = "discover";
     public const string Announce = "announce";
@@ -34,6 +26,15 @@ internal static class ForwardProtocol
     public const string ForwardReply = "forward.reply";
     public const string ForwardData = "forward.data";
     public const string Status = "status";
+
+    /// <summary>How long a pairing request waits for the user to confirm it.</summary>
+    public static readonly TimeSpan PairTimeout = TimeSpan.FromMinutes(2);
+
+    /// <summary>How long a single connection may take before it is abandoned.</summary>
+    public static readonly TimeSpan ConnectionTimeout = TimeSpan.FromSeconds(15);
+
+    /// <summary>How long a forwarded URL stays valid, as a second line of defence against replay.</summary>
+    public static readonly TimeSpan MaxMessageAge = TimeSpan.FromMinutes(5);
 
     /// <summary>Reads one length-prefixed frame, or returns <c>null</c> when it is missing or too large.</summary>
     public static async Task<byte[]?> ReadFrameAsync(Stream stream, CancellationToken token)
@@ -108,7 +109,12 @@ internal sealed record PairAcceptMessage(string Type, string Signature);
 internal sealed record PairRejectMessage(string Type, string Reason);
 
 /// <summary>Opens a forwarding connection: the sender's identity plus an ephemeral X25519 key.</summary>
-internal sealed record ForwardHelloMessage(string Type, string DeviceId, string EphemeralKey, string Nonce, string Signature);
+internal sealed record ForwardHelloMessage(
+    string Type,
+    string DeviceId,
+    string EphemeralKey,
+    string Nonce,
+    string Signature);
 
 /// <summary>The receiver's ephemeral key and signature over the whole handshake.</summary>
 internal sealed record ForwardReplyMessage(string Type, string EphemeralKey, string Nonce, string Signature);
