@@ -35,6 +35,7 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
     private string _publicKey = "";
     private CancellationTokenSource? _queryCts;
     private CancellationTokenSource? _receiveCts;
+    private bool _scanning;
     private bool _searching;
     private UdpClient? _v4;
     private UdpClient? _v6;
@@ -67,13 +68,12 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
     {
         lock (_gate)
         {
-            if (_v4 is null && _v6 is null)
-                return;
-
             _searching = true;
             _found.Clear();
             StopQuery();
             _queryCts = new();
+
+            // Runs even when the UDP sockets could not be opened: the TCP sweep does not need them.
             _ = Task.Run(() => QueryLoopAsync(_queryCts.Token));
         }
     }
@@ -182,7 +182,10 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
 
     private async Task HandleDatagramAsync(UdpClient client, UdpReceiveResult result, CancellationToken token)
     {
-        switch (ForwardProtocol.ReadType(result.Buffer))
+        var type = ForwardProtocol.ReadType(result.Buffer);
+        Log.Debug("Discovery datagram {Type} from {From}", type, result.RemoteEndPoint);
+
+        switch (type)
         {
             case ForwardProtocol.Discover:
             {
@@ -198,17 +201,7 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
                     return;
 
                 var announce = JsonSerializer.Deserialize(result.Buffer, AppJsonContext.Default.AnnounceMessage);
-                if (announce is null || announce.DeviceId == _deviceId || announce.PublicKey.Length == 0)
-                    return;
-
-                _found[announce.DeviceId] = (new()
-                {
-                    Id = announce.DeviceId,
-                    Name = announce.DeviceName,
-                    Host = HostOf(result.RemoteEndPoint),
-                    Port = announce.Port,
-                    PublicKey = announce.PublicKey
-                }, Environment.TickCount64);
+                Record(announce, HostOf(result.RemoteEndPoint));
                 return;
             }
         }
@@ -216,10 +209,19 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
 
     private async Task QueryLoopAsync(CancellationToken token)
     {
+        var lastScan = 0L;
+
         while (!token.IsCancellationRequested)
         {
             SendQuery();
             Publish();
+
+            // The UDP query is cheap and repeats; the TCP sweep is heavier, so it runs less often.
+            if (Environment.TickCount64 - lastScan > 10_000)
+            {
+                lastScan = Environment.TickCount64;
+                StartScan(token);
+            }
 
             try
             {
@@ -230,6 +232,159 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
                 break;
             }
         }
+    }
+
+    private void StartScan(CancellationToken token)
+    {
+        lock (_gate)
+        {
+            if (_scanning)
+                return;
+
+            _scanning = true;
+        }
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await ScanAsync(token);
+            }
+            catch (OperationCanceledException)
+            {
+                // The search was closed; nothing to do.
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "The discovery sweep failed");
+            }
+            finally
+            {
+                lock (_gate)
+                    _scanning = false;
+            }
+        }, token);
+    }
+
+    /// <summary>
+    ///     Sweeps the local /24 over TCP, asking each host whether it is a device. It never needs an
+    ///     inbound packet, so it still works when the UDP broadcast is blocked.
+    /// </summary>
+    private async Task ScanAsync(CancellationToken token)
+    {
+        var ports = _port == AppSettings.DefaultForwardPort
+            ? new[] { _port }
+            : new[] { _port, AppSettings.DefaultForwardPort };
+
+        var networks = LocalNetworks();
+        var targets = CandidateAddresses(networks);
+        if (targets.Count == 0)
+            return;
+
+        Log.Information("Device discovery is probing {Count} addresses on {Networks} over TCP",
+            targets.Count, string.Join(", ", networks));
+
+        foreach (var port in ports.Distinct())
+            await Parallel.ForEachAsync(targets, new ParallelOptions
+            {
+                MaxDegreeOfParallelism = 64,
+                CancellationToken = token
+            }, async (address, ct) => await ProbeAsync(address, port, ct));
+    }
+
+    private async Task ProbeAsync(IPAddress address, int port, CancellationToken token)
+    {
+        try
+        {
+            using var client = new TcpClient();
+            client.NoDelay = true;
+
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+            cts.CancelAfter(TimeSpan.FromMilliseconds(400));
+            await client.ConnectAsync(address, port, cts.Token);
+
+            var stream = client.GetStream();
+            var query = JsonSerializer.SerializeToUtf8Bytes(new DiscoverMessage(ForwardProtocol.Discover),
+                AppJsonContext.Default.DiscoverMessage);
+            await ForwardProtocol.WriteFrameAsync(stream, query, cts.Token);
+
+            var reply = await ForwardProtocol.ReadFrameAsync(stream, cts.Token);
+            if (reply is null || ForwardProtocol.ReadType(reply) != ForwardProtocol.Announce)
+                return;
+
+            var announce = JsonSerializer.Deserialize(reply, AppJsonContext.Default.AnnounceMessage);
+            Record(announce, address.ToString());
+        }
+        catch (Exception)
+        {
+            // A host that does not answer is simply not a device.
+        }
+    }
+
+    /// <summary>The distinct /24 prefixes this device's IPv4 addresses live in.</summary>
+    private static List<string> LocalNetworks()
+    {
+        var networks = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var nic in UpInterfaces(NetworkInterfaceComponent.IPv4))
+        foreach (var unicast in nic.GetIPProperties().UnicastAddresses)
+        {
+            if (unicast.Address.AddressFamily != AddressFamily.InterNetwork)
+                continue;
+
+            var self = unicast.Address.GetAddressBytes();
+            networks.Add($"{self[0]}.{self[1]}.{self[2]}.0/24");
+        }
+
+        return [.. networks];
+    }
+
+    /// <summary>The other hosts in the given /24 networks.</summary>
+    private static List<IPAddress> CandidateAddresses(List<string> networks)
+    {
+        var local = new HashSet<IPAddress>();
+        foreach (var nic in UpInterfaces(NetworkInterfaceComponent.IPv4))
+        foreach (var unicast in nic.GetIPProperties().UnicastAddresses)
+            if (unicast.Address.AddressFamily == AddressFamily.InterNetwork)
+                local.Add(unicast.Address);
+
+        var candidates = new List<IPAddress>();
+        foreach (var network in networks)
+        {
+            var parts = network.Split('/')[0].Split('.');
+            var a = byte.Parse(parts[0]);
+            var b = byte.Parse(parts[1]);
+            var c = byte.Parse(parts[2]);
+
+            for (var host = 1; host <= 254; host++)
+            {
+                var address = new IPAddress([a, b, c, (byte)host]);
+                if (!local.Contains(address))
+                    candidates.Add(address);
+            }
+        }
+
+        return candidates;
+    }
+
+    private void Record(AnnounceMessage? announce, string host)
+    {
+        if (announce is null || announce.DeviceId == _deviceId || announce.PublicKey.Length == 0)
+            return;
+
+        var device = new DeviceEntry
+        {
+            Id = announce.DeviceId,
+            Name = announce.DeviceName,
+            Host = host,
+            Port = announce.Port,
+            PublicKey = announce.PublicKey
+        };
+
+        if (_found.TryAdd(announce.DeviceId, (device, Environment.TickCount64)))
+            Log.Information("Device discovery found {Name} at {Host}:{Port}", announce.DeviceName, host, announce.Port);
+        else
+            _found[announce.DeviceId] = (device, Environment.TickCount64);
     }
 
     private void SendQuery()
@@ -261,7 +416,15 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
             .OrderBy(device => device.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        onDiscovered(devices);
+        try
+        {
+            onDiscovered(devices);
+        }
+        catch (Exception ex)
+        {
+            // A window that cannot take the event must not stop the search loop.
+            Log.Debug(ex, "Failed to publish discovered devices");
+        }
     }
 
     /// <summary>Every interface's broadcast address, so all of them are probed and not just the default one.</summary>

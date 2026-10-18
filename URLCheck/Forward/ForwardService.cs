@@ -337,6 +337,11 @@ internal sealed class ForwardService
                         await HandleForwardHelloAsync(stream, frame, cts.Token);
                         break;
 
+                    // A device searching over TCP: answer with who we are, then the connection closes.
+                    case ForwardProtocol.Discover:
+                        await HandleDiscoverAsync(stream, cts.Token);
+                        break;
+
                     default:
                         await WriteStatusAsync(stream, false, "error.forwardFailed", cts.Token);
                         break;
@@ -445,6 +450,18 @@ internal sealed class ForwardService
                 if (_incoming?.RequestId == requestId)
                     _incoming = null;
         }
+    }
+
+    /// <summary>
+    ///     Answers a TCP discovery query. This is the reliable half of discovery: it only needs the
+    ///     listener's inbound TCP, which pairing already requires, so it works even when a firewall
+    ///     blocks the inbound UDP that broadcast discovery depends on.
+    /// </summary>
+    private async Task HandleDiscoverAsync(NetworkStream stream, CancellationToken token)
+    {
+        var settings = await _settings.GetAsync();
+        await WriteMessageAsync(stream, new AnnounceMessage(ForwardProtocol.Announce, settings.DeviceId,
+            settings.DeviceName, settings.ForwardPort, _identity.PublicKeyBase64), token);
     }
 
     private async Task HandleForwardHelloAsync(NetworkStream stream, byte[] frame, CancellationToken token)
