@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Serilog;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Interop;
 
@@ -223,15 +225,6 @@ internal sealed class WindowsTrayIcon(
             WindowProc(_hwnd, WmCommand, command, IntPtr.Zero);
     }
 
-    private static void SafeInvoke(Action action)
-    {
-        try
-        {
-            action();
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Tray callback failed");
-        }
-    }
+    private static void SafeInvoke(Action action) =>
+        Try.Run(action).OnFailure(ex => Log.Warning(ex, "Tray callback failed"));
 }

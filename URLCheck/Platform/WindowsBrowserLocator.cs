@@ -2,12 +2,14 @@ using System.Runtime.Versioning;
 using Microsoft.Win32;
 using Serilog;
 using URLCheck.Models;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Platform;
 
 /// <summary>Reads installed browsers from the Windows "StartMenuInternet" client registry.</summary>
 [SupportedOSPlatform("windows")]
-internal sealed class WindowsBrowserLocator : IBrowserLocator
+internal sealed class WindowsBrowserLocator : Singleton<WindowsBrowserLocator>, IBrowserLocator
 {
     private const string OwnClientName = "URLCheck";
 
@@ -26,14 +28,8 @@ internal sealed class WindowsBrowserLocator : IBrowserLocator
                      Registry.LocalMachine, Registry.CurrentUser
                  })
         foreach (var root in ClientRoots)
-            try
-            {
-                ScanRoot(hive, root, found);
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex, "Failed to scan {Root}", root);
-            }
+            Try.Run(() => ScanRoot(hive, root, found))
+                .OnFailure(ex => Log.Warning(ex, "Failed to scan {Root}", root));
 
         return
         [

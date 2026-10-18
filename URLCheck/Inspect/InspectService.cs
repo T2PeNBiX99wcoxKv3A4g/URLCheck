@@ -1,11 +1,13 @@
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Services;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Inspect;
 
 /// <summary>Answers the <c>inspect.*</c> messages: the HTTP status of a URL, redirects included.</summary>
-internal sealed class InspectService
+internal sealed class InspectService : Singleton<InspectService>
 {
     /// <summary>
     ///     Never follows redirects, so the response keeps its own status: a redirect comes back as the
@@ -17,13 +19,9 @@ internal sealed class InspectService
         AllowAutoRedirect = false
     });
 
-    private readonly SettingsService _settings;
+    private readonly SettingsService _settings = SettingsService.Instance;
 
-    public InspectService(SettingsService settings)
-    {
-        _settings = settings;
-        NativeBridge.MessageReceived += HandleMessageAsync;
-    }
+    public InspectService() => NativeBridge.MessageReceived += HandleMessageAsync;
 
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch
     {
@@ -38,7 +36,7 @@ internal sealed class InspectService
 
         var settings = await _settings.GetAsync();
 
-        try
+        var result = await Try.Run(async () =>
         {
             using var cts = new CancellationTokenSource(settings.RequestTimeoutMs);
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
@@ -46,16 +44,13 @@ internal sealed class InspectService
 
             using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
-            return context.Reply("inspect.status.result",
-                new InspectStatusPayload((int)response.StatusCode, response.ReasonPhrase ?? string.Empty,
-                    response.IsSuccessStatusCode, response.Headers.Location?.ToString()));
-        }
-        catch (Exception ex)
-        {
-            // A failed request (DNS, TLS, timeout, ...) is reported as a non-OK status.
-            return context.Reply("inspect.status.result",
-                new InspectStatusPayload(0, ex is TaskCanceledException ? "error.timeout" : ex.Message, false, null));
-        }
+            return new InspectStatusPayload((int)response.StatusCode, response.ReasonPhrase ?? string.Empty,
+                response.IsSuccessStatusCode, response.Headers.Location?.ToString());
+        });
+
+        // A failed request (DNS, TLS, timeout, ...) is reported as a non-OK status.
+        return context.Reply("inspect.status.result", result.GetOrElse(ex =>
+            new InspectStatusPayload(0, ex is TaskCanceledException ? "error.timeout" : ex.Message, false, null)));
     }
 
     /// <summary>

@@ -1,6 +1,8 @@
 using System.IO.Pipes;
 using JetBrains.Annotations;
 using Serilog;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Services;
 
@@ -13,7 +15,7 @@ namespace URLCheck.Services;
 ///     enforced across processes by both platforms (share modes on Windows, <c>flock</c> on Unix),
 ///     whereas a named <see cref="Mutex" /> is not a reliable cross-process primitive on Unix.
 /// </remarks>
-internal sealed class SingleInstance : IDisposable
+internal sealed class SingleInstance : Singleton<SingleInstance>, IDisposable
 {
     private const string PipeName = "URLCheck.Ipc";
     private readonly CancellationTokenSource _cts = new();
@@ -51,9 +53,8 @@ internal sealed class SingleInstance : IDisposable
 
     /// <summary>Hands the arguments to the already-running instance. Returns false on failure.</summary>
     [PublicAPI]
-    public static async Task<bool> ForwardAsync(IReadOnlyList<string> args)
-    {
-        try
+    public async Task<bool> ForwardAsync(IReadOnlyList<string> args) =>
+        (await Try.Run(async () =>
         {
             await using var client = new NamedPipeClientStream(".", PipeName, PipeDirection.Out);
             await client.ConnectAsync(3000);
@@ -64,13 +65,11 @@ internal sealed class SingleInstance : IDisposable
 
             Log.Information("Forwarded {Count} argument(s) to the running instance", args.Count);
             return true;
-        }
-        catch (Exception ex)
+        })).GetOrElse(ex =>
         {
             Log.Warning(ex, "Failed to forward arguments to the running instance");
             return false;
-        }
-    }
+        });
 
     /// <summary>Starts the pipe server; <paramref name="onArguments" /> runs on a background thread.</summary>
     public void StartServer(Action<IReadOnlyList<string>> onArguments) =>

@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Serilog;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Platform;
 
@@ -43,15 +45,17 @@ internal static class LinuxDiagnostics
                  {
                      "libayatana-appindicator3.so.1", "libappindicator3.so.1"
                  })
-            try
-            {
-                if (NativeLibrary.TryLoad(name, out _))
-                    return name;
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex, "Failed to probe {Library}", name);
-            }
+        {
+            var found = Try.Run<string?>(() => NativeLibrary.TryLoad(name, out _) ? name : null)
+                .GetOrElse(ex =>
+                {
+                    Log.Debug(ex, "Failed to probe {Library}", name);
+                    return null;
+                });
+
+            if (found is not null)
+                return found;
+        }
 
         return null;
     }

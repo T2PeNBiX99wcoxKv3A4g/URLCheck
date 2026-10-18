@@ -2,19 +2,16 @@ using System.Diagnostics;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Platform;
+using URLCheck.Utils;
 
 namespace URLCheck.Services;
 
 /// <summary>Lists browsers through the platform locator and launches them with a URL.</summary>
-internal sealed class BrowserService
+internal sealed class BrowserService : Singleton<BrowserService>
 {
-    private readonly IBrowserLocator _locator;
+    private readonly IBrowserLocator _locator = PlatformServices.BrowserLocator;
 
-    public BrowserService(IBrowserLocator locator)
-    {
-        _locator = locator;
-        NativeBridge.MessageReceived += HandleMessageAsync;
-    }
+    public BrowserService() => NativeBridge.MessageReceived += HandleMessageAsync;
 
     /// <summary>Starts <paramref name="browser" /> with <paramref name="url" />, honouring its extra arguments.</summary>
     public static void Launch(BrowserEntry browser, string url, bool privateMode = false)

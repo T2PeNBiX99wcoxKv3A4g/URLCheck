@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Text;
 using Serilog;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Platform;
 
@@ -11,7 +13,7 @@ namespace URLCheck.Platform;
 ///     pulls it with an asynchronous request.
 /// </summary>
 [SupportedOSPlatform("linux")]
-internal sealed class LinuxClipboardWatcher : IClipboardWatcher
+internal sealed class LinuxClipboardWatcher : Singleton<LinuxClipboardWatcher>, IClipboardWatcher
 {
     /// <summary>Opens each value in the child's output. A control byte can never appear in a URL.</summary>
     private const byte Separator = 0x01;
@@ -42,15 +44,11 @@ internal sealed class LinuxClipboardWatcher : IClipboardWatcher
     {
         _cancellation?.Cancel();
 
-        try
+        Try.Run(() =>
         {
             if (_process is { HasExited: false } process)
                 process.Kill(true);
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "Failed to stop the clipboard watcher");
-        }
+        }).OnFailure(ex => Log.Debug(ex, "Failed to stop the clipboard watcher"));
 
         _process = null;
         _cancellation?.Dispose();
@@ -71,7 +69,7 @@ internal sealed class LinuxClipboardWatcher : IClipboardWatcher
         if (Environment.GetEnvironmentVariable("WAYLAND_DISPLAY") is not { Length: > 0 })
             return false;
 
-        try
+        return Try.Run(() =>
         {
             var startInfo = new ProcessStartInfo("wl-paste")
             {
@@ -100,13 +98,12 @@ internal sealed class LinuxClipboardWatcher : IClipboardWatcher
 
             Log.Information("Watching the clipboard through wl-paste");
             return true;
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             // No wl-paste installed, or no Wayland session after all.
             Log.Information(ex, "Could not watch the clipboard through wl-paste: {Message}", ex.Message);
             return false;
-        }
+        });
     }
 
     /// <summary>Reads the child's output and reports every value the marker delimits.</summary>
@@ -156,25 +153,10 @@ internal sealed class LinuxClipboardWatcher : IClipboardWatcher
         if (value.Count == 0)
             return;
 
-        try
-        {
-            TextCopied?.Invoke(Encoding.UTF8.GetString(value.ToArray()));
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Clipboard handler failed");
-        }
+        Try.Run(() => TextCopied?.Invoke(Encoding.UTF8.GetString(value.ToArray())))
+            .OnFailure(ex => Log.Warning(ex, "Clipboard handler failed"));
     }
 
-    private void OnTextCopied(string text)
-    {
-        try
-        {
-            TextCopied?.Invoke(text);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Clipboard handler failed");
-        }
-    }
+    private void OnTextCopied(string text) =>
+        Try.Run(() => TextCopied?.Invoke(text)).OnFailure(ex => Log.Warning(ex, "Clipboard handler failed"));
 }

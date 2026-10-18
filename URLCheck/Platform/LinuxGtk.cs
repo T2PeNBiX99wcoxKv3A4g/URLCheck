@@ -2,6 +2,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Serilog;
 using Serilog.Events;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Platform;
 
@@ -51,21 +53,13 @@ internal static partial class LinuxGtk
     ///     Whether the screen supports RGBA visuals at all. This can be answered without a window, which
     ///     matters because the decision has to be taken before the popup is created.
     /// </summary>
-    public static bool CanBeTransparent
-    {
-        get
-        {
-            try
-            {
-                return gdk_screen_get_rgba_visual(gdk_screen_get_default()) != IntPtr.Zero;
-            }
-            catch (Exception ex)
+    public static bool CanBeTransparent =>
+        Try.Run(() => gdk_screen_get_rgba_visual(gdk_screen_get_default()) != IntPtr.Zero)
+            .GetOrElse(ex =>
             {
                 Log.Debug(ex, "Could not query the screen's RGBA visual");
                 return false;
-            }
-        }
-    }
+            });
 
     /// <summary>
     ///     Hides a toplevel by title. Returns false when it could not be found. Unmapping is what takes
@@ -91,17 +85,8 @@ internal static partial class LinuxGtk
     });
 
     /// <summary>Sets the program name, which GTK reports as the Wayland app id.</summary>
-    public static void SetProgramName(string name)
-    {
-        try
-        {
-            g_set_prgname(name);
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "Failed to set the program name");
-        }
-    }
+    public static void SetProgramName(string name) =>
+        Try.Run(() => g_set_prgname(name)).OnFailure(ex => Log.Debug(ex, "Failed to set the program name"));
 
     /// <summary>Connects a GObject signal. The caller has to keep the callback alive.</summary>
     public static void Connect(IntPtr instance, string signal, Delegate callback, IntPtr data) =>
@@ -155,9 +140,8 @@ internal static partial class LinuxGtk
     ///     RGBA visual plus a draw handler that clears the background, and both have to be in place
     ///     before the window is realised.
     /// </summary>
-    public static bool MakeTransparent(string title)
-    {
-        try
+    public static bool MakeTransparent(string title) =>
+        Try.Run(() =>
         {
             var window = FindByTitle(title);
             if (window == IntPtr.Zero)
@@ -180,21 +164,18 @@ internal static partial class LinuxGtk
 
             Log.Information("Popup background is transparent (realised={Realized})", realized);
             return true;
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Warning(ex, "Failed to make {Title} transparent", title);
             return false;
-        }
-    }
+        });
 
     /// <summary>
     ///     Clears the web view's own background. Without this the GTK window can be transparent and the
     ///     page can have transparent corners, and WebKit still paints opaque white behind them.
     /// </summary>
-    public static bool MakeWebViewTransparent(string title)
-    {
-        try
+    public static bool MakeWebViewTransparent(string title) =>
+        Try.Run(() =>
         {
             var webView = FindWebView(FindByTitle(title));
             if (webView == IntPtr.Zero)
@@ -211,13 +192,11 @@ internal static partial class LinuxGtk
 
             Log.Information("Web view background cleared");
             return true;
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Warning(ex, "Failed to clear the web view background");
             return false;
-        }
-    }
+        });
 
     /// <summary>
     ///     The pointer position in screen coordinates. Wayland deliberately hides the global pointer, so
@@ -254,9 +233,8 @@ internal static partial class LinuxGtk
     ///     trip a GDK assertion on every poll. Wayland only reports input aimed at this client's own
     ///     surfaces, so this is effectively X11-only; elsewhere it simply stays false.
     /// </summary>
-    public static bool IsPointerButtonPressed()
-    {
-        try
+    public static bool IsPointerButtonPressed() =>
+        Try.Run(() =>
         {
             var root = gdk_get_default_root_window();
             if (root == IntPtr.Zero)
@@ -276,21 +254,18 @@ internal static partial class LinuxGtk
 
             gdk_device_get_state(pointer, root, IntPtr.Zero, out var mask);
             return (mask & PointerButtonMask) != 0;
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Debug(ex, "Could not read the pointer state");
             return false;
-        }
-    }
+        });
 
     /// <summary>
     ///     Watches the clipboard and reports every new text selection. The text is requested
     ///     asynchronously, so a busy or frozen clipboard owner can never block this process.
     /// </summary>
-    public static bool WatchClipboard(Action<string> onText)
-    {
-        try
+    public static bool WatchClipboard(Action<string> onText) =>
+        Try.Run(() =>
         {
             _clipboardSink = onText;
             if (_clipboardConnected)
@@ -307,13 +282,11 @@ internal static partial class LinuxGtk
             _clipboardConnected = true;
             Log.Information("Watching the clipboard for copied URLs");
             return true;
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Warning(ex, "Could not watch the clipboard");
             return false;
-        }
-    }
+        });
 
     /// <summary>Stops asking for the clipboard's text. The signal stays connected, it just does nothing.</summary>
     public static void StopWatchingClipboard() => _clipboardSink = null;
@@ -378,9 +351,8 @@ internal static partial class LinuxGtk
         return 0;
     }
 
-    private static bool WithWindow(string title, Action<IntPtr> action)
-    {
-        try
+    private static bool WithWindow(string title, Action<IntPtr> action) =>
+        Try.Run(() =>
         {
             var window = FindByTitle(title);
             if (window == IntPtr.Zero)
@@ -388,13 +360,11 @@ internal static partial class LinuxGtk
 
             action(window);
             return true;
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Debug(ex, "GTK window lookup for {Title} failed", title);
             return false;
-        }
-    }
+        });
 
     private static IntPtr FindByTitle(string title)
     {

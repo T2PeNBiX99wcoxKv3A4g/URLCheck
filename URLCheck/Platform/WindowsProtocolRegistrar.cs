@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
+using URLCheck.Utils;
 
 namespace URLCheck.Platform;
 
@@ -15,7 +16,7 @@ namespace URLCheck.Platform;
 ///     deep-links them to that page.
 /// </remarks>
 [SupportedOSPlatform("windows")]
-internal sealed class WindowsProtocolRegistrar : IProtocolRegistrar
+internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegistrar>, IProtocolRegistrar
 {
     private const string AppKeyName = "URLCheck";
     private const string CustomScheme = "urlcheck";

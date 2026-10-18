@@ -7,6 +7,8 @@ using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Forward;
 
@@ -80,21 +82,15 @@ internal static class ForwardCrypto
         return signer.GenerateSignature();
     }
 
-    public static bool Verify(byte[] publicKey, byte[] message, byte[] signature)
-    {
-        try
+    // A malformed key or signature is a failed verification, never a crash.
+    public static bool Verify(byte[] publicKey, byte[] message, byte[] signature) =>
+        Try.Run(() =>
         {
             var verifier = new Ed25519Signer();
             verifier.Init(false, new Ed25519PublicKeyParameters(publicKey, 0));
             verifier.BlockUpdate(message, 0, message.Length);
             return verifier.VerifySignature(signature);
-        }
-        catch (Exception)
-        {
-            // A malformed key or signature is a failed verification, never a crash.
-            return false;
-        }
-    }
+        }).GetOrElse(_ => false);
 
     /// <summary>A fresh X25519 key pair, used once per connection so every session has its own key.</summary>
     public static (byte[] PrivateKey, byte[] PublicKey) GenerateEphemeralKeyPair()

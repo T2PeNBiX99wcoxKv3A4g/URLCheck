@@ -8,6 +8,8 @@ using Serilog;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Services;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Forward;
 
@@ -16,17 +18,17 @@ namespace URLCheck.Forward;
 ///     accepts pairing requests and forwarded URLs. A URL that arrives opens in the inspection popup,
 ///     so the receiving side still checks it first.
 /// </summary>
-internal sealed class ForwardService
+internal sealed class ForwardService : Singleton<ForwardService>
 {
-    private readonly ForwardDiscovery _discovery;
+    private readonly ForwardDiscovery _discovery = ForwardDiscovery.Instance;
     private readonly SemaphoreSlim _gate = new(1, 1);
-    private readonly DeviceIdentity _identity;
+    private readonly DeviceIdentity _identity = DeviceIdentity.Instance;
 
     /// <summary>The one pairing request currently waiting for the user to accept or reject it.</summary>
     private readonly Lock _incomingLock = new();
 
-    private readonly SettingsService _settings;
-    private readonly WindowManager _windows;
+    private readonly SettingsService _settings = SettingsService.Instance;
+    private readonly WindowManager _windows = WindowManager.Instance;
 
     private IncomingPairing? _incoming;
     private TcpListener? _listener;
@@ -35,15 +37,8 @@ internal sealed class ForwardService
     /// <summary>The port the running listener was built for, so it only restarts on a real change.</summary>
     private string _signature = "";
 
-    public ForwardService(SettingsService settings, WindowManager windows, DeviceIdentity identity)
+    public ForwardService()
     {
-        _settings = settings;
-        _windows = windows;
-        _identity = identity;
-
-        _discovery = new(devices => _windows.RunOnMainWindow(() =>
-            _windows.BroadcastEvent("forward.discovered", new ForwardDiscoveredPayload(devices))));
-
         NativeBridge.MessageReceived += HandleMessageAsync;
         SettingsService.Changed += payload => _ = ApplyAsync(payload.Settings);
         _ = ApplyAsync(null);
@@ -207,13 +202,13 @@ internal sealed class ForwardService
     /// <summary>Brings the listener in line with the settings: it only runs while forwarding is on.</summary>
     private async Task ApplyAsync(AppSettings? settings)
     {
-        settings ??= await _settings.GetAsync();
-        _discovery.Apply(settings, _identity);
+        var current = settings ?? await _settings.GetAsync();
+        _discovery.Apply(current, _identity);
 
-        var signature = settings.ForwardingEnabled ? settings.ForwardPort.ToString() : "";
+        var signature = current.ForwardingEnabled ? current.ForwardPort.ToString() : "";
 
         await _gate.WaitAsync();
-        try
+        Try.Run(() =>
         {
             if (signature == _signature)
                 return;
@@ -221,32 +216,25 @@ internal sealed class ForwardService
             StopListener();
             _signature = signature;
 
-            if (!settings.ForwardingEnabled)
+            if (!current.ForwardingEnabled)
                 return;
 
-            var listener = StartListener(settings.ForwardPort);
+            var listener = StartListener(current.ForwardPort);
             var cts = new CancellationTokenSource();
             _listener = listener;
             _listenerCts = cts;
             _ = Task.Run(() => AcceptLoopAsync(listener, cts.Token));
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to start the forwarding listener on port {Port}", settings.ForwardPort);
-        }
-        finally
-        {
-            _gate.Release();
-        }
+        }).OnFailure(ex =>
+            Log.Warning(ex, "Failed to start the forwarding listener on port {Port}", current.ForwardPort));
+        _gate.Release();
     }
 
     /// <summary>
     ///     Binds the listener on every interface. A dual-stack IPv6 socket serves IPv4 and IPv6 alike,
     ///     so one listener covers both; platforms without an IPv6 stack fall back to IPv4 only.
     /// </summary>
-    private static TcpListener StartListener(int port)
-    {
-        try
+    private TcpListener StartListener(int port) =>
+        Try.Run(() =>
         {
             var dual = new TcpListener(IPAddress.IPv6Any, port);
             dual.Server.DualMode = true;
@@ -254,8 +242,7 @@ internal sealed class ForwardService
 
             Log.Information("Forwarding listener bound to IPv4 and IPv6 on port {Port}", port);
             return dual;
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Debug(ex, "A dual-stack forwarding listener is unavailable; binding IPv4 only");
 
@@ -264,8 +251,7 @@ internal sealed class ForwardService
 
             Log.Information("Forwarding listener bound to IPv4 on port {Port}", port);
             return ipv4;
-        }
-    }
+        });
 
     private void StopListener()
     {
@@ -273,15 +259,7 @@ internal sealed class ForwardService
         _listenerCts?.Dispose();
         _listenerCts = null;
 
-        try
-        {
-            _listener?.Stop();
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "Failed to stop the forwarding listener");
-        }
-
+        Try.Run(() => _listener?.Stop()).OnFailure(ex => Log.Debug(ex, "Failed to stop the forwarding listener"));
         _listener = null;
     }
 
@@ -321,7 +299,7 @@ internal sealed class ForwardService
             client.NoDelay = true;
 
             var stream = client.GetStream();
-            try
+            (await Try.Run(async () =>
             {
                 var frame = await ForwardProtocol.ReadFrameAsync(stream, cts.Token);
                 if (frame is null)
@@ -346,11 +324,7 @@ internal sealed class ForwardService
                         await WriteStatusAsync(stream, false, "error.forwardFailed", cts.Token);
                         break;
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex, "Failed to handle a forwarding connection");
-            }
+            })).OnFailure(ex => Log.Debug(ex, "Failed to handle a forwarding connection"));
         }
     }
 
@@ -413,15 +387,8 @@ internal sealed class ForwardService
                     requestId, request.DeviceId, request.DeviceName, incoming.Code));
             });
 
-            bool accepted;
-            try
-            {
-                accepted = await incoming.Decision.Task.WaitAsync(ForwardProtocol.PairTimeout, token);
-            }
-            catch (Exception)
-            {
-                accepted = false;
-            }
+            var accepted = (await Try.Run(() => incoming.Decision.Task.WaitAsync(ForwardProtocol.PairTimeout, token)))
+                .GetOrElse(_ => false);
 
             if (!accepted)
             {
@@ -596,30 +563,24 @@ internal sealed class ForwardService
     ///     link-local addresses are left out: the latter need a scope id that only means something on
     ///     the machine that owns the interface, so it cannot be typed into the other device.
     /// </summary>
-    private static List<string> LocalAddresses()
-    {
-        try
-        {
-            return
-            [
-                .. NetworkInterface.GetAllNetworkInterfaces()
-                    .Where(nic => nic.OperationalStatus == OperationalStatus.Up &&
-                                  nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
-                    .SelectMany(nic => nic.GetIPProperties().UnicastAddresses)
-                    .Select(address => address.Address)
-                    .Where(IsReachableAddress)
-                    // IPv4 first, so the familiar address stays at the front of the list.
-                    .OrderBy(address => address.AddressFamily == AddressFamily.InterNetwork ? 0 : 1)
-                    .Select(address => address.ToString())
-                    .Distinct()
-            ];
-        }
-        catch (Exception ex)
+    private List<string> LocalAddresses() =>
+        Try.Run<List<string>>(() =>
+        [
+            .. NetworkInterface.GetAllNetworkInterfaces()
+                .Where(nic => nic.OperationalStatus == OperationalStatus.Up &&
+                              nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                .SelectMany(nic => nic.GetIPProperties().UnicastAddresses)
+                .Select(address => address.Address)
+                .Where(IsReachableAddress)
+                // IPv4 first, so the familiar address stays at the front of the list.
+                .OrderBy(address => address.AddressFamily == AddressFamily.InterNetwork ? 0 : 1)
+                .Select(address => address.ToString())
+                .Distinct()
+        ]).GetOrElse(ex =>
         {
             Log.Debug(ex, "Failed to list the local addresses");
             return [];
-        }
-    }
+        });
 
     private static bool IsReachableAddress(IPAddress address) =>
         address.AddressFamily is AddressFamily.InterNetwork or AddressFamily.InterNetworkV6 &&

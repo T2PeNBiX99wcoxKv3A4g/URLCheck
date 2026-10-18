@@ -3,12 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using URLCheck.Data;
 using URLCheck.Messaging;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Services;
 
 /// <summary>Stores the URLs that were intercepted (clicked) in a local SQLite database.</summary>
 [PublicAPI]
-internal sealed class HistoryService
+internal sealed class HistoryService : Singleton<HistoryService>
 {
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly DbContextOptions<HistoryContext> _options;
@@ -41,7 +43,7 @@ internal sealed class HistoryService
         _ = Task.Run(async () =>
         {
             await _gate.WaitAsync();
-            try
+            (await Try.Run(async () =>
             {
                 await using var context = new HistoryContext(_options);
                 context.Entries.Add(new()
@@ -49,15 +51,8 @@ internal sealed class HistoryService
                     Url = url
                 });
                 await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex, "Failed to record a history entry");
-            }
-            finally
-            {
-                _gate.Release();
-            }
+            })).OnFailure(ex => Log.Warning(ex, "Failed to record a history entry"));
+            _gate.Release();
         });
     }
 

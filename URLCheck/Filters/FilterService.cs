@@ -6,6 +6,8 @@ using JetBrains.Annotations;
 using Serilog;
 using URLCheck.Messaging;
 using URLCheck.Models;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Filters;
 
@@ -15,7 +17,7 @@ namespace URLCheck.Filters;
 ///     rules are handed to the popup so it can clean a URL without another round-trip.
 /// </summary>
 [PublicAPI]
-internal sealed class FilterService
+internal sealed class FilterService : Singleton<FilterService>
 {
     private static readonly JsonSerializerOptions ManifestOptions = new(JsonSerializerDefaults.Web)
     {
@@ -209,7 +211,7 @@ internal sealed class FilterService
     /// </summary>
     private async Task<string?> DownloadAsync(FilterListEntry entry)
     {
-        try
+        var result = await Try.Run(async () =>
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, entry.Url);
             if (!string.IsNullOrEmpty(entry.ETag))
@@ -257,13 +259,14 @@ internal sealed class FilterService
             entry.LastUpdated = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             entry.Error = null;
             return null;
-        }
-        catch (Exception ex)
+        });
+
+        return result.GetOrElse(ex =>
         {
             Log.Warning(ex, "Failed to download the filter list {Url}", entry.Url);
             entry.Error = ex.Message;
             return entry.Error;
-        }
+        });
     }
 
     /// <summary>Reads the manifest. Callers hold the gate.</summary>
@@ -275,17 +278,18 @@ internal sealed class FilterService
         if (!File.Exists(_manifestPath))
             return _lists = [];
 
-        try
+        var lists = (await Try.Run(async () =>
         {
             var json = await File.ReadAllTextAsync(_manifestPath);
-            return _lists = JsonSerializer.Deserialize(json,
-                ManifestOptions.GetTypeInfo(typeof(List<FilterListEntry>))) as List<FilterListEntry> ?? [];
-        }
-        catch (Exception ex)
+            return JsonSerializer.Deserialize(json, ManifestOptions.GetTypeInfo(typeof(List<FilterListEntry>)))
+                as List<FilterListEntry> ?? [];
+        })).GetOrElse(ex =>
         {
             Log.Warning(ex, "Failed to read the filter list manifest");
-            return _lists = [];
-        }
+            return [];
+        });
+
+        return _lists = lists;
     }
 
     /// <summary>Writes the manifest. Callers hold the gate.</summary>
@@ -298,19 +302,10 @@ internal sealed class FilterService
 
     private string RuleFilePath(string id) => Path.Combine(_directory, $"{id}.txt");
 
-    private static void TryDelete(string path)
-    {
-        try
-        {
-            File.Delete(path);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to delete {Path}", path);
-        }
-    }
+    private void TryDelete(string path) =>
+        Try.Run(() => File.Delete(path)).OnFailure(ex => Log.Warning(ex, "Failed to delete {Path}", path));
 
-    private static string ReadBuiltin()
+    private string ReadBuiltin()
     {
         using var stream = typeof(FilterService).Assembly
             .GetManifestResourceStream("URLCheck.Resources.filters.builtin.txt");

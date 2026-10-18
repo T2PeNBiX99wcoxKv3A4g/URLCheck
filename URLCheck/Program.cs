@@ -66,11 +66,11 @@ internal static class Program
                           OperatingSystem.IsLinux() && LinuxDiagnostics.AppIndicatorLibrary is not null;
 
             // Only one instance may run; later launches hand their URLs to it and exit.
-            using var singleInstance = new SingleInstance();
+            using var singleInstance = SingleInstance.Instance;
             if (!singleInstance.IsFirstInstance)
             {
                 // Blocking here is fine: this process only forwards its args and exits.
-                SingleInstance.ForwardAsync(args).GetAwaiter().GetResult();
+                singleInstance.ForwardAsync(args).GetAwaiter().GetResult();
                 return;
             }
 
@@ -92,9 +92,8 @@ internal static class Program
 
             Log.Information("Serving React app at {AppUrl}", appUrl);
 
-            var (browserLocator, windowPlatform, protocolRegistrar) = CreatePlatformServices();
-
-            var settings = new SettingsService(browserLocator);
+            // Touching each singleton constructs it, which is what registers its message handlers.
+            var settings = SettingsService.Instance;
             _ = settings.GetAsync().GetAwaiter().GetResult(); // know the language before the tray is built
 
             // Show the management window unless we were launched to stay in the tray or the settings
@@ -104,27 +103,27 @@ internal static class Program
             var startHidden = args.Contains("--tray") || (settings.Current?.HideOnLaunch ?? false);
             var showMainWindow = !hasTray || !startHidden;
 
-            var localization = new LocalizationService(settings);
-            var history = new HistoryService();
+            _ = LocalizationService.Instance;
+            _ = HistoryService.Instance;
             var iconPath = AppIcon.EnsureExtracted();
-            _ = new AppInfoService();
-            _ = new BrowserService(browserLocator);
-            _ = new ProtocolRegistrationService(protocolRegistrar);
-            _ = new StartupService();
-            _ = new InspectService(settings);
-            _ = new FilterService();
-            var manager = new WindowManager(appUrl, windowPlatform, settings, history, CreateClipboardWatcher())
-            {
-                ShowMainWindowOnStartup = showMainWindow,
-                IconPath = iconPath
-            };
+            _ = AppInfoService.Instance;
+            _ = BrowserService.Instance;
+            _ = ProtocolRegistrationService.Instance;
+            _ = StartupService.Instance;
+            _ = InspectService.Instance;
+            _ = FilterService.Instance;
 
-            using var tray = CreateTray(localization, manager, iconPath);
+            var manager = WindowManager.Instance;
+            manager.AppUrl = appUrl;
+            manager.ShowMainWindowOnStartup = showMainWindow;
+            manager.IconPath = iconPath;
+
+            using var tray = CreateTray(iconPath);
 
             manager.MainWindowCreated += [SuppressMessage("ReSharper", "AccessToDisposedClosure")]() =>
             {
                 // The message loop is about to start, so windows can now be created safely.
-                singleInstance.StartServer(forwarded => DispatchUrls(manager, forwarded));
+                singleInstance.StartServer(DispatchUrls);
 
                 if (startupUrls.Count > 0)
                     _ = Task.Run(() => startupUrls.ForEach(manager.ShowPopup));
@@ -133,9 +132,9 @@ internal static class Program
             manager.CreateMainWindow();
 
             // Needs the window manager: a forwarded URL is opened in the inspection popup.
-            _ = new ForwardService(settings, manager, DeviceIdentity.LoadOrCreate());
+            _ = ForwardService.Instance;
 
-            StartTray(tray, manager);
+            StartTray(tray);
 
             manager.Run();
 
@@ -147,50 +146,25 @@ internal static class Program
         }
     }
 
-    private static void DispatchUrls(WindowManager manager, IReadOnlyList<string> args)
+    private static void DispatchUrls(IReadOnlyList<string> args)
     {
         foreach (var url in ExtractUrls(args))
-            manager.ShowPopup(url);
-    }
-
-    /// <summary>Creates the platform-specific services for the OS we are running on.</summary>
-    private static (IBrowserLocator Browsers, IWindowPlatform Window, IProtocolRegistrar Protocols)
-        CreatePlatformServices()
-    {
-        if (OperatingSystem.IsWindows())
-            return (new WindowsBrowserLocator(), new WindowsWindowPlatform(), new WindowsProtocolRegistrar());
-
-        if (OperatingSystem.IsLinux())
-            return (new LinuxBrowserLocator(), new LinuxWindowPlatform(), new LinuxProtocolRegistrar());
-
-        throw new PlatformNotSupportedException("URLCheck supports Windows and Linux.");
-    }
-
-    /// <summary>Creates the clipboard watcher for the OS we are running on.</summary>
-    private static IClipboardWatcher CreateClipboardWatcher()
-    {
-        if (OperatingSystem.IsWindows())
-            return new WindowsClipboardWatcher();
-
-        if (OperatingSystem.IsLinux())
-            return new LinuxClipboardWatcher();
-
-        throw new PlatformNotSupportedException("URLCheck supports Windows and Linux.");
+            WindowManager.Instance.ShowPopup(url);
     }
 
     /// <summary>
     ///     Starts the tray icon and records whether it exists, so closing the window only hides it when
     ///     there is really something to restore it from.
     /// </summary>
-    private static void StartTray(ITrayIcon tray, WindowManager manager)
+    private static void StartTray(ITrayIcon tray)
     {
         if (!OperatingSystem.IsLinux())
         {
-            manager.CloseToTray = tray.Start();
+            WindowManager.Instance.CloseToTray = tray.Start();
             return;
         }
 
-        StartLinuxTrayWhenReady(tray, manager);
+        StartLinuxTrayWhenReady(tray);
     }
 
     /// <summary>
@@ -199,18 +173,21 @@ internal static class Program
     ///     process if it is asked any earlier, so it waits for the toolkit to report ready.
     /// </summary>
     [SupportedOSPlatform("linux")]
-    private static void StartLinuxTrayWhenReady(ITrayIcon tray, WindowManager manager) =>
+    private static void StartLinuxTrayWhenReady(ITrayIcon tray) =>
         _ = Task.Run(async () =>
         {
             for (var attempt = 0; attempt < 100 && !LinuxTrayIcon.IsToolkitReady; attempt++)
                 await Task.Delay(100);
 
-            manager.RunOnMainWindow(() => { manager.CloseToTray = tray.Start(); });
+            WindowManager.Instance.RunOnMainWindow(() => { WindowManager.Instance.CloseToTray = tray.Start(); });
         });
 
     /// <summary>The tray icon, or a no-op stand-in on platforms that have none.</summary>
-    private static ITrayIcon CreateTray(LocalizationService localization, WindowManager manager, string? iconPath)
+    private static ITrayIcon CreateTray(string? iconPath)
     {
+        var localization = LocalizationService.Instance;
+        var manager = WindowManager.Instance;
+
         if (OperatingSystem.IsWindows())
             return new WindowsTrayIcon(
                 Constants.WindowTitle,

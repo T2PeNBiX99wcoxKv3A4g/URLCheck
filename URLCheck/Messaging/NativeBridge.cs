@@ -2,6 +2,8 @@ using System.Text.Json;
 using Photino.NET;
 using Serilog;
 using Swan;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Messaging;
 
@@ -39,7 +41,7 @@ internal static class NativeBridge
 
         var context = new NativeContext(window, request);
 
-        try
+        (await Try.Run(async () =>
         {
             var response = await RaiseAsync(context);
 
@@ -47,14 +49,13 @@ internal static class NativeBridge
                 Send(window, response);
             else if (context.WantsReply)
                 Send(window, context.Fail($"{request.Type}.result", "error.unsupported"));
-        }
-        catch (Exception ex)
+        })).OnFailure(ex =>
         {
             Log.Error(ex, "Handler for {Type} failed", request.Type);
 
             if (context.WantsReply)
                 Send(window, context.Fail($"{request.Type}.result", ex.Message));
-        }
+        });
     }
 
     private static async Task<NativeResponse?> RaiseAsync(NativeContext context)

@@ -1,10 +1,11 @@
 using JetBrains.Annotations;
 using URLCheck.Messaging;
+using URLCheck.Utils;
 
 namespace URLCheck.Services;
 
 /// <summary>Answers the <c>app.info</c> message so the UI can show the build version.</summary>
-internal sealed class AppInfoService
+internal sealed class AppInfoService : Singleton<AppInfoService>
 {
     /// <summary>The version declared in the csproj (<c>&lt;Version&gt;</c>).</summary>
     [PublicAPI] public static readonly string Version =

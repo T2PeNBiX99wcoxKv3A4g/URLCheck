@@ -6,6 +6,9 @@ using System.Text.Json;
 using Serilog;
 using URLCheck.Messaging;
 using URLCheck.Models;
+using URLCheck.Services;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Forward;
 
@@ -15,8 +18,14 @@ namespace URLCheck.Forward;
 ///     with its name, port and public key. Discovery is only a hint: the keys are pinned for real when
 ///     the user pairs.
 /// </summary>
-internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDiscovered)
+internal sealed class ForwardDiscovery : Singleton<ForwardDiscovery>
 {
+    private readonly Action<IReadOnlyList<DeviceEntry>> _onDiscovered;
+
+    public ForwardDiscovery() =>
+        _onDiscovered = devices => WindowManager.Instance.RunOnMainWindow(() =>
+            WindowManager.Instance.BroadcastEvent("forward.discovered", new ForwardDiscoveredPayload(devices)));
+
     /// <summary>A fixed link-local multicast group, so IPv6-only networks work as well as IPv4 ones.</summary>
     private static readonly IPAddress Group = IPAddress.Parse("ff02::5552:4c48");
 
@@ -93,23 +102,19 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
 
     private void StartSockets()
     {
-        _receiveCts = new();
+        var receiveCts = _receiveCts = new();
 
-        try
+        Try.Run(() =>
         {
             var v4 = new UdpClient(AddressFamily.InterNetwork);
             v4.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             v4.EnableBroadcast = true;
             v4.Client.Bind(new IPEndPoint(IPAddress.Any, ForwardProtocol.DiscoveryPort));
             _v4 = v4;
-            _ = Task.Run(() => ReceiveLoopAsync(v4, _receiveCts.Token));
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to open the IPv4 discovery socket");
-        }
+            _ = Task.Run(() => ReceiveLoopAsync(v4, receiveCts.Token));
+        }).OnFailure(ex => Log.Warning(ex, "Failed to open the IPv4 discovery socket"));
 
-        try
+        Try.Run(() =>
         {
             var v6 = new UdpClient(AddressFamily.InterNetworkV6);
             v6.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -118,12 +123,8 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
             v6.Client.Bind(new IPEndPoint(IPAddress.IPv6Any, ForwardProtocol.DiscoveryPort));
             JoinGroups(v6);
             _v6 = v6;
-            _ = Task.Run(() => ReceiveLoopAsync(v6, _receiveCts.Token));
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to open the IPv6 discovery socket");
-        }
+            _ = Task.Run(() => ReceiveLoopAsync(v6, receiveCts.Token));
+        }).OnFailure(ex => Log.Warning(ex, "Failed to open the IPv6 discovery socket"));
 
         _enabled = _v4 is not null || _v6 is not null;
         if (_enabled)
@@ -172,14 +173,8 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
                 continue;
             }
 
-            try
-            {
-                await HandleDatagramAsync(client, result, token);
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex, "A discovery datagram could not be handled");
-            }
+            (await Try.Run(() => HandleDatagramAsync(client, result, token)))
+                .OnFailure(ex => Log.Debug(ex, "A discovery datagram could not be handled"));
         }
     }
 
@@ -303,7 +298,8 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
 
     private async Task ProbeAsync(IPAddress address, int port, CancellationToken token)
     {
-        try
+        // A host that does not answer is simply not a device.
+        await Try.Run(async () =>
         {
             using var client = new TcpClient();
             client.NoDelay = true;
@@ -323,11 +319,7 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
 
             var announce = JsonSerializer.Deserialize(reply, AppJsonContext.Default.AnnounceMessage);
             Record(announce, address.ToString());
-        }
-        catch (Exception)
-        {
-            // A host that does not answer is simply not a device.
-        }
+        });
     }
 
     /// <summary>The distinct /24 prefixes this device's IPv4 addresses live in.</summary>
@@ -425,15 +417,9 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
             .OrderBy(device => device.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        try
-        {
-            onDiscovered(devices);
-        }
-        catch (Exception ex)
-        {
-            // A window that cannot take the event must not stop the search loop.
-            Log.Debug(ex, "Failed to publish discovered devices");
-        }
+        // A window that cannot take the event must not stop the search loop.
+        Try.Run(() => _onDiscovered(devices))
+            .OnFailure(ex => Log.Debug(ex, "Failed to publish discovered devices"));
     }
 
     /// <summary>The limited broadcast plus every interface's subnet broadcast.</summary>
@@ -464,17 +450,11 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
         }
     }
 
-    private static void JoinGroups(UdpClient client)
+    private void JoinGroups(UdpClient client)
     {
         foreach (var nic in UpInterfaces(NetworkInterfaceComponent.IPv6))
-            try
-            {
-                client.JoinMulticastGroup(Index6(nic), Group);
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex, "Failed to join the discovery group on {Nic}", nic.Name);
-            }
+            Try.Run(() => client.JoinMulticastGroup(Index6(nic), Group))
+                .OnFailure(ex => Log.Debug(ex, "Failed to join the discovery group on {Nic}", nic.Name));
     }
 
     private static IEnumerable<NetworkInterface> UpInterfaces(NetworkInterfaceComponent component) =>
@@ -483,17 +463,8 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
             nic.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
             nic.Supports(component));
 
-    private static int Index6(NetworkInterface nic)
-    {
-        try
-        {
-            return nic.GetIPProperties().GetIPv6Properties().Index;
-        }
-        catch (Exception)
-        {
-            return 0;
-        }
-    }
+    private static int Index6(NetworkInterface nic) =>
+        Try.Run(() => nic.GetIPProperties().GetIPv6Properties().Index).GetOrElse(_ => 0);
 
     private static string HostOf(IPEndPoint endpoint)
     {
@@ -504,27 +475,10 @@ internal sealed class ForwardDiscovery(Action<IReadOnlyList<DeviceEntry>> onDisc
         return address.ToString();
     }
 
-    private static void TrySend(UdpClient client, byte[] frame, IPEndPoint target)
-    {
-        try
-        {
-            client.Send(frame, frame.Length, target);
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "Failed to send a discovery query to {Target}", target);
-        }
-    }
+    private void TrySend(UdpClient client, byte[] frame, IPEndPoint target) =>
+        Try.Run(() => client.Send(frame, frame.Length, target))
+            .OnFailure(ex => Log.Debug(ex, "Failed to send a discovery query to {Target}", target));
 
-    private static void Close(UdpClient? client)
-    {
-        try
-        {
-            client?.Close();
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "Failed to close a discovery socket");
-        }
-    }
+    private void Close(UdpClient? client) =>
+        Try.Run(() => client?.Close()).OnFailure(ex => Log.Debug(ex, "Failed to close a discovery socket"));
 }

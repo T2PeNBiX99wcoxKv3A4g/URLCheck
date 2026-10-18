@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using URLCheck.Messaging;
 using URLCheck.Platform;
+using URLCheck.Utils;
 
 namespace URLCheck.Services;
 
@@ -8,19 +9,15 @@ namespace URLCheck.Services;
 ///     Exposes the platform protocol registrar (<see cref="IProtocolRegistrar" />) over the native
 ///     message bridge.
 /// </summary>
-internal sealed class ProtocolRegistrationService
+internal sealed class ProtocolRegistrationService : Singleton<ProtocolRegistrationService>
 {
     private static readonly TimeSpan StatusLifetime = TimeSpan.FromSeconds(2);
 
-    private readonly IProtocolRegistrar _registrar;
+    private readonly IProtocolRegistrar _registrar = PlatformServices.ProtocolRegistrar;
     private ProtocolStatusPayload? _status;
     private DateTime _statusReadAt;
 
-    public ProtocolRegistrationService(IProtocolRegistrar registrar)
-    {
-        _registrar = registrar;
-        NativeBridge.MessageReceived += HandleMessageAsync;
-    }
+    public ProtocolRegistrationService() => NativeBridge.MessageReceived += HandleMessageAsync;
 
     [PublicAPI] public string ExecutablePath => _registrar.ExecutablePath;
 

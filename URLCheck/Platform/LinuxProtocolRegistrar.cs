@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
 using Serilog;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Platform;
 
@@ -9,7 +11,7 @@ namespace URLCheck.Platform;
 ///     file plus <c>xdg-mime default</c>. Unlike Windows, the default handler can be set directly.
 /// </summary>
 [SupportedOSPlatform("linux")]
-internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
+internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>, IProtocolRegistrar
 {
     private const string DesktopFileName = "urlcheck.desktop";
     private const string CustomSchemeMime = "x-scheme-handler/urlcheck";
@@ -125,7 +127,7 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
         File.SetUnixFileMode(DesktopFilePath, File.GetUnixFileMode(DesktopFilePath) | UnixFileMode.UserExecute);
     }
 
-    private static void SetDefault(string mimeType)
+    private void SetDefault(string mimeType)
     {
         var (ok, _) = Run("xdg-mime", "default", DesktopFileName, mimeType);
         if (!ok)
@@ -133,9 +135,8 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
     }
 
     /// <summary>Reads the <c>Exec=</c> line of our desktop entry, if it exists.</summary>
-    private static string? ReadExecCommand()
-    {
-        try
+    private string? ReadExecCommand() =>
+        Try.Run<string?>(() =>
         {
             if (!File.Exists(DesktopFilePath))
                 return null;
@@ -144,19 +145,17 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
                 .FirstOrDefault(candidate => candidate.StartsWith("Exec=", StringComparison.Ordinal));
 
             return line is null ? null : line["Exec=".Length..].Trim();
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Warning(ex, "Failed to read {File}", DesktopFilePath);
             return null;
-        }
-    }
+        });
 
     /// <summary>Refreshes the MIME cache so the new entry is picked up immediately (best effort).</summary>
-    private static void UpdateDesktopDatabase() =>
+    private void UpdateDesktopDatabase() =>
         Run("update-desktop-database", ApplicationsDirectory);
 
-    private static bool IsDefault(string mimeType)
+    private bool IsDefault(string mimeType)
     {
         var (ok, output) = Run("xdg-mime", "query", "default", mimeType);
         var reported = output.Trim();
@@ -186,13 +185,14 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
     }
 
     /// <summary>Reads a <c>[Default Applications]</c> entry straight out of mimeapps.list.</summary>
-    private static string? ReadMimeAppsDefault(string mimeType)
+    private string? ReadMimeAppsDefault(string mimeType)
     {
         foreach (var file in MimeAppsFiles())
-            try
+        {
+            var value = Try.Run<string?>(() =>
             {
                 if (!File.Exists(file))
-                    continue;
+                    return null;
 
                 var inDefaults = false;
                 foreach (var raw in File.ReadLines(file))
@@ -213,18 +213,23 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
                             .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                             .FirstOrDefault();
                 }
-            }
-            catch (Exception ex)
+
+                return null;
+            }).GetOrElse(ex =>
             {
                 Log.Warning(ex, "Failed to read {File}", file);
-            }
+                return null;
+            });
+
+            if (value is not null)
+                return value;
+        }
 
         return null;
     }
 
-    private static void CleanMimeApps(string file)
-    {
-        try
+    private void CleanMimeApps(string file) =>
+        Try.Run(() =>
         {
             if (!File.Exists(file))
                 return;
@@ -234,29 +239,14 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
                 .ToArray();
 
             File.WriteAllLines(file, kept);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to clean {File}", file);
-        }
-    }
+        }).OnFailure(ex => Log.Warning(ex, "Failed to clean {File}", file));
 
-    private static void TryDelete(string file)
-    {
-        try
-        {
-            File.Delete(file);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to delete {File}", file);
-        }
-    }
+    private void TryDelete(string file) =>
+        Try.Run(() => File.Delete(file)).OnFailure(ex => Log.Warning(ex, "Failed to delete {File}", file));
 
     /// <summary>Runs a helper command, returning whether it succeeded and what it printed.</summary>
-    private static (bool Ok, string Output) Run(string file, params string[] args)
-    {
-        try
+    private (bool Ok, string Output) Run(string file, params string[] args) =>
+        Try.Run(() =>
         {
             var info = new ProcessStartInfo(file)
             {
@@ -277,11 +267,9 @@ internal sealed class LinuxProtocolRegistrar : IProtocolRegistrar
             process.WaitForExit(5000);
 
             return (process.HasExited && process.ExitCode == 0, output);
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Debug(ex, "Failed to run {File}", file);
             return (false, string.Empty);
-        }
-    }
+        });
 }

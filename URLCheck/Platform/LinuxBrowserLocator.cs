@@ -1,6 +1,8 @@
 using System.Runtime.Versioning;
 using Serilog;
 using URLCheck.Models;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Platform;
 
@@ -9,7 +11,7 @@ namespace URLCheck.Platform;
 ///     themselves as <c>x-scheme-handler/http</c> or <c>https</c> handlers.
 /// </summary>
 [SupportedOSPlatform("linux")]
-internal sealed class LinuxBrowserLocator : IBrowserLocator
+internal sealed class LinuxBrowserLocator : Singleton<LinuxBrowserLocator>, IBrowserLocator
 {
     private const string OwnDesktopFile = "urlcheck.desktop";
 
@@ -18,18 +20,13 @@ internal sealed class LinuxBrowserLocator : IBrowserLocator
         var found = new Dictionary<string, BrowserEntry>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var directory in ApplicationDirectories())
-            try
-            {
-                if (!Directory.Exists(directory))
-                    continue;
-
-                foreach (var file in Directory.EnumerateFiles(directory, "*.desktop"))
-                    Scan(file, found);
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex, "Failed to scan {Directory}", directory);
-            }
+            Try.Run(() =>
+                {
+                    if (Directory.Exists(directory))
+                        foreach (var file in Directory.EnumerateFiles(directory, "*.desktop"))
+                            Scan(file, found);
+                })
+                .OnFailure(ex => Log.Warning(ex, "Failed to scan {Directory}", directory));
 
         return
         [

@@ -3,6 +3,8 @@ using JetBrains.Annotations;
 using Serilog;
 using URLCheck.Messaging;
 using URLCheck.Platform;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Services;
 
@@ -17,7 +19,7 @@ namespace URLCheck.Services;
 ///     panels write to.
 /// </remarks>
 [PublicAPI]
-internal sealed class StartupService
+internal sealed class StartupService : Singleton<StartupService>
 {
     private const string ShortcutName = "URLCheck.lnk";
     private const string DesktopEntryName = "URLCheck.desktop";
@@ -48,14 +50,7 @@ internal sealed class StartupService
         if (!IsEnabled)
             return;
 
-        try
-        {
-            Create();
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to refresh the autostart entry");
-        }
+        Try.Run(Create).OnFailure(ex => Log.Warning(ex, "Failed to refresh the autostart entry"));
     }
 
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch
@@ -75,17 +70,13 @@ internal sealed class StartupService
         if (!IsSupported)
             return context.Reply("app.setStartup.result", new StartupPayload(false, false));
 
-        try
+        Try.Run(() =>
         {
             if (enabled)
                 Create();
             else if (File.Exists(_entryPath))
                 File.Delete(_entryPath);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to update the autostart entry");
-        }
+        }).OnFailure(ex => Log.Warning(ex, "Failed to update the autostart entry"));
 
         return context.Reply("app.setStartup.result", new StartupPayload(IsSupported, IsEnabled));
     }

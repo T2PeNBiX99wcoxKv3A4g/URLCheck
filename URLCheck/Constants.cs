@@ -22,5 +22,9 @@ public static class Constants
     /// </summary>
     public const string SelectionButtonTitle = "SelectionButton";
 
-    internal static ILogger Logger = Log.ForContext("SourceContext", "Core");
+    /// <summary>
+    ///     The shared "Core" logger. Resolved from the configured <see cref="Log.Logger" /> on every
+    ///     access, so it must not be captured before <see cref="Logging.Initialize" /> has run.
+    /// </summary>
+    internal static ILogger Logger => Log.Logger.ForContext("SourceContext", "Core");
 }

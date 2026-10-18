@@ -1,5 +1,7 @@
 using Org.BouncyCastle.Crypto.Parameters;
 using Serilog;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Forward;
 
@@ -8,12 +10,29 @@ namespace URLCheck.Forward;
 ///     when they pair, and every handshake is signed with the private key. The private key lives in its
 ///     own file so it never travels with the settings.
 /// </summary>
-internal sealed class DeviceIdentity
+internal sealed class DeviceIdentity : Singleton<DeviceIdentity>
 {
     private const string FileName = "device.key";
 
-    private DeviceIdentity(byte[] privateKey)
+    /// <summary>Reads the key from the config folder, generating one on first use.</summary>
+    public DeviceIdentity()
     {
+        var directory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.Name);
+        Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, FileName);
+
+        var privateKey = File.Exists(path) ? Read(path) : null;
+        if (privateKey is null)
+        {
+            if (File.Exists(path))
+                Log.Warning("The device key at {Path} is unusable; generating a new one", path);
+
+            privateKey = ForwardCrypto.RandomBytes(32);
+            Try.Run(() => File.WriteAllText(path, ForwardCrypto.ToBase64(privateKey)))
+                .OnFailure(ex => Log.Warning(ex, "Failed to save the device key at {Path}", path));
+        }
+
         PrivateKey = privateKey;
         PublicKey = new Ed25519PrivateKeyParameters(privateKey, 0).GeneratePublicKey().GetEncoded();
     }
@@ -24,47 +43,15 @@ internal sealed class DeviceIdentity
 
     public string PublicKeyBase64 => ForwardCrypto.ToBase64(PublicKey);
 
-    /// <summary>Reads the key from the config folder, generating one on first use.</summary>
-    public static DeviceIdentity LoadOrCreate()
+    private byte[]? Read(string path)
     {
-        var directory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.Name);
-        Directory.CreateDirectory(directory);
-        var path = Path.Combine(directory, FileName);
+        var key = Try.Run(() => ForwardCrypto.FromBase64(File.ReadAllText(path)))
+            .GetOrElse(ex =>
+            {
+                Log.Warning(ex, "Failed to read the device key at {Path}", path);
+                return null;
+            });
 
-        if (File.Exists(path))
-        {
-            var key = Read(path);
-            if (key is not null)
-                return new(key);
-
-            Log.Warning("The device key at {Path} is unusable; generating a new one", path);
-        }
-
-        var generated = ForwardCrypto.RandomBytes(32);
-        try
-        {
-            File.WriteAllText(path, ForwardCrypto.ToBase64(generated));
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to save the device key at {Path}", path);
-        }
-
-        return new(generated);
-    }
-
-    private static byte[]? Read(string path)
-    {
-        try
-        {
-            var key = ForwardCrypto.FromBase64(File.ReadAllText(path));
-            return key is { Length: 32 } ? key : null;
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to read the device key at {Path}", path);
-            return null;
-        }
+        return key is { Length: 32 } ? key : null;
     }
 }

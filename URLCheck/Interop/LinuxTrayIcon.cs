@@ -4,6 +4,8 @@ using System.Runtime.Versioning;
 using Serilog;
 using Serilog.Events;
 using URLCheck.Platform;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Interop;
 
@@ -55,21 +57,13 @@ internal sealed partial class LinuxTrayIcon(
     ///     True once GTK has a display connection. libayatana-appindicator does not fail gracefully
     ///     without one — it aborts the process — so every call is guarded by this.
     /// </summary>
-    public static bool IsToolkitReady
-    {
-        get
-        {
-            try
-            {
-                return gdk_display_get_default() != IntPtr.Zero;
-            }
-            catch (Exception ex)
+    public static bool IsToolkitReady =>
+        Try.Run(() => gdk_display_get_default() != IntPtr.Zero)
+            .GetOrElse(ex =>
             {
                 Log.Debug(ex, "GTK is not available");
                 return false;
-            }
-        }
-    }
+            });
 
     public bool Start()
     {
@@ -79,7 +73,7 @@ internal sealed partial class LinuxTrayIcon(
             return false;
         }
 
-        try
+        return Try.Run(() =>
         {
             _indicator = app_indicator_new(Constants.Name, iconPath ?? "web-browser", CategoryApplicationStatus);
             if (_indicator == IntPtr.Zero)
@@ -98,13 +92,12 @@ internal sealed partial class LinuxTrayIcon(
 
             Log.Information("Tray icon created via {Library}", LinuxDiagnostics.AppIndicatorLibrary);
             return true;
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Warning(ex, "Failed to create the tray icon");
             _indicator = IntPtr.Zero;
             return false;
-        }
+        });
     }
 
     public void Dispose()
@@ -113,14 +106,8 @@ internal sealed partial class LinuxTrayIcon(
             return;
 
         // Only withdraw it: the process is on its way out and the OS reclaims the rest.
-        try
-        {
-            app_indicator_set_status(_indicator, StatusPassive);
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "Failed to withdraw the tray icon");
-        }
+        Try.Run(() => app_indicator_set_status(_indicator, StatusPassive))
+            .OnFailure(ex => Log.Debug(ex, "Failed to withdraw the tray icon"));
 
         _indicator = IntPtr.Zero;
     }
@@ -162,17 +149,7 @@ internal sealed partial class LinuxTrayIcon(
     {
         var action = _actions[actionIndex];
 
-        _ = Task.Run(() =>
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex, "Tray callback failed");
-            }
-        });
+        _ = Task.Run(() => Try.Run(action).OnFailure(ex => Log.Warning(ex, "Tray callback failed")));
     }
 
     /// <summary>Resolves the indicator library, accepting either the Ayatana or the original soname.</summary>

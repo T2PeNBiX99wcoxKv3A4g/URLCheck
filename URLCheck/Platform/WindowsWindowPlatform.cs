@@ -4,12 +4,13 @@ using System.Runtime.Versioning;
 using Photino.NET;
 using Serilog;
 using URLCheck.Interop;
+using URLCheck.Utils;
 
 namespace URLCheck.Platform;
 
 /// <summary>Win32 implementation of the platform window operations.</summary>
 [SupportedOSPlatform("windows")]
-internal sealed class WindowsWindowPlatform : IWindowPlatform
+internal sealed class WindowsWindowPlatform : Singleton<WindowsWindowPlatform>, IWindowPlatform
 {
     /// <summary>Hides the window outright, the way closing it to the tray always has.</summary>
     public void Hide(PhotinoWindow window) =>

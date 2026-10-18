@@ -5,6 +5,8 @@ using Serilog;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Platform;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Services;
 
@@ -12,7 +14,7 @@ namespace URLCheck.Services;
 ///     Owns the Photino windows: a hidden "host" window that keeps the message loop alive while the
 ///     app sits in the tray, and an on-demand borderless popup used to inspect a URL.
 /// </summary>
-internal sealed class WindowManager
+internal sealed class WindowManager : Singleton<WindowManager>
 {
     /// <summary>
     ///     Side of the floating button's square window, in physical pixels. It is a little larger than
@@ -48,12 +50,11 @@ internal sealed class WindowManager
     /// <summary>How long after showing the button its position is re-asserted, once everything settled.</summary>
     private static readonly TimeSpan PositionNudgeDelay = TimeSpan.FromMilliseconds(400);
 
-    private readonly string _appUrl;
-    private readonly IClipboardWatcher _clipboard;
-    private readonly HistoryService _history;
-    private readonly IWindowPlatform _platform;
+    private readonly IClipboardWatcher _clipboard = PlatformServices.Clipboard;
+    private readonly HistoryService _history = HistoryService.Instance;
+    private readonly IWindowPlatform _platform = PlatformServices.Window;
     private readonly Timer _pointerTimer;
-    private readonly SettingsService _settings;
+    private readonly SettingsService _settings = SettingsService.Instance;
     private bool _allowClose;
 
     /// <summary>Where the button was really placed, so a press on it is told apart from a press away.</summary>
@@ -67,15 +68,8 @@ internal sealed class WindowManager
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
 
-    public WindowManager(string appUrl, IWindowPlatform platform, SettingsService settings, HistoryService history,
-        IClipboardWatcher clipboard)
+    public WindowManager()
     {
-        _appUrl = appUrl;
-        _platform = platform;
-        _settings = settings;
-        _history = history;
-        _clipboard = clipboard;
-
         _clipboard.TextCopied += OnTextCopied;
         _pointerTimer = new(_ => PollPointer(), null, Timeout.Infinite, Timeout.Infinite);
 
@@ -87,8 +81,11 @@ internal sealed class WindowManager
         NativeBridge.MessageReceived += HandleMessageAsync;
     }
 
+    /// <summary>Address the windows load the interface from, set before the host window is created.</summary>
+    public string AppUrl { get; set; } = "";
+
     /// <summary>When true the host window is shown at startup instead of hiding to the tray.</summary>
-    public bool ShowMainWindowOnStartup { get; init; }
+    public bool ShowMainWindowOnStartup { get; set; }
 
     /// <summary>
     ///     Whether closing the host window hides it. Set once the tray reports whether it was really
@@ -97,7 +94,7 @@ internal sealed class WindowManager
     public bool CloseToTray { get; set; }
 
     /// <summary>Path to the extracted <c>.ico</c> for the window icons, or null to keep the default.</summary>
-    public string? IconPath { get; init; }
+    public string? IconPath { get; set; }
 
     /// <summary>Raised once the host window's native handle exists (message loop is about to start).</summary>
     public event Action? MainWindowCreated;
@@ -192,7 +189,7 @@ internal sealed class WindowManager
             });
 
         ApplyIcon(window);
-        window.Load(_appUrl);
+        window.Load(AppUrl);
         _mainWindow = window;
 
         window.RegisterWindowCreatedHandler((_, _) =>
@@ -229,11 +226,11 @@ internal sealed class WindowManager
     ///     with every upgrade. Only the profile folder goes; the marker that records the build lives
     ///     beside it.
     /// </summary>
-    private static void PrepareWebViewData()
+    private void PrepareWebViewData()
     {
         var marker = Path.Combine(Path.GetDirectoryName(WebViewDataPath)!, "webview.build");
 
-        try
+        Try.Run(() =>
         {
             if (File.Exists(marker) && File.ReadAllText(marker) != AppInfoService.BuildToken)
             {
@@ -242,11 +239,7 @@ internal sealed class WindowManager
             }
 
             File.WriteAllText(marker, AppInfoService.BuildToken);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to prepare the web view's data folder");
-        }
+        }).OnFailure(ex => Log.Warning(ex, "Failed to prepare the web view's data folder"));
     }
 
     /// <summary>
@@ -407,7 +400,7 @@ internal sealed class WindowManager
         if (_buttonWindow is not null)
             return _buttonWindow;
 
-        try
+        return Try.Run<PhotinoWindow?>(() =>
         {
             var button = _platform.CreateSelectionButtonWindow(_mainWindow)
                 .SetTitle(Constants.SelectionButtonTitle)
@@ -434,17 +427,16 @@ internal sealed class WindowManager
             });
 
             ApplyIcon(button);
-            button.Load($"{_appUrl}#selection?url={Uri.EscapeDataString(url)}");
+            button.Load($"{AppUrl}#selection?url={Uri.EscapeDataString(url)}");
             button.WaitForClose();
 
             _buttonWindow = button;
             return button;
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Warning(ex, "Failed to create the selection button window");
             return null;
-        }
+        });
     }
 
     [PublicAPI]
@@ -477,19 +469,20 @@ internal sealed class WindowManager
 
         _mainWindow?.Invoke(() =>
         {
-            if (_popupWindow is not null)
-                try
-                {
-                    _popupWindow.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate",
-                        new PopupNavigatePayload(url)));
-                    _platform.Show(_popupWindow);
-                    _platform.KeepOnTop(_popupWindow);
+            var existing = _popupWindow;
+            if (existing is not null)
+            {
+                if (Try.Run(() =>
+                    {
+                        existing.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate",
+                            new PopupNavigatePayload(url)));
+                        _platform.Show(existing);
+                        _platform.KeepOnTop(existing);
+                    }))
                     return;
-                }
-                catch
-                {
-                    _popupWindow = null;
-                }
+
+                _popupWindow = null;
+            }
 
             // Top-level on Win32, a transient child of the host on GTK (see CreatePopupWindow).
             var popup = _platform.CreatePopupWindow(_mainWindow)
@@ -519,10 +512,10 @@ internal sealed class WindowManager
 
             ApplyIcon(popup);
             popup.Load(
-                $"{_appUrl}#popup?url={Uri.EscapeDataString(url)}&borderless={(borderless ? 1 : 0)}&strip={(stripTracking ? 1 : 0)}");
+                $"{AppUrl}#popup?url={Uri.EscapeDataString(url)}&borderless={(borderless ? 1 : 0)}&strip={(stripTracking ? 1 : 0)}");
             _popupWindow = popup;
 
-            try
+            Try.Run(() =>
             {
                 popup.WaitForClose();
 
@@ -532,12 +525,11 @@ internal sealed class WindowManager
                 // The native show/center runs after the created callback and clears the style,
                 // so re-assert it once the window has settled.
                 _ = Task.Delay(700).ContinueWith(_ => ReassertTopMost(popup));
-            }
-            catch (Exception ex)
+            }).OnFailure(ex =>
             {
                 Log.Warning(ex, "Failed to create popup");
                 _popupWindow = null;
-            }
+            });
 
             Log.Information("Popup message loop returned");
         });
@@ -553,16 +545,7 @@ internal sealed class WindowManager
             _popupWindow = null;
 
         Invoke(window, target =>
-        {
-            try
-            {
-                target.Close();
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex, "Failed to close window");
-            }
-        });
+            Try.Run(target.Close).OnFailure(ex => Log.Warning(ex, "Failed to close window")));
     }
 
     /// <summary>Pushes an event to every open window.</summary>
@@ -598,28 +581,13 @@ internal sealed class WindowManager
         window?.Invoke(() => action(window));
     }
 
-    private void ReassertTopMost(PhotinoWindow popup)
-    {
-        try
+    private void ReassertTopMost(PhotinoWindow popup) =>
+        Try.Run(() =>
         {
             if (ReferenceEquals(_popupWindow, popup))
                 popup.Invoke(() => _platform.KeepOnTop(popup));
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "Failed to re-assert topmost");
-        }
-    }
+        }).OnFailure(ex => Log.Debug(ex, "Failed to re-assert topmost"));
 
-    private static void TrySend(PhotinoWindow? window, string json)
-    {
-        try
-        {
-            window?.SendWebMessage(json);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to send event");
-        }
-    }
+    private void TrySend(PhotinoWindow? window, string json) =>
+        Try.Run(() => window?.SendWebMessage(json)).OnFailure(ex => Log.Warning(ex, "Failed to send event"));
 }

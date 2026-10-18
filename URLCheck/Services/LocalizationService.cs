@@ -3,6 +3,8 @@ using System.Text.Json;
 using JetBrains.Annotations;
 using Serilog;
 using URLCheck.Messaging;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Services;
 
@@ -11,19 +13,15 @@ namespace URLCheck.Services;
 ///     and the React front-end read the exact same text.
 /// </summary>
 [PublicAPI]
-internal sealed class LocalizationService
+internal sealed class LocalizationService : Singleton<LocalizationService>
 {
     public const string DefaultLocale = "en";
 
     private readonly Dictionary<string, Dictionary<string, string>> _cache = new(StringComparer.OrdinalIgnoreCase);
-    private readonly SettingsService _settings;
+    private readonly SettingsService _settings = SettingsService.Instance;
     private readonly Lock _sync = new();
 
-    public LocalizationService(SettingsService settings)
-    {
-        _settings = settings;
-        NativeBridge.MessageReceived += HandleMessageAsync;
-    }
+    public LocalizationService() => NativeBridge.MessageReceived += HandleMessageAsync;
 
     /// <summary>Locales discovered from the embedded translation files.</summary>
     public static IReadOnlyList<string> AvailableLocales { get; } = DiscoverLocales();
@@ -79,7 +77,7 @@ internal sealed class LocalizationService
         }
     }
 
-    private static Dictionary<string, string> ReadFile(string locale)
+    private Dictionary<string, string> ReadFile(string locale)
     {
         using var stream = typeof(LocalizationService).Assembly
             .GetManifestResourceStream($"URLCheck.Resources.i18n.{locale}.jsonc");
@@ -87,16 +85,13 @@ internal sealed class LocalizationService
         if (stream is null)
             return new();
 
-        try
-        {
-            return JsonSerializer.Deserialize(stream, AppJsonContext.Default.DictionaryStringString)
-                   ?? new Dictionary<string, string>();
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to read the translation file for {Locale}", locale);
-            return new();
-        }
+        return Try.Run(() => JsonSerializer.Deserialize(stream, AppJsonContext.Default.DictionaryStringString)
+                              ?? new Dictionary<string, string>())
+            .GetOrElse(ex =>
+            {
+                Log.Warning(ex, "Failed to read the translation file for {Locale}", locale);
+                return new();
+            });
     }
 
     private static IEnumerable<string> FallbackChain(string locale)

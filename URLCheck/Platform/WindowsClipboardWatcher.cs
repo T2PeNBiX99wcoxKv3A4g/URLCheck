@@ -2,6 +2,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Serilog;
 using URLCheck.Interop;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Platform;
 
@@ -11,7 +13,7 @@ namespace URLCheck.Platform;
 ///     retried a couple of times and then skipped, so the clipboard is never blocked for anyone else.
 /// </summary>
 [SupportedOSPlatform("windows")]
-internal sealed class WindowsClipboardWatcher : IClipboardWatcher
+internal sealed class WindowsClipboardWatcher : Singleton<WindowsClipboardWatcher>, IClipboardWatcher
 {
     private const uint WmDestroy = 0x0002;
     private const int ReadAttempts = 6;
@@ -128,14 +130,8 @@ internal sealed class WindowsClipboardWatcher : IClipboardWatcher
 
         _lastText = text;
 
-        try
-        {
-            TextCopied?.Invoke(text);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Clipboard handler failed");
-        }
+        Try.Run(() => TextCopied?.Invoke(text))
+            .OnFailure(ex => Log.Warning(ex, "Clipboard handler failed"));
     }
 
     private static bool IsOwnedByThisProcess()
@@ -147,7 +143,7 @@ internal sealed class WindowsClipboardWatcher : IClipboardWatcher
     }
 
     /// <summary>Reads the clipboard's Unicode text, giving up rather than blocking when it stays locked.</summary>
-    private static string? ReadText()
+    private string? ReadText()
     {
         for (var attempt = 0; attempt < ReadAttempts; attempt++)
         {

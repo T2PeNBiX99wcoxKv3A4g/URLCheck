@@ -4,6 +4,8 @@ using Serilog;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Platform;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck.Services;
 
@@ -12,7 +14,7 @@ namespace URLCheck.Services;
 ///     (<c>%APPDATA%\URLCheck</c> on Windows, <c>~/.config/URLCheck</c> on Linux).
 ///     The first read seeds the browser list so the popup works out of the box.
 /// </summary>
-internal sealed class SettingsService
+internal sealed class SettingsService : Singleton<SettingsService>
 {
     private static readonly JsonSerializerOptions SettingsFileOptions = new(JsonSerializerDefaults.Web)
     {
@@ -20,13 +22,11 @@ internal sealed class SettingsService
         TypeInfoResolver = AppJsonContext.Default
     };
 
-    private readonly IBrowserLocator _browserLocator;
+    private readonly IBrowserLocator _browserLocator = PlatformServices.BrowserLocator;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
-    public SettingsService(IBrowserLocator browserLocator)
+    public SettingsService()
     {
-        _browserLocator = browserLocator;
-
         var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             Constants.Name);
         Directory.CreateDirectory(directory);
@@ -147,16 +147,15 @@ internal sealed class SettingsService
                 Language = LocalizationService.ResolveSystemLocale()
             };
 
-        try
+        return (await Try.Run(async () =>
         {
             var json = await File.ReadAllTextAsync(SettingsFilePath);
             return JsonSerializer.Deserialize(json, SettingsFileOptions.GetTypeInfo(typeof(AppSettings)))
                 as AppSettings ?? new AppSettings();
-        }
-        catch (Exception ex)
+        })).GetOrElse(ex =>
         {
             Log.Warning(ex, "Failed to load settings from {Path}", SettingsFilePath);
             return new();
-        }
+        });
     }
 }

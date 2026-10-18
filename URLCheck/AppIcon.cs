@@ -1,4 +1,6 @@
 using Serilog;
+using URLCheck.Extensions;
+using URLCheck.Utils;
 
 namespace URLCheck;
 
@@ -17,9 +19,8 @@ internal static class AppIcon
         ? Extract("URLCheck.Resources.icon.ico", "icon.ico")
         : Extract("URLCheck.Resources.icon.png", "icon.png");
 
-    private static string? Extract(string resourceName, string fileName)
-    {
-        try
+    private static string? Extract(string resourceName, string fileName) =>
+        Try.Run<string?>(() =>
         {
             using var stream = typeof(AppIcon).Assembly.GetManifestResourceStream(resourceName);
             if (stream is null)
@@ -41,11 +42,9 @@ internal static class AppIcon
                 File.WriteAllBytes(path, icon);
 
             return path;
-        }
-        catch (Exception ex)
+        }).GetOrElse(ex =>
         {
             Log.Warning(ex, "Failed to extract the app icon");
             return null;
-        }
-    }
+        });
 }

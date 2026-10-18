@@ -2,12 +2,13 @@ using System.Drawing;
 using System.Runtime.Versioning;
 using Photino.NET;
 using Serilog;
+using URLCheck.Utils;
 
 namespace URLCheck.Platform;
 
 /// <summary>GTK implementation of the platform window operations.</summary>
 [SupportedOSPlatform("linux")]
-internal sealed class LinuxWindowPlatform : IWindowPlatform
+internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWindowPlatform
 {
     public void Hide(PhotinoWindow window)
     {
