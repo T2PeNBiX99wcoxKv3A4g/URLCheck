@@ -11,20 +11,31 @@ import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type Settin
 import {detectBrowsers} from "../api/browsers";
 import {
   addFilterList,
+  type FilterListEntry,
+  type FilterListsPayload,
   loadFilterLists,
   removeFilterList,
   setFilterListEnabled,
   updateFilterLists,
-  type FilterListEntry,
-  type FilterListsPayload,
 } from "../api/filters";
 import {FILTER_CATALOG} from "../data/filterCatalog";
+import {
+  getAppInfo,
+  openDefaultAppsSettings,
+  protocolStatus,
+  type ProtocolStatus,
+  registerCustomScheme,
+  registerProtocols,
+  setStartup,
+  startupStatus,
+  type StartupStatus,
+  unregisterProtocols
+} from "../api/system";
 
 /* Loaded on demand: the licence texts are far too large to sit in the main bundle. */
 const AttributionPage = React.lazy(() =>
     import("./AttributionPage").then((module) => ({default: module.AttributionPage}))
 );
-import {getAppInfo, openDefaultAppsSettings, protocolStatus, registerCustomScheme, registerProtocols, setStartup, startupStatus, unregisterProtocols, type ProtocolStatus, type StartupStatus} from "../api/system";
 
 const SettingRow = styled.div`
   display: flex;
@@ -410,7 +421,11 @@ const Checkbox = styled.input.attrs({type: "checkbox"})`
   height: 18px;
   accent-color: #6366f1;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.12);
+  }
 
   &:disabled {
     opacity: 0.5;
