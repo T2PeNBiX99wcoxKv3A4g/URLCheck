@@ -9,7 +9,8 @@ namespace URLCheck;
 /// <summary>Configures the Serilog pipeline used across the app.</summary>
 internal static class Logging
 {
-    internal const string ConsoleTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}";
+    internal const string ConsoleTemplate =
+        "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}";
 
     public static void Initialize()
     {
@@ -28,13 +29,17 @@ internal static class Logging
             .MinimumLevel.Is(LogEventLevel.Information)
 #endif
             .Enrich.FromLogContext()
+            // Default for events logged through the plain static Log: the contextual loggers created by
+            // Singleton<T> override it with their own type name (see Constants.Logger).
+            .Enrich.WithProperty("SourceContext", "Core")
             .WriteTo.Sink(new ConsoleSink(console))
             .WriteTo.File(
                 Path.Combine(logDirectory, "urlcheck-.log"),
                 rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 7,
                 shared: true,
-                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                outputTemplate:
+                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
 
         // The host, the toolkit and native libraries all print to the console. Mirroring that into the log
