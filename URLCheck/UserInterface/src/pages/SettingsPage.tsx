@@ -404,15 +404,13 @@ const WarnText = styled.div`
 `;
 
 const Checkbox = styled.input.attrs({type: "checkbox"})`
+  /* A fixed size: as a flex item it would otherwise be squeezed by however long the label is. */
+  flex: none;
   width: 18px;
   height: 18px;
   accent-color: #6366f1;
   cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.2s ease;
-
-  &:hover:not(:disabled) {
-    transform: scale(1.12);
-  }
+  transition: opacity 0.2s ease;
 
   &:disabled {
     opacity: 0.5;

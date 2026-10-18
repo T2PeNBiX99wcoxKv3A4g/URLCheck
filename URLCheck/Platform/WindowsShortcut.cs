@@ -25,11 +25,15 @@ internal static class WindowsShortcut
             {
                 Path = targetPath
             },
+            // Without an explicit index the link stores -1, which points at no icon at all, so the
+            // shortcut turns up blank in the Startup folder.
+            IconIndex = 0,
             StringData = new StringData
             {
                 NameString = description,
                 WorkingDir = workingDirectory,
                 CommandLineArguments = arguments,
+                // The target's own icon, which is the one the executable was built with.
                 IconLocation = targetPath
             }
         };

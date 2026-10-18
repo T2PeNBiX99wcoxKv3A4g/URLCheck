@@ -31,6 +31,26 @@ internal sealed class StartupService
             : Path.Combine(ConfigHome(), "autostart", DesktopEntryName);
 
         NativeBridge.MessageReceived += HandleMessageAsync;
+        Refresh();
+    }
+
+    /// <summary>
+    ///     Rewrites an autostart entry that already exists, so one left by an older version picks up
+    ///     fixes to it — its icon, or a moved executable — without the setting being toggled.
+    /// </summary>
+    private void Refresh()
+    {
+        if (!IsEnabled)
+            return;
+
+        try
+        {
+            Create();
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to refresh the autostart entry");
+        }
     }
 
     /// <summary>True on the platforms that have a per-user autostart location we can write to.</summary>
