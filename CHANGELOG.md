@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.0..v0.5.1) - 2026-10-18
+
+### 🐛 Bug Fixes
+
+- *(ui)* Give the floating button its shadow back - ([91d2738](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/91d27388c84de177537ea18e38e5e275f0b3756b))
+- *(ui)* Clip the floating button's window to a circle - ([43a804f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/43a804f3a4c41fa203146cfff57e0f1c90be3045))
+- Correct indentation in README code block - ([e68cd37](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e68cd37b9c13ac069f8f1697927f6cb07a9902ab))
+
+### ◀️ Revert
+
+- *(ui)* Leave the button window's border to the window manager - ([b952a4d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b952a4d692297594cd7eb8bb4b234c587d3b82d0))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([366d378](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/366d37864674fb164ada7ab7f38441318ba6fe14))
+
+
 ## [0.5.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.4.0..v0.5.0) - 2026-10-17
 
 ### ⛰️  Features
