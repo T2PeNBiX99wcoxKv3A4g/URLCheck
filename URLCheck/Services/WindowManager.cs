@@ -418,7 +418,6 @@ internal sealed class WindowManager
                 .SetSize(new(ButtonSize, ButtonSize))
                 .SetMinSize(ButtonSize, ButtonSize)
                 .SetMaxSize(ButtonSize, ButtonSize)
-                .SetResizable(false)
                 .SetChromeless(true)
                 .SetTransparent(true)
                 .SetTopMost(true)

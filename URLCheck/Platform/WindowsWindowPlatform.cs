@@ -82,6 +82,10 @@ internal sealed class WindowsWindowPlatform : IWindowPlatform
     /// </summary>
     public void ConfigureSelectionButtonWindow(PhotinoWindow window)
     {
+        // The button window is created resizable because GTK ignores a resize on a window that is not
+        // resizable; on Windows the size is fixed here instead, after SetSize has run.
+        window.SetResizable(false);
+
         // GetWindowLongPtrW only exists on 64-bit Windows; the styles are a nicety, not a requirement.
         if (!Environment.Is64BitProcess)
             return;
