@@ -122,8 +122,7 @@ internal sealed class ForwardService
             if (string.IsNullOrEmpty(settings.PairingCode))
                 return;
 
-            var listener = new TcpListener(IPAddress.Any, settings.ForwardPort);
-            listener.Start();
+            var listener = StartListener(settings.ForwardPort);
 
             var cts = new CancellationTokenSource();
             _listener = listener;
@@ -131,7 +130,6 @@ internal sealed class ForwardService
 
             var key = ForwardCrypto.DeriveKey(settings.PairingCode);
             _ = Task.Run(() => AcceptLoopAsync(listener, key, cts.Token));
-            Log.Information("Forwarding listener started on port {Port}", settings.ForwardPort);
         }
         catch (Exception ex)
         {
@@ -140,6 +138,33 @@ internal sealed class ForwardService
         finally
         {
             _gate.Release();
+        }
+    }
+
+    /// <summary>
+    ///     Binds the listener on every interface. A dual-stack IPv6 socket serves IPv4 and IPv6 alike,
+    ///     so one listener covers both; platforms without an IPv6 stack fall back to IPv4 only.
+    /// </summary>
+    private static TcpListener StartListener(int port)
+    {
+        try
+        {
+            var dual = new TcpListener(IPAddress.IPv6Any, port);
+            dual.Server.DualMode = true;
+            dual.Start();
+
+            Log.Information("Forwarding listener bound to IPv4 and IPv6 on port {Port}", port);
+            return dual;
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "A dual-stack forwarding listener is unavailable; binding IPv4 only");
+
+            var ipv4 = new TcpListener(IPAddress.Any, port);
+            ipv4.Start();
+
+            Log.Information("Forwarding listener bound to IPv4 on port {Port}", port);
+            return ipv4;
         }
     }
 
@@ -259,7 +284,11 @@ internal sealed class ForwardService
     private static bool IsHttpUrl(string url) =>
         Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https";
 
-    /// <summary>The IPv4 addresses this device can be reached at on the local network.</summary>
+    /// <summary>
+    ///     The addresses this device can be reached at on the local network. Loopback and IPv6
+    ///     link-local addresses are left out: the latter need a scope id that only means something on
+    ///     the machine that owns the interface, so it cannot be typed into the other device.
+    /// </summary>
     private static List<string> LocalAddresses()
     {
         try
@@ -270,8 +299,11 @@ internal sealed class ForwardService
                     .Where(nic => nic.OperationalStatus == OperationalStatus.Up &&
                                   nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
                     .SelectMany(nic => nic.GetIPProperties().UnicastAddresses)
-                    .Where(address => address.Address.AddressFamily == AddressFamily.InterNetwork)
-                    .Select(address => address.Address.ToString())
+                    .Select(address => address.Address)
+                    .Where(IsReachableAddress)
+                    // IPv4 first, so the familiar address stays at the front of the list.
+                    .OrderBy(address => address.AddressFamily == AddressFamily.InterNetwork ? 0 : 1)
+                    .Select(address => address.ToString())
                     .Distinct()
             ];
         }
@@ -281,4 +313,9 @@ internal sealed class ForwardService
             return [];
         }
     }
+
+    private static bool IsReachableAddress(IPAddress address) =>
+        address.AddressFamily is AddressFamily.InterNetwork or AddressFamily.InterNetworkV6 &&
+        !IPAddress.IsLoopback(address) &&
+        !address.IsIPv6LinkLocal;
 }
