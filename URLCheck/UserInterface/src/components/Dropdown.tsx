@@ -170,7 +170,7 @@ const Label = styled.span`
     white-space: nowrap;
 `;
 
-const Caret = styled.span<{ $open: boolean }>`
+export const Caret = styled.span<{ $open: boolean }>`
     flex-shrink: 0;
     font-size: 0.7em;
     opacity: 0.75;

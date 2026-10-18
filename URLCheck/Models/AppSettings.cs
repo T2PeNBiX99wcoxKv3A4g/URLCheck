@@ -14,6 +14,9 @@ internal sealed class AppSettings
     public const int TimeoutMaxMs = 15_000;
     public const string DefaultLanguage = "en";
 
+    /// <summary>Port the device-forwarding listener uses unless the user picks another one.</summary>
+    public const int DefaultForwardPort = 45_454;
+
     /// <summary>Maximum milliseconds to wait for a single URL response.</summary>
     public int RequestTimeoutMs { get; set; } = 5_000;
 
@@ -55,6 +58,24 @@ internal sealed class AppSettings
     /// </summary>
     public bool ShowUrlButton { get; set; } = true;
 
+    /// <summary>Display name this device advertises to peers.</summary>
+    public string DeviceName { get; set; } = "";
+
+    /// <summary>Stable identifier for this device, generated on first use.</summary>
+    public string DeviceId { get; set; } = "";
+
+    /// <summary>
+    ///     Shared secret for device forwarding. It authenticates peers and encrypts the URLs on the
+    ///     wire; the listener only runs while it is set.
+    /// </summary>
+    public string PairingCode { get; set; } = "";
+
+    /// <summary>Port this device listens on for incoming forwarded URLs.</summary>
+    public int ForwardPort { get; set; } = DefaultForwardPort;
+
+    /// <summary>Peer devices URLs can be forwarded to; the popup hides its button while this is empty.</summary>
+    public List<DeviceEntry> Devices { get; set; } = [];
+
     public AppSettings Clone() => (AppSettings)MemberwiseClone();
 
     /// <summary>Clamps values into their supported ranges so invalid input can never be persisted.</summary>
@@ -91,6 +112,29 @@ internal sealed class AppSettings
 
             if (string.IsNullOrWhiteSpace(browser.Name))
                 browser.Name = Path.GetFileNameWithoutExtension(browser.ExecutablePath);
+        }
+
+        // A device needs an identity before it can be reached, even when the user never opens the
+        // forwarding settings.
+        if (string.IsNullOrWhiteSpace(DeviceId))
+            DeviceId = Guid.NewGuid().ToString("N");
+
+        if (string.IsNullOrWhiteSpace(DeviceName))
+            DeviceName = Environment.MachineName;
+
+        ForwardPort = Math.Clamp(ForwardPort, 1_024, 65_535);
+
+        Devices ??= [];
+
+        foreach (var device in Devices)
+        {
+            if (string.IsNullOrWhiteSpace(device.Id))
+                device.Id = Guid.NewGuid().ToString("N");
+
+            if (string.IsNullOrWhiteSpace(device.Name))
+                device.Name = device.Host;
+
+            device.Port = Math.Clamp(device.Port, 1_024, 65_535);
         }
     }
 

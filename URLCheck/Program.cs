@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 using Serilog;
 using URLCheck.Filters;
+using URLCheck.Forward;
 using URLCheck.Inspect;
 using URLCheck.Interop;
 using URLCheck.Platform;
@@ -128,6 +129,10 @@ internal static class Program
             };
 
             manager.CreateMainWindow();
+
+            // Needs the window manager: a forwarded URL is opened in the inspection popup.
+            _ = new ForwardService(settings, manager);
+
             StartTray(tray, manager);
 
             manager.Run();

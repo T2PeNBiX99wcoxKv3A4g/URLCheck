@@ -1,8 +1,9 @@
 import React, {useEffect, useMemo, useReducer, useRef, useState} from "react";
 import styled, {keyframes} from "styled-components";
-import {BrowserEntry, UserAgentEntry} from "../types";
+import {BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
 import {loadSettings} from "../api/settings";
 import {openWithBrowser} from "../api/browsers";
+import {forwardUrl} from "../api/forward";
 import {checkStatus, type StatusResult} from "../api/inspect";
 import {closePopup, resizePopup} from "../api/system";
 import {loadFilterRules} from "../api/filters";
@@ -15,11 +16,12 @@ import {
     CopyIcon,
     LockIcon,
     PlusIcon,
+    SendIcon,
     ShieldCheckIcon,
     TrashIcon,
     XCircleIcon,
 } from "../components/Icons";
-import {Dropdown, DropdownItem, DropdownMenu, useMenuFit} from "../components/Dropdown";
+import {Caret, Dropdown, DropdownItem, DropdownMenu, useMenuFit} from "../components/Dropdown";
 
 /* ------------------------------------------------------------------ history */
 
@@ -503,6 +505,12 @@ const SplitButton = styled.div`
     display: flex;
 `;
 
+/** Anchors the "send to device" menu to its button, the way `SplitButton` anchors the browser one. */
+const ForwardGroup = styled.div`
+    position: relative;
+    display: flex;
+`;
+
 const OpenButton = styled.button`
     display: inline-flex;
     align-items: center;
@@ -605,12 +613,17 @@ export const PopupPage: React.FC = () => {
 
     const [browsers, setBrowsers] = useState<BrowserEntry[]>([]);
     const [userAgents, setUserAgents] = useState<UserAgentEntry[]>([]);
+    /* Devices this URL can be forwarded to; the button is hidden while the list is empty. */
+    const [devices, setDevices] = useState<DeviceEntry[]>([]);
     /* Picked here for this popup only; the settings hold the default. */
     const [userAgentId, setUserAgentId] = useState("");
     const [status, setStatus] = useState<StatusResult | null>(null);
     const [statusBusy, setStatusBusy] = useState(false);
     const [browserMenuOpen, setBrowserMenuOpen] = useState(false);
     const [historyMenuOpen, setHistoryMenuOpen] = useState(false);
+    const [forwardMenuOpen, setForwardMenuOpen] = useState(false);
+    /* Id of the device the URL was just sent to, so its entry can confirm the send briefly. */
+    const [forwardedTo, setForwardedTo] = useState<string | null>(null);
     const [privateMode, setPrivateMode] = useState(false);
     const [copied, setCopied] = useState(false);
     const [borderless] = useState(() => readPopupFlag("borderless"));
@@ -635,9 +648,11 @@ export const PopupPage: React.FC = () => {
     /* Anchors for the two menus that are not `Dropdown`s, so they stay inside the window too. */
     const historyAnchor = useRef<HTMLDivElement>(null);
     const browserAnchor = useRef<HTMLDivElement>(null);
+    const forwardAnchor = useRef<HTMLDivElement>(null);
 
     const historyMenuStyle = useMenuFit(historyMenuOpen, false, historyAnchor);
     const browserMenuStyle = useMenuFit(browserMenuOpen, true, browserAnchor);
+    const forwardMenuStyle = useMenuFit(forwardMenuOpen, true, forwardAnchor);
 
     const parsed = useMemo(() => {
         try {
@@ -668,6 +683,7 @@ export const PopupPage: React.FC = () => {
                 setBrowsers(payload.settings.browsers);
                 setUserAgents(payload.settings.userAgents);
                 setUserAgentId(payload.settings.selectedUserAgentId);
+                setDevices(payload.settings.devices ?? []);
             } catch {
                 // The popup still works without a browser list.
             }
@@ -706,6 +722,15 @@ export const PopupPage: React.FC = () => {
                 setStatus(null);
                 setError(null);
             }
+        });
+    }, []);
+
+    /* the device list can change while the popup is open, since the settings live in another window */
+    useEffect(() => {
+        return Native.on((message) => {
+            const event = message as { type?: string; data?: { settings?: { devices?: DeviceEntry[] } } };
+            if (event.type === "settings.changed" && event.data?.settings)
+                setDevices(event.data.settings.devices ?? []);
         });
     }, []);
 
@@ -836,6 +861,18 @@ export const PopupPage: React.FC = () => {
             await navigator.clipboard.writeText(url);
             setCopied(true);
             setTimeout(() => setCopied(false), 1500);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : String(err));
+        }
+    };
+
+    const handleForward = async (deviceId: string) => {
+        setForwardMenuOpen(false);
+        setError(null);
+        try {
+            await forwardUrl(url, deviceId);
+            setForwardedTo(deviceId);
+            setTimeout(() => setForwardedTo(null), 1500);
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
         }
@@ -1135,6 +1172,30 @@ export const PopupPage: React.FC = () => {
                         <LockIcon size={13}/>
                         {t("popup.private")}
                     </GhostButton>
+
+                    {devices.length > 0 && (
+                        <ForwardGroup ref={forwardAnchor}>
+                            <GhostButton onClick={() => setForwardMenuOpen((open) => !open)}
+                                         disabled={!parsed}
+                                         title={t("popup.sendToTooltip")}>
+                                <SendIcon size={13}/>
+                                {t("popup.sendTo")}
+                                <Caret $open={forwardMenuOpen}>▾</Caret>
+                            </GhostButton>
+                            {forwardMenuOpen && (
+                                <DropdownMenu $up
+                                              style={{...forwardMenuStyle, left: "auto", right: 0, maxWidth: 280}}>
+                                    {devices.map((device) => (
+                                        <DropdownItem key={device.id} onClick={() => handleForward(device.id)}>
+                                            {forwardedTo === device.id
+                                                ? t("popup.sent")
+                                                : device.name || device.host}
+                                        </DropdownItem>
+                                    ))}
+                                </DropdownMenu>
+                            )}
+                        </ForwardGroup>
+                    )}
 
                     <GhostButton onClick={handleCopy} disabled={!parsed}>
                         <CopyIcon size={13}/>

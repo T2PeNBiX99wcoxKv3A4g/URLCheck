@@ -16,6 +16,7 @@ import RedirectSvg from "./icons/redirect.svg?react";
 import PlusSvg from "./icons/plus.svg?react";
 import TrashSvg from "./icons/trash.svg?react";
 import PlaySvg from "./icons/play.svg?react";
+import SendSvg from "./icons/send.svg?react";
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
     size?: number;
@@ -47,3 +48,4 @@ export const RedirectIcon = sized(RedirectSvg);
 export const PlusIcon = sized(PlusSvg);
 export const TrashIcon = sized(TrashSvg);
 export const PlayIcon = sized(PlaySvg);
+export const SendIcon = sized(SendSvg);

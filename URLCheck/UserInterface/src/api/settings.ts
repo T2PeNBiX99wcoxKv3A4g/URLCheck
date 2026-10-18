@@ -29,6 +29,11 @@ export const DEFAULT_SETTINGS: AppSettings = {
     hideOnLaunch: false,
     showUrlButton: true,
     selectedUserAgentId: "default",
+    deviceName: "",
+    deviceId: "",
+    pairingCode: "",
+    forwardPort: 45454,
+    devices: [],
 };
 
 export interface SettingsPayload {
@@ -67,6 +72,15 @@ function normalize(settings: AppSettings): AppSettings {
             settings.autoStripTrackingParams ?? DEFAULT_SETTINGS.autoStripTrackingParams,
         hideOnLaunch: settings.hideOnLaunch ?? DEFAULT_SETTINGS.hideOnLaunch,
         showUrlButton: settings.showUrlButton ?? DEFAULT_SETTINGS.showUrlButton,
+        deviceName: settings.deviceName ?? DEFAULT_SETTINGS.deviceName,
+        deviceId: settings.deviceId ?? DEFAULT_SETTINGS.deviceId,
+        pairingCode: settings.pairingCode ?? DEFAULT_SETTINGS.pairingCode,
+        forwardPort: settings.forwardPort ?? DEFAULT_SETTINGS.forwardPort,
+        devices: (Array.isArray(settings.devices) ? settings.devices : []).map((device) => ({
+            ...device,
+            host: device.host ?? "",
+            port: device.port ?? DEFAULT_SETTINGS.forwardPort,
+        })),
     };
 }
 

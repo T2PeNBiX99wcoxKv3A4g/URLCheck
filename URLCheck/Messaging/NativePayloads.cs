@@ -69,3 +69,17 @@ internal sealed record PopupNavigatePayload(string Url);
 
 /// <summary>Body for the <c>selection.show</c> event: the URL the floating button should offer.</summary>
 internal sealed record SelectionShowPayload(string Url);
+
+/// <summary>Body for <c>forward.send</c>: which device accepted the URL.</summary>
+internal sealed record ForwardSendPayload(bool Ok, string Device);
+
+/// <summary>
+///     Body for <c>forward.info</c>: how this device can be reached, plus whether the listener is
+///     currently accepting forwarded URLs.
+/// </summary>
+internal sealed record ForwardInfoPayload(
+    string DeviceId,
+    string DeviceName,
+    int Port,
+    IReadOnlyList<string> Addresses,
+    bool Listening);

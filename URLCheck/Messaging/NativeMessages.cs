@@ -97,6 +97,9 @@ internal sealed record PopupOpenRequest(string Url, string? BrowserId, bool Priv
 /// <summary>Payload for <c>popup.resize</c>.</summary>
 internal sealed record PopupResizeRequest(int Height);
 
+/// <summary>Payload for <c>forward.send</c>: the URL to forward and the target device.</summary>
+internal sealed record ForwardSendRequest(string Url, string? DeviceId);
+
 /// <summary>
 ///     Payload for the <c>inspect.*</c> messages. The User-Agent is optional: the configured default is used when it
 ///     is empty.

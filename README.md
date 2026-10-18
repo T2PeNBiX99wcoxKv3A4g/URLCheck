@@ -43,6 +43,9 @@ desktop version.
 - **Float a button over copied links** — copying an `http(s)` URL anywhere makes a small button
   appear next to the pointer; one click opens the inspection popup without switching applications.
   It can be turned off in the settings.
+- **Forward to another device** — send a URL from the popup to another URLCheck on the local
+  network, where it opens in its own inspection popup. Devices are paired with a shared code and
+  the transfer is encrypted, and nothing ever leaves the network.
 
 ## Built with
 

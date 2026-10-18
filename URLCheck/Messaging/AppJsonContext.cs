@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using URLCheck.Filters;
+using URLCheck.Forward;
 using URLCheck.Models;
 
 namespace URLCheck.Messaging;
@@ -51,6 +52,10 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(NavigatePayload))]
 [JsonSerializable(typeof(PopupNavigatePayload))]
 [JsonSerializable(typeof(SelectionShowPayload))]
+[JsonSerializable(typeof(ForwardEnvelope))]
+[JsonSerializable(typeof(ForwardSendRequest))]
+[JsonSerializable(typeof(ForwardSendPayload))]
+[JsonSerializable(typeof(ForwardInfoPayload))]
 [JsonSerializable(typeof(Dictionary<string, string>))]
 internal sealed partial class AppJsonContext : JsonSerializerContext;
 
