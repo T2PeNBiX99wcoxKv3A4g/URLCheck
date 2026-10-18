@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.3..v0.5.4) - 2026-10-18
+
+### 🐛 Bug Fixes
+
+- *(linux)* Restore hiding the main window and stop the GTK log spam - ([94f7af6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/94f7af681c621aff78e565074e7d0008420bf7f5))
+- *(ui)* Drop the web view's cache when the build changes - ([8ea841a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8ea841a6782eba8c21bc3378b2ccccb95c9d5e45))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([ce266c3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ce266c393c77690912d61d3ad6d9ab95343bf640))
+
+
 ## [0.5.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.5.2..v0.5.3) - 2026-10-18
 
 ### 🐛 Bug Fixes
