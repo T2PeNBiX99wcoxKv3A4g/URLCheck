@@ -20,8 +20,11 @@ internal sealed class WindowManager
     private static readonly string WebViewDataPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name, "webview");
 
-    /// <summary>Side of the floating button's square window, in physical pixels.</summary>
-    private const int ButtonSize = 44;
+    /// <summary>
+    ///     Side of the floating button's square window, in physical pixels. It is a little larger than
+    ///     the button itself so the button's shadow has room inside the window's round clip.
+    /// </summary>
+    private const int ButtonSize = 52;
 
     /// <summary>Offset from the pointer, so the button does not sit under the cursor.</summary>
     private const int ButtonOffset = 16;

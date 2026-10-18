@@ -17,9 +17,8 @@ const popIn = keyframes`
 `;
 
 /**
- * Centres the button in the window. A pixel of slack is left around it so the window's round region
- * — which is clipped without antialiasing — trims that empty ring rather than the button's own
- * smooth edge.
+ * Centres the button in the window, which is a little larger than the button so the window's round
+ * region — clipped without antialiasing — trims empty space rather than the button or its shadow.
  */
 const Root = styled.div`
     display: flex;
@@ -32,22 +31,22 @@ const Root = styled.div`
 
 /**
  * The button itself: an icon-only circle carrying the app's own mark, so what a click leads to is
- * obvious without a label.
+ * obvious without a label. It is a little smaller than the window so its shadow has room inside the
+ * window's round clip, which trims anything drawn outside the circle.
  */
 const Button = styled.button`
     display: flex;
     box-sizing: border-box;
-    width: calc(100% - 2px);
-    height: calc(100% - 2px);
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
     align-items: center;
     justify-content: center;
     padding: 0;
-    border: 1px solid rgba(255, 255, 255, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 50%;
     background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
     cursor: pointer;
-    /* Inset, because anything drawn outside the circle is clipped away by the window's region. */
-    box-shadow: inset 0 -2px 6px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     animation: ${popIn} 0.16s cubic-bezier(0.22, 1, 0.36, 1);
     transition: filter 0.15s ease;
 
