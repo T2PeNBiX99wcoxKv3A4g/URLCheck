@@ -501,6 +501,17 @@ const FilterActions = styled.div`
   flex-shrink: 0;
 `;
 
+/** Sits where a catalogue entry's Add button was, once that rule file is installed. */
+const AddedMark = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #34d399;
+`;
+
 /**
  * A switch, so a list can be turned on and off at any time without removing it. The "on" state uses
  * the same indigo as the settings' checkboxes and sliders.
@@ -758,6 +769,10 @@ export const SettingsPage: React.FC = () => {
     setBuiltinRuleCount(payload.builtinRuleCount);
   };
 
+  /** True when a rule file is already installed, so offering to add it again would do nothing. */
+  const isFilterAdded = (url: string) =>
+      filterLists.some((list) => list.url.trim().toLowerCase() === url.trim().toLowerCase());
+
   /** Applies a backend payload and treats it as the new saved baseline. */
   const applyPayload = (payload: SettingsPayload) => {
     setSettings(payload.settings);
@@ -989,7 +1004,7 @@ export const SettingsPage: React.FC = () => {
   const handleAddFilterList = async (name: string, url: string) => {
     if (!(await runFilterAction(() => addFilterList(name, url), setAdding))) return;
 
-    setAddOpen(false);
+    // The dialog stays open: several rule files are usually added in one go.
     setNewFilterName("");
     setNewFilterUrl("");
   };
@@ -1421,10 +1436,17 @@ export const SettingsPage: React.FC = () => {
                           <CatalogItem key={entry.url}>
                             <CatalogItemHead>
                               <CatalogName>{entry.name}</CatalogName>
-                              <GhostButton type="button" disabled={adding}
-                                           onClick={() => handleAddFilterList(entry.name, entry.url)}>
-                                {adding ? t("settings.filterAdding") : t("settings.filterAdd")}
-                              </GhostButton>
+                              {isFilterAdded(entry.url) ? (
+                                  <AddedMark>
+                                    <CheckCircleIcon size={14}/>
+                                    {t("settings.filterAdded")}
+                                  </AddedMark>
+                              ) : (
+                                  <GhostButton type="button" disabled={adding}
+                                               onClick={() => handleAddFilterList(entry.name, entry.url)}>
+                                    {adding ? t("settings.filterAdding") : t("settings.filterAdd")}
+                                  </GhostButton>
+                              )}
                             </CatalogItemHead>
                             <CatalogDescription>{t(entry.descriptionKey)}</CatalogDescription>
                             <FilterUrl>{entry.url}</FilterUrl>
@@ -1444,11 +1466,18 @@ export const SettingsPage: React.FC = () => {
                                      onChange={(event) => setNewFilterUrl(event.target.value)}/>
                       </FieldLabel>
                       <ButtonRow>
-                        <GhostButton type="button"
-                                     disabled={adding || !newFilterName.trim() || !newFilterUrl.trim()}
-                                     onClick={() => handleAddFilterList(newFilterName, newFilterUrl)}>
-                          {adding ? t("settings.filterAdding") : t("settings.filterAdd")}
-                        </GhostButton>
+                        {isFilterAdded(newFilterUrl) ? (
+                            <AddedMark>
+                              <CheckCircleIcon size={14}/>
+                              {t("settings.filterAdded")}
+                            </AddedMark>
+                        ) : (
+                            <GhostButton type="button"
+                                         disabled={adding || !newFilterName.trim() || !newFilterUrl.trim()}
+                                         onClick={() => handleAddFilterList(newFilterName, newFilterUrl)}>
+                              {adding ? t("settings.filterAdding") : t("settings.filterAdd")}
+                            </GhostButton>
+                        )}
                       </ButtonRow>
                     </>
                 )}

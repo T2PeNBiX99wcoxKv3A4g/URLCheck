@@ -79,6 +79,7 @@
   "settings.filterNamePlaceholder": "マイ フィルター リスト",
   "settings.filterUrl": "ルール ファイルの URL",
   "settings.filterUrlPlaceholder": "https://example.com/filters.txt",
+  "settings.filterAdded": "追加済み",
   "settings.filterAdd": "追加",
   "settings.filterAdding": "追加中...",
   "settings.filterCancel": "キャンセル",

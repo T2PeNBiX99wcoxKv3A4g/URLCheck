@@ -24,22 +24,15 @@ internal static partial class LinuxGtk
     private const string WebKitLibrary = "libwebkit2gtk-4.1.so.0";
 
     /// <summary>
-    ///     Takes a toplevel off the screen and out of the taskbar without unmapping it. Unmapping one
-    ///     that still has a web view to create leaves that view blank, so the window is iconified
-    ///     with the skip-taskbar hint set instead: GTK keeps it alive, the compositor hides it.
+    ///     Hides a toplevel by title. Returns false when it could not be found. Unmapping is what takes
+    ///     a window out of the taskbar here: iconifying it only minimises it, which leaves it there.
     /// </summary>
-    public static bool Hide(string title) => WithWindow(title, window =>
-    {
-        gtk_window_set_skip_taskbar_hint(window, true);
-        gtk_window_iconify(window);
-    });
+    public static bool Hide(string title) => WithWindow(title, gtk_widget_hide);
 
     /// <summary>Un-hides and raises a toplevel by title. Returns false when it could not be found.</summary>
     public static bool Present(string title) => WithWindow(title, window =>
     {
         gtk_widget_show(window);
-        gtk_window_deiconify(window);
-        gtk_window_set_skip_taskbar_hint(window, false);
         gtk_window_present(window);
     });
 
@@ -49,7 +42,6 @@ internal static partial class LinuxGtk
     /// </summary>
     public static bool ShowOnTop(string title) => WithWindow(title, window =>
     {
-        gtk_window_deiconify(window);
         gtk_widget_show(window);
         gtk_window_set_keep_above(window, true);
     });
@@ -244,13 +236,19 @@ internal static partial class LinuxGtk
     private static bool _clipboardConnected;
 
     /// <summary>
-    ///     Whether a mouse button is down. Wayland only reports input aimed at this client's own
+    ///     Whether a mouse button is down. GDK insists on a window to ask about, so the query goes
+    ///     through the root window; without one it is skipped rather than passed a null, which would
+    ///     trip a GDK assertion on every poll. Wayland only reports input aimed at this client's own
     ///     surfaces, so this is effectively X11-only; elsewhere it simply stays false.
     /// </summary>
     public static bool IsPointerButtonPressed()
     {
         try
         {
+            var root = gdk_get_default_root_window();
+            if (root == IntPtr.Zero)
+                return false;
+
             var display = gdk_display_get_default();
             if (display == IntPtr.Zero)
                 return false;
@@ -263,7 +261,7 @@ internal static partial class LinuxGtk
             if (pointer == IntPtr.Zero)
                 return false;
 
-            gdk_device_get_state(pointer, IntPtr.Zero, IntPtr.Zero, out var mask);
+            gdk_device_get_state(pointer, root, IntPtr.Zero, out var mask);
             return (mask & PointerButtonMask) != 0;
         }
         catch (Exception ex)
@@ -427,6 +425,12 @@ internal static partial class LinuxGtk
             for (var node = list; node != IntPtr.Zero; node = Marshal.ReadIntPtr(node, IntPtr.Size))
             {
                 var window = Marshal.ReadIntPtr(node);
+
+                // A toplevel that is being torn down can still sit in this list for a moment, and
+                // asking it for its title would trip a GTK assertion.
+                if (window == IntPtr.Zero || g_type_check_instance_is_a(window, gtk_window_get_type()) == 0)
+                    continue;
+
                 var current = gtk_window_get_title(window);
 
                 if (current != IntPtr.Zero && Marshal.PtrToStringUTF8(current) == title)
@@ -460,14 +464,7 @@ internal static partial class LinuxGtk
     private static partial void gtk_window_set_keep_above(IntPtr window, [MarshalAs(UnmanagedType.Bool)] bool setting);
 
     [LibraryImport(GtkLibrary)]
-    private static partial void gtk_window_set_skip_taskbar_hint(IntPtr window,
-        [MarshalAs(UnmanagedType.Bool)] bool setting);
-
-    [LibraryImport(GtkLibrary)]
-    private static partial void gtk_window_iconify(IntPtr window);
-
-    [LibraryImport(GtkLibrary)]
-    private static partial void gtk_window_deiconify(IntPtr window);
+    private static partial IntPtr gdk_get_default_root_window();
 
     [LibraryImport(GtkLibrary)]
     private static partial IntPtr gtk_clipboard_get(IntPtr selection);
@@ -543,6 +540,9 @@ internal static partial class LinuxGtk
 
     [LibraryImport(GtkLibrary)]
     private static partial IntPtr gtk_container_get_type();
+
+    [LibraryImport(GtkLibrary)]
+    private static partial IntPtr gtk_window_get_type();
 
     [LibraryImport(GtkLibrary)]
     private static partial IntPtr gtk_container_get_children(IntPtr container);

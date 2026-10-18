@@ -84,6 +84,7 @@
   "settings.filterNamePlaceholder": "My filter list",
   "settings.filterUrl": "Rule file URL",
   "settings.filterUrlPlaceholder": "https://example.com/filters.txt",
+  "settings.filterAdded": "Added",
   "settings.filterAdd": "Add",
   "settings.filterAdding": "Adding...",
   "settings.filterCancel": "Cancel",

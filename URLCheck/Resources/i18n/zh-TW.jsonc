@@ -79,6 +79,7 @@
   "settings.filterNamePlaceholder": "我的規則清單",
   "settings.filterUrl": "規則檔網址",
   "settings.filterUrlPlaceholder": "https://example.com/filters.txt",
+  "settings.filterAdded": "已加入",
   "settings.filterAdd": "新增",
   "settings.filterAdding": "新增中...",
   "settings.filterCancel": "取消",
