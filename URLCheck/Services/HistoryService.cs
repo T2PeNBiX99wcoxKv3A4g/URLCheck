@@ -24,8 +24,9 @@ internal sealed class HistoryService : Singleton<HistoryService>
         CREATE INDEX IF NOT EXISTS IX_History_Timestamp ON History (Timestamp);
         """;
 
-    private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly string _connectionString;
+
+    private readonly SemaphoreSlim _gate = new(1, 1);
 
     public HistoryService()
     {
@@ -33,7 +34,10 @@ internal sealed class HistoryService : Singleton<HistoryService>
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.Name);
         Directory.CreateDirectory(directory);
         DatabasePath = Path.Combine(directory, "history.db");
-        _connectionString = new SqliteConnectionStringBuilder { DataSource = DatabasePath }.ToString();
+        _connectionString = new SqliteConnectionStringBuilder
+        {
+            DataSource = DatabasePath
+        }.ToString();
 
         using (var connection = Open())
         using (var command = connection.CreateCommand())
@@ -88,7 +92,7 @@ internal sealed class HistoryService : Singleton<HistoryService>
             var entries = new List<HistoryItemPayload>();
             await using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
-                entries.Add(new HistoryItemPayload(reader.GetInt32(0), reader.GetString(1), reader.GetInt64(2)));
+                entries.Add(new(reader.GetInt32(0), reader.GetString(1), reader.GetInt64(2)));
 
             return context.Reply("history.list.result", new HistoryListPayload(entries));
         }

@@ -94,7 +94,7 @@ internal static partial class LinuxGtk
     /// </summary>
     public static void Connect<TDelegate>(IntPtr instance, string signal, TDelegate callback, IntPtr data)
         where TDelegate : Delegate =>
-        g_signal_connect_data(instance, signal, Marshal.GetFunctionPointerForDelegate<TDelegate>(callback), data,
+        g_signal_connect_data(instance, signal, Marshal.GetFunctionPointerForDelegate(callback), data,
             IntPtr.Zero, 0);
 
     /// <summary>
