@@ -26,5 +26,4 @@ jobs:
       filename: 'URLCheck'
       runtimes: '["win-x64", "linux-x64"]'
       version_file_path: './URLCheck/URLCheck.csproj'
-      setup_aot_toolchain: true
     secrets: inherit
