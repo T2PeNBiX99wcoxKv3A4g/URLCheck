@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Photino.NET;
 using Serilog;
-using Swan;
 using URLCheck.Extensions;
 using URLCheck.Utils;
 

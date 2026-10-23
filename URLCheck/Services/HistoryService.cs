@@ -1,18 +1,31 @@
 using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
-using URLCheck.Data;
+using Microsoft.Data.Sqlite;
 using URLCheck.Extensions;
 using URLCheck.Messaging;
 using URLCheck.Utils;
 
 namespace URLCheck.Services;
 
-/// <summary>Stores the URLs that were intercepted (clicked) in a local SQLite database.</summary>
+/// <summary>
+///     Stores the URLs that were intercepted (clicked) in a local SQLite database.
+///     Uses raw ADO.NET (<see cref="SqliteConnection" />) rather than EF Core, whose runtime model
+///     building generates code and is therefore not usable from a Native AOT build.
+/// </summary>
 [PublicAPI]
 internal sealed class HistoryService : Singleton<HistoryService>
 {
+    private const string CreateSchema =
+        """
+        CREATE TABLE IF NOT EXISTS History (
+            Id INTEGER NOT NULL CONSTRAINT PK_History PRIMARY KEY AUTOINCREMENT,
+            Url TEXT NOT NULL,
+            Timestamp INTEGER NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS IX_History_Timestamp ON History (Timestamp);
+        """;
+
     private readonly SemaphoreSlim _gate = new(1, 1);
-    private readonly DbContextOptions<HistoryContext> _options;
+    private readonly string _connectionString;
 
     public HistoryService()
     {
@@ -20,13 +33,14 @@ internal sealed class HistoryService : Singleton<HistoryService>
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.Name);
         Directory.CreateDirectory(directory);
         DatabasePath = Path.Combine(directory, "history.db");
+        _connectionString = new SqliteConnectionStringBuilder { DataSource = DatabasePath }.ToString();
 
-        _options = new DbContextOptionsBuilder<HistoryContext>()
-            .UseSqlite($"Data Source={DatabasePath}")
-            .Options;
-
-        using (var context = new HistoryContext(_options))
-            context.Database.EnsureCreated();
+        using (var connection = Open())
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = CreateSchema;
+            command.ExecuteNonQuery();
+        }
 
         NativeBridge.MessageReceived += HandleMessageAsync;
     }
@@ -44,12 +58,12 @@ internal sealed class HistoryService : Singleton<HistoryService>
             await _gate.WaitAsync();
             (await Try.Run(async () =>
             {
-                await using var context = new HistoryContext(_options);
-                context.Entries.Add(new()
-                {
-                    Url = url
-                });
-                await context.SaveChangesAsync();
+                await using var connection = await OpenAsync();
+                await using var command = connection.CreateCommand();
+                command.CommandText = "INSERT INTO History (Url, Timestamp) VALUES ($url, $timestamp)";
+                command.Parameters.AddWithValue("$url", url);
+                command.Parameters.AddWithValue("$timestamp", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                await command.ExecuteNonQueryAsync();
             })).OnFailure(ex => Log.Warning(ex, "Failed to record a history entry"));
             _gate.Release();
         });
@@ -67,17 +81,16 @@ internal sealed class HistoryService : Singleton<HistoryService>
         await _gate.WaitAsync();
         try
         {
-            await using var db = new HistoryContext(_options);
-            var entries = await db.Entries
-                .AsNoTracking()
-                .OrderByDescending(entry => entry.Timestamp)
-                .Take(500)
-                .ToListAsync();
+            await using var connection = await OpenAsync();
+            await using var command = connection.CreateCommand();
+            command.CommandText = "SELECT Id, Url, Timestamp FROM History ORDER BY Timestamp DESC LIMIT 500";
 
-            return context.Reply("history.list.result", new HistoryListPayload(
-            [
-                .. entries.Select(entry => new HistoryItemPayload(entry.Id, entry.Url, entry.Timestamp))
-            ]));
+            var entries = new List<HistoryItemPayload>();
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                entries.Add(new HistoryItemPayload(reader.GetInt32(0), reader.GetString(1), reader.GetInt64(2)));
+
+            return context.Reply("history.list.result", new HistoryListPayload(entries));
         }
         finally
         {
@@ -90,8 +103,10 @@ internal sealed class HistoryService : Singleton<HistoryService>
         await _gate.WaitAsync();
         try
         {
-            await using var db = new HistoryContext(_options);
-            await db.Entries.ExecuteDeleteAsync();
+            await using var connection = await OpenAsync();
+            await using var command = connection.CreateCommand();
+            command.CommandText = "DELETE FROM History";
+            await command.ExecuteNonQueryAsync();
 
             return context.Reply("history.clear.result", new OkPayload());
         }
@@ -99,5 +114,19 @@ internal sealed class HistoryService : Singleton<HistoryService>
         {
             _gate.Release();
         }
+    }
+
+    private SqliteConnection Open()
+    {
+        var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+        return connection;
+    }
+
+    private async Task<SqliteConnection> OpenAsync()
+    {
+        var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+        return connection;
     }
 }
