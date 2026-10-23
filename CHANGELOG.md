@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.7.5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.4..v0.7.5) - 2026-10-23
+
+### 🐛 Bug Fixes
+
+- *(selection)* Rebuild the floating button when its window is gone - ([3f90358](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/3f9035812493ca521672579f4dd696329f777a5f))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([8bce347](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8bce3475fb2ccf5ce2801dbcf9d311cf012ddae9))
+
+
 ## [0.7.4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.3..v0.7.4) - 2026-10-23
 
 ### 🐛 Bug Fixes
