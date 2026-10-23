@@ -90,6 +90,13 @@ internal sealed partial class LinuxTrayIcon(
             app_indicator_set_menu(_indicator, BuildMenu());
             app_indicator_set_status(_indicator, StatusActive);
 
+            // A primary click (left button) only arrives as "activate" while a handler is connected;
+            // with none, libayatana-appindicator falls back to popping the menu. The menu stays on the
+            // right button either way.
+            IndicatorActivateCallback activated = (_, _, _, _) => Dispatch(0);
+            _callbacks.Add(activated);
+            LinuxGtk.Connect(_indicator, "activate", activated, IntPtr.Zero);
+
             Log.Information("Tray icon created via {Library}", LinuxDiagnostics.AppIndicatorLibrary);
             return true;
         }).GetOrElse(ex =>
@@ -113,8 +120,8 @@ internal sealed partial class LinuxTrayIcon(
     }
 
     /// <summary>
-    ///     Builds the indicator's menu. On Wayland an indicator receives no click events of its own, so
-    ///     every action lives in the menu rather than on a left click.
+    ///     Builds the indicator's menu, shown on a right click (and on hosts that only support the menu).
+    ///     A left click opens the window instead, through the indicator's "activate" signal.
     /// </summary>
     private IntPtr BuildMenu()
     {
@@ -201,4 +208,8 @@ internal sealed partial class LinuxTrayIcon(
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void ActivateCallback(IntPtr widget, IntPtr data);
+
+    /// <summary>AppIndicator::activate — a primary click, carrying the coordinates it happened at.</summary>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void IndicatorActivateCallback(IntPtr indicator, int x, int y, IntPtr data);
 }
