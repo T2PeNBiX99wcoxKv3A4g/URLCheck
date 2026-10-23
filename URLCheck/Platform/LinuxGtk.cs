@@ -88,9 +88,13 @@ internal static partial class LinuxGtk
     public static void SetProgramName(string name) =>
         Try.Run(() => g_set_prgname(name)).OnFailure(ex => Log.Debug(ex, "Failed to set the program name"));
 
-    /// <summary>Connects a GObject signal. The caller has to keep the callback alive.</summary>
-    public static void Connect(IntPtr instance, string signal, Delegate callback, IntPtr data) =>
-        g_signal_connect_data(instance, signal, Marshal.GetFunctionPointerForDelegate(callback), data,
+    /// <summary>
+    ///     Connects a GObject signal. The caller has to keep the callback alive. Generic so the
+    ///     AOT-safe <see cref="Marshal.GetFunctionPointerForDelegate{TDelegate}" /> overload is used.
+    /// </summary>
+    public static void Connect<TDelegate>(IntPtr instance, string signal, TDelegate callback, IntPtr data)
+        where TDelegate : Delegate =>
+        g_signal_connect_data(instance, signal, Marshal.GetFunctionPointerForDelegate<TDelegate>(callback), data,
             IntPtr.Zero, 0);
 
     /// <summary>
