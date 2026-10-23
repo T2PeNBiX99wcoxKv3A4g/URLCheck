@@ -84,6 +84,13 @@ internal static partial class LinuxGtk
         gtk_window_set_keep_above(window, true);
     });
 
+    /// <summary>
+    ///     Asks the window manager to leave the toplevel out of the taskbar, so its close button can never
+    ///     be reached. Best-effort: Wayland has no taskbar hint and simply ignores it.
+    /// </summary>
+    public static bool SkipTaskbar(string title) =>
+        WithWindow(title, window => gtk_window_set_skip_taskbar_hint(window, true));
+
     /// <summary>Sets the program name, which GTK reports as the Wayland app id.</summary>
     public static void SetProgramName(string name) =>
         Try.Run(() => g_set_prgname(name)).OnFailure(ex => Log.Debug(ex, "Failed to set the program name"));
@@ -419,6 +426,10 @@ internal static partial class LinuxGtk
 
     [LibraryImport(GtkLibrary)]
     private static partial void gtk_window_set_keep_above(IntPtr window, [MarshalAs(UnmanagedType.Bool)] bool setting);
+
+    [LibraryImport(GtkLibrary)]
+    private static partial void gtk_window_set_skip_taskbar_hint(IntPtr window,
+        [MarshalAs(UnmanagedType.Bool)] bool setting);
 
     [LibraryImport(GtkLibrary)]
     private static partial IntPtr gdk_get_default_root_window();

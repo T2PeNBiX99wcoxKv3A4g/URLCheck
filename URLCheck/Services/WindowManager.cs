@@ -415,6 +415,10 @@ internal sealed class WindowManager : Singleton<WindowManager>
                 .SetTopMost(true)
                 // Registering for notifications would drop a Start Menu shortcut named after the button.
                 .SetNotificationsEnabled(false)
+                // The button is only ever hidden, never closed. An OS-initiated close — the taskbar's
+                // close button, for instance — would destroy the native window while this reference
+                // lives on, and the button would then never appear again.
+                .RegisterWindowClosingHandler((_, _) => true)
                 .RegisterWebMessageReceivedHandler((sender, message) =>
                     _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message));
 

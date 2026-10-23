@@ -105,9 +105,14 @@ internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWin
     public PhotinoWindow CreateSelectionButtonWindow(PhotinoWindow? parent) =>
         parent is null ? new() : new PhotinoWindow(parent);
 
-    /// <summary>Reuses the popup's transparency treatment so the pill's rounded corners are not filled in.</summary>
+    /// <summary>
+    ///     Reuses the popup's transparency treatment so the pill's rounded corners are not filled in, and
+    ///     keeps the window out of the taskbar so it has no reachable close button.
+    /// </summary>
     public void ConfigureSelectionButtonWindow(PhotinoWindow window)
     {
+        LinuxGtk.SkipTaskbar(window.Title);
+
         if (!LinuxGtk.MakeTransparent(window.Title))
             return;
 
