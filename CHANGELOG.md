@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.8.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.5..v0.8.0) - 2026-10-23
+
+### ⛰️  Features
+
+- *(linux)* Open the main window on a left click of the tray icon - ([e807baa](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e807baa20a76cd4313822336b77142e6277e8208))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([187c11c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/187c11cba9d164c3ab6e56e88794ba5fee634a08))
+
+
 ## [0.7.5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.4..v0.7.5) - 2026-10-23
 
 ### 🐛 Bug Fixes
