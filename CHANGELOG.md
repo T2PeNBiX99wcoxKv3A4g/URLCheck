@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.1..v0.7.2) - 2026-10-23
+
+### 🚜 Refactor
+
+- *(extensions)* Make Truncate follow the argument's nullability - ([222b055](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/222b0555605bfa8b90ffb4813328f017a44c8887))
+- Improve code readability and formatting across multiple files - ([537aaa5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/537aaa567f42b59cd22ed6bca6c5bb8d478d5193))
+
+### ⚡ Performance
+
+- *(aot)* Use the generic GetFunctionPointerForDelegate overload in LinuxGtk - ([f5c83be](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f5c83be3c3f292344cf9b27ad0e10e472bffc0f4))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([f567faf](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f567fafd95a3125c3ba1ca0a79a479343c8cbcad))
+
+
 ## [0.7.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.0..v0.7.1) - 2026-10-23
 
 ### 🚜 Refactor

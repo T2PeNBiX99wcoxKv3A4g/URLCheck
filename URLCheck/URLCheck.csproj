@@ -11,7 +11,7 @@
         <!-- Generate embedded file manifest when using the Photino.NET StaticFileServer -->
         <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
         <RootNamespace>URLCheck</RootNamespace>
-        <Version>0.7.1</Version>
+        <Version>0.7.2</Version>
         <!-- Explorer/taskbar icon; also embedded (Resources\**) so the tray can load it at runtime. -->
         <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
         <PublishAot>true</PublishAot>
