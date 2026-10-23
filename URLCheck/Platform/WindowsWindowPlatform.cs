@@ -122,6 +122,13 @@ internal sealed class WindowsWindowPlatform : Singleton<WindowsWindowPlatform>, 
     public bool PointerButtonPressed() =>
         IsPressed(NativeMethods.VkLButton) || IsPressed(NativeMethods.VkRButton) || IsPressed(NativeMethods.VkMButton);
 
+    /// <summary>A handle that is still a live window; a destroyed one must never be handed back.</summary>
+    public bool IsAlive(PhotinoWindow window)
+    {
+        var handle = window.WindowHandle;
+        return handle != IntPtr.Zero && NativeMethods.IsWindow(handle);
+    }
+
     public bool TryGetCursorPosition(out int x, out int y)
     {
         if (NativeMethods.GetCursorPos(out var point))

@@ -135,6 +135,9 @@ internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWin
     ///     Wayland only tells a client about input aimed at its own surfaces, so this stays false there
     ///     and the button simply falls back to its own timeout. X11 does report it.
     /// </summary>
+    /// <summary>GTK lists toplevels while they are hidden, so a lookup succeeds as long as the window lives.</summary>
+    public bool IsAlive(PhotinoWindow window) => LinuxGtk.Exists(window.Title);
+
     public bool PointerButtonPressed() => LinuxGtk.IsPointerButtonPressed();
 
     public bool TryGetCursorPosition(out int x, out int y) => LinuxGtk.TryGetPointerPosition(out x, out y);

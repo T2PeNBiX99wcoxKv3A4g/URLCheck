@@ -46,6 +46,12 @@ internal interface IWindowPlatform
     Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size);
 
     /// <summary>
+    ///     Whether the window's native counterpart still exists. A window that something else destroyed
+    ///     anyway must be rebuilt rather than handed back, or the button never appears again.
+    /// </summary>
+    bool IsAlive(PhotinoWindow window);
+
+    /// <summary>
     ///     True while a mouse button is down, so the floating button can be dismissed the moment the
     ///     user clicks anywhere else: no window ever tells us that such a click happened.
     /// </summary>

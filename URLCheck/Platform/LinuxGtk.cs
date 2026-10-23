@@ -91,6 +91,13 @@ internal static partial class LinuxGtk
     public static bool SkipTaskbar(string title) =>
         WithWindow(title, window => gtk_window_set_skip_taskbar_hint(window, true));
 
+    /// <summary>
+    ///     Whether a toplevel with this title still exists. Hidden toplevels are still listed, so this
+    ///     reports false only once the window is really gone.
+    /// </summary>
+    public static bool Exists(string title) =>
+        Try.Run(() => FindByTitle(title) != IntPtr.Zero).GetOrElse(_ => false);
+
     /// <summary>Sets the program name, which GTK reports as the Wayland app id.</summary>
     public static void SetProgramName(string name) =>
         Try.Run(() => g_set_prgname(name)).OnFailure(ex => Log.Debug(ex, "Failed to set the program name"));

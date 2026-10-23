@@ -396,8 +396,17 @@ internal sealed class WindowManager : Singleton<WindowManager>
     /// </summary>
     private PhotinoWindow? EnsureButtonWindow(string url, int x, int y)
     {
-        if (_buttonWindow is not null)
-            return _buttonWindow;
+        if (_buttonWindow is { } current)
+        {
+            // Normally the button is only hidden and can be reused. If something destroyed it anyway,
+            // handing back the stale reference is exactly what makes the button never appear again, so
+            // rebuild it instead.
+            if (_platform.IsAlive(current))
+                return current;
+
+            Log.Warning("The selection button window is gone; recreating it");
+            _buttonWindow = null;
+        }
 
         return Try.Run<PhotinoWindow?>(() =>
         {

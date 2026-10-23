@@ -107,6 +107,11 @@ internal static partial class NativeMethods
     [LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
     public static partial IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
+    /// <summary>Whether a window handle is still a live window; a destroyed one must never be reused.</summary>
+    [LibraryImport("user32.dll", EntryPoint = "IsWindow")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool IsWindow(IntPtr hWnd);
+
     // ---- Regions ----
 
     [LibraryImport("gdi32.dll", SetLastError = true)]
