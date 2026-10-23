@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.7.4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.3..v0.7.4) - 2026-10-23
+
+### 🐛 Bug Fixes
+
+- *(linux)* Keep the selection button from being closed by the taskbar - ([85c5bfe](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/85c5bfeb759d07dd796defc8467388bbaffef384))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([d075d27](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d075d278fa813bdd46f7cf6669d15e0692ca3491))
+
+
 ## [0.7.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.2..v0.7.3) - 2026-10-23
 
 ### ⚙️ Miscellaneous Tasks
