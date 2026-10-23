@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.2..v0.7.3) - 2026-10-23
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove AOT toolchain setup from release and pre-release workflows - ([b376043](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b3760435e1f68b4b932cb605cbaf84b3b9643411))
+- Update URLCheck.csproj for optimized release builds and dependency updates - ([5dcca6d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5dcca6ddf6cb928161beb2e7c4a920ec7a3800d4))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([6f16ca0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6f16ca00b7e407423f0525f6a2bde6fbb85f1c73))
+
+
 ## [0.7.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.1..v0.7.2) - 2026-10-23
 
 ### 🚜 Refactor
