@@ -15,6 +15,8 @@
         <!-- Explorer/taskbar icon; also embedded (Resources\**) so the tray can load it at runtime. -->
         <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
         <PublishAot>true</PublishAot>
+        <!-- AOT otherwise emits a very large .pdb (~85 MB); it is not worth shipping in the release archive. -->
+        <DebugType>none</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
