@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.7.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.0..v0.7.1) - 2026-10-23
+
+### 🚜 Refactor
+
+- *(history)* Replace EF Core with Microsoft.Data.Sqlite and enable Native AOT - ([534939f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/534939f8efde3ba3a5cb4f51f61a6f6b1a31a401))
+
+### ⚙️ Miscellaneous Tasks
+
+- Enable AOT toolchain setup in release and pre-release workflows - ([e26f233](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e26f233260a28c6ee7b4adfd9afa75bca2c52d88))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([b4d3c93](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b4d3c9340749b2632222e3963509bbbbc05c3b0e))
+
+### Build
+
+- Drop the large native symbol file from the AOT output - ([c3bc7bf](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/c3bc7bf412ee6b3abc6fcd22a4b554398429ec96))
+
+
 ## [0.7.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.6.0..v0.7.0) - 2026-10-18
 
 ### ⛰️  Features
