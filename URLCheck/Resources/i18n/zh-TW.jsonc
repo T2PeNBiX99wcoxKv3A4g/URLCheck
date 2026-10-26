@@ -169,6 +169,7 @@
   "popup.domain": "網域",
   "popup.scheme": "協定",
   "popup.host": "主機",
+  "popup.path": "路徑",
   "popup.hostTooltip": "把網址換成只剩這個主機",
   "popup.parameters": "參數",
   "popup.noParameters": "沒有參數",

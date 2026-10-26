@@ -169,6 +169,7 @@
   "popup.domain": "域名",
   "popup.scheme": "协议",
   "popup.host": "主机",
+  "popup.path": "路径",
   "popup.hostTooltip": "把网址换成只剩这个主机",
   "popup.parameters": "参数",
   "popup.noParameters": "没有参数",

@@ -668,6 +668,8 @@ export const PopupPage: React.FC = () => {
     );
 
     const fragment = decode(parsed?.hash.replace(/^#/, "") ?? "");
+    /* The path without its leading slash, decoded the way the query and the fragment are. */
+    const path = decode((parsed?.pathname ?? "").replace(/^\//, ""));
     const isHttp = parsed?.protocol === "http:";
     const defaultBrowser = browsers[0];
     const canOpen = Boolean(parsed) && browsers.length > 0;
@@ -1052,12 +1054,16 @@ export const PopupPage: React.FC = () => {
                                 <RowValue>
                                     {parsed ? (
                                         <HostLink onClick={useOrigin} title={t("popup.hostTooltip")}>
-                                            {parsed.host}
+                                            {decode(parsed.host)}
                                         </HostLink>
                                     ) : (
                                         "(none)"
                                     )}
                                 </RowValue>
+                            </Row>
+                            <Row>
+                                <RowKey>{t("popup.path")}</RowKey>
+                                <RowValue>{parsed ? path || "/" : "(none)"}</RowValue>
                             </Row>
                         </SectionBody>
                     )}

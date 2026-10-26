@@ -169,6 +169,7 @@
   "popup.domain": "ドメイン",
   "popup.scheme": "スキーム",
   "popup.host": "ホスト",
+  "popup.path": "パス",
   "popup.hostTooltip": "URL をこのホストだけにする",
   "popup.parameters": "パラメータ",
   "popup.noParameters": "パラメータはありません",

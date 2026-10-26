@@ -175,6 +175,7 @@
   "popup.domain": "Domain",
   "popup.scheme": "scheme",
   "popup.host": "host",
+  "popup.path": "path",
   "popup.hostTooltip": "Replace the URL with just this host",
   "popup.parameters": "Parameters",
   "popup.noParameters": "No parameters",
