@@ -16,7 +16,6 @@ import {
     CopyIcon,
     LockIcon,
     PlusIcon,
-    RedirectIcon,
     SendIcon,
     ShieldCheckIcon,
     TrashIcon,
@@ -95,21 +94,9 @@ function decode(value: string): string {
     }
 }
 
-interface Authority {
-    scheme: string;
-    host: string;
-    path: string;
-}
-
-/** The editable parts of the URL, decoded the way they are shown. */
-function authorityFrom(target: URL | null): Authority {
-    if (!target) return {scheme: "", host: "", path: ""};
-
-    return {
-        scheme: target.protocol.replace(/:$/, ""),
-        host: decode(target.host),
-        path: decode(target.pathname).replace(/^\//, ""),
-    };
+/** The path without its leading slash, decoded the way it is shown. */
+function pathFrom(target: URL | null): string {
+    return target ? decode(target.pathname).replace(/^\//, "") : "";
 }
 
 /* ------------------------------------------------------------------- styled */
@@ -440,6 +427,29 @@ const RowKey = styled.span`
     white-space: nowrap;
 `;
 
+const RowValue = styled.span`
+    color: #cbd5e1;
+    flex: 1;
+    word-break: break-all;
+`;
+
+const HostLink = styled.button`
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: #60a5fa;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    word-break: break-all;
+    transition: color 0.15s ease;
+
+    &:hover {
+        color: #93c5fd;
+    }
+`;
+
 const ParamInput = styled.input`
     background: transparent;
     border: 1px solid transparent;
@@ -657,12 +667,12 @@ export const PopupPage: React.FC = () => {
         }
     }, [url]);
 
-    /* The domain fields edit a draft and apply it on blur, so half-typed input never has to be
-       parsed as half a URL. */
-    const [authority, setAuthority] = useState<Authority>(() => authorityFrom(parsed));
+    /* The path edits a draft and applies it on blur, so half-typed input never has to be parsed as
+       half a URL. */
+    const [pathDraft, setPathDraft] = useState(() => pathFrom(parsed));
 
     useEffect(() => {
-        setAuthority(authorityFrom(parsed));
+        setPathDraft(pathFrom(parsed));
     }, [parsed]);
 
     const params = useMemo(
@@ -671,8 +681,7 @@ export const PopupPage: React.FC = () => {
     );
 
     const fragment = decode(parsed?.hash.replace(/^#/, "") ?? "");
-    /* The path without its leading slash, decoded the way the query and the fragment are. */
-    const path = decode((parsed?.pathname ?? "").replace(/^\//, ""));
+    const path = pathFrom(parsed);
     const isHttp = parsed?.protocol === "http:";
     const defaultBrowser = browsers[0];
     const canOpen = Boolean(parsed) && browsers.length > 0;
@@ -791,37 +800,15 @@ export const PopupPage: React.FC = () => {
         if (event.key === "Enter") event.currentTarget.blur();
     };
 
-    /* Commits the edited URL, then snaps the drafts back to what it really became. */
-    const settleAuthority = (next: URL) => {
-        const result = next.toString();
-        commit(result);
-        setAuthority(authorityFrom(new URL(result)));
-    };
-
-    const applyScheme = () => {
-        if (!parsed) return;
-
-        const next = new URL(url);
-        const scheme = authority.scheme.trim().replace(/:$/, "");
-        if (scheme.length > 0) next.protocol = `${scheme}:`;
-        settleAuthority(next);
-    };
-
-    const applyHost = () => {
-        if (!parsed) return;
-
-        const next = new URL(url);
-        const host = authority.host.trim();
-        if (host.length > 0) next.host = host;
-        settleAuthority(next);
-    };
-
+    /* Commits the edited URL, then snaps the draft back to what it really became. */
     const applyPath = () => {
         if (!parsed) return;
 
         const next = new URL(url);
-        next.pathname = `/${authority.path}`;
-        settleAuthority(next);
+        next.pathname = `/${pathDraft}`;
+        const result = next.toString();
+        commit(result);
+        setPathDraft(pathFrom(new URL(result)));
     };
 
     const updateParamAt = (index: number, patch: { key?: string; value?: string }) => {
@@ -1082,35 +1069,24 @@ export const PopupPage: React.FC = () => {
                             <Chevron $open={open.domain}>▶</Chevron>
                             <span>{t("popup.domain")}</span>
                         </SectionToggle>
-                        <HeaderAction title={t("popup.hostTooltip")} onClick={useOrigin} disabled={!parsed}>
-                            <RedirectIcon size={14}/>
-                        </HeaderAction>
                     </SectionHeader>
                     {open.domain && (
                         <SectionBody>
                             <Row>
                                 <RowKey>{t("popup.scheme")}</RowKey>
-                                <ParamInput
-                                    className="value"
-                                    spellCheck={false}
-                                    value={authority.scheme}
-                                    disabled={!parsed}
-                                    onChange={(e) => setAuthority((prev) => ({...prev, scheme: e.target.value}))}
-                                    onBlur={applyScheme}
-                                    onKeyDown={enterBlurs}
-                                />
+                                <RowValue>{parsed?.protocol.replace(/:$/, "") ?? "(none)"}</RowValue>
                             </Row>
                             <Row>
                                 <RowKey>{t("popup.host")}</RowKey>
-                                <ParamInput
-                                    className="value"
-                                    spellCheck={false}
-                                    value={authority.host}
-                                    disabled={!parsed}
-                                    onChange={(e) => setAuthority((prev) => ({...prev, host: e.target.value}))}
-                                    onBlur={applyHost}
-                                    onKeyDown={enterBlurs}
-                                />
+                                <RowValue>
+                                    {parsed ? (
+                                        <HostLink onClick={useOrigin} title={t("popup.hostTooltip")}>
+                                            {decode(parsed.host)}
+                                        </HostLink>
+                                    ) : (
+                                        "(none)"
+                                    )}
+                                </RowValue>
                             </Row>
                             {path.length > 0 && (
                                 <Row>
@@ -1118,8 +1094,8 @@ export const PopupPage: React.FC = () => {
                                     <ParamInput
                                         className="value"
                                         spellCheck={false}
-                                        value={authority.path}
-                                        onChange={(e) => setAuthority((prev) => ({...prev, path: e.target.value}))}
+                                        value={pathDraft}
+                                        onChange={(e) => setPathDraft(e.target.value)}
                                         onBlur={applyPath}
                                         onKeyDown={enterBlurs}
                                     />
