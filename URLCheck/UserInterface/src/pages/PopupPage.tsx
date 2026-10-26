@@ -681,7 +681,6 @@ export const PopupPage: React.FC = () => {
     );
 
     const fragment = decode(parsed?.hash.replace(/^#/, "") ?? "");
-    const path = pathFrom(parsed);
     const isHttp = parsed?.protocol === "http:";
     const defaultBrowser = browsers[0];
     const canOpen = Boolean(parsed) && browsers.length > 0;
@@ -1088,19 +1087,19 @@ export const PopupPage: React.FC = () => {
                                     )}
                                 </RowValue>
                             </Row>
-                            {path.length > 0 && (
-                                <Row>
-                                    <RowKey>{t("popup.path")}</RowKey>
-                                    <ParamInput
-                                        className="value"
-                                        spellCheck={false}
-                                        value={pathDraft}
-                                        onChange={(e) => setPathDraft(e.target.value)}
-                                        onBlur={applyPath}
-                                        onKeyDown={enterBlurs}
-                                    />
-                                </Row>
-                            )}
+                            <Row>
+                                <RowKey>{t("popup.path")}</RowKey>
+                                <ParamInput
+                                    className="value"
+                                    spellCheck={false}
+                                    placeholder={t("popup.empty")}
+                                    value={pathDraft}
+                                    disabled={!parsed}
+                                    onChange={(e) => setPathDraft(e.target.value)}
+                                    onBlur={applyPath}
+                                    onKeyDown={enterBlurs}
+                                />
+                            </Row>
                         </SectionBody>
                     )}
                 </Section>
