@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.8.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.8.1..v0.8.2) - 2026-10-26
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove unused DebugType property from URLCheck.csproj - ([70552ba](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/70552bae302796bc1d17833258ca0a9e8e87232c))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([deee850](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/deee8503d1fc597e6208b3cb85d643aa4546a54b))
+
+
 ## [0.8.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.8.0..v0.8.1) - 2026-10-26
 
 ### 🐛 Bug Fixes
