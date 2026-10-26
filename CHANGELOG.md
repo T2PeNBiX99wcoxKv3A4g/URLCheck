@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.8.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.8.0..v0.8.1) - 2026-10-26
+
+### 🐛 Bug Fixes
+
+- *(popup)* Keep long URLs out of Photino's fixed start-URL buffer - ([ce9d78d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ce9d78dabedfcf4e388f9a37b2534a37d9119da9))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([6956cf5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6956cf5cfccf6515487a89d6411f90e8706fc467))
+
+
 ## [0.8.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.7.5..v0.8.0) - 2026-10-23
 
 ### ⛰️  Features
