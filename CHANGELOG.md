@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.9.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.8.2..v0.9.0) - 2026-10-26
+
+### ⛰️  Features
+
+- *(popup)* Keep only the path editable - ([155f8e8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/155f8e8f28725c9488975446291fe5abf201f0a3))
+- *(popup)* Make the scheme, host and path editable - ([2a67b4e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2a67b4edab9860379b343c0e94633230d9d740db))
+- *(popup)* Show the URL path and decode the host and path - ([6f5dab8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6f5dab85e1d09c3b0ab24814af0bc236fd474aef))
+
+### 🐛 Bug Fixes
+
+- *(popup)* Always show the path row - ([8947140](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8947140a3dc2a7cdaba66f2640ecef7c0b8b9249))
+- *(popup)* Hide the path row when the URL has no path - ([f00067a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f00067ae63b24608aeee4d5ff634dc684f5b5e55))
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump the nuget group with 2 updates - ([8e2b140](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8e2b14051abecbce276e29c7eeade24d52ab69d8))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([5f9234e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5f9234e37081a1432c48beb8aefdd3d537f4cc96))
+
+
 ## [0.8.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.8.1..v0.8.2) - 2026-10-26
 
 ### ⚙️ Miscellaneous Tasks
