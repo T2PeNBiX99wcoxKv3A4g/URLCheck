@@ -1061,10 +1061,12 @@ export const PopupPage: React.FC = () => {
                                     )}
                                 </RowValue>
                             </Row>
-                            <Row>
-                                <RowKey>{t("popup.path")}</RowKey>
-                                <RowValue>{parsed ? path || "/" : "(none)"}</RowValue>
-                            </Row>
+                            {path.length > 0 && (
+                                <Row>
+                                    <RowKey>{t("popup.path")}</RowKey>
+                                    <RowValue>{path}</RowValue>
+                                </Row>
+                            )}
                         </SectionBody>
                     )}
                 </Section>
