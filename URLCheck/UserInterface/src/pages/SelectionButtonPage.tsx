@@ -81,6 +81,11 @@ export const SelectionButtonPage: React.FC = () => {
         []
     );
 
+    /* The backend holds the URL back when it is too long for the start URL, and sends it once we are listening. */
+    useEffect(() => {
+        Native.send({type: "selection.ready"});
+    }, []);
+
     /* The transparent page background is what lets the pill's rounded corners show through. */
     useEffect(() => {
         document.documentElement.classList.add("selection-transparent");

@@ -725,6 +725,11 @@ export const PopupPage: React.FC = () => {
         });
     }, []);
 
+    /* The backend holds the URL back when it is too long for the start URL, and sends it once we are listening. */
+    useEffect(() => {
+        Native.send({type: "popup.ready"});
+    }, []);
+
     /* the device list can change while the popup is open, since the settings live in another window */
     useEffect(() => {
         return Native.on((message) => {

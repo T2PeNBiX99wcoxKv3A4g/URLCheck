@@ -31,6 +31,13 @@ internal sealed class WindowManager : Singleton<WindowManager>
     private const int MaxUrlLength = 2048;
 
     /// <summary>
+    ///     Photino.Native copies a window's start URL into a fixed 2048-byte buffer with a plain
+    ///     <c>strcpy</c>, so a longer one aborts the process (first seen on Linux). Anything that would
+    ///     not fit is sent to the page once it reports ready instead; this leaves room for the prefix.
+    /// </summary>
+    private const int MaxStartUrlLength = 1800;
+
+    /// <summary>
     ///     Per-app web view data folder. On Windows, Photino defaults to a WebView2 folder shared by
     ///     every Photino app, which breaks when another app holds it, so keep URLCheck's separate.
     /// </summary>
@@ -66,6 +73,18 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
+
+    /// <summary>The popup's URL when it was too long to travel in the start URL; null once delivered.</summary>
+    private string? _pendingPopupUrl;
+
+    /// <summary>Whether the popup's page is listening for <c>popup.navigate</c> yet.</summary>
+    private bool _popupReady;
+
+    /// <summary>The button's URL when it did not fit in the start URL, or arrived before it was ready.</summary>
+    private string? _pendingSelectionUrl;
+
+    /// <summary>Whether the button's page is listening for <c>selection.show</c> yet.</summary>
+    private bool _selectionReady;
 
     public WindowManager()
     {
@@ -142,6 +161,16 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
             case "app.ready":
                 HideWhenRendered();
+                return null;
+
+            case "popup.ready":
+                _popupReady = true;
+                FlushPendingPopupUrl(context.Window);
+                return null;
+
+            case "selection.ready":
+                _selectionReady = true;
+                FlushPendingSelectionUrl(context.Window);
                 return null;
 
             case "popup.resize":
@@ -329,8 +358,12 @@ internal sealed class WindowManager : Singleton<WindowManager>
             if (EnsureButtonWindow(url, x, y) is not { } button)
                 return;
 
-            if (!created)
-                button.SendWebMessage(NativeProtocol.SerializeEvent("selection.show", new SelectionShowPayload(url)));
+            // A fresh window carries the URL in its fragment, or collects it from the pending field
+            // once the page reports ready. A reused one gets the event, or replaces the pending URL.
+            if (!created && _selectionReady)
+                TrySend(button, NativeProtocol.SerializeEvent("selection.show", new SelectionShowPayload(url)));
+            else if (!created)
+                _pendingSelectionUrl = url;
 
             _buttonAt = _platform.ShowSelectionButton(button, x, y, ButtonSize);
 
@@ -438,8 +471,15 @@ internal sealed class WindowManager : Singleton<WindowManager>
                 _platform.Hide(button);
             });
 
+            // Same fixed-buffer limit as the popup: the URL travels in the fragment only when it fits.
+            var startUrl = $"{AppUrl}#selection";
+            _selectionReady = false;
+            _pendingSelectionUrl = FitsInStartUrl(startUrl, url) ? null : url;
+            if (_pendingSelectionUrl is null)
+                startUrl += $"?url={Uri.EscapeDataString(url)}";
+
             ApplyIcon(button);
-            button.Load($"{AppUrl}#selection?url={Uri.EscapeDataString(url)}");
+            button.Load(startUrl);
             button.WaitForClose();
 
             _buttonWindow = button;
@@ -484,6 +524,15 @@ internal sealed class WindowManager : Singleton<WindowManager>
             var existing = _popupWindow;
             if (existing is not null)
             {
+                if (!_popupReady)
+                {
+                    // Still loading: it collects the URL when it reports ready.
+                    _pendingPopupUrl = url;
+                    _platform.Show(existing);
+                    _platform.KeepOnTop(existing);
+                    return;
+                }
+
                 if (Try.Run(() =>
                     {
                         existing.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate",
@@ -505,6 +554,8 @@ internal sealed class WindowManager : Singleton<WindowManager>
                 .RegisterWindowClosingHandler((_, _) =>
                 {
                     _popupWindow = null;
+                    _popupReady = false;
+                    _pendingPopupUrl = null;
                     return false;
                 });
 
@@ -522,9 +573,15 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
             var stripTracking = _settings.Current?.AutoStripTrackingParams ?? true;
 
+            // Keep the start URL short enough for Photino's fixed buffer; a long one travels as an event.
+            var startUrl = $"{AppUrl}#popup?borderless={(borderless ? 1 : 0)}&strip={(stripTracking ? 1 : 0)}";
+            _popupReady = false;
+            _pendingPopupUrl = FitsInStartUrl(startUrl, url) ? null : url;
+            if (_pendingPopupUrl is null)
+                startUrl += $"&url={Uri.EscapeDataString(url)}";
+
             ApplyIcon(popup);
-            popup.Load(
-                $"{AppUrl}#popup?url={Uri.EscapeDataString(url)}&borderless={(borderless ? 1 : 0)}&strip={(stripTracking ? 1 : 0)}");
+            popup.Load(startUrl);
             _popupWindow = popup;
 
             Try.Run(() =>
@@ -541,6 +598,8 @@ internal sealed class WindowManager : Singleton<WindowManager>
             {
                 Log.Warning(ex, "Failed to create popup");
                 _popupWindow = null;
+                _popupReady = false;
+                _pendingPopupUrl = null;
             });
 
             Log.Information("Popup message loop returned");
@@ -602,4 +661,31 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
     private void TrySend(PhotinoWindow? window, string json) =>
         Try.Run(() => window?.SendWebMessage(json)).OnFailure(ex => Log.Warning(ex, "Failed to send event"));
+
+    /// <summary>Hands over a URL that was too long to travel in the popup's start URL.</summary>
+    private void FlushPendingPopupUrl(PhotinoWindow? window)
+    {
+        if (_pendingPopupUrl is not { } url)
+            return;
+
+        _pendingPopupUrl = null;
+        TrySend(window, NativeProtocol.SerializeEvent("popup.navigate", new PopupNavigatePayload(url)));
+    }
+
+    /// <summary>Hands over a URL that was too long to travel in the button's start URL.</summary>
+    private void FlushPendingSelectionUrl(PhotinoWindow? window)
+    {
+        if (_pendingSelectionUrl is not { } url)
+            return;
+
+        _pendingSelectionUrl = null;
+        TrySend(window, NativeProtocol.SerializeEvent("selection.show", new SelectionShowPayload(url)));
+    }
+
+    /// <summary>
+    ///     Whether a URL can travel in a window's start URL without overflowing Photino's fixed buffer.
+    ///     The extra five characters cover the <c>?url=</c> / <c>&amp;url=</c> that introduces it.
+    /// </summary>
+    private static bool FitsInStartUrl(string startUrl, string url) =>
+        startUrl.Length + Uri.EscapeDataString(url).Length + 5 <= MaxStartUrlLength;
 }
