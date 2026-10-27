@@ -123,6 +123,8 @@
   "settings.forwardDevices": "设备",
   "settings.forwardDevicesDescription": "已配对、可以转发网址的设备。弹窗会以下拉菜单列出，列表为空时隐藏按钮。",
   "settings.forwardDevicesEmpty": "尚未配对任何设备。",
+  "settings.deviceOnline": "在线：当前有响应",
+  "settings.deviceOffline": "离线：当前没有响应",
   "settings.removeDevice": "忘记此设备",
   "settings.forwardAddressesHint": "连接时先使用配对的地址。可再添加多个地址（IP，或类似 nas.lan 的名称，共用同一个端口）；第一个连不上时会依次尝试。",
   "settings.deviceAddressPlaceholder": "nas.lan 或 192.168.1.23",

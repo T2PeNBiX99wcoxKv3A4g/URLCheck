@@ -10,7 +10,9 @@ import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
 import {
+  getDevicePresence,
   getForwardInfo,
+  type DevicePresence,
   type ForwardInfo,
   pairWith,
   type PairRequestEvent,
@@ -504,6 +506,23 @@ const FilterName = styled.span`
   word-break: break-word;
 `;
 
+/** A paired device's name, preceded by its live state dot. */
+const DeviceNameRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+/** Green while the device answered the last check; dark when it could not be reached. */
+const StatusDot = styled.span<{ $online: boolean }>`
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: ${(props) => (props.$online ? "#22c55e" : "#374151")};
+  box-shadow: ${(props) => (props.$online ? "0 0 6px rgba(34, 197, 94, 0.7)" : "none")};
+`;
+
 const FilterUrl = styled.span`
   font-size: 0.75rem;
   color: #6b7280;
@@ -799,6 +818,8 @@ export const SettingsPage: React.FC = () => {
   const [forwardInfo, setForwardInfo] = useState<ForwardInfo | null>(null);
   /** Devices found by the search dialog, live-updated while it is open. */
   const [discovered, setDiscovered] = useState<DeviceEntry[]>([]);
+  /** Ids of the paired devices that answered the last reachability check. */
+  const [onlineDevices, setOnlineDevices] = useState<Set<string>>(() => new Set());
   const [searchOpen, setSearchOpen] = useState(false);
   /** A pairing this device started, while it waits for the other side to confirm. */
   const [pairing, setPairing] = useState<{ name: string; code: string | null; error: string | null } | null>(null);
@@ -818,6 +839,7 @@ export const SettingsPage: React.FC = () => {
   useEffect(() => {
     getForwardInfo().then(setForwardInfo).catch(() => setForwardInfo(null));
     pendingPairing().then(setIncoming).catch(() => undefined);
+    getDevicePresence().then(setOnlineDevices).catch(() => undefined);
   }, []);
 
   /* Pairing and discovery all report through events, so the page never has to poll. */
@@ -844,6 +866,9 @@ export const SettingsPage: React.FC = () => {
       }
 
       if (event.type === "forward.pairRequest") setIncoming(event.data as PairRequestEvent);
+
+      if (event.type === "forward.presence")
+        setOnlineDevices(new Set((event.data as DevicePresence)?.online ?? []));
     });
   }, []);
 
@@ -1515,7 +1540,13 @@ export const SettingsPage: React.FC = () => {
                 {settings.devices.map((device) => (
                     <FilterRow key={device.id}>
                       <FilterBody>
-                        <FilterName>{device.name || device.host}</FilterName>
+                        <DeviceNameRow>
+                          <StatusDot
+                              $online={onlineDevices.has(device.id)}
+                              title={t(onlineDevices.has(device.id) ? "settings.deviceOnline" : "settings.deviceOffline")}
+                          />
+                          <FilterName>{device.name || device.host}</FilterName>
+                        </DeviceNameRow>
                         <FilterUrl>{device.host}:{device.port}</FilterUrl>
 
                         {(device.addresses ?? []).map((address) => (

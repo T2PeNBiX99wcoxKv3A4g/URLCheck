@@ -38,6 +38,22 @@ export async function forwardUrl(url: string, deviceId: string): Promise<void> {
     await Native.request("forward.send", {url, deviceId});
 }
 
+/** Body of `forward.presence`: ids of the paired devices that answer right now. */
+export interface DevicePresence {
+    online: string[];
+}
+
+/**
+ * Which paired devices answer right now. An outdated answer is followed by a fresh check, which
+ * arrives as a `forward.presence` event.
+ */
+export async function getDevicePresence(): Promise<Set<string>> {
+    if (!Native.available) return new Set();
+
+    const presence = await Native.request<DevicePresence>("forward.presence");
+    return new Set(presence.online ?? []);
+}
+
 /** Starts broadcasting discovery queries; results arrive as `forward.discovered` events. */
 export function startDiscovery(): void {
     Native.send({type: "forward.discoverStart"});

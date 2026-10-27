@@ -123,6 +123,8 @@
   "settings.forwardDevices": "デバイス",
   "settings.forwardDevicesDescription": "URL を転送できるペアリング済みのデバイスです。ポップアップにドロップダウンとして表示され、空のときはボタンを隠します。",
   "settings.forwardDevicesEmpty": "ペアリング済みのデバイスはまだありません。",
+  "settings.deviceOnline": "オンライン: 現在応答しています",
+  "settings.deviceOffline": "未接続: 現在応答がありません",
   "settings.removeDevice": "このデバイスを削除",
   "settings.forwardAddressesHint": "接続にはまずペアリング済みのアドレスを使います。追加アドレス（IP、または nas.lan のような名前。ポートは共通）を登録すると、最初のアドレスに届かない場合に順番に試します。",
   "settings.deviceAddressPlaceholder": "nas.lan または 192.168.1.23",

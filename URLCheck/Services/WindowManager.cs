@@ -706,6 +706,19 @@ internal sealed class WindowManager : Singleton<WindowManager>
         TrySend(_mainWindow, NativeProtocol.SerializeEvent(type, data));
     }
 
+    /// <summary>
+    ///     Pushes an event to every window that has reported in. A web view that is still loading
+    ///     aborts the process when it is sent to, and it loads its own state when it mounts anyway.
+    /// </summary>
+    public void BroadcastEventIfReady(string type, object? data)
+    {
+        var json = NativeProtocol.SerializeEvent(type, data);
+        if (_mainWindowReady)
+            TrySend(_mainWindow, json);
+        if (_popupReady)
+            TrySend(_popupWindow, json);
+    }
+
     public void Exit()
     {
         _allowClose = true;

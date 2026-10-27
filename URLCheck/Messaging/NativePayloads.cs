@@ -92,8 +92,11 @@ internal sealed record ForwardInfoPayload(
     bool Listening,
     string PublicKey);
 
-/// <summary>Body for the <c>forward.discovered</c> event: devices found on the local network.</summary>
+/// <summary>Body for <c>forward.discovered</c>: devices found on the local network.</summary>
 internal sealed record ForwardDiscoveredPayload(IReadOnlyList<DeviceEntry> Devices);
+
+/// <summary>Body for <c>forward.presence</c>: ids of the paired devices that answer right now.</summary>
+internal sealed record ForwardPresencePayload(IReadOnlyList<string> Online);
 
 /// <summary>
 ///     Body for the <c>forward.pairState</c> event: progress of a pairing this device started.

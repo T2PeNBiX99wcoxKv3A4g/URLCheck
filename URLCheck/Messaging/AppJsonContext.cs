@@ -62,6 +62,7 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(ForwardRemoveRequest))]
 [JsonSerializable(typeof(ForwardAddressRequest))]
 [JsonSerializable(typeof(ForwardDiscoveredPayload))]
+[JsonSerializable(typeof(ForwardPresencePayload))]
 [JsonSerializable(typeof(ForwardPairStatePayload))]
 [JsonSerializable(typeof(ForwardPairRequestPayload))]
 [JsonSerializable(typeof(DeviceEntry))]

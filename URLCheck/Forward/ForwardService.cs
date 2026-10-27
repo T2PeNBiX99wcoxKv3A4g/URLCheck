@@ -47,6 +47,7 @@ internal sealed class ForwardService : Singleton<ForwardService>
     {
         "forward.send" => SendAsync(context),
         "forward.info" => InfoAsync(context),
+        "forward.presence" => PresenceAsync(context),
         "forward.pair" => StartPairingAsync(context),
         "forward.pairRespond" => RespondToPairingAsync(context),
         "forward.pendingPairing" => PendingPairingAsync(context),
@@ -77,6 +78,7 @@ internal sealed class ForwardService : Singleton<ForwardService>
             using var cts = new CancellationTokenSource(
                 ForwardProtocol.AttemptTimeout * Math.Max(1, 1 + device.Addresses.Count));
             await ForwardClient.SendAsync(device, settings, _identity, url, cts.Token);
+            ForwardPresence.Instance.MarkOnline(device.Id);
             Log.Information("Forwarded a URL to {Device}", device.Name);
             return context.Reply("forward.send.result", new ForwardSendPayload(true, device.Name));
         }
@@ -109,6 +111,17 @@ internal sealed class ForwardService : Singleton<ForwardService>
 
         return context.Reply("forward.info.result", new ForwardInfoPayload(settings.DeviceId, settings.DeviceName,
             settings.ForwardPort, LocalAddresses(), settings.ForwardingEnabled, listening, _identity.PublicKeyBase64));
+    }
+
+    /// <summary>
+    ///     Reports which paired devices answer right now, rechecking them when the last answer is old.
+    ///     A fresh check also arrives later as a <c>forward.presence</c> event.
+    /// </summary>
+    private Task<NativeResponse?> PresenceAsync(NativeContext context)
+    {
+        ForwardPresence.Instance.RequestRefresh();
+        return Task.FromResult<NativeResponse?>(
+            context.Reply("forward.presence.result", ForwardPresence.Instance.Snapshot()));
     }
 
     /// <summary>Starts a pairing in the background; progress arrives as <c>forward.pairState</c> events.</summary>
@@ -243,6 +256,7 @@ internal sealed class ForwardService : Singleton<ForwardService>
     {
         var current = settings ?? await _settings.GetAsync();
         _discovery.Apply(current, _identity);
+        ForwardPresence.Instance.Apply(current);
 
         var signature = current.ForwardingEnabled ? current.ForwardPort.ToString() : "";
 

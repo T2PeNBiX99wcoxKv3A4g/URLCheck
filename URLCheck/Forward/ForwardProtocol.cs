@@ -42,6 +42,12 @@ internal static class ForwardProtocol
     /// <summary>How long a forwarded URL stays valid, as a second line of defence against replay.</summary>
     public static readonly TimeSpan MaxMessageAge = TimeSpan.FromMinutes(5);
 
+    /// <summary>
+    ///     How long a reachability check waits. It only opens a connection and exchanges one small
+    ///     frame, so a device that does not answer quickly is treated as unreachable.
+    /// </summary>
+    public static readonly TimeSpan ProbeTimeout = TimeSpan.FromSeconds(1.5);
+
     /// <summary>Reads one length-prefixed frame, or returns <c>null</c> when it is missing or too large.</summary>
     public static async Task<byte[]?> ReadFrameAsync(Stream stream, CancellationToken token)
     {

@@ -128,6 +128,8 @@
   "settings.forwardDevices": "Devices",
   "settings.forwardDevicesDescription": "Paired devices a URL can be forwarded to. The popup lists them as a dropdown and hides its button while this is empty.",
   "settings.forwardDevicesEmpty": "No devices paired yet.",
+  "settings.deviceOnline": "Online: answers right now",
+  "settings.deviceOffline": "Not reachable: does not answer right now",
   "settings.removeDevice": "Forget this device",
   "settings.forwardAddressesHint": "A device is reached at its paired address first. Add more addresses (an IP, or a name such as nas.lan on the same port) and they are tried in order when the first cannot be reached.",
   "settings.deviceAddressPlaceholder": "nas.lan or 192.168.1.23",

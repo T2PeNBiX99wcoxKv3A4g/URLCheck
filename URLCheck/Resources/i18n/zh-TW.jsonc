@@ -123,6 +123,8 @@
   "settings.forwardDevices": "裝置",
   "settings.forwardDevicesDescription": "已配對、可以轉傳網址的裝置。彈窗會以下拉選單列出，清單為空時則隱藏按鈕。",
   "settings.forwardDevicesEmpty": "尚未配對任何裝置。",
+  "settings.deviceOnline": "在線：目前有回應",
+  "settings.deviceOffline": "離線：目前沒有回應",
   "settings.removeDevice": "忘記這台裝置",
   "settings.forwardAddressesHint": "連線時會先使用配對的位址。可再新增多個位址（IP，或像 nas.lan 這樣的名稱，共用同一個連接埠）；第一個連不上時會依序嘗試。",
   "settings.deviceAddressPlaceholder": "nas.lan 或 192.168.1.23",

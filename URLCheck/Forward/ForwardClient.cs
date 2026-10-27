@@ -2,8 +2,10 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using URLCheck.Extensions;
 using URLCheck.Messaging;
 using URLCheck.Models;
+using URLCheck.Utils;
 
 namespace URLCheck.Forward;
 
@@ -128,6 +130,44 @@ internal static class ForwardClient
         }
 
         throw failure ?? new ForwardException("error.forwardFailed");
+    }
+
+    /// <summary>
+    ///     Checks whether a paired device answers right now. The reply has to name the paired device and
+    ///     carry its pinned key, so an address that now belongs to something else counts as offline
+    ///     rather than being mistaken for the device. Every address is tried, like a real send.
+    /// </summary>
+    public static async Task<bool> IsAliveAsync(DeviceEntry device, CancellationToken token)
+    {
+        foreach (var address in device.AllAddresses().Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            using var attempt = CancellationTokenSource.CreateLinkedTokenSource(token);
+            attempt.CancelAfter(ForwardProtocol.ProbeTimeout);
+
+            var alive = (await Try.Run(async () =>
+            {
+                using var client = new TcpClient();
+                client.NoDelay = true;
+                await client.ConnectAsync(address, device.Port, attempt.Token);
+
+                var stream = client.GetStream();
+                var query = JsonSerializer.SerializeToUtf8Bytes(new DiscoverMessage(ForwardProtocol.Discover),
+                    AppJsonContext.Default.DiscoverMessage);
+                await ForwardProtocol.WriteFrameAsync(stream, query, attempt.Token);
+
+                var reply = await ForwardProtocol.ReadFrameAsync(stream, attempt.Token);
+                if (reply is null || ForwardProtocol.ReadType(reply) != ForwardProtocol.Announce)
+                    return false;
+
+                var announce = JsonSerializer.Deserialize(reply, AppJsonContext.Default.AnnounceMessage);
+                return announce is not null && announce.DeviceId == device.Id && announce.PublicKey == device.PublicKey;
+            })).GetOrElse(_ => false);
+
+            if (alive)
+                return true;
+        }
+
+        return false;
     }
 
     private static async Task SendAttemptAsync(string host, DeviceEntry device, byte[] peerPublicKey,

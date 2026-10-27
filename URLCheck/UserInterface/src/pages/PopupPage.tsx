@@ -3,7 +3,7 @@ import styled, {keyframes} from "styled-components";
 import {BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
 import {loadSettings} from "../api/settings";
 import {openWithBrowser} from "../api/browsers";
-import {forwardUrl} from "../api/forward";
+import {forwardUrl, getDevicePresence, type DevicePresence} from "../api/forward";
 import {checkStatus, type StatusResult} from "../api/inspect";
 import {closePopup, resizePopup} from "../api/system";
 import {loadFilterRules} from "../api/filters";
@@ -618,8 +618,10 @@ export const PopupPage: React.FC = () => {
 
     const [browsers, setBrowsers] = useState<BrowserEntry[]>([]);
     const [userAgents, setUserAgents] = useState<UserAgentEntry[]>([]);
-    /* Devices this URL can be forwarded to; the button is hidden while the list is empty. */
+    /* Devices this URL can be forwarded to; the button is hidden while none of them answer. */
     const [devices, setDevices] = useState<DeviceEntry[]>([]);
+    /* Ids of the devices that answered the last reachability check. */
+    const [onlineDevices, setOnlineDevices] = useState<Set<string>>(() => new Set());
     /* Picked here for this popup only; the settings hold the default. */
     const [userAgentId, setUserAgentId] = useState("");
     const [status, setStatus] = useState<StatusResult | null>(null);
@@ -751,6 +753,35 @@ export const PopupPage: React.FC = () => {
                 setDevices(event.data.settings.devices ?? []);
         });
     }, []);
+
+    /* Only devices that answer are offered; the list is rechecked while the popup is open. */
+    useEffect(() => {
+        let cancelled = false;
+
+        getDevicePresence()
+            .then((online) => {
+                if (!cancelled) setOnlineDevices(online);
+            })
+            .catch(() => undefined);
+
+        const unsubscribe = Native.on((message) => {
+            const event = message as { type?: string; data?: DevicePresence };
+            if (event.type === "forward.presence")
+                setOnlineDevices(new Set(event.data?.online ?? []));
+        });
+
+        return () => {
+            cancelled = true;
+            unsubscribe();
+        };
+    }, []);
+
+    const sendableDevices = devices.filter((device) => onlineDevices.has(device.id));
+
+    /* Nothing to pick from, so the menu never stays open on an empty list. */
+    useEffect(() => {
+        if (sendableDevices.length === 0) setForwardMenuOpen(false);
+    }, [sendableDevices.length]);
 
     /* tracking parameters are stripped as soon as the popup opens, unless the setting turns it off */
     useEffect(() => {
@@ -1219,7 +1250,7 @@ export const PopupPage: React.FC = () => {
                         {t("popup.private")}
                     </GhostButton>
 
-                    {devices.length > 0 && (
+                    {sendableDevices.length > 0 && (
                         <ForwardGroup ref={forwardAnchor}>
                             <GhostButton onClick={() => setForwardMenuOpen((open) => !open)}
                                          disabled={!parsed}
@@ -1231,7 +1262,7 @@ export const PopupPage: React.FC = () => {
                             {forwardMenuOpen && (
                                 <DropdownMenu $up
                                               style={{...forwardMenuStyle, left: "auto", right: 0, maxWidth: 280}}>
-                                    {devices.map((device) => (
+                                    {sendableDevices.map((device) => (
                                         <DropdownItem key={device.id} onClick={() => handleForward(device.id)}>
                                             {forwardedTo === device.id
                                                 ? t("popup.sent")
