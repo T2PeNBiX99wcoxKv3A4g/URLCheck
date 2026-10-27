@@ -45,7 +45,6 @@ internal sealed class ForwardPresence : Singleton<ForwardPresence>
         bool started;
         var empty = settings.Devices.Count == 0;
         lock (_gate)
-        {
             if (empty)
             {
                 StopLoop();
@@ -57,7 +56,6 @@ internal sealed class ForwardPresence : Singleton<ForwardPresence>
                 if (started)
                     StartLoop();
             }
-        }
 
         if (empty)
         {
@@ -73,7 +71,7 @@ internal sealed class ForwardPresence : Singleton<ForwardPresence>
         _signature = signature;
 
         if (started || changed)
-            RequestRefresh(force: true);
+            RequestRefresh(true);
     }
 
     /// <summary>Rechecks the devices, unless the last result is only a moment old.</summary>
@@ -108,7 +106,7 @@ internal sealed class ForwardPresence : Singleton<ForwardPresence>
     {
         while (!token.IsCancellationRequested)
         {
-            RequestRefresh(force: true);
+            RequestRefresh(true);
 
             try
             {

@@ -59,6 +59,21 @@ internal sealed class WindowsClipboardWatcher : Singleton<WindowsClipboardWatche
 
     public void Dispose() => Stop();
 
+    /// <summary>Reads the clipboard's Unicode text, giving up rather than blocking when it stays locked.</summary>
+    public string? ReadText()
+    {
+        for (var attempt = 0; attempt < ReadAttempts; attempt++)
+        {
+            if (TryReadText(out var text))
+                return text;
+
+            Thread.Sleep(ReadRetryMs);
+        }
+
+        Log.Debug("The clipboard stayed locked; skipping this change");
+        return null;
+    }
+
     private void EnsureThread()
     {
         if (_thread is not null)
@@ -139,21 +154,6 @@ internal sealed class WindowsClipboardWatcher : Singleton<WindowsClipboardWatche
         return owner != IntPtr.Zero &&
                NativeMethods.GetWindowThreadProcessId(owner, out var processId) != 0 &&
                processId == Environment.ProcessId;
-    }
-
-    /// <summary>Reads the clipboard's Unicode text, giving up rather than blocking when it stays locked.</summary>
-    public string? ReadText()
-    {
-        for (var attempt = 0; attempt < ReadAttempts; attempt++)
-        {
-            if (TryReadText(out var text))
-                return text;
-
-            Thread.Sleep(ReadRetryMs);
-        }
-
-        Log.Debug("The clipboard stayed locked; skipping this change");
-        return null;
     }
 
     private static bool TryReadText(out string? text)

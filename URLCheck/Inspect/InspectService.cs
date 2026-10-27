@@ -72,7 +72,7 @@ internal sealed class InspectService : Singleton<InspectService>
         if ((int)response.StatusCode is < 300 or >= 400 || response.Headers.Location is not { } location)
             return null;
 
-        var next = new Uri(new Uri(url), location);
+        var next = new Uri(new(url), location);
         return next.Scheme is "http" or "https" ? next.ToString() : null;
     }
 

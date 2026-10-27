@@ -3,7 +3,7 @@ import styled, {keyframes} from "styled-components";
 import {BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
 import {loadSettings} from "../api/settings";
 import {openWithBrowser} from "../api/browsers";
-import {forwardUrl, getDevicePresence, type DevicePresence} from "../api/forward";
+import {type DevicePresence, forwardUrl, getDevicePresence} from "../api/forward";
 import {checkStatus, type StatusResult} from "../api/inspect";
 import {closePopup, resizePopup} from "../api/system";
 import {loadFilterRules} from "../api/filters";

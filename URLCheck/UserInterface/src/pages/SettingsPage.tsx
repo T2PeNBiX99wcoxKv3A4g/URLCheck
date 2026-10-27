@@ -10,16 +10,16 @@ import {Native} from "../Native";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
 import {
-  getDevicePresence,
-  getForwardInfo,
+  addDeviceAddress,
   type DevicePresence,
   type ForwardInfo,
-  pairWith,
+  getDevicePresence,
+  getForwardInfo,
   type PairRequestEvent,
   type PairStateEvent,
+  pairWith,
   pendingPairing,
   removeDevice,
-  addDeviceAddress,
   removeDeviceAddress,
   respondToPairing,
   startDiscovery,
@@ -860,7 +860,11 @@ export const SettingsPage: React.FC = () => {
           setPairing({name: state.device?.name ?? "", code: null, error: null});
           setTimeout(() => setPairing(null), 1500);
         } else {
-          setPairing((previous) => ({name: previous?.name ?? "", code: null, error: state.error ?? "error.forwardFailed"}));
+          setPairing((previous) => ({
+            name: previous?.name ?? "",
+            code: null,
+            error: state.error ?? "error.forwardFailed"
+          }));
         }
         return;
       }
@@ -1038,7 +1042,8 @@ export const SettingsPage: React.FC = () => {
     }));
   };
 
-  const updateBrowser = (id: string, patch: Partial<BrowserEntry>) => {    setSettings((prev) => ({
+  const updateBrowser = (id: string, patch: Partial<BrowserEntry>) => {
+    setSettings((prev) => ({
       ...prev,
       browsers: prev.browsers.map((browser) => (browser.id === id ? {...browser, ...patch} : browser)),
     }));
@@ -1964,7 +1969,8 @@ export const SettingsPage: React.FC = () => {
                           <CatalogItem key={device.id}>
                             <CatalogItemHead>
                               <CatalogName>{device.name || device.host}</CatalogName>
-                              <GhostButton type="button" onClick={() => handlePair(device.host, device.port)}>
+                              <GhostButton type="button"
+                                           onClick={() => handlePair(device.host, device.port)}>
                                 {t("settings.forwardPair")}
                               </GhostButton>
                             </CatalogItemHead>

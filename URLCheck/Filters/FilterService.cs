@@ -34,9 +34,9 @@ internal sealed class FilterService : Singleton<FilterService>
     private readonly string _directory;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly string _manifestPath;
+    private CompiledRules? _compiledRules;
 
     private List<RemoveParamRule>? _effectiveRules;
-    private CompiledRules? _compiledRules;
     private List<FilterListEntry>? _lists;
 
     public FilterService()
@@ -402,7 +402,7 @@ internal sealed class FilterService : Singleton<FilterService>
                 continue;
             }
 
-            IEnumerable<string?> hosts = rule.Include is { Count: > 0 } include
+            var hosts = rule.Include is { Count: > 0 } include
                 ? include.Select(host => (string?)host)
                 : [null];
 
@@ -463,6 +463,20 @@ internal sealed class FilterService : Singleton<FilterService>
         return false;
     }
 
+    private string ReadBuiltin()
+    {
+        using var stream = typeof(FilterService).Assembly
+            .GetManifestResourceStream("URLCheck.Resources.filters.builtin.txt");
+        if (stream is null)
+        {
+            Log.Error("The built-in filter list is missing from the assembly");
+            return "";
+        }
+
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+
     private sealed class CompiledRules
     {
         public HashSet<string> GlobalLiterals { get; } = new(StringComparer.OrdinalIgnoreCase);
@@ -478,19 +492,5 @@ internal sealed class FilterService : Singleton<FilterService>
             public HashSet<string> Literals { get; } = new(StringComparer.OrdinalIgnoreCase);
             public List<Regex> Regexes { get; } = [];
         }
-    }
-
-    private string ReadBuiltin()
-    {
-        using var stream = typeof(FilterService).Assembly
-            .GetManifestResourceStream("URLCheck.Resources.filters.builtin.txt");
-        if (stream is null)
-        {
-            Log.Error("The built-in filter list is missing from the assembly");
-            return "";
-        }
-
-        using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
     }
 }

@@ -151,7 +151,7 @@ internal static class ForwardClient
                 await client.ConnectAsync(address, device.Port, attempt.Token);
 
                 var stream = client.GetStream();
-                var query = JsonSerializer.SerializeToUtf8Bytes(new DiscoverMessage(ForwardProtocol.Discover),
+                var query = JsonSerializer.SerializeToUtf8Bytes(new(ForwardProtocol.Discover),
                     AppJsonContext.Default.DiscoverMessage);
                 await ForwardProtocol.WriteFrameAsync(stream, query, attempt.Token);
 

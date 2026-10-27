@@ -79,20 +79,21 @@ internal sealed class WindowManager : Singleton<WindowManager>
     /// <summary>Set while a hidden start is still waiting for the interface's first render.</summary>
     private bool _hideWhenRendered;
 
+    private PhotinoWindow? _mainWindow;
+
     /// <summary>Whether the host window's interface has reported in; before that, messages crash.</summary>
     private bool _mainWindowReady;
-
-    private PhotinoWindow? _mainWindow;
-    private PhotinoWindow? _popupWindow;
 
     /// <summary>The popup's URL when it was too long to travel in the start URL; null once delivered.</summary>
     private string? _pendingPopupUrl;
 
+    /// <summary>The button's URL when it did not fit in the start URL, or arrived before it was ready.</summary>
+    private string? _pendingSelectionUrl;
+
     /// <summary>Whether the popup's page is listening for <c>popup.navigate</c> yet.</summary>
     private bool _popupReady;
 
-    /// <summary>The button's URL when it did not fit in the start URL, or arrived before it was ready.</summary>
-    private string? _pendingSelectionUrl;
+    private PhotinoWindow? _popupWindow;
 
     /// <summary>Whether the button's page is listening for <c>selection.show</c> yet.</summary>
     private bool _selectionReady;
