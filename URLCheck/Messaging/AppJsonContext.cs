@@ -30,6 +30,7 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(InspectRequest))]
 [JsonSerializable(typeof(LocaleRequest))]
 [JsonSerializable(typeof(OkPayload))]
+[JsonSerializable(typeof(AutoRedirectRequest))]
 [JsonSerializable(typeof(BrowserOpenPayload))]
 [JsonSerializable(typeof(RegisterPayload))]
 [JsonSerializable(typeof(ProtocolStatusPayload))]

@@ -543,7 +543,7 @@ internal sealed class ForwardService : Singleton<ForwardService>
 
         await WriteStatusAsync(stream, true, null, token);
         Log.Information("Received a forwarded URL from {Device} ({Id})", device.Name, device.Id);
-        _windows.ShowPopup(payload.Url);
+        _ = _windows.ShowPopupAsync(payload.Url);
     }
 
     /* ------------------------------------------------------------------ helpers */

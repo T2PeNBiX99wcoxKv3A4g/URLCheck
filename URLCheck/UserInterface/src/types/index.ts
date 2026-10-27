@@ -16,6 +16,8 @@ export interface AppSettings {
     borderlessPopup: boolean;
     /** Strip known tracking parameters from a URL as soon as the popup opens. */
     autoStripTrackingParams: boolean;
+    /** Hosts whose links are followed through their redirects before the popup opens. */
+    autoRedirectHosts: string[];
     /** Start with the management window hidden, like a link launch. Ignored without a tray icon. */
     hideOnLaunch: boolean;
     /** Watch the clipboard and float a button over the pointer whenever a copied text is an http(s) URL. */

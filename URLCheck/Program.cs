@@ -126,7 +126,7 @@ internal static class Program
                 singleInstance.StartServer(DispatchUrls);
 
                 if (startupUrls.Count > 0)
-                    _ = Task.Run(() => startupUrls.ForEach(manager.ShowPopup));
+                    _ = Task.Run(() => Task.WhenAll(startupUrls.Select(manager.ShowPopupAsync)));
             };
 
             manager.CreateMainWindow();
@@ -149,7 +149,7 @@ internal static class Program
     private static void DispatchUrls(IReadOnlyList<string> args)
     {
         foreach (var url in ExtractUrls(args))
-            WindowManager.Instance.ShowPopup(url);
+            _ = WindowManager.Instance.ShowPopupAsync(url);
     }
 
     /// <summary>

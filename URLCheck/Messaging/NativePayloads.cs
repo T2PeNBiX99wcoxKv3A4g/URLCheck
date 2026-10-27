@@ -9,6 +9,9 @@ namespace URLCheck.Messaging;
 /// <summary>Body for a bare <c>{ "ok": true }</c> acknowledgement.</summary>
 internal sealed record OkPayload(bool Ok = true);
 
+/// <summary>Body for <c>settings.addAutoRedirect</c>: the URL whose host should be added.</summary>
+internal sealed record AutoRedirectRequest(string Url);
+
 /// <summary>Body for <c>popup.open</c>: which browser actually launched.</summary>
 internal sealed record BrowserOpenPayload(bool Ok, string Browser);
 

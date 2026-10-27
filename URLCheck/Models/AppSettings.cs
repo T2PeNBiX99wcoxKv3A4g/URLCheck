@@ -46,6 +46,12 @@ internal sealed class AppSettings
     public bool AutoStripTrackingParams { get; set; } = true;
 
     /// <summary>
+    ///     Hosts whose links are followed through their redirects before the popup opens, so a short
+    ///     link reveals (and is stored as) its real destination. Matching is by host, subdomains included.
+    /// </summary>
+    public List<string> AutoRedirectHosts { get; set; } = [];
+
+    /// <summary>
     ///     Start with the management window hidden, the way a link launch does. The popup is a window
     ///     of its own, so it still appears. Ignored when there is no tray icon to restore the window
     ///     from.
@@ -77,6 +83,12 @@ internal sealed class AppSettings
     public List<DeviceEntry> Devices { get; set; } = [];
 
     public AppSettings Clone() => (AppSettings)MemberwiseClone();
+
+    /// <summary>Whether a URL's host is on the auto-redirect list, subdomains included.</summary>
+    public bool ShouldAutoRedirect(Uri uri) =>
+        AutoRedirectHosts.Any(host =>
+            uri.Host.Equals(host, StringComparison.OrdinalIgnoreCase) ||
+            uri.Host.EndsWith($".{host}", StringComparison.OrdinalIgnoreCase));
 
     /// <summary>Clamps values into their supported ranges so invalid input can never be persisted.</summary>
     public void Normalize()
@@ -123,6 +135,17 @@ internal sealed class AppSettings
             DeviceName = Environment.MachineName;
 
         ForwardPort = Math.Clamp(ForwardPort, 1_024, 65_535);
+
+        // Hosts are compared as plain lower-case names, without blanks or repeats.
+        AutoRedirectHosts ??= [];
+
+        AutoRedirectHosts =
+        [
+            .. AutoRedirectHosts
+                .Select(host => host.Trim().TrimEnd('.').ToLowerInvariant())
+                .Where(host => host.Length > 0)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+        ];
 
         Devices ??= [];
 

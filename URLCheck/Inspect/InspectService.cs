@@ -19,6 +19,9 @@ internal sealed class InspectService : Singleton<InspectService>
         AllowAutoRedirect = false
     });
 
+    /// <summary>How many hops a short link is followed through before giving up.</summary>
+    private const int MaxRedirects = 10;
+
     private readonly SettingsService _settings = SettingsService.Instance;
 
     public InspectService() => NativeBridge.MessageReceived += HandleMessageAsync;
@@ -51,6 +54,37 @@ internal sealed class InspectService : Singleton<InspectService>
         // A failed request (DNS, TLS, timeout, ...) is reported as a non-OK status.
         return context.Reply("inspect.status.result", result.GetOrElse(ex =>
             new(0, ex is TaskCanceledException ? "error.timeout" : ex.Message, false, null)));
+    }
+
+    /// <summary>
+    ///     Follows a URL's redirect chain and returns where it finally lands. A non-http(s) target, a
+    ///     failed request or the hop limit just stops it, so the caller always gets something usable.
+    /// </summary>
+    public async Task<string> ResolveRedirectsAsync(string url)
+    {
+        var settings = await _settings.GetAsync();
+        var userAgent = ResolveUserAgent(settings, null);
+        var current = url;
+
+        for (var hop = 0; hop < MaxRedirects; hop++)
+        {
+            using var cts = new CancellationTokenSource(settings.RequestTimeoutMs);
+            using var request = new HttpRequestMessage(HttpMethod.Get, current);
+            request.Headers.TryAddWithoutValidation("User-Agent", userAgent);
+
+            using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
+
+            if (response.Headers.Location is not { } location)
+                return current;
+
+            var next = new Uri(new Uri(current), location);
+            if (next.Scheme is not ("http" or "https"))
+                return current;
+
+            current = next.ToString();
+        }
+
+        return current;
     }
 
     /// <summary>

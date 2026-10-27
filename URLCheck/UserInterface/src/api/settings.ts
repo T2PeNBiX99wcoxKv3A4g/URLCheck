@@ -8,6 +8,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     language: "en",
     borderlessPopup: true,
     autoStripTrackingParams: true,
+    autoRedirectHosts: [],
     hideOnLaunch: false,
     showUrlButton: true,
     selectedUserAgentId: "default",
@@ -49,6 +50,9 @@ function normalize(settings: AppSettings): AppSettings {
         borderlessPopup: settings.borderlessPopup ?? DEFAULT_SETTINGS.borderlessPopup,
         autoStripTrackingParams:
             settings.autoStripTrackingParams ?? DEFAULT_SETTINGS.autoStripTrackingParams,
+        autoRedirectHosts: (Array.isArray(settings.autoRedirectHosts) ? settings.autoRedirectHosts : [])
+            .map((host) => host.trim().toLowerCase())
+            .filter((host) => host.length > 0),
         hideOnLaunch: settings.hideOnLaunch ?? DEFAULT_SETTINGS.hideOnLaunch,
         showUrlButton: settings.showUrlButton ?? DEFAULT_SETTINGS.showUrlButton,
         deviceName: settings.deviceName ?? DEFAULT_SETTINGS.deviceName,
@@ -103,4 +107,11 @@ export async function resetSettings(): Promise<SettingsPayload> {
 
     window.localStorage.removeItem(STORAGE_KEY);
     return {settings: {...DEFAULT_SETTINGS}, settingsFilePath: "(browser localStorage)"};
+}
+
+/** Adds a URL's host to the auto-redirect list. Idempotent. */
+export async function addAutoRedirect(url: string): Promise<void> {
+    if (!Native.available) return;
+
+    await Native.request("settings.addAutoRedirect", {url});
 }

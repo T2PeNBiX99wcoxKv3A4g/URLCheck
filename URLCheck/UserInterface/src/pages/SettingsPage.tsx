@@ -808,6 +808,8 @@ export const SettingsPage: React.FC = () => {
   const [manualPort, setManualPort] = useState(DEFAULT_SETTINGS.forwardPort);
   /** Draft fallback address per paired device, keyed by device id. */
   const [addressInputs, setAddressInputs] = useState<Record<string, string>>({});
+  /** Draft host for the auto-redirect list. */
+  const [newAutoRedirectHost, setNewAutoRedirectHost] = useState("");
 
   useEffect(() => {
     protocolStatus().then(setProtocols).catch(() => setProtocols(null));
@@ -973,8 +975,28 @@ export const SettingsPage: React.FC = () => {
       [settings, baseline, loading]
   );
 
-  const updateBrowser = (id: string, patch: Partial<BrowserEntry>) => {
+  /** Adds a host to the auto-redirect list, lower-case and without duplicates. */
+  const addAutoRedirectHost = () => {
+    const host = newAutoRedirectHost.trim().toLowerCase().replace(/^\.+|\.+$/g, "");
+    if (!host) return;
+
     setSettings((prev) => ({
+      ...prev,
+      autoRedirectHosts: prev.autoRedirectHosts.includes(host)
+          ? prev.autoRedirectHosts
+          : [...prev.autoRedirectHosts, host],
+    }));
+    setNewAutoRedirectHost("");
+  };
+
+  const removeAutoRedirectHost = (host: string) => {
+    setSettings((prev) => ({
+      ...prev,
+      autoRedirectHosts: prev.autoRedirectHosts.filter((value) => value !== host),
+    }));
+  };
+
+  const updateBrowser = (id: string, patch: Partial<BrowserEntry>) => {    setSettings((prev) => ({
       ...prev,
       browsers: prev.browsers.map((browser) => (browser.id === id ? {...browser, ...patch} : browser)),
     }));
@@ -1610,6 +1632,58 @@ export const SettingsPage: React.FC = () => {
           )}
 
           {integrationMessage && <InfoText>{t(integrationMessage.key, integrationMessage.params)}</InfoText>}
+        </StackCard>
+
+        <StackCard>
+          <SectionTitle>{t("settings.autoRedirect")}</SectionTitle>
+
+          <SettingInfo>
+            <SettingDescription>{t("settings.autoRedirectDescription")}</SettingDescription>
+          </SettingInfo>
+
+          {settings.autoRedirectHosts.length === 0 ? (
+              <InfoText>{t("settings.autoRedirectEmpty")}</InfoText>
+          ) : (
+              <FilterList>
+                {settings.autoRedirectHosts.map((host) => (
+                    <FilterRow key={host}>
+                      <FilterBody>
+                        <FilterName>{host}</FilterName>
+                      </FilterBody>
+                      <FilterActions>
+                        <IconOnlyButton
+                            type="button"
+                            disabled={busy}
+                            title={t("settings.removeAutoRedirect")}
+                            onClick={() => removeAutoRedirectHost(host)}
+                        >
+                          <TrashIcon size={16}/>
+                        </IconOnlyButton>
+                      </FilterActions>
+                    </FilterRow>
+                ))}
+              </FilterList>
+          )}
+
+          <ButtonRow>
+            <ListInput
+                className="name"
+                disabled={busy}
+                placeholder={t("settings.autoRedirectPlaceholder")}
+                value={newAutoRedirectHost}
+                onChange={(event) => setNewAutoRedirectHost(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    addAutoRedirectHost();
+                  }
+                }}
+            />
+            <GhostButton type="button" disabled={busy || newAutoRedirectHost.trim().length === 0}
+                         onClick={addAutoRedirectHost}>
+              {t("settings.addAutoRedirect")}
+            </GhostButton>
+          </ButtonRow>
         </StackCard>
 
         <StackCard>

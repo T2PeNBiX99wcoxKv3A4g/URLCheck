@@ -2,6 +2,7 @@ using System.Drawing;
 using JetBrains.Annotations;
 using Photino.NET;
 using URLCheck.Extensions;
+using URLCheck.Inspect;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Platform;
@@ -128,7 +129,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
                 if (string.IsNullOrWhiteSpace(payload?.Url))
                     return context.Fail("popup.show.result", "error.missingUrl");
 
-                ShowPopup(payload.Url);
+                await ShowPopupAsync(payload.Url);
                 return context.Reply("popup.show.result", new OkPayload());
             }
 
@@ -197,6 +198,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
             .SetUseOsDefaultSize(false)
             .SetSize(new(1024, 720))
             .SetMinSize(720, 480)
+            .SetContextMenuEnabled(false)
             // Only here so that nothing flashes: the native show skips a minimised window, and the
             // window is hidden outright below either way.
             .SetMinimized(!ShowMainWindowOnStartup)
@@ -446,6 +448,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
             var button = _platform.CreateSelectionButtonWindow(_mainWindow)
                 .SetTitle(Constants.SelectionButtonTitle)
                 .SetTemporaryFilesPath(WebViewDataPath)
+                .SetContextMenuEnabled(false)
                 .SetUseOsDefaultSize(false)
                 .SetUseOsDefaultLocation(false)
                 .SetLocation(new(x, y))
@@ -507,6 +510,37 @@ internal sealed class WindowManager : Singleton<WindowManager>
             _mainWindow?.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new NavigatePayload(tab)));
     }
 
+    /// <summary>
+    ///     Opens the popup for a URL, first following its redirects when its host is on the auto-redirect
+    ///     list. The history then records the destination instead of the short link.
+    /// </summary>
+    public async Task ShowPopupAsync(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return;
+
+        ShowPopup(await ResolveAutoRedirectAsync(url));
+    }
+
+    /// <summary>Follows a short link when its host asks for it; otherwise returns the URL untouched.</summary>
+    private async Task<string> ResolveAutoRedirectAsync(string url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+            uri.Scheme is not ("http" or "https") ||
+            !(await _settings.GetAsync()).ShouldAutoRedirect(uri))
+            return url;
+
+        var result = await Try.Run(() => InspectService.Instance.ResolveRedirectsAsync(url));
+        var resolved = result
+            .OnFailure(ex => Log.Warning(ex, "Failed to follow {Url} through its redirects", url))
+            .GetOrElse(_ => url);
+
+        if (resolved != url)
+            Log.Information("Auto-redirected {From} to {To}", url, resolved);
+
+        return resolved;
+    }
+
     /// <summary>Opens a popup for <paramref name="url" />, or navigates the existing popup to it.</summary>
     public void ShowPopup(string url)
     {
@@ -549,6 +583,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
             var popup = _platform.CreatePopupWindow(_mainWindow)
                 .SetTitle(Constants.PopupTitle)
                 .SetTemporaryFilesPath(WebViewDataPath)
+                .SetContextMenuEnabled(false)
                 .RegisterWebMessageReceivedHandler((sender, message) =>
                     _ = NativeBridge.HandleMessageAsync(sender as PhotinoWindow, message))
                 .RegisterWindowClosingHandler((_, _) =>

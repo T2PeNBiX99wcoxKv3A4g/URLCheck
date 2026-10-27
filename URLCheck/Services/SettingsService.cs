@@ -62,6 +62,24 @@ internal sealed class SettingsService : Singleton<SettingsService>
                 return context.Reply("settings.save.result", await PublishAsync());
             }
 
+            case "settings.addAutoRedirect":
+            {
+                if (context.Payload<AutoRedirectRequest>()?.Url is not { Length: > 0 } url ||
+                    !Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+                    uri.Host.Length == 0)
+                    return context.Fail("settings.addAutoRedirect.result", "error.missingUrl");
+
+                var settings = await GetAsync();
+                var host = uri.Host.ToLowerInvariant();
+                if (!settings.AutoRedirectHosts.Contains(host, StringComparer.OrdinalIgnoreCase))
+                {
+                    settings.AutoRedirectHosts.Add(host);
+                    await SaveAndPublishAsync(settings);
+                }
+
+                return context.Reply("settings.addAutoRedirect.result", new OkPayload());
+            }
+
             case "settings.reset":
                 await ResetAsync();
                 return context.Reply("settings.reset.result", await PublishAsync());
