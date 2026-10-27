@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.10.2..v0.10.3) - 2026-10-27
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove AttributionPage script and associated license details - ([a480db7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a480db70142ca689bf028f68b13ccc19851874d0))
+- Remove npm install step from upgrade script in package.json - ([9fd4427](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/9fd4427c7a935796867b4c45e56d77a5c0bc7af2))
+- Update third-party licenses and dependencies in attributions - ([562cc7f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/562cc7f9a2f7e3d37e20e094d71915dd19f9996a))
+- Update dependencies (sass, vite) in package.json - ([fb3fe18](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/fb3fe181d4b494a8a30a328316911d25c693faed))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([39114b7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/39114b78297924c896cda1ad4c82d9a709333622))
+
+
 ## [0.10.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.10.1..v0.10.2) - 2026-10-27
 
 ### 🐛 Bug Fixes
