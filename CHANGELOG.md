@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.10.4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.10.3..v0.10.4) - 2026-10-27
+
+### ⚙️ Miscellaneous Tasks
+
+- Add allowScripts configuration for @parcel/watcher in package.json - ([2a34e3a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2a34e3a1e54546fcd460f9c14b249606b028f984))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([f870205](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f870205c1e7b2d3b9c448ed51b243828558da116))
+
+
 ## [0.10.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.10.2..v0.10.3) - 2026-10-27
 
 ### ⚙️ Miscellaneous Tasks
