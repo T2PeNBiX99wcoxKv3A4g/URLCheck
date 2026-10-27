@@ -68,6 +68,7 @@ internal sealed class HistoryService : Singleton<HistoryService>
                 command.Parameters.AddWithValue("$url", url);
                 command.Parameters.AddWithValue("$timestamp", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
                 await command.ExecuteNonQueryAsync();
+                NotifyChanged();
             })).OnFailure(ex => Log.Warning(ex, "Failed to record a history entry"));
             _gate.Release();
         });
@@ -111,6 +112,7 @@ internal sealed class HistoryService : Singleton<HistoryService>
             await using var command = connection.CreateCommand();
             command.CommandText = "DELETE FROM History";
             await command.ExecuteNonQueryAsync();
+            NotifyChanged();
 
             return context.Reply("history.clear.result", new OkPayload());
         }
@@ -119,6 +121,9 @@ internal sealed class HistoryService : Singleton<HistoryService>
             _gate.Release();
         }
     }
+
+    /// <summary>Tells the open history view that the list changed.</summary>
+    private static void NotifyChanged() => WindowManager.Instance.NotifyMainWindow("history.changed", null);
 
     private SqliteConnection Open()
     {

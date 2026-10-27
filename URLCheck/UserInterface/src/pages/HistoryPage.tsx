@@ -5,6 +5,7 @@ import {AlertTriangleIcon, SearchIcon, TrashIcon} from "../components/Icons";
 import {Card, PageContainer} from "../components/Layout";
 import {useLocale, useTranslation} from "../i18n";
 import {clearHistory, listHistory} from "../api/history";
+import {Native} from "../Native";
 import {showPopup} from "../api/system";
 
 const ControlsCard = styled(Card)`
@@ -195,6 +196,37 @@ export const HistoryPage: React.FC = () => {
     }, []);
 
     const filteredHistory = history.filter((item) => item.url.toLowerCase().includes(keyword.toLowerCase()));
+
+    /* The backend pushes `history.changed` whenever a URL is recorded or the history is cleared. */
+    useEffect(() => {
+        let cancelled = false;
+        let timer: number | undefined;
+
+        const reload = async () => {
+            try {
+                const entries = await listHistory();
+                if (!cancelled) setHistory(entries);
+            } catch {
+                // Keep the current list; the next change tries again.
+            }
+        };
+
+        const unsubscribe = Native.on((message) => {
+            if ((message as { type?: string }).type !== "history.changed") return;
+
+            // A burst of records collapses into a single reload.
+            window.clearTimeout(timer);
+            timer = window.setTimeout(() => {
+                void reload();
+            }, 150);
+        });
+
+        return () => {
+            cancelled = true;
+            window.clearTimeout(timer);
+            unsubscribe();
+        };
+    }, []);
 
     const handleOpen = async (target: string) => {
         setError(null);

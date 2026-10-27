@@ -79,6 +79,9 @@ internal sealed class WindowManager : Singleton<WindowManager>
     /// <summary>Set while a hidden start is still waiting for the interface's first render.</summary>
     private bool _hideWhenRendered;
 
+    /// <summary>Whether the host window's interface has reported in; before that, messages crash.</summary>
+    private bool _mainWindowReady;
+
     private PhotinoWindow? _mainWindow;
     private PhotinoWindow? _popupWindow;
 
@@ -168,6 +171,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
                 return null;
 
             case "app.ready":
+                _mainWindowReady = true;
                 HideWhenRendered();
                 return null;
 
@@ -689,6 +693,17 @@ internal sealed class WindowManager : Singleton<WindowManager>
         var json = NativeProtocol.SerializeEvent(type, data);
         TrySend(_mainWindow, json);
         TrySend(_popupWindow, json);
+    }
+
+    /// <summary>Sends an event to the host window only; views that live there are the only listeners.</summary>
+    public void NotifyMainWindow(string type, object? data)
+    {
+        // Sending to a web view that is still loading aborts the process; the page loads the current
+        // data itself when it mounts, so nothing is lost by waiting.
+        if (!_mainWindowReady)
+            return;
+
+        TrySend(_mainWindow, NativeProtocol.SerializeEvent(type, data));
     }
 
     public void Exit()
