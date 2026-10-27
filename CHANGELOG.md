@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.10.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.9.0..v0.10.0) - 2026-10-27
+
+### ⛰️  Features
+
+- Show which paired devices are reachable - ([902669c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/902669ca9d910e7c040d0ffdbe05ccdd1ff1baf6))
+- Refresh the history view as soon as the history changes - ([7d50a8c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/7d50a8c34d41c65d3c00040c814daee416f785d9))
+- One hop per listed host, cleaner chaining, richer context menu - ([7a187ee](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/7a187ee9913806d479d26a3e3bb41a9092f8a032))
+- Auto-redirect short links and a custom history context menu - ([06c8855](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/06c88554488dfc6fd3cf94995dcd8b72db5866bc))
+
+### 🐛 Bug Fixes
+
+- Reduce auto-redirect entries to their host - ([abd4a32](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/abd4a328640bca973ecb4a4b256d0430df34c1a8))
+- Only follow real 3xx redirects when auto-redirecting - ([abfca13](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/abfca138536e4aabd9fc626b2538cbf033eeb430))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([afcba42](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/afcba424f4cd57ba2d0e71863c390fce9706995e))
+
+
 ## [0.9.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.8.2..v0.9.0) - 2026-10-26
 
 ### ⛰️  Features
