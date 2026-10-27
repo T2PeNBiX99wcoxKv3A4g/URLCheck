@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.10.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.10.1..v0.10.2) - 2026-10-27
+
+### 🐛 Bug Fixes
+
+- Bind the static file server to an OS-assigned port - ([3f5b4fd](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/3f5b4fd3499cdc62756d83f8ba423e6190036096))
+
+### 🚜 Refactor
+
+- Add PublicAPI annotation to Address property in StaticServer for improved API clarity - ([36a699c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/36a699cda4c082988b08e0aa80cfc306f8c7b674))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([2fc42c7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2fc42c7e0682a6efb620ee27b1f0e34637ea84f5))
+
+
 ## [0.10.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.10.0..v0.10.1) - 2026-10-27
 
 ### 🚜 Refactor
