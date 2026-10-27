@@ -67,7 +67,9 @@ internal sealed class InspectService : Singleton<InspectService>
 
         using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
-        if (response.Headers.Location is not { } location)
+        // Only a real redirect counts: a 201 Created can carry a Location too, and following that
+        // would be an unexpected jump.
+        if ((int)response.StatusCode is < 300 or >= 400 || response.Headers.Location is not { } location)
             return null;
 
         var next = new Uri(new Uri(url), location);
