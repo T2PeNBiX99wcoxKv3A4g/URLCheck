@@ -12,6 +12,9 @@ internal sealed record OkPayload(bool Ok = true);
 /// <summary>Body for <c>settings.addAutoRedirect</c>: the URL whose host should be added.</summary>
 internal sealed record AutoRedirectRequest(string Url);
 
+/// <summary>Body for <c>clipboard.read</c>: the clipboard's text, or null when it cannot be read.</summary>
+internal sealed record ClipboardTextPayload(string? Text);
+
 /// <summary>Body for <c>popup.open</c>: which browser actually launched.</summary>
 internal sealed record BrowserOpenPayload(bool Ok, string Browser);
 

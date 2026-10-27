@@ -19,9 +19,6 @@ internal sealed class InspectService : Singleton<InspectService>
         AllowAutoRedirect = false
     });
 
-    /// <summary>How many hops a short link is followed through before giving up.</summary>
-    private const int MaxRedirects = 10;
-
     private readonly SettingsService _settings = SettingsService.Instance;
 
     public InspectService() => NativeBridge.MessageReceived += HandleMessageAsync;
@@ -57,34 +54,24 @@ internal sealed class InspectService : Singleton<InspectService>
     }
 
     /// <summary>
-    ///     Follows a URL's redirect chain and returns where it finally lands. A non-http(s) target, a
-    ///     failed request or the hop limit just stops it, so the caller always gets something usable.
+    ///     Follows exactly one redirect and returns its target, or null when the response is not a
+    ///     redirect (or points at a scheme the app cannot open).
     /// </summary>
-    public async Task<string> ResolveRedirectsAsync(string url)
+    public async Task<string?> ResolveRedirectAsync(string url)
     {
         var settings = await _settings.GetAsync();
-        var userAgent = ResolveUserAgent(settings, null);
-        var current = url;
 
-        for (var hop = 0; hop < MaxRedirects; hop++)
-        {
-            using var cts = new CancellationTokenSource(settings.RequestTimeoutMs);
-            using var request = new HttpRequestMessage(HttpMethod.Get, current);
-            request.Headers.TryAddWithoutValidation("User-Agent", userAgent);
+        using var cts = new CancellationTokenSource(settings.RequestTimeoutMs);
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.TryAddWithoutValidation("User-Agent", ResolveUserAgent(settings, null));
 
-            using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
+        using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
-            if (response.Headers.Location is not { } location)
-                return current;
+        if (response.Headers.Location is not { } location)
+            return null;
 
-            var next = new Uri(new Uri(current), location);
-            if (next.Scheme is not ("http" or "https"))
-                return current;
-
-            current = next.ToString();
-        }
-
-        return current;
+        var next = new Uri(new Uri(url), location);
+        return next.Scheme is "http" or "https" ? next.ToString() : null;
     }
 
     /// <summary>

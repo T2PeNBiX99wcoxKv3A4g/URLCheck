@@ -142,7 +142,7 @@ internal sealed class WindowsClipboardWatcher : Singleton<WindowsClipboardWatche
     }
 
     /// <summary>Reads the clipboard's Unicode text, giving up rather than blocking when it stays locked.</summary>
-    private string? ReadText()
+    public string? ReadText()
     {
         for (var attempt = 0; attempt < ReadAttempts; attempt++)
         {

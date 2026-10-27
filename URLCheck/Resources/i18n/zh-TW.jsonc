@@ -27,6 +27,8 @@
   "history.copy": "複製",
   "history.addAutoRedirect": "加入自動跳轉",
   "history.autoRedirectAdded": "已加入自動跳轉",
+  "context.copyUrl": "複製 URL",
+  "context.paste": "貼上",
   "settings.network": "網路與請求設定",
   "settings.requestTimeout": "請求逾時",
   "settings.requestTimeoutDescription": "單一網址回應的最長等待毫秒數",

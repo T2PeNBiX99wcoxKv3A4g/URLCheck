@@ -27,6 +27,8 @@
   "history.copy": "复制",
   "history.addAutoRedirect": "加入自动跳转",
   "history.autoRedirectAdded": "已加入自动跳转",
+  "context.copyUrl": "复制 URL",
+  "context.paste": "粘贴",
   "settings.network": "网络与请求设置",
   "settings.requestTimeout": "请求超时",
   "settings.requestTimeoutDescription": "单个网址响应的最长等待毫秒数",

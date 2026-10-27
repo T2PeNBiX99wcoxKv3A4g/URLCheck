@@ -12,6 +12,7 @@ import "@fontsource/jetbrains-mono/latin-500.css";
 import "@fontsource/jetbrains-mono/latin-600.css";
 import "@fontsource/jetbrains-mono/latin-700.css";
 import App from "./App";
+import {ContextMenu} from "./components/ContextMenu";
 import {LocalizationProvider} from "./i18n";
 import {PopupPage} from "./pages/PopupPage";
 import {SelectionButtonPage} from "./pages/SelectionButtonPage";
@@ -29,7 +30,10 @@ if (rootElement) {
 
     createRoot(rootElement).render(
         <StrictMode>
-            <LocalizationProvider>{page}</LocalizationProvider>
+            <LocalizationProvider>
+                {page}
+                <ContextMenu/>
+            </LocalizationProvider>
         </StrictMode>
     );
 }

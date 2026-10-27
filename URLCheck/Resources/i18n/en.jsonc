@@ -31,6 +31,8 @@
   "history.copy": "Copy",
   "history.addAutoRedirect": "Add to auto redirect",
   "history.autoRedirectAdded": "Added to auto redirect",
+  "context.copyUrl": "Copy URL",
+  "context.paste": "Paste",
   // -------------------------------------------------------------- settings
   "settings.network": "Network & Request Settings",
   "settings.requestTimeout": "Request Timeout",

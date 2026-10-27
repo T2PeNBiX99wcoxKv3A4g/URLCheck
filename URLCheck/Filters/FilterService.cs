@@ -2,6 +2,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using URLCheck.Extensions;
 using URLCheck.Messaging;
@@ -35,6 +36,7 @@ internal sealed class FilterService : Singleton<FilterService>
     private readonly string _manifestPath;
 
     private List<RemoveParamRule>? _effectiveRules;
+    private CompiledRules? _compiledRules;
     private List<FilterListEntry>? _lists;
 
     public FilterService()
@@ -97,7 +99,7 @@ internal sealed class FilterService : Singleton<FilterService>
             entry.Error = await DownloadAsync(entry);
             lists.Add(entry);
             await SaveListsAsync(lists);
-            _effectiveRules = null;
+            InvalidateRules();
 
             return context.Reply("filters.add.result", new FilterListPayload(lists, _builtinRules.Count));
         }
@@ -119,7 +121,7 @@ internal sealed class FilterService : Singleton<FilterService>
             var lists = await LoadListsAsync();
             lists.RemoveAll(entry => entry.Id == id);
             await SaveListsAsync(lists);
-            _effectiveRules = null;
+            InvalidateRules();
 
             TryDelete(RuleFilePath(id));
             return context.Reply("filters.remove.result", new FilterListPayload(lists, _builtinRules.Count));
@@ -144,7 +146,7 @@ internal sealed class FilterService : Singleton<FilterService>
                 entry.Enabled = request.Enabled;
 
             await SaveListsAsync(lists);
-            _effectiveRules = null;
+            InvalidateRules();
 
             return context.Reply("filters.setEnabled.result", new FilterListPayload(lists, _builtinRules.Count));
         }
@@ -167,7 +169,7 @@ internal sealed class FilterService : Singleton<FilterService>
                 entry.Error = await DownloadAsync(entry);
 
             await SaveListsAsync(lists);
-            _effectiveRules = null;
+            InvalidateRules();
 
             return context.Reply("filters.update.result", new FilterListPayload(lists, _builtinRules.Count));
         }
@@ -182,25 +184,35 @@ internal sealed class FilterService : Singleton<FilterService>
         await _gate.WaitAsync();
         try
         {
-            if (_effectiveRules is null)
-            {
-                var rules = new List<RemoveParamRule>(_builtinRules);
-                foreach (var entry in (await LoadListsAsync()).Where(entry => entry.Enabled))
-                {
-                    var path = RuleFilePath(entry.Id);
-                    if (File.Exists(path))
-                        rules.AddRange(FilterParser.Parse(await File.ReadAllTextAsync(path)));
-                }
-
-                _effectiveRules = rules;
-            }
-
-            return context.Reply("filters.rules.result", new FilterRulesPayload(_effectiveRules));
+            return context.Reply("filters.rules.result", new FilterRulesPayload(await EffectiveRulesAsync()));
         }
         finally
         {
             _gate.Release();
         }
+    }
+
+    /// <summary>The built-in rules plus every enabled list. Callers hold the gate.</summary>
+    private async Task<List<RemoveParamRule>> EffectiveRulesAsync()
+    {
+        if (_effectiveRules is not null)
+            return _effectiveRules;
+
+        var rules = new List<RemoveParamRule>(_builtinRules);
+        foreach (var entry in (await LoadListsAsync()).Where(entry => entry.Enabled))
+        {
+            var path = RuleFilePath(entry.Id);
+            if (File.Exists(path))
+                rules.AddRange(FilterParser.Parse(await File.ReadAllTextAsync(path)));
+        }
+
+        return _effectiveRules = rules;
+    }
+
+    private void InvalidateRules()
+    {
+        _effectiveRules = null;
+        _compiledRules = null;
     }
 
     /// <summary>
@@ -303,6 +315,170 @@ internal sealed class FilterService : Singleton<FilterService>
 
     private void TryDelete(string path) =>
         Try.Run(() => File.Delete(path)).OnFailure(ex => Log.Warning(ex, "Failed to delete {Path}", path));
+
+    // ------------------------------------------------------------------- cleaning
+
+    /// <summary>
+    ///     Removes the tracking parameters from a URL, so an auto-redirect can be followed from the
+    ///     cleaned address. The URL keeps its raw form: only the removed parameters change.
+    /// </summary>
+    public async Task<string> StripTrackingParamsAsync(string url)
+    {
+        try
+        {
+            return await StripTrackingParamsCoreAsync(url);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to strip the tracking parameters from {Url}", url);
+            return url;
+        }
+    }
+
+    private async Task<string> StripTrackingParamsCoreAsync(string url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            return url;
+
+        CompiledRules compiled;
+        await _gate.WaitAsync();
+        try
+        {
+            compiled = _compiledRules ??= Compile(await EffectiveRulesAsync());
+        }
+        finally
+        {
+            _gate.Release();
+        }
+
+        var fragment = url.IndexOf('#');
+        var end = fragment < 0 ? url.Length : fragment;
+        var question = url.IndexOf('?');
+        if (question < 0 || question > end)
+            return url;
+
+        var kept = new List<string>();
+        var removed = false;
+
+        foreach (var pair in url[(question + 1)..end].Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var equals = pair.IndexOf('=');
+            var key = Uri.UnescapeDataString((equals < 0 ? pair : pair[..equals]).Replace("+", " "));
+
+            if (IsTracked(key, compiled, uri.Host, url))
+            {
+                removed = true;
+                continue;
+            }
+
+            kept.Add(pair);
+        }
+
+        if (!removed)
+            return url;
+
+        return url[..question] + (kept.Count == 0 ? "" : $"?{string.Join("&", kept)}") + url[end..];
+    }
+
+    /// <summary>Compiles the rule list once into the lookups the cleaner queries per URL.</summary>
+    private static CompiledRules Compile(List<RemoveParamRule> rules)
+    {
+        var compiled = new CompiledRules();
+
+        foreach (var rule in rules)
+        {
+            var unrestricted = rule.UrlPattern is null &&
+                               rule.Include is not { Count: > 0 } &&
+                               rule.Exclude is not { Count: > 0 } &&
+                               rule.UrlExceptions is not { Count: > 0 };
+
+            if (unrestricted)
+            {
+                if (rule.Regex)
+                    compiled.GlobalRegex.Add(CompileRegex(rule.Pattern));
+                else
+                    compiled.GlobalLiterals.Add(rule.Pattern);
+
+                continue;
+            }
+
+            IEnumerable<string?> hosts = rule.Include is { Count: > 0 } include
+                ? include.Select(host => (string?)host)
+                : [null];
+
+            foreach (var host in hosts)
+            {
+                var scope = new CompiledRules.Scope
+                {
+                    Host = host is null ? null : HostPattern(host),
+                    Url = rule.UrlPattern is null ? null : CompileRegex(rule.UrlPattern),
+                    Exclude = rule.Exclude?.Select(HostPattern).ToList(),
+                    UrlExceptions = rule.UrlExceptions?.Select(CompileRegex).ToList()
+                };
+
+                if (rule.Regex)
+                    scope.Regexes.Add(CompileRegex(rule.Pattern));
+                else
+                    scope.Literals.Add(rule.Pattern);
+
+                compiled.Scopes.Add(scope);
+            }
+        }
+
+        return compiled;
+    }
+
+    private static Regex CompileRegex(string pattern) =>
+        new(pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+    /// <summary>Matches a host itself or a subdomain, with <c>*</c> wildcards, like the popup does.</summary>
+    private static Regex HostPattern(string pattern) =>
+        CompileRegex($@"(^|\.){Regex.Escape(pattern.ToLowerInvariant()).Replace(@"\*", ".*")}$");
+
+    private static bool IsTracked(string key, CompiledRules rules, string host, string url)
+    {
+        var name = key.ToLowerInvariant();
+
+        if (rules.GlobalLiterals.Contains(name) || rules.GlobalRegex.Any(expression => expression.IsMatch(key)))
+            return true;
+
+        foreach (var scope in rules.Scopes)
+        {
+            if (scope.Host is not null && !scope.Host.IsMatch(host))
+                continue;
+
+            if (scope.Url is not null && !scope.Url.IsMatch(url))
+                continue;
+
+            if (scope.Exclude?.Any(expression => expression.IsMatch(host)) == true)
+                continue;
+
+            if (scope.UrlExceptions?.Any(expression => expression.IsMatch(url)) == true)
+                continue;
+
+            if (scope.Literals.Contains(name) || scope.Regexes.Any(expression => expression.IsMatch(key)))
+                return true;
+        }
+
+        return false;
+    }
+
+    private sealed class CompiledRules
+    {
+        public HashSet<string> GlobalLiterals { get; } = new(StringComparer.OrdinalIgnoreCase);
+        public List<Regex> GlobalRegex { get; } = [];
+        public List<Scope> Scopes { get; } = [];
+
+        public sealed class Scope
+        {
+            public Regex? Host { get; init; }
+            public Regex? Url { get; init; }
+            public List<Regex>? Exclude { get; init; }
+            public List<Regex>? UrlExceptions { get; init; }
+            public HashSet<string> Literals { get; } = new(StringComparer.OrdinalIgnoreCase);
+            public List<Regex> Regexes { get; } = [];
+        }
+    }
 
     private string ReadBuiltin()
     {

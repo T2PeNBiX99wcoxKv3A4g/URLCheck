@@ -58,6 +58,59 @@ internal sealed class LinuxClipboardWatcher : Singleton<LinuxClipboardWatcher>, 
 
     public void Dispose() => Stop();
 
+    /// <summary>Reads the clipboard's text once, best-effort, without GTK's asynchronous request.</summary>
+    public string? ReadText() =>
+        Try.Run(ReadWithCommand).GetOrElse(ex =>
+        {
+            Log.Debug(ex, "Could not read the clipboard");
+            return null;
+        });
+
+    private static string? ReadWithCommand()
+    {
+        // wl-paste speaks Wayland's data-control protocol; xclip and xsel cover X11.
+        (string Command, string[] Arguments)[] candidates =
+        [
+            ("wl-paste", ["--no-newline", "--type", "text"]),
+            ("xclip", ["-selection", "clipboard", "-o"]),
+            ("xsel", ["--clipboard", "--output"])
+        ];
+
+        foreach (var (command, arguments) in candidates)
+            if (Run(command, arguments) is { Length: > 0 } text)
+                return text;
+
+        return null;
+    }
+
+    private static string? Run(string command, string[] arguments)
+    {
+        var process = Try.Run(() =>
+        {
+            var startInfo = new ProcessStartInfo(command)
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            foreach (var argument in arguments)
+                startInfo.ArgumentList.Add(argument);
+
+            return Process.Start(startInfo);
+        }).GetOrNull();
+
+        if (process is null)
+            return null;
+
+        using (process)
+        {
+            var output = process.StandardOutput.ReadToEnd();
+            return process.WaitForExit(2000) && process.ExitCode == 0 ? output : null;
+        }
+    }
+
     /// <summary>
     ///     Wayland hides the clipboard from unfocused clients, so the only way in is the data-control
     ///     protocol, which <c>wl-paste --watch</c> speaks. It feeds every new value to its command's

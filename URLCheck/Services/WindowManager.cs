@@ -2,6 +2,7 @@ using System.Drawing;
 using JetBrains.Annotations;
 using Photino.NET;
 using URLCheck.Extensions;
+using URLCheck.Filters;
 using URLCheck.Inspect;
 using URLCheck.Messaging;
 using URLCheck.Models;
@@ -37,6 +38,12 @@ internal sealed class WindowManager : Singleton<WindowManager>
     ///     not fit is sent to the page once it reports ready instead; this leaves room for the prefix.
     /// </summary>
     private const int MaxStartUrlLength = 1800;
+
+    /// <summary>
+    ///     How many listed hosts a link may be followed through. Every hop has to be on the auto-redirect
+    ///     list by itself; this is only a guard against a loop between two listed hosts.
+    /// </summary>
+    private const int MaxAutoRedirects = 10;
 
     /// <summary>
     ///     Per-app web view data folder. On Windows, Photino defaults to a WebView2 folder shared by
@@ -173,6 +180,9 @@ internal sealed class WindowManager : Singleton<WindowManager>
                 _selectionReady = true;
                 FlushPendingSelectionUrl(context.Window);
                 return null;
+
+            case "clipboard.read":
+                return context.Reply("clipboard.read.result", new ClipboardTextPayload(_clipboard.ReadText()));
 
             case "popup.resize":
             {
@@ -522,23 +532,41 @@ internal sealed class WindowManager : Singleton<WindowManager>
         ShowPopup(await ResolveAutoRedirectAsync(url));
     }
 
-    /// <summary>Follows a short link when its host asks for it; otherwise returns the URL untouched.</summary>
+    /// <summary>
+    ///     Follows a short link through its redirects. Each hop is only followed when its own host is
+    ///     also on the list, so a chain cannot drag the app somewhere unexpected; with tracking-parameter
+    ///     stripping on, the URL is cleaned before every hop.
+    /// </summary>
     private async Task<string> ResolveAutoRedirectAsync(string url)
     {
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
-            uri.Scheme is not ("http" or "https") ||
-            !(await _settings.GetAsync()).ShouldAutoRedirect(uri))
-            return url;
+        var settings = await _settings.GetAsync();
+        var current = url;
 
-        var result = await Try.Run(() => InspectService.Instance.ResolveRedirectsAsync(url));
-        var resolved = result
-            .OnFailure(ex => Log.Warning(ex, "Failed to follow {Url} through its redirects", url))
-            .GetOrElse(_ => url);
+        for (var hop = 0; hop < MaxAutoRedirects; hop++)
+        {
+            if (!Uri.TryCreate(current, UriKind.Absolute, out var uri) ||
+                uri.Scheme is not ("http" or "https") ||
+                !settings.ShouldAutoRedirect(uri))
+                break;
 
-        if (resolved != url)
-            Log.Information("Auto-redirected {From} to {To}", url, resolved);
+            if (settings.AutoStripTrackingParams)
+                current = await FilterService.Instance.StripTrackingParamsAsync(current);
 
-        return resolved;
+            var attempt = await Try.Run(() => InspectService.Instance.ResolveRedirectAsync(current));
+            if (attempt.Exception is { } exception)
+            {
+                Log.Warning(exception, "Failed to follow {Url} through its redirect", current);
+                break;
+            }
+
+            if (attempt.Value is not { } next)
+                break;
+
+            Log.Information("Auto-redirected {From} to {To}", current, next);
+            current = next;
+        }
+
+        return current;
     }
 
     /// <summary>Opens a popup for <paramref name="url" />, or navigates the existing popup to it.</summary>

@@ -27,6 +27,8 @@
   "history.copy": "コピー",
   "history.addAutoRedirect": "自動リダイレクトに追加",
   "history.autoRedirectAdded": "自動リダイレクトに追加しました",
+  "context.copyUrl": "URL をコピー",
+  "context.paste": "貼り付け",
   "settings.network": "ネットワークとリクエストの設定",
   "settings.requestTimeout": "リクエストのタイムアウト",
   "settings.requestTimeoutDescription": "1 つの URL 応答を待つ最大ミリ秒",

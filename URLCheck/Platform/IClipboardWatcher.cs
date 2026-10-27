@@ -17,4 +17,7 @@ internal interface IClipboardWatcher : IDisposable
 
     /// <summary>Stops watching. Safe to call when not watching.</summary>
     void Stop();
+
+    /// <summary>Reads the clipboard's text once, or null when it cannot be read right now.</summary>
+    string? ReadText();
 }

@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {HistoryItem} from "../types";
-import {AlertTriangleIcon, CheckCircleIcon, SearchIcon, TrashIcon} from "../components/Icons";
+import {AlertTriangleIcon, SearchIcon, TrashIcon} from "../components/Icons";
 import {Card, PageContainer} from "../components/Layout";
 import {useLocale, useTranslation} from "../i18n";
 import {clearHistory, listHistory} from "../api/history";
-import {addAutoRedirect} from "../api/settings";
 import {showPopup} from "../api/system";
 
 const ControlsCard = styled(Card)`
@@ -162,56 +161,6 @@ const ErrorBanner = styled.div`
     font-size: 0.85rem;
 `;
 
-const NoticeBanner = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-radius: 8px;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    color: #34d399;
-    font-size: 0.85rem;
-`;
-
-/** The app's own right-click menu; the web view's built-in one is disabled. */
-const ContextMenu = styled.div`
-    position: fixed;
-    z-index: 1000;
-    min-width: 200px;
-    padding: 4px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(15, 23, 42, 0.98);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(12px);
-`;
-
-const ContextItem = styled.button`
-    display: block;
-    width: 100%;
-    padding: 8px 10px;
-    border: none;
-    border-radius: 7px;
-    background: none;
-    color: #e2e8f0;
-    font-size: 0.85rem;
-    text-align: left;
-    cursor: pointer;
-    font-family: inherit;
-
-    &:hover {
-        background: rgba(59, 130, 246, 0.18);
-        color: #f9fafb;
-    }
-`;
-
-interface HistoryMenu {
-    x: number;
-    y: number;
-    url: string;
-}
-
 /** Renders an epoch-milliseconds timestamp in the app's language (local time zone). */
 function formatTimestamp(value: number, locale: string): string {
     const date = new Date(value);
@@ -225,8 +174,6 @@ export const HistoryPage: React.FC = () => {
     const [keyword, setKeyword] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [menu, setMenu] = useState<HistoryMenu | null>(null);
-    const [notice, setNotice] = useState<string | null>(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -248,65 +195,6 @@ export const HistoryPage: React.FC = () => {
     }, []);
 
     const filteredHistory = history.filter((item) => item.url.toLowerCase().includes(keyword.toLowerCase()));
-
-    /* Any click, scroll, Escape or another right-click closes the custom menu. */
-    useEffect(() => {
-        if (!menu) return;
-
-        const close = () => setMenu(null);
-        const onKey = (event: KeyboardEvent) => {
-            if (event.key === "Escape") setMenu(null);
-        };
-
-        window.addEventListener("click", close);
-        window.addEventListener("contextmenu", close);
-        window.addEventListener("scroll", close, true);
-        window.addEventListener("keydown", onKey);
-
-        return () => {
-            window.removeEventListener("click", close);
-            window.removeEventListener("contextmenu", close);
-            window.removeEventListener("scroll", close, true);
-            window.removeEventListener("keydown", onKey);
-        };
-    }, [menu]);
-
-    const flashNotice = (message: string) => {
-        setNotice(message);
-        window.setTimeout(() => setNotice(null), 1800);
-    };
-
-    const openMenu = (event: React.MouseEvent, url: string) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setMenu({
-            x: Math.min(event.clientX, window.innerWidth - 220),
-            y: Math.min(event.clientY, window.innerHeight - 96),
-            url,
-        });
-    };
-
-    const handleCopy = async (url: string) => {
-        setMenu(null);
-        setError(null);
-        try {
-            await navigator.clipboard.writeText(url);
-            flashNotice(t("popup.copied"));
-        } catch (err) {
-            setError(err instanceof Error ? err.message : String(err));
-        }
-    };
-
-    const handleAddAutoRedirect = async (url: string) => {
-        setMenu(null);
-        setError(null);
-        try {
-            await addAutoRedirect(url);
-            flashNotice(t("history.autoRedirectAdded"));
-        } catch (err) {
-            setError(err instanceof Error ? err.message : String(err));
-        }
-    };
 
     const handleOpen = async (target: string) => {
         setError(null);
@@ -334,13 +222,6 @@ export const HistoryPage: React.FC = () => {
                     <AlertTriangleIcon size={16}/>
                     <span>{t(error)}</span>
                 </ErrorBanner>
-            )}
-
-            {notice && (
-                <NoticeBanner>
-                    <CheckCircleIcon size={16}/>
-                    <span>{notice}</span>
-                </NoticeBanner>
             )}
 
             <ControlsCard>
@@ -371,7 +252,7 @@ export const HistoryPage: React.FC = () => {
                     <tbody>
                     {filteredHistory.length > 0 ? (
                         filteredHistory.map((item) => (
-                            <tr key={item.id} onContextMenu={(event) => openMenu(event, item.url)}>
+                            <tr key={item.id} data-history-url={item.url}>
                                 <td style={{color: "#9ca3af", fontSize: "0.85rem"}}>
                                     {formatTimestamp(item.timestamp, locale)}
                                 </td>
@@ -395,17 +276,6 @@ export const HistoryPage: React.FC = () => {
                     </tbody>
                 </Table>
             </TableContainer>
-
-            {menu && (
-                <ContextMenu style={{left: menu.x, top: menu.y}}>
-                    <ContextItem type="button" onClick={() => handleCopy(menu.url)}>
-                        {t("history.copy")}
-                    </ContextItem>
-                    <ContextItem type="button" onClick={() => handleAddAutoRedirect(menu.url)}>
-                        {t("history.addAutoRedirect")}
-                    </ContextItem>
-                </ContextMenu>
-            )}
         </PageContainer>
     );
 };

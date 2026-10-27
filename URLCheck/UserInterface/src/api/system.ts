@@ -10,6 +10,14 @@ export async function showPopup(url: string): Promise<void> {
     await Native.request("popup.show", {url});
 }
 
+/** Reads the clipboard's text once, through the backend, so no web permission is involved. */
+export async function readClipboard(): Promise<string | null> {
+    if (!Native.available) return null;
+
+    const data = await Native.request<{ text: string | null }>("clipboard.read");
+    return data.text ?? null;
+}
+
 /** Closes the window that sent the request. */
 export function closePopup(): void {
     if (!Native.available) {
