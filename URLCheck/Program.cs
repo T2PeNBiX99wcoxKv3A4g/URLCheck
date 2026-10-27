@@ -8,9 +8,6 @@ using URLCheck.Inspect;
 using URLCheck.Interop;
 using URLCheck.Platform;
 using URLCheck.Services;
-#if !DEBUG
-using Photino.NET.Server;
-#endif
 
 namespace URLCheck;
 //NOTE: To hide the console window, go to the project properties and change the Output Type to Windows Application.
@@ -75,17 +72,11 @@ internal static class Program
             }
 
 #if !DEBUG
-            // The static server insists on a web root and creates it when missing, which would drop an
-            // empty wwwroot next to the executable on every start. Giving the host a content root we own
-            // keeps that out of the way — the front-end is served from the embedded manifest either way.
-            _ = PhotinoServer
-                .CreateStaticFileServer(["--contentRoot", DataDirectory], out var baseUrl)
-                .RunAsync();
-
-            // The version query is what keeps an upgrade from showing the previous interface: the
-            // served page is always at the same address, so without it the web view would keep
-            // returning its cached copy — along with the old asset names inside it.
-            var appUrl = $"{baseUrl}/index.html?v={AppInfoService.BuildToken}";
+            // Kestrel binds to an OS-assigned port, so several Photino apps can run side by side
+            // without racing for the default 8000. The content root is a folder we own, which keeps
+            // the web root out of the executable's directory.
+            using var staticServer = StaticServer.Start(DataDirectory);
+            var appUrl = staticServer.AppUrl;
 #else
             const string appUrl = "http://127.0.0.1:3000";
 #endif
