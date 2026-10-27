@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.10.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.10.0..v0.10.1) - 2026-10-27
+
+### 🚜 Refactor
+
+- Optimize readability and consistency across multiple files - ([29bcc53](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/29bcc539117ab0324a542d8d88494d3640191a2e))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([83e2810](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/83e2810c70d14c14e55e454cc6678d01ec3b9212))
+
+
 ## [0.10.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.9.0..v0.10.0) - 2026-10-27
 
 ### ⛰️  Features
