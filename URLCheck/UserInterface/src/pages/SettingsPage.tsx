@@ -975,9 +975,26 @@ export const SettingsPage: React.FC = () => {
       [settings, baseline, loading]
   );
 
+  /** Reduces whatever was typed to the bare host the matcher compares against. */
+  const toAutoRedirectHost = (value: string): string => {
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+
+    try {
+      return new URL(trimmed).hostname.toLowerCase();
+    } catch {
+      // A bare host, possibly with a path or a port the matcher never sees.
+      return trimmed
+          .split(/[/?#]/)[0]
+          .replace(/:\d+$/, "")
+          .replace(/^\.+|\.+$/g, "")
+          .toLowerCase();
+    }
+  };
+
   /** Adds a host to the auto-redirect list, lower-case and without duplicates. */
   const addAutoRedirectHost = () => {
-    const host = newAutoRedirectHost.trim().toLowerCase().replace(/^\.+|\.+$/g, "");
+    const host = toAutoRedirectHost(newAutoRedirectHost);
     if (!host) return;
 
     setSettings((prev) => ({

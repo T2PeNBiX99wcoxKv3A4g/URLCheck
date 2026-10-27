@@ -90,6 +90,29 @@ internal sealed class AppSettings
             uri.Host.Equals(host, StringComparison.OrdinalIgnoreCase) ||
             uri.Host.EndsWith($".{host}", StringComparison.OrdinalIgnoreCase));
 
+    /// <summary>Reduces an entry to the bare host the matcher compares against.</summary>
+    private static string NormalizeHost(string value)
+    {
+        var trimmed = value.Trim();
+
+        // A full URL: the host is all the matcher looks at.
+        if (Uri.TryCreate(trimmed, UriKind.Absolute, out var uri) &&
+            uri.Scheme is "http" or "https" &&
+            uri.Host.Length > 0)
+            return uri.Host.ToLowerInvariant();
+
+        // A bare host, possibly with a path or a port the matcher never sees.
+        var cut = trimmed.IndexOfAny(['/', '?', '#']);
+        if (cut >= 0)
+            trimmed = trimmed[..cut];
+
+        var colon = trimmed.LastIndexOf(':');
+        if (colon > 0 && !trimmed.Contains(']'))
+            trimmed = trimmed[..colon];
+
+        return trimmed.TrimEnd('.').ToLowerInvariant();
+    }
+
     /// <summary>Clamps values into their supported ranges so invalid input can never be persisted.</summary>
     public void Normalize()
     {
@@ -136,13 +159,13 @@ internal sealed class AppSettings
 
         ForwardPort = Math.Clamp(ForwardPort, 1_024, 65_535);
 
-        // Hosts are compared as plain lower-case names, without blanks or repeats.
+        // Only the host is matched, so a pasted URL is reduced to its host here as well.
         AutoRedirectHosts ??= [];
 
         AutoRedirectHosts =
         [
             .. AutoRedirectHosts
-                .Select(host => host.Trim().TrimEnd('.').ToLowerInvariant())
+                .Select(NormalizeHost)
                 .Where(host => host.Length > 0)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
         ];
