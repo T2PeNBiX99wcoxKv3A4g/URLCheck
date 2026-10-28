@@ -241,6 +241,11 @@ internal sealed class WindowManager : Singleton<WindowManager>
         {
             ApplyClipboardWatching();
 
+            // Photino drops a Start Menu shortcut for the toast registration and never revisits it,
+            // so a build that moved would keep one pointing at the old copy.
+            if (OperatingSystem.IsWindows())
+                StartMenuShortcut.Refresh();
+
             // Starting hidden keeps the window minimised for now. Hiding a window while its web view
             // is still starting up leaves that web view permanently blank, so the window stays
             // minimised — which it renders fine from — until the interface has really rendered, and

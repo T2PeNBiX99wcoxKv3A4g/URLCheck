@@ -48,9 +48,7 @@
             </Directory>
         </StandardDirectory>
 
-        <StandardDirectory Id="ProgramMenuFolder">
-            <Directory Id="AppMenuFolder" Name="URLCheck" />
-        </StandardDirectory>
+        <StandardDirectory Id="ProgramMenuFolder" />
 
         <StandardDirectory Id="DesktopFolder" />
     </Fragment>
@@ -59,13 +57,17 @@
         <ComponentGroup Id="ApplicationFiles">
             <Component Id="Application" Directory="INSTALLFOLDER" Guid="*">
                 <File Id="URLCheckExe" Source="$(var.SourceDir)\URLCheck.exe" KeyPath="yes">
-                    <Shortcut Id="StartMenuShortcut" Directory="AppMenuFolder" Name="URLCheck"
+                    <!--
+                        Deliberately in the Programs folder itself, under the name Photino gives the
+                        shortcut it creates for toast notifications. One file, so the Start Menu never
+                        shows the app twice; the app keeps it pointing at the running build.
+                    -->
+                    <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="URLCheck"
                               Description="URLCheck URL intermediary" />
                     <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="URLCheck"
                               Description="URLCheck URL intermediary" />
                 </File>
                 <RemoveFolder Id="RemoveInstallFolder" On="uninstall" />
-                <RemoveFolder Id="RemoveAppMenuFolder" Directory="AppMenuFolder" On="uninstall" />
             </Component>
         </ComponentGroup>
     </Fragment>
