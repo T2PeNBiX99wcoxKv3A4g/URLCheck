@@ -38,6 +38,7 @@ import {FILTER_CATALOG} from "../data/filterCatalog";
 import {
   checkForUpdates,
   getAppInfo,
+  getUpdateStatus,
   openDefaultAppsSettings,
   openLogsFolder,
   protocolStatus,
@@ -45,14 +46,12 @@ import {
   type UpdateCheck,
   registerCustomScheme,
   registerProtocols,
+  RELEASES_URL,
   setStartup,
   startupStatus,
   type StartupStatus,
   unregisterProtocols
 } from "../api/system";
-
-/* Where the newest release can be downloaded from, once a check says there is one. */
-const RELEASES_URL = "https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/releases/latest";
 
 /* Loaded on demand: the licence texts are far too large to sit in the main bundle. */
 const AttributionPage = React.lazy(() =>
@@ -896,6 +895,9 @@ export const SettingsPage: React.FC = () => {
           setLogDirectory(info.logDirectory);
         })
         .catch(() => undefined);
+
+    /* The sidebar already ran the automatic check, so this normally answers from the cache. */
+    getUpdateStatus().then(setUpdateResult).catch(() => undefined);
   }, []);
 
   useEffect(() => {

@@ -2,6 +2,7 @@
   // ------------------------------------------------------------------ app
   "app.name": "URLCheck",
   "app.tagline": "Link intermediary",
+  "app.updateAvailable": "Version {version} is available - click to open the release page.",
   // ------------------------------------------------------- navigation/tabs
   "tabs.home.label": "Home",
   "tabs.home.title": "Home",

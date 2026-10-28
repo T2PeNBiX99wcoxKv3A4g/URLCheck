@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from "react";
-import styled from "styled-components";
+import styled, {keyframes} from "styled-components";
+import {Native} from "@photino-net-utils/bridge";
 import {TABS, type TabType} from "../tabs";
 import {useTranslation} from "../i18n";
-import {getAppInfo} from "../api/system";
+import {getAppInfo, getUpdateStatus, RELEASES_URL, type UpdateCheck} from "../api/system";
+import {openWithBrowser} from "../api/browsers";
 import {LogoIcon} from "./Icons";
 
 interface SidebarProps {
@@ -105,6 +107,7 @@ const FooterSection = styled.div`
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
+    gap: 8px;
 `;
 
 const VersionLabel = styled.span`
@@ -113,12 +116,53 @@ const VersionLabel = styled.span`
     font-family: var(--font-mono);
 `;
 
+/** Draws attention to the update dot without moving anything around it. */
+const pulse = keyframes`
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 0 4px rgba(251, 191, 36, 0);
+    }
+`;
+
+/** Sits beside the version when a newer release exists, and opens its page when clicked. */
+const UpdateDot = styled.button`
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #fbbf24;
+    cursor: pointer;
+    animation: ${pulse} 2s ease-in-out infinite;
+    transition: background 0.15s ease;
+
+    &:hover {
+        background: #fcd34d;
+    }
+`;
+
 export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
     const t = useTranslation();
     const [version, setVersion] = useState<string | null>(null);
+    /** The automatically checked update state; null until it is known. */
+    const [update, setUpdate] = useState<UpdateCheck | null>(null);
 
     useEffect(() => {
         getAppInfo().then((info) => setVersion(info.version)).catch(() => setVersion(null));
+    }, []);
+
+    /* The first ask runs the check; the backend answers from its cache after that. */
+    useEffect(() => {
+        getUpdateStatus().then(setUpdate).catch(() => setUpdate(null));
+
+        /* A check started from the settings page reports its result here too. */
+        return Native.on((message) => {
+            const event = message as { type?: string; data?: UpdateCheck };
+            if (event.type === "app.update" && event.data)
+                setUpdate(event.data);
+        });
     }, []);
 
     return (
@@ -151,6 +195,13 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
 
             <FooterSection>
                 <VersionLabel>{version ? `v${version}` : "…"}</VersionLabel>
+                {update?.available && (
+                    <UpdateDot
+                        type="button"
+                        title={t("app.updateAvailable", {version: update.latest})}
+                        onClick={() => void openWithBrowser(RELEASES_URL).catch(() => undefined)}
+                    />
+                )}
             </FooterSection>
         </SidebarContainer>
     );

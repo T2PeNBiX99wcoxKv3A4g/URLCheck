@@ -1,6 +1,7 @@
 {
   "app.name": "URLCheck",
   "app.tagline": "链接中介",
+  "app.updateAvailable": "有新版本 {version} - 点击打开发布页面。",
   "tabs.home.label": "首页",
   "tabs.home.title": "首页",
   "tabs.home.subtitle": "打开网址，在打开前检查并清理它",

@@ -5,9 +5,10 @@ using URLCheck.Messaging;
 namespace URLCheck.Services;
 
 /// <summary>
-///     Answers the <c>app.checkUpdate</c> message by reading the tiny version file the release
-///     workflow publishes. The file is served as plain text from the repository, so a check costs one
-///     small download and never touches the GitHub API or its rate limit.
+///     Answers the <c>app.updateStatus</c> and <c>app.checkUpdate</c> messages by reading the tiny
+///     version file the release workflow publishes. The file is served as plain text from the
+///     repository, so a check costs one small download and never touches the GitHub API or its rate
+///     limit.
 /// </summary>
 internal sealed class UpdateService : Singleton<UpdateService>
 {
@@ -18,28 +19,67 @@ internal sealed class UpdateService : Singleton<UpdateService>
     /// <summary>Shorter than the bridge's own request timeout, so the button always gets an answer.</summary>
     private static readonly HttpClient Client = new() { Timeout = TimeSpan.FromSeconds(8) };
 
+    /// <summary>How long an answer is reused. The sidebar asks on every start; the button forces one.</summary>
+    private static readonly TimeSpan CacheLifetime = TimeSpan.FromHours(6);
+
+    private readonly SemaphoreSlim _gate = new(1, 1);
+    private UpdateCheckPayload? _cached;
+    private DateTime _cachedAt;
+
     public UpdateService() => NativeBridge.MessageReceived += HandleMessageAsync;
 
-    private Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
-        context.Request.Type == "app.checkUpdate" ? CheckAsync(context) : Task.FromResult<NativeResponse?>(null);
-
-    private async Task<NativeResponse?> CheckAsync(NativeContext context)
+    private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch
     {
-        var published = await Try.Run(ReadPublishedVersionAsync);
+        "app.updateStatus" => StatusAsync(context),
+        "app.checkUpdate" => CheckAsync(context),
+        _ => Task.FromResult<NativeResponse?>(null)
+    };
 
-        if (published.Exception is { } exception)
+    /// <summary>
+    ///     The automatic check: answers from the cache, and only reads the version file when there is
+    ///     nothing recent to answer with. A failure stays silent, since nobody asked for it.
+    /// </summary>
+    private async Task<NativeResponse?> StatusAsync(NativeContext context) =>
+        context.Reply("app.updateStatus.result", await ResolveAsync(force: false));
+
+    /// <summary>The check the user asked for: always reads the version file, and reports a failure.</summary>
+    private async Task<NativeResponse?> CheckAsync(NativeContext context) =>
+        await ResolveAsync(force: true) is { } result
+            ? context.Reply("app.checkUpdate.result", result)
+            : context.Fail("app.checkUpdate.result", "error.updateCheckFailed");
+
+    /// <summary>The fresh or cached answer, or null when the version file cannot be read.</summary>
+    private async Task<UpdateCheckPayload?> ResolveAsync(bool force)
+    {
+        await _gate.WaitAsync();
+        try
         {
-            Log.Warning(exception, "Failed to check for a newer version");
-            return context.Fail("app.checkUpdate.result",
-                exception is TaskCanceledException ? "error.timeout" : "error.updateCheckFailed");
+            if (!force && _cached is { } cached && DateTime.UtcNow - _cachedAt < CacheLifetime)
+                return cached;
+
+            var published = await Try.Run(ReadPublishedVersionAsync);
+
+            if (published.Exception is { } exception)
+            {
+                Log.Warning(exception, "Failed to check for a newer version");
+                return null;
+            }
+
+            if (published.Value is not { Length: > 0 } latest)
+                return null;
+
+            var current = AppInfoService.Version;
+            _cachedAt = DateTime.UtcNow;
+            _cached = new UpdateCheckPayload(current, latest, IsNewer(latest, current));
+
+            // A check the user started elsewhere updates the dot in the sidebar as well.
+            WindowManager.Instance.NotifyMainWindow("app.update", _cached);
+            return _cached;
         }
-
-        if (published.Value is not { Length: > 0 } latest)
-            return context.Fail("app.checkUpdate.result", "error.updateCheckFailed");
-
-        var current = AppInfoService.Version;
-        return context.Reply("app.checkUpdate.result",
-            new UpdateCheckPayload(current, latest, IsNewer(latest, current)));
+        finally
+        {
+            _gate.Release();
+        }
     }
 
     /// <summary>Reads the version file and keeps its first non-empty line, which is the version.</summary>

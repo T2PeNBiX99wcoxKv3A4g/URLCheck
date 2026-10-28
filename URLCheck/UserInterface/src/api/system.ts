@@ -115,9 +115,22 @@ export interface UpdateCheck {
     available: boolean;
 }
 
+/** Where the newest release can be downloaded from. */
+export const RELEASES_URL = "https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/releases/latest";
+
 /**
- * Compares this build with the version file the release workflow publishes. It is a plain download
- * from the repository, so checking never runs into the GitHub API rate limit.
+ * The update state, checked automatically on first use and then cached by the backend. Null while it
+ * is unknown, which is also what a failed check reports: nobody asked for it, so nothing is shown.
+ */
+export async function getUpdateStatus(): Promise<UpdateCheck | null> {
+    if (!Native.available) return null;
+
+    return (await Native.request<UpdateCheck | null>("app.updateStatus")) ?? null;
+}
+
+/**
+ * Compares this build with the version file the release workflow publishes, ignoring the cache. It is
+ * a plain download from the repository, so checking never runs into the GitHub API rate limit.
  */
 export async function checkForUpdates(): Promise<UpdateCheck> {
     if (!Native.available) return {current: "dev", latest: "dev", available: false};
