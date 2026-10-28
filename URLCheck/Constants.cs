@@ -28,4 +28,19 @@ public static class Constants
     ///     access, so it must not be captured before <see cref="Logging.Initialize" /> has run.
     /// </summary>
     internal static ILogger Logger => Log.Logger.ForContext("SourceContext", "Core");
+
+    /// <summary>
+    ///     A directory we own, used as the host's content root. The static server creates a <c>wwwroot</c>
+    ///     web root under it when missing, which without this would land next to the executable.
+    /// </summary>
+    internal static string DataDirectory
+    {
+        get
+        {
+            var path = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Name);
+            Directory.CreateDirectory(path);
+            return path;
+        }
+    }
 }
