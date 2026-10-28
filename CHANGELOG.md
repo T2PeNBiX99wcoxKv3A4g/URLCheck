@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.12.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.11.0..v0.12.0) - 2026-10-28
+
+### ⛰️  Features
+
+- Publish an MSI installer and a Fedora RPM - ([bb5cebd](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/bb5cebd088105268bd6f3f177e5fc654947dcc2c))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([2768600](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/27686008a24be3b5240abb68f46cdbdfe3b282ea))
+
+
 ## [0.11.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.10.4..v0.11.0) - 2026-10-28
 
 ### ⛰️  Features
