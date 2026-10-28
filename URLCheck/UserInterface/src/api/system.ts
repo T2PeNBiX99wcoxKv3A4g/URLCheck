@@ -1,4 +1,4 @@
-import {Native} from "../Native";
+import {Native} from "@photino-net-utils/bridge";
 
 /** Simulates a link click: asks the backend to open (or navigate) the inspection popup. */
 export async function showPopup(url: string): Promise<void> {

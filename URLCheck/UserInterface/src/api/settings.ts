@@ -1,4 +1,4 @@
-import {Native} from "../Native";
+import {Native} from "@photino-net-utils/bridge";
 import type {AppSettings} from "../types";
 
 export const DEFAULT_SETTINGS: AppSettings = {

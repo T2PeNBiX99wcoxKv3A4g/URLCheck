@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Services;
-using URLCheck.Utils;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Forward;
 

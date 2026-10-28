@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Text.Json;
 using JetBrains.Annotations;
-using URLCheck.Extensions;
+using PhotinoNetUtils.Extensions;
 using URLCheck.Messaging;
-using URLCheck.Utils;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Services;
 

@@ -9,7 +9,7 @@ import {closePopup, resizePopup} from "../api/system";
 import {loadFilterRules} from "../api/filters";
 import {type CompiledRules, compileRules, stripTrackingParams, trackingParamKeys} from "../data/filterRules";
 import {useTranslation} from "../i18n";
-import {Native} from "../Native";
+import {Native} from "@photino-net-utils/bridge";
 import {
     AlertTriangleIcon,
     CheckCircleIcon,

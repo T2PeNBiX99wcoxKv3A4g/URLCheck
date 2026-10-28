@@ -1,4 +1,4 @@
-import {Native} from "../Native";
+import {Native} from "@photino-net-utils/bridge";
 import type {HistoryItem} from "../types";
 
 /** Lists the intercepted URLs, newest first. */

@@ -1,8 +1,8 @@
 using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
-using URLCheck.Extensions;
+using PhotinoNetUtils.Extensions;
 using URLCheck.Messaging;
-using URLCheck.Utils;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Services;
 

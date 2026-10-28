@@ -4,10 +4,10 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
-using URLCheck.Extensions;
+using PhotinoNetUtils.Extensions;
 using URLCheck.Messaging;
 using URLCheck.Models;
-using URLCheck.Utils;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Filters;
 

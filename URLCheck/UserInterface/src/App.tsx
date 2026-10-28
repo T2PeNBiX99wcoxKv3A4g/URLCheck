@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import styled from "styled-components";
 import {DEFAULT_TAB, findTab, type TabType} from "./tabs";
-import {Native} from "./Native";
+import {Native} from "@photino-net-utils/bridge";
 import {NavigationContext} from "./navigation";
 import {Sidebar} from "./components/Sidebar";
 import {Header} from "./components/Header";

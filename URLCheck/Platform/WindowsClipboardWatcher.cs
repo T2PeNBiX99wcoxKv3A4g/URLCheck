@@ -1,8 +1,8 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using URLCheck.Extensions;
-using URLCheck.Interop;
-using URLCheck.Utils;
+using PhotinoNetUtils.Extensions;
+using PhotinoNetUtils.Interop;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Platform;
 

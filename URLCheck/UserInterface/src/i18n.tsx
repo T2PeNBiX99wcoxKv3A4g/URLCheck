@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import {loadStrings} from "./api/i18n";
-import {Native} from "./Native";
+import {Native} from "@photino-net-utils/bridge";
 
 export type Translate = (key: string, params?: Record<string, string | number>) => string;
 

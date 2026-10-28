@@ -1,6 +1,6 @@
 using Org.BouncyCastle.Crypto.Parameters;
-using URLCheck.Extensions;
-using URLCheck.Utils;
+using PhotinoNetUtils.Extensions;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Forward;
 

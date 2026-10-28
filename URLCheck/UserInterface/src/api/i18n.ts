@@ -1,4 +1,4 @@
-import {Native} from "../Native";
+import {Native} from "@photino-net-utils/bridge";
 
 export interface I18nPayload {
     locale: string;

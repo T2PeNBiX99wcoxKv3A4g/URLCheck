@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Photino.NET;
 using Serilog;
-using URLCheck.Extensions;
-using URLCheck.Utils;
+using PhotinoNetUtils.Extensions;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Messaging;
 

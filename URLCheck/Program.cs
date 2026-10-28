@@ -2,10 +2,14 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 using JetBrains.Annotations;
 using Serilog;
+using PhotinoNetUtils;
+using PhotinoNetUtils.Hosting;
+using PhotinoNetUtils.Interop;
+using PhotinoNetUtils.Platform;
+using PhotinoNetUtils.Services;
 using URLCheck.Filters;
 using URLCheck.Forward;
 using URLCheck.Inspect;
-using URLCheck.Interop;
 using URLCheck.Platform;
 using URLCheck.Services;
 
@@ -40,7 +44,7 @@ internal static class Program
 
         // Main must stay synchronous: [STAThread] is ignored for an async entry point, and the
         // Photino message loop / WebView2 require an STA thread.
-        Logging.Initialize();
+        Logging.Initialize(Constants.Name, "urlcheck");
 
         if (OperatingSystem.IsLinux())
         {
@@ -63,7 +67,7 @@ internal static class Program
                           OperatingSystem.IsLinux() && LinuxDiagnostics.AppIndicatorLibrary is not null;
 
             // Only one instance may run; later launches hand their URLs to it and exit.
-            using var singleInstance = SingleInstance.Instance;
+            using var singleInstance = new SingleInstance(Constants.Name);
             if (!singleInstance.IsFirstInstance)
             {
                 // Blocking here is fine: this process only forwards its args and exits.
@@ -76,7 +80,7 @@ internal static class Program
             // without racing for the default 8000. The content root is a folder we own, which keeps
             // the web root out of the executable's directory.
             using var staticServer = StaticServer.Start(DataDirectory);
-            var appUrl = staticServer.AppUrl;
+            var appUrl = $"{staticServer.BaseUrl}/index.html?v={AppInfoService.BuildToken}";
 #else
             const string appUrl = "http://127.0.0.1:3000";
 #endif
@@ -96,7 +100,7 @@ internal static class Program
 
             _ = LocalizationService.Instance;
             _ = HistoryService.Instance;
-            var iconPath = AppIcon.EnsureExtracted();
+            var iconPath = AppIcon.EnsureExtracted(typeof(Program).Assembly, Constants.Name);
             _ = AppInfoService.Instance;
             _ = BrowserService.Instance;
             _ = ProtocolRegistrationService.Instance;
@@ -167,37 +171,28 @@ internal static class Program
     private static void StartLinuxTrayWhenReady(ITrayIcon tray) =>
         _ = Task.Run(async () =>
         {
-            for (var attempt = 0; attempt < 100 && !LinuxTrayIcon.IsToolkitReady; attempt++)
+            for (var attempt = 0; attempt < 100 && !TrayIconFactory.IsToolkitReady; attempt++)
                 await Task.Delay(100);
 
             WindowManager.Instance.RunOnMainWindow(() => { WindowManager.Instance.CloseToTray = tray.Start(); });
         });
 
-    /// <summary>The tray icon, or a no-op stand-in on platforms that have none.</summary>
+    /// <summary>The platform's tray icon, or a no-op stand-in when there is none.</summary>
     private static ITrayIcon CreateTray(string? iconPath)
     {
         var localization = LocalizationService.Instance;
         var manager = WindowManager.Instance;
 
-        if (OperatingSystem.IsWindows())
-            return new WindowsTrayIcon(
-                Constants.WindowTitle,
-                iconPath,
-                localization.Get,
-                () => manager.ShowMainWindow(),
-                () => manager.ShowMainWindow("settings"),
-                manager.Exit);
-
-        if (OperatingSystem.IsLinux() && LinuxDiagnostics.AppIndicatorLibrary is not null)
-            return new LinuxTrayIcon(
-                Constants.WindowTitle,
-                iconPath,
-                localization.Get,
-                () => manager.ShowMainWindow(),
-                () => manager.ShowMainWindow("settings"),
-                manager.Exit);
-
-        return new NullTrayIcon();
+        return TrayIconFactory.Create(
+            Constants.Name,
+            Constants.WindowTitle,
+            iconPath,
+            () => manager.ShowMainWindow(),
+            [
+                new TrayMenuItem(localization.Get("tray.open"), () => manager.ShowMainWindow()),
+                new TrayMenuItem(localization.Get("tray.settings"), () => manager.ShowMainWindow("settings")),
+                new TrayMenuItem(localization.Get("tray.exit"), manager.Exit, SeparatorBefore: true)
+            ]);
     }
 
     /// <summary>Pulls the http/https/urlcheck URLs out of a raw argument list.</summary>

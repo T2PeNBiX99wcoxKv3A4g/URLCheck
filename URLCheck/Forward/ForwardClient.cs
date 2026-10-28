@@ -2,10 +2,10 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using URLCheck.Extensions;
+using PhotinoNetUtils.Extensions;
 using URLCheck.Messaging;
 using URLCheck.Models;
-using URLCheck.Utils;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Forward;
 

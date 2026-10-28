@@ -6,7 +6,7 @@ import {Dropdown} from "../components/Dropdown";
 import {useLocale, useTranslation} from "../i18n";
 import {loadStrings} from "../api/i18n";
 import {AppSettings, BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
-import {Native} from "../Native";
+import {Native} from "@photino-net-utils/bridge";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
 import {

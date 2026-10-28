@@ -1,13 +1,13 @@
 using System.Drawing;
 using JetBrains.Annotations;
 using Photino.NET;
-using URLCheck.Extensions;
+using PhotinoNetUtils.Extensions;
 using URLCheck.Filters;
 using URLCheck.Inspect;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Platform;
-using URLCheck.Utils;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Services;
 

@@ -1,7 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using URLCheck.Extensions;
-using URLCheck.Utils;
+using PhotinoNetUtils;
+using PhotinoNetUtils.Extensions;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Platform;
 
@@ -104,7 +105,7 @@ internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>
 
         // On Wayland the compositor takes a window's icon from the desktop entry matched to its app id,
         // so this is what decides the title bar and taskbar icon. An absolute path is allowed here.
-        var icon = AppIcon.EnsureExtracted() ?? "web-browser";
+        var icon = AppIcon.EnsureExtracted(typeof(LinuxProtocolRegistrar).Assembly, Constants.Name) ?? "web-browser";
 
         var content = $"""
                        [Desktop Entry]

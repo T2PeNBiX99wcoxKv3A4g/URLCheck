@@ -1,7 +1,7 @@
 using System.Runtime.Versioning;
-using URLCheck.Extensions;
+using PhotinoNetUtils.Extensions;
 using URLCheck.Models;
-using URLCheck.Utils;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Platform;
 

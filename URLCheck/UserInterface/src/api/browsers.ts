@@ -1,4 +1,4 @@
-import {Native} from "../Native";
+import {Native} from "@photino-net-utils/bridge";
 import type {BrowserEntry} from "../types";
 
 /** Asks the C# backend to enumerate installed browsers from the Windows registry. */

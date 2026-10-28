@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using URLCheck.Messaging;
 using URLCheck.Platform;
-using URLCheck.Utils;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Services;
 

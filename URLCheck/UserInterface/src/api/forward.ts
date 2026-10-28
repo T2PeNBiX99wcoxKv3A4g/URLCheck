@@ -1,4 +1,4 @@
-import {Native} from "../Native";
+import {Native} from "@photino-net-utils/bridge";
 import type {DeviceEntry} from "../types";
 
 export interface ForwardInfo {

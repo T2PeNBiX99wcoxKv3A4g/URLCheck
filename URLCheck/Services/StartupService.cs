@@ -1,9 +1,10 @@
 using System.Runtime.Versioning;
 using JetBrains.Annotations;
-using URLCheck.Extensions;
+using PhotinoNetUtils;
+using PhotinoNetUtils.Extensions;
 using URLCheck.Messaging;
 using URLCheck.Platform;
-using URLCheck.Utils;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Services;
 
@@ -104,7 +105,7 @@ internal sealed class StartupService : Singleton<StartupService>
         // Mirrors the desktop entry the protocol registrar writes: without an icon the session's
         // autostart list shows a blank entry, and without the app id the window is not associated with
         // that icon once it is up.
-        var icon = AppIcon.EnsureExtracted() ?? "web-browser";
+        var icon = AppIcon.EnsureExtracted(typeof(StartupService).Assembly, Constants.Name) ?? "web-browser";
 
         // Built line by line rather than as one raw string, so that no source indentation can leak into
         // the file, and written without a BOM: Encoding.UTF8 would prepend one, hiding the

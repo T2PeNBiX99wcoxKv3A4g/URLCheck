@@ -7,8 +7,8 @@ using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
-using URLCheck.Extensions;
-using URLCheck.Utils;
+using PhotinoNetUtils.Extensions;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Forward;
 

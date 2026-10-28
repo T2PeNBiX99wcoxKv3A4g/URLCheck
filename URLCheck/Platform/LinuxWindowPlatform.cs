@@ -1,7 +1,8 @@
 using System.Drawing;
 using System.Runtime.Versioning;
 using Photino.NET;
-using URLCheck.Utils;
+using PhotinoNetUtils.Platform;
+using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Platform;
 

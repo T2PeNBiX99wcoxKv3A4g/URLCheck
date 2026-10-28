@@ -11,6 +11,7 @@
     "upgrade": "node -e \"require('fs').rmSync('package-lock.json',{force:true})\" && npm-check-updates -u"
   },
   "dependencies": {
+    "@photino-net-utils/bridge": "file:../../../PhotinoNETUtils/UserInterface",
     "react": "^19",
     "react-dom": "^19",
     "styled-components": "^6.6.0"
