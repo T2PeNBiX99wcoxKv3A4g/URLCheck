@@ -94,11 +94,35 @@ export function resizePopup(height: number): void {
     Native.send({type: "popup.resize", payload: {height: Math.round(height)}});
 }
 
-/** Reads the app version declared in the csproj, plus the host platform id. */
-export async function getAppInfo(): Promise<{ version: string; platform: string }> {
-    if (!Native.available) return {version: "dev", platform: "windows"};
+/** Reads the app version declared in the csproj, plus the host platform id and where logs live. */
+export async function getAppInfo(): Promise<{ version: string; platform: string; logDirectory: string }> {
+    if (!Native.available) return {version: "dev", platform: "windows", logDirectory: ""};
 
-    return await Native.request<{ version: string; platform: string }>("app.info");
+    return await Native.request<{ version: string; platform: string; logDirectory: string }>("app.info");
+}
+
+/** Opens the folder the app writes its log files to, in the desktop's file manager. */
+export async function openLogsFolder(): Promise<void> {
+    if (!Native.available) return;
+
+    await Native.request("app.openLogs");
+}
+
+/** Body of `app.checkUpdate`: the running version, the published one, and whether it is newer. */
+export interface UpdateCheck {
+    current: string;
+    latest: string;
+    available: boolean;
+}
+
+/**
+ * Compares this build with the version file the release workflow publishes. It is a plain download
+ * from the repository, so checking never runs into the GitHub API rate limit.
+ */
+export async function checkForUpdates(): Promise<UpdateCheck> {
+    if (!Native.available) return {current: "dev", latest: "dev", available: false};
+
+    return await Native.request<UpdateCheck>("app.checkUpdate");
 }
 
 /**

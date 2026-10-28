@@ -8,7 +8,7 @@ import {loadStrings} from "../api/i18n";
 import {AppSettings, BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
 import {Native} from "@photino-net-utils/bridge";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
-import {detectBrowsers} from "../api/browsers";
+import {detectBrowsers, openWithBrowser} from "../api/browsers";
 import {
   addDeviceAddress,
   type DevicePresence,
@@ -36,10 +36,13 @@ import {
 } from "../api/filters";
 import {FILTER_CATALOG} from "../data/filterCatalog";
 import {
+  checkForUpdates,
   getAppInfo,
   openDefaultAppsSettings,
+  openLogsFolder,
   protocolStatus,
   type ProtocolStatus,
+  type UpdateCheck,
   registerCustomScheme,
   registerProtocols,
   setStartup,
@@ -47,6 +50,9 @@ import {
   type StartupStatus,
   unregisterProtocols
 } from "../api/system";
+
+/* Where the newest release can be downloaded from, once a check says there is one. */
+const RELEASES_URL = "https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/releases/latest";
 
 /* Loaded on demand: the licence texts are far too large to sit in the main bundle. */
 const AttributionPage = React.lazy(() =>
@@ -803,6 +809,12 @@ export const SettingsPage: React.FC = () => {
   } | null>(null);
   const [protocols, setProtocols] = useState<ProtocolStatus | null>(null);
   const [platform, setPlatform] = useState("windows");
+  /** The running build's version and the folder it writes logs to. */
+  const [appVersion, setAppVersion] = useState("");
+  const [logDirectory, setLogDirectory] = useState("");
+  /** Result of the last update check, and whether one is running. */
+  const [updateResult, setUpdateResult] = useState<UpdateCheck | null>(null);
+  const [updateBusy, setUpdateBusy] = useState(false);
   const [filterLists, setFilterLists] = useState<FilterListEntry[]>([]);
   const [builtinRuleCount, setBuiltinRuleCount] = useState(0);
   const [filtersBusy, setFiltersBusy] = useState(false);
@@ -877,7 +889,13 @@ export const SettingsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    getAppInfo().then((info) => setPlatform(info.platform)).catch(() => undefined);
+    getAppInfo()
+        .then((info) => {
+          setPlatform(info.platform);
+          setAppVersion(info.version);
+          setLogDirectory(info.logDirectory);
+        })
+        .catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -1146,6 +1164,38 @@ export const SettingsPage: React.FC = () => {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setIntegrationBusy(false);
+    }
+  };
+
+  /** Opens the folder the backend writes its logs to, ready to attach to a bug report. */
+  const handleOpenLogs = async () => {
+    try {
+      await openLogsFolder();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  /** Reads the published version file and compares it with this build. */
+  const handleCheckUpdate = async () => {
+    setUpdateBusy(true);
+    setUpdateResult(null);
+    setError(null);
+    try {
+      setUpdateResult(await checkForUpdates());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setUpdateBusy(false);
+    }
+  };
+
+  /** Opens the release page of the newer version in the configured browser. */
+  const handleOpenRelease = async () => {
+    try {
+      await openWithBrowser(RELEASES_URL);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
     }
   };
 
@@ -1840,6 +1890,47 @@ export const SettingsPage: React.FC = () => {
                 onChange={(event) => update({hideOnLaunch: event.target.checked})}
             />
           </SettingRow>
+        </StackCard>
+
+        <StackCard>
+          <SectionTitle>{t("settings.about")}</SectionTitle>
+
+          <SettingInfo>
+            <SettingDescription>
+              {t("settings.aboutDescription", {version: appVersion || "…"})}
+            </SettingDescription>
+          </SettingInfo>
+
+          <ButtonRow>
+            <GhostButton type="button" disabled={updateBusy} onClick={handleCheckUpdate}>
+              {updateBusy ? t("settings.updateChecking") : t("settings.checkUpdates")}
+            </GhostButton>
+            {updateResult?.available && (
+                <GhostButton type="button" onClick={handleOpenRelease}>
+                  {t("settings.openRelease")}
+                </GhostButton>
+            )}
+            <GhostButton type="button" onClick={handleOpenLogs}>
+              {t("settings.openLogs")}
+            </GhostButton>
+          </ButtonRow>
+
+          {updateResult &&
+              (updateResult.available ? (
+                  <WarnText>
+                    <AlertTriangleIcon size={14}/>
+                    <span>{t("settings.updateAvailable", {version: updateResult.latest})}</span>
+                  </WarnText>
+              ) : (
+                  <InfoText>{t("settings.updateCurrent", {version: updateResult.current})}</InfoText>
+              ))}
+
+          {logDirectory && (
+              <FileInfo>
+                <span>{t("settings.logsLocation")}</span>
+                <code>{logDirectory}</code>
+              </FileInfo>
+          )}
         </StackCard>
 
         <ActionRow>

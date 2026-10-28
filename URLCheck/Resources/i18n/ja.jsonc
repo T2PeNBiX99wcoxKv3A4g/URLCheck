@@ -146,6 +146,15 @@
   "settings.forwardIncomingDescription": "{name} がこのデバイスとペアリングしようとしています。",
   "settings.forwardReject": "拒否",
   "settings.forwardAccept": "承認",
+  "settings.about": "情報",
+  "settings.aboutDescription": "URLCheck {version}。ここで新しいリリースを確認でき、不具合報告用のログフォルダーも開けます。",
+  "settings.checkUpdates": "アップデートを確認",
+  "settings.updateChecking": "確認中...",
+  "settings.updateCurrent": "最新です: {version} が最新バージョンです。",
+  "settings.updateAvailable": "バージョン {version} が利用可能です。",
+  "settings.openRelease": "リリースページを開く",
+  "settings.openLogs": "ログフォルダーを開く",
+  "settings.logsLocation": "ログファイルの保存先:",
   "settings.save": "設定を保存",
   "settings.saving": "保存中...",
   "settings.loading": "読み込み中...",
@@ -221,5 +230,7 @@
   "error.forwardUnpaired": "このデバイスは相手とペアリングされていません。もう一度ペアリングしてください。",
   "error.forwardPairRejected": "ペアリングが拒否されたか、コードが一致しませんでした。",
   "error.forwardBusy": "別のペアリング要求がすでに確認待ちです。",
-  "error.invalidAddress": "有効なアドレスではありません。"
+  "error.invalidAddress": "有効なアドレスではありません。",
+  "error.updateCheckFailed": "公開されているバージョンを読み取れませんでした。",
+  "error.openLogsFailed": "ログフォルダーを開けませんでした。"
 }

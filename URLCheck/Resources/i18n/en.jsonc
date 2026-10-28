@@ -151,6 +151,15 @@
   "settings.forwardIncomingDescription": "{name} wants to pair with this device.",
   "settings.forwardReject": "Reject",
   "settings.forwardAccept": "Accept",
+  "settings.about": "About",
+  "settings.aboutDescription": "URLCheck {version}. Check for a newer release here, or open the log folder when reporting a problem.",
+  "settings.checkUpdates": "Check for updates",
+  "settings.updateChecking": "Checking...",
+  "settings.updateCurrent": "Up to date: {version} is the newest version.",
+  "settings.updateAvailable": "Version {version} is available.",
+  "settings.openRelease": "Open release page",
+  "settings.openLogs": "Open log folder",
+  "settings.logsLocation": "Log files are written to:",
   "settings.save": "Save Settings",
   "settings.saving": "Saving...",
   "settings.loading": "Loading...",
@@ -229,5 +238,7 @@
   "error.forwardUnpaired": "This device is not paired with the target; pair it again.",
   "error.forwardPairRejected": "The pairing was rejected, or the codes did not match.",
   "error.forwardBusy": "Another pairing request is already waiting for confirmation.",
-  "error.invalidAddress": "That is not a valid address."
+  "error.invalidAddress": "That is not a valid address.",
+  "error.updateCheckFailed": "Could not read the published version.",
+  "error.openLogsFailed": "Could not open the log folder."
 }

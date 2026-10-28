@@ -31,8 +31,14 @@ internal sealed record ProtocolStatusPayload(
 /// <summary>Body for <c>browsers.detect</c>.</summary>
 internal sealed record BrowsersPayload(IReadOnlyList<BrowserEntry> Browsers);
 
-/// <summary>Body for <c>app.info</c>.</summary>
-internal sealed record AppInfoPayload(string Version, string Platform);
+/// <summary>Body for <c>app.info</c>: the build version, the platform id and where the logs live.</summary>
+internal sealed record AppInfoPayload(string Version, string Platform, string LogDirectory);
+
+/// <summary>
+///     Body for <c>app.checkUpdate</c>: the running version, the published one, and whether the
+///     published one is actually newer.
+/// </summary>
+internal sealed record UpdateCheckPayload(string Current, string Latest, bool Available);
 
 /// <summary>
 ///     Body for the <c>app.startup</c> messages. The state lives in the Startup folder, so it is

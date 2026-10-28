@@ -146,6 +146,15 @@
   "settings.forwardIncomingDescription": "{name} 想与本机配对。",
   "settings.forwardReject": "拒绝",
   "settings.forwardAccept": "接受",
+  "settings.about": "关于",
+  "settings.aboutDescription": "URLCheck {version}。可以在这里检查新版本，或在反馈问题时打开日志文件夹。",
+  "settings.checkUpdates": "检查更新",
+  "settings.updateChecking": "检查中...",
+  "settings.updateCurrent": "已是最新：{version} 是最新版本。",
+  "settings.updateAvailable": "有新版本 {version} 可用。",
+  "settings.openRelease": "打开发布页面",
+  "settings.openLogs": "打开日志文件夹",
+  "settings.logsLocation": "日志文件位置：",
   "settings.save": "保存设置",
   "settings.saving": "保存中...",
   "settings.loading": "加载中...",
@@ -221,5 +230,7 @@
   "error.forwardUnpaired": "本机尚未与目标设备配对，请重新配对。",
   "error.forwardPairRejected": "配对被拒绝，或验证码不一致。",
   "error.forwardBusy": "已有另一个配对请求正在等待确认。",
-  "error.invalidAddress": "这不是有效的地址。"
+  "error.invalidAddress": "这不是有效的地址。",
+  "error.updateCheckFailed": "无法读取已发布的版本。",
+  "error.openLogsFailed": "无法打开日志文件夹。"
 }

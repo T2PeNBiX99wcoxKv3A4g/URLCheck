@@ -85,6 +85,7 @@ internal static class Program
             _ = HistoryService.Instance;
             var iconPath = AppIcon.EnsureExtracted(typeof(Program).Assembly, Constants.Name);
             _ = AppInfoService.Instance;
+            _ = UpdateService.Instance;
             _ = BrowserService.Instance;
             _ = ProtocolRegistrationService.Instance;
             _ = StartupService.Instance;

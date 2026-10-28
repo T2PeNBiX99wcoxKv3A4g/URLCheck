@@ -30,6 +30,24 @@ public static class Constants
     internal static ILogger Logger => Log.Logger.ForContext("SourceContext", "Core");
 
     /// <summary>
+    ///     Where the rolling log files are written. The logging library owns the exact location, so the
+    ///     conventional folder is only a fallback: the one that really holds log files wins.
+    /// </summary>
+    internal static string LogDirectory
+    {
+        get
+        {
+            string[] candidates =
+            [
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Name, "logs"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Name, "logs")
+            ];
+
+            return candidates.FirstOrDefault(Directory.Exists) ?? candidates[0];
+        }
+    }
+
+    /// <summary>
     ///     A directory we own, used as the host's content root. The static server creates a <c>wwwroot</c>
     ///     web root under it when missing, which without this would land next to the executable.
     /// </summary>

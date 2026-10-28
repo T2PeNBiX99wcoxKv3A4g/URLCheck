@@ -146,6 +146,15 @@
   "settings.forwardIncomingDescription": "{name} 想與本機配對。",
   "settings.forwardReject": "拒絕",
   "settings.forwardAccept": "接受",
+  "settings.about": "關於",
+  "settings.aboutDescription": "URLCheck {version}。可以在這裡檢查新版本，或在回報問題時開啟日誌資料夾。",
+  "settings.checkUpdates": "檢查更新",
+  "settings.updateChecking": "檢查中...",
+  "settings.updateCurrent": "已是最新：{version} 是最新版本。",
+  "settings.updateAvailable": "有新版本 {version} 可用。",
+  "settings.openRelease": "開啟發行頁面",
+  "settings.openLogs": "開啟日誌資料夾",
+  "settings.logsLocation": "日誌檔案位置：",
   "settings.save": "儲存設定",
   "settings.saving": "儲存中...",
   "settings.loading": "載入中...",
@@ -221,5 +230,7 @@
   "error.forwardUnpaired": "本機尚未與目標裝置配對，請重新配對。",
   "error.forwardPairRejected": "配對被拒絕，或驗證碼不一致。",
   "error.forwardBusy": "已有另一個配對請求正在等待確認。",
-  "error.invalidAddress": "這不是有效的位址。"
+  "error.invalidAddress": "這不是有效的位址。",
+  "error.updateCheckFailed": "無法讀取已發佈的版本。",
+  "error.openLogsFailed": "無法開啟日誌資料夾。"
 }
