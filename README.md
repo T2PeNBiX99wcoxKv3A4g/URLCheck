@@ -117,8 +117,8 @@ has no tray and keeps its main window visible instead.
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/) 20 or newer, to build the interface
-- The sibling [PhotinoNETUtils](../PhotinoNETUtils) project — clone it next to this repository; the
-  shared tray, static server, single-instance and helper code lives there
+- The shared DLL and front-end bridge package in `URLCheck/libs`, copied from the separate
+  [PhotinoNETUtils](../PhotinoNETUtils) project with its `build-and-copy.ps1`
 
 ## Build and run
 
