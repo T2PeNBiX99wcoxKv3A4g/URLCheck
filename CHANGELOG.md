@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.12.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.12.1..v0.12.2) - 2026-10-28
+
+### ⚙️ Miscellaneous Tasks
+
+- Update PhotinoNETUtils.dll and @photino-net-utils/bridge to v0.2.1 in URLCheck - ([0e4c6a2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0e4c6a295f1a408a1f1ace09ab5300a7c8241b0c))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([feb81c4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/feb81c469545ee8cef655b177eb5d97f6eb1253f))
+
+
 ## [0.12.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.12.0..v0.12.1) - 2026-10-28
 
 ### 🐛 Bug Fixes
