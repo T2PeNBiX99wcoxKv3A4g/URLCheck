@@ -26,4 +26,6 @@ jobs:
       filename: 'URLCheck'
       runtimes: '["win-x64", "linux-x64"]'
       version_file_path: './URLCheck/URLCheck.csproj'
+      msi_script: 'installer/windows/build-msi.ps1'
+      rpm_script: 'installer/linux/build-rpm.sh'
     secrets: inherit

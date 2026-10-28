@@ -63,6 +63,13 @@ desktop version.
 The published builds are **self-contained** — they bundle the .NET runtime, so nothing needs to be
 installed for them. What the operating system still has to provide:
 
+Two package formats are published beside the plain archives:
+
+| File                                 | What it does                                                                        |
+|--------------------------------------|-------------------------------------------------------------------------------------|
+| `URLCheck-<version>-win-x64.msi`     | Per-user Windows installer: installs into `%LOCALAPPDATA%\Programs\URLCheck`, adds a Start menu entry and a desktop shortcut, and never asks for administrator rights. |
+| `urlcheck-<version>-1.fcXX.x86_64.rpm` | Fedora package for the same build: `sudo dnf install ./urlcheck-<version>-*.rpm`. It installs to `/opt/URLCheck` with a `urlcheck` command, a desktop entry and the icon. |
+
 ### Windows
 
 1. The Microsoft Edge **WebView2 Runtime**. If you are not using Windows 11, you need it.

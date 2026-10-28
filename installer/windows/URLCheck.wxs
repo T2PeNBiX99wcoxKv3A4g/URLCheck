@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Per-user installer: URLCheck keeps its settings and its http/https registration under HKCU and
+    %APPDATA%, so it never needs elevation and never writes to a location another user shares.
+
+    The published build is a single executable, so the package is one component plus the shortcuts.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="URLCheck"
+             Manufacturer="yukiyosanako"
+             Version="$(var.Version)"
+             UpgradeCode="6f3e6f4c-8f0a-4d67-9d5f-1a2b3c4d5e6f"
+             Scope="perUser"
+             Compressed="yes"
+             InstallerVersion="500">
+
+        <SummaryInformation Description="URLCheck URL intermediary" Manufacturer="yukiyosanako" />
+
+        <!--
+            Force the per-user context even when the MSI is started from an elevated shell: the app
+            lives in %LOCALAPPDATA% and registers itself under HKCU, so a per-machine copy would be
+            shared by every user and none of them could use it properly.
+        -->
+        <Property Id="ALLUSERS" Value="2" />
+        <Property Id="MSIINSTALLPERUSER" Value="1" />
+
+        <!-- A reinstall of the same version replaces the files instead of failing. -->
+        <MajorUpgrade AllowSameVersionUpgrades="yes"
+                      DowngradeErrorMessage="A newer version of URLCheck is already installed." />
+
+        <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+        <Icon Id="AppIcon.ico" SourceFile="$(var.IconPath)" />
+        <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
+        <Property Id="ARPHELPLINK" Value="https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck" />
+        <Property Id="ARPNOMODIFY" Value="1" />
+
+        <Feature Id="Main" Title="URLCheck" Level="1">
+            <ComponentGroupRef Id="ApplicationFiles" />
+        </Feature>
+    </Package>
+
+    <Fragment>
+        <!-- Same place per-user installers normally use, so no elevation is involved. -->
+        <StandardDirectory Id="LocalAppDataFolder">
+            <Directory Id="ProgramsFolder" Name="Programs">
+                <Directory Id="INSTALLFOLDER" Name="URLCheck" />
+            </Directory>
+        </StandardDirectory>
+
+        <StandardDirectory Id="ProgramMenuFolder">
+            <Directory Id="AppMenuFolder" Name="URLCheck" />
+        </StandardDirectory>
+
+        <StandardDirectory Id="DesktopFolder" />
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ApplicationFiles">
+            <Component Id="Application" Directory="INSTALLFOLDER" Guid="*">
+                <File Id="URLCheckExe" Source="$(var.SourceDir)\URLCheck.exe" KeyPath="yes">
+                    <Shortcut Id="StartMenuShortcut" Directory="AppMenuFolder" Name="URLCheck"
+                              Description="URLCheck URL intermediary" />
+                    <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="URLCheck"
+                              Description="URLCheck URL intermediary" />
+                </File>
+                <RemoveFolder Id="RemoveInstallFolder" On="uninstall" />
+                <RemoveFolder Id="RemoveAppMenuFolder" Directory="AppMenuFolder" On="uninstall" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

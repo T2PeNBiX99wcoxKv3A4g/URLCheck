@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=URLCheck
+GenericName=Link Intermediary
+Comment=Inspect and clean a link before opening it
+Exec=/opt/URLCheck/URLCheck %u
+Icon=urlcheck
+Terminal=false
+StartupWMClass=urlcheck
+Categories=Network;WebBrowser;
+MimeType=x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/urlcheck;text/html;
