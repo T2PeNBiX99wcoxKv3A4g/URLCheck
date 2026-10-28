@@ -2,6 +2,7 @@ using System.Runtime.Versioning;
 using JetBrains.Annotations;
 using PhotinoNetUtils;
 using PhotinoNetUtils.Extensions;
+using PhotinoNetUtils.Platform;
 using URLCheck.Messaging;
 using URLCheck.Platform;
 using PhotinoNetUtils.Utils;

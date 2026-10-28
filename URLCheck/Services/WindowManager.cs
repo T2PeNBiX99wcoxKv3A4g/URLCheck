@@ -2,6 +2,7 @@ using System.Drawing;
 using JetBrains.Annotations;
 using Photino.NET;
 using PhotinoNetUtils.Extensions;
+using PhotinoNetUtils.Platform;
 using URLCheck.Filters;
 using URLCheck.Inspect;
 using URLCheck.Messaging;
@@ -244,7 +245,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
             // Photino drops a Start Menu shortcut for the toast registration and never revisits it,
             // so a build that moved would keep one pointing at the old copy.
             if (OperatingSystem.IsWindows())
-                StartMenuShortcut.Refresh();
+                StartMenuShortcut.Refresh(Constants.WindowTitle);
 
             // Starting hidden keeps the window minimised for now. Hiding a window while its web view
             // is still starting up leaves that web view permanently blank, so the window stays
