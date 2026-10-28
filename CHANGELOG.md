@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.11.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.10.4..v0.11.0) - 2026-10-28
+
+### ⛰️  Features
+
+- Check for updates automatically and mark them in the sidebar - ([252594b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/252594b6311db0192748a941ebe7affd8377b5f4))
+- Add an about section with update checks and the log folder - ([802968c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/802968cabe3a57d25dd13fcba4b88925bcf9ff6e))
+
+### 🐛 Bug Fixes
+
+- Let the Vite dev server serve the shared bridge - ([4b124c3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4b124c33d0bf4fd508719df890a6ecb57e602f72))
+
+### 🚜 Refactor
+
+- Move DataDirectory property to Constants for improved code organization - ([2bb47b5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2bb47b5cd37a313bcf58191e53eda87b694285c5))
+- Move shared Photino plumbing to PhotinoNETUtils - ([c944ad7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/c944ad733e216d3de35e2ef11b98e701c1c29464))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update PhotinoNETUtils.dll in URLCheck\Libs - ([7acf7a9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/7acf7a9e6ef20b7f4dcd7ec20dc247179cc8d389))
+- Inherit secrets in reusable workflow calls - ([b7e6f97](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b7e6f97a7b1d7520c55a4945f5ee18f5bf7bd982))
+- Update PhotinoNETUtils artifacts - ([8b8dc4f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8b8dc4f87867987724c64609523f14ed4906c781))
+- Update PhotinoNETUtils.dll in URLCheck\Libs - ([f64249e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f64249e30800cb69778c50adf5a693203ebb282f))
+- Update PhotinoNETUtils artifacts - ([dde838f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/dde838f7339aa6bff55978ae1c9be37b09f471fb))
+- Update PhotinoNETUtils artifacts - ([8b7a071](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8b7a07122a1ee9cfdbcfdfd800db5f4eb67e5e06))
+- Rename libs to Libs - ([a49cd54](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a49cd54b0946b7397d6c3e96a93102b594f8deca))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([87e6734](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/87e67344b97310f439734265228b63452dd568be))
+
+### Build
+
+- Consume PhotinoNETUtils from libs - ([ba59286](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ba5928677275135683269baf9acb3d607ae3ce5e))
+
+
 ## [0.10.4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.10.3..v0.10.4) - 2026-10-27
 
 ### ⚙️ Miscellaneous Tasks
