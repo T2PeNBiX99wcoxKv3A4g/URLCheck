@@ -58,10 +58,41 @@ internal sealed class BrowserService : Singleton<BrowserService>
     private static bool Starts(string name, params string[] prefixes) =>
         prefixes.Any(prefix => name.StartsWith(prefix, StringComparison.Ordinal));
 
+    /// <summary>
+    ///     Opens a URL with whatever the system has registered for http/https, instead of one of the
+    ///     configured browsers. When this app is the default handler the system starts it again, and
+    ///     the URL comes back as a forwarded argument that opens the inspection popup.
+    /// </summary>
+    public static void OpenWithDefaultHandler(string url) =>
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = OperatingSystem.IsWindows() ? url : "xdg-open",
+            Arguments = OperatingSystem.IsWindows() ? "" : $"\"{url}\"",
+            // ShellExecute is what makes Windows ask the shell for the default handler.
+            UseShellExecute = OperatingSystem.IsWindows()
+        });
+
     /// <summary>Handles the <c>browsers.*</c> messages.</summary>
-    private Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
-        context.Request.Type == "browsers.detect"
-            ? Task.FromResult<NativeResponse?>(context.Reply("browsers.detect.result",
-                new BrowsersPayload(_locator.Detect())))
-            : Task.FromResult<NativeResponse?>(null);
+    private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => Task.FromResult(
+        context.Request.Type switch
+        {
+            "browsers.detect" => context.Reply("browsers.detect.result", new BrowsersPayload(_locator.Detect())),
+            "browsers.openDefault" => OpenDefaultReply(context),
+            _ => null
+        });
+
+    private static NativeResponse OpenDefaultReply(NativeContext context)
+    {
+        if (context.Payload<OpenUrlRequest>() is not { Url.Length: > 0 } request ||
+            !Uri.TryCreate(request.Url, UriKind.Absolute, out var uri) ||
+            uri.Scheme is not ("http" or "https"))
+            return context.Fail("browsers.openDefault.result", "error.missingUrl");
+
+        var started = Try.Run(() => OpenWithDefaultHandler(uri.AbsoluteUri));
+        if (started.Exception is not { } exception)
+            return context.Reply("browsers.openDefault.result", new OkPayload());
+
+        Constants.Logger.Warning(exception, "Failed to open {Url} with the system handler", uri);
+        return context.Fail("browsers.openDefault.result", "error.openFailed");
+    }
 }

@@ -9,6 +9,9 @@ namespace URLCheck.Messaging;
 /// <summary>Body for a bare <c>{ "ok": true }</c> acknowledgement.</summary>
 internal sealed record OkPayload(bool Ok = true);
 
+/// <summary>Body for <c>browsers.openDefault</c>: the URL the system's handler should open.</summary>
+internal sealed record OpenUrlRequest(string Url);
+
 /// <summary>Body for <c>settings.addAutoRedirect</c>: the URL whose host should be added.</summary>
 internal sealed record AutoRedirectRequest(string Url);
 

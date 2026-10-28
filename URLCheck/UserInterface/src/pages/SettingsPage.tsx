@@ -8,7 +8,7 @@ import {loadStrings} from "../api/i18n";
 import {AppSettings, BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
 import {Native} from "@photino-net-utils/bridge";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
-import {detectBrowsers, openWithBrowser} from "../api/browsers";
+import {detectBrowsers, openWithDefaultHandler} from "../api/browsers";
 import {
   addDeviceAddress,
   type DevicePresence,
@@ -1192,10 +1192,10 @@ export const SettingsPage: React.FC = () => {
     }
   };
 
-  /** Opens the release page of the newer version in the configured browser. */
+  /** Hands the release page to the system's default handler, which may be this app itself. */
   const handleOpenRelease = async () => {
     try {
-      await openWithBrowser(RELEASES_URL);
+      await openWithDefaultHandler(RELEASES_URL);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }

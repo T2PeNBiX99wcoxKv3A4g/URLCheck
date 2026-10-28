@@ -233,5 +233,6 @@
   "error.forwardBusy": "別のペアリング要求がすでに確認待ちです。",
   "error.invalidAddress": "有効なアドレスではありません。",
   "error.updateCheckFailed": "公開されているバージョンを読み取れませんでした。",
-  "error.openLogsFailed": "ログフォルダーを開けませんでした。"
+  "error.openLogsFailed": "ログフォルダーを開けませんでした。",
+  "error.openFailed": "システムの既定のハンドラーで URL を開けませんでした。"
 }

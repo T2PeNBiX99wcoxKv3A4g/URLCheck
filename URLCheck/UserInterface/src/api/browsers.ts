@@ -18,3 +18,16 @@ export async function openWithBrowser(url: string, browserId?: string, privateMo
 
     await Native.request("popup.open", {url, browserId, private: privateMode});
 }
+
+/**
+ * Hands a URL to the system's default handler instead of a configured browser. When URLCheck is
+ * that handler, the URL comes back as a forwarded link and opens the inspection popup.
+ */
+export async function openWithDefaultHandler(url: string): Promise<void> {
+    if (!Native.available) {
+        window.open(url, "_blank", "noopener,noreferrer");
+        return;
+    }
+
+    await Native.request("browsers.openDefault", {url});
+}

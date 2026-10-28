@@ -241,5 +241,6 @@
   "error.forwardBusy": "Another pairing request is already waiting for confirmation.",
   "error.invalidAddress": "That is not a valid address.",
   "error.updateCheckFailed": "Could not read the published version.",
-  "error.openLogsFailed": "Could not open the log folder."
+  "error.openLogsFailed": "Could not open the log folder.",
+  "error.openFailed": "Could not open the URL with the system default handler."
 }

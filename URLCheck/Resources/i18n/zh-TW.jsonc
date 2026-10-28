@@ -233,5 +233,6 @@
   "error.forwardBusy": "已有另一個配對請求正在等待確認。",
   "error.invalidAddress": "這不是有效的位址。",
   "error.updateCheckFailed": "無法讀取已發佈的版本。",
-  "error.openLogsFailed": "無法開啟日誌資料夾。"
+  "error.openLogsFailed": "無法開啟日誌資料夾。",
+  "error.openFailed": "無法用系統預設處理程式開啟此 URL。"
 }

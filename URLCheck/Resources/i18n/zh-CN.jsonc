@@ -233,5 +233,6 @@
   "error.forwardBusy": "已有另一个配对请求正在等待确认。",
   "error.invalidAddress": "这不是有效的地址。",
   "error.updateCheckFailed": "无法读取已发布的版本。",
-  "error.openLogsFailed": "无法打开日志文件夹。"
+  "error.openLogsFailed": "无法打开日志文件夹。",
+  "error.openFailed": "无法用系统默认处理程序打开此 URL。"
 }

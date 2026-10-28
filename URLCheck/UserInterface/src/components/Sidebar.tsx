@@ -4,7 +4,7 @@ import {Native} from "@photino-net-utils/bridge";
 import {TABS, type TabType} from "../tabs";
 import {useTranslation} from "../i18n";
 import {getAppInfo, getUpdateStatus, RELEASES_URL, type UpdateCheck} from "../api/system";
-import {openWithBrowser} from "../api/browsers";
+import {openWithDefaultHandler} from "../api/browsers";
 import {LogoIcon} from "./Icons";
 
 interface SidebarProps {
@@ -199,7 +199,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
                     <UpdateDot
                         type="button"
                         title={t("app.updateAvailable", {version: update.latest})}
-                        onClick={() => void openWithBrowser(RELEASES_URL).catch(() => undefined)}
+                        onClick={() => void openWithDefaultHandler(RELEASES_URL).catch(() => undefined)}
                     />
                 )}
             </FooterSection>
