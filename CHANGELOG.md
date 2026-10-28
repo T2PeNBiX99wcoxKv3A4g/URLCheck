@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.12.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.12.2..v0.12.3) - 2026-10-28
+
+### 🐛 Bug Fixes
+
+- Open the release page through the system's default handler - ([0dbc65b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0dbc65be0d99667ceee67184b9a53d3c03bbb05a))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([b50f41e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b50f41e9c4128564069fb9c633c4aed68225955e))
+
+
 ## [0.12.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.12.1..v0.12.2) - 2026-10-28
 
 ### ⚙️ Miscellaneous Tasks
