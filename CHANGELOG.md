@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.12.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.12.0..v0.12.1) - 2026-10-28
+
+### 🐛 Bug Fixes
+
+- Repoint the Start Menu shortcut when the build moves - ([b0f7a70](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b0f7a704bc8b8b13364266ee464d4a25fbbbad48))
+
+### 🚜 Refactor
+
+- Use the shared shortcut helpers from PhotinoNETUtils - ([414d1bb](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/414d1bb627b0b1cb60dd59c5d988a1af939a4d1d))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update PhotinoNETUtils to 0.2.0 - ([c42a51d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/c42a51dfa1d320fcf9930adec98187424a338a4b))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([fb5bbe0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/fb5bbe09552fe4f6fac745b4b2dc241f15838acf))
+
+
 ## [0.12.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.11.0..v0.12.0) - 2026-10-28
 
 ### ⛰️  Features
