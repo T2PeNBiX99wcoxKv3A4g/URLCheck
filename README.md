@@ -117,7 +117,7 @@ has no tray and keeps its main window visible instead.
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/) 20 or newer, to build the interface
-- The shared DLL and front-end bridge package in `URLCheck/libs`, copied from the separate
+- The shared DLL and front-end bridge package in `URLCheck/Libs`, copied from the separate
   [PhotinoNETUtils](../PhotinoNETUtils) project with its `build-and-copy.ps1`
 
 ## Build and run
