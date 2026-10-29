@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.15.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.14.1..v0.15.0) - 2026-10-29
+
+### ⛰️  Features
+
+- Put the floating button next to the pointer on KDE - ([23bd78e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/23bd78ec113dca46d21c720b4ed8821b64c26bc9))
+- Keep the overlay windows above the others on KDE - ([c009839](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/c0098392766d27766ceecbbca87a5ba49994246f))
+
+### ⚙️ Miscellaneous Tasks
+
+- Add LuaCSharp package reference to URLCheck project - ([26fcc86](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/26fcc86748dd0ea862f9a083ea514e9d04d08ec2))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([cd5102c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cd5102ca3ede386f870c1c16e450c75096fbaa50))
+
+
 ## [0.14.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.14.0..v0.14.1) - 2026-10-29
 
 ### 🐛 Bug Fixes
