@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.13.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.12.3..v0.13.0) - 2026-10-29
+
+### ⛰️  Features
+
+- Jump to a settings section - ([26e5dea](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/26e5deadf28b16a81a5ad578a9d39f2f271dca12))
+- Draw the window title bar - ([5568c2a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5568c2ab6b01c98342a5aac6b0e9197d4d9ea6a2))
+
+### 🚜 Refactor
+
+- Use the shared React localization - ([4b725a6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4b725a6a926223e87c64450f0f9009995f8299ed))
+- Use the shared localization - ([1f7cb7d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1f7cb7d7962d800b5441fe09ed51b0a8bb562db2))
+- Use the shared native bridge - ([5ec16a4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5ec16a4dab84af36354d6c8209b7de3df59ba0fe))
+- Use the shared app paths and system launcher - ([799a91b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/799a91bd43e113b854c96ef8512ac8c989741c5c))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update PhotinoNETUtils.dll in URLCheck\Libs - ([d3e4981](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d3e4981f5160a226fad57b341f57abc34da1dfdf))
+- Refresh the shared library build - ([cac75f1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cac75f1492a554baadcf38329d3f1fa9b8f51de3))
+- Update PhotinoNETUtils.dll in URLCheck\Libs - ([f9e21f5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f9e21f5a01e9a3f5dcf658b69a9055190bd1bfb0))
+- Update @photino-net-utils/bridge to v0.3.1 and PhotinoNETUtils.dll in URLCheck - ([e87e48e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e87e48e2730949214544cda341e22473e9082929))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([2fd776b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2fd776bd41c192777148b75159a50fa678ac1992))
+
+
 ## [0.12.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.12.2..v0.12.3) - 2026-10-28
 
 ### 🐛 Bug Fixes
