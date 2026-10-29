@@ -3,6 +3,7 @@ using System.Runtime.Versioning;
 using PhotinoNetUtils;
 using PhotinoNetUtils.Hosting;
 using PhotinoNetUtils.Interop;
+using PhotinoNetUtils.Localization;
 using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Platform;
 using PhotinoNetUtils.Services;
@@ -33,6 +34,10 @@ internal static class Program
 
         // The bridge serializes through this context; it has to know it before the interface speaks.
         NativeBridge.Initialize(AppJsonContext.Default);
+
+        // The strings come from this assembly's Resources/i18n, and the language lives in the settings.
+        Localization.Initialize(typeof(Program).Assembly, "URLCheck.Resources.i18n.",
+            () => SettingsService.Instance.Language);
 
         if (OperatingSystem.IsLinux())
         {
@@ -86,7 +91,6 @@ internal static class Program
             var startHidden = args.Contains("--tray") || (settings.Current?.HideOnLaunch ?? false);
             var showMainWindow = !hasTray || !startHidden;
 
-            _ = LocalizationService.Instance;
             _ = HistoryService.Instance;
             var iconPath = AppIcon.EnsureExtracted(typeof(Program).Assembly, Constants.Name);
             _ = AppInfoService.Instance;
@@ -169,7 +173,6 @@ internal static class Program
     /// <summary>The platform's tray icon, or a no-op stand-in when there is none.</summary>
     private static ITrayIcon CreateTray(string? iconPath)
     {
-        var localization = LocalizationService.Instance;
         var manager = WindowManager.Instance;
 
         return TrayIconFactory.Create(
@@ -178,9 +181,9 @@ internal static class Program
             iconPath,
             () => manager.ShowMainWindow(),
             [
-                new TrayMenuItem(localization.Get("tray.open"), () => manager.ShowMainWindow()),
-                new TrayMenuItem(localization.Get("tray.settings"), () => manager.ShowMainWindow("settings")),
-                new TrayMenuItem(localization.Get("tray.exit"), manager.Exit, SeparatorBefore: true)
+                new TrayMenuItem(Localization.Get("tray.open"), () => manager.ShowMainWindow()),
+                new TrayMenuItem(Localization.Get("tray.settings"), () => manager.ShowMainWindow("settings")),
+                new TrayMenuItem(Localization.Get("tray.exit"), manager.Exit, SeparatorBefore: true)
             ]);
     }
 

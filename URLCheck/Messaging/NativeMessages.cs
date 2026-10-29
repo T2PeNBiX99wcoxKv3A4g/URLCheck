@@ -38,8 +38,6 @@ internal sealed record ForwardAddressRequest(string DeviceId, string Address);
 /// </summary>
 internal sealed record InspectRequest(string Url, string? UserAgentId = null);
 
-/// <summary>Payload for <c>i18n.get</c>.</summary>
-internal sealed record LocaleRequest(string? Locale);
 
 /// <summary>Payload for <c>app.setStartup</c>: whether the startup shortcut should exist.</summary>
 internal sealed record StartupRequest(bool Enabled);

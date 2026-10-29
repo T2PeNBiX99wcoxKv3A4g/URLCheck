@@ -49,11 +49,6 @@ internal sealed record UpdateCheckPayload(string Current, string Latest, bool Av
 /// </summary>
 internal sealed record StartupPayload(bool Supported, bool Enabled);
 
-/// <summary>Body for <c>i18n.get</c>.</summary>
-internal sealed record LocalePayload(
-    string Locale,
-    Dictionary<string, string> Strings,
-    IReadOnlyList<string> Available);
 
 /// <summary>Body for <c>history.list</c>.</summary>
 internal sealed record HistoryListPayload(IReadOnlyList<HistoryItemPayload> Entries);
