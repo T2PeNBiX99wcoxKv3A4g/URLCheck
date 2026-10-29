@@ -22,6 +22,10 @@ internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWin
 
     public void OnMainWindowCreated(PhotinoWindow window)
     {
+        // Wayland only lets a client draw its own decorations, so ask GTK for exactly that — without
+        // any — and the compositor stops adding its own frame.
+        LinuxWindow.UseClientSideFrame(window.Title);
+
         _transparent = LinuxWindow.EnableTransparency(window.Title);
 
         if (!_transparent)
