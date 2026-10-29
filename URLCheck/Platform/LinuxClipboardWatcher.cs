@@ -8,9 +8,10 @@ using PhotinoNetUtils.Utils;
 namespace URLCheck.Platform;
 
 /// <summary>
-///     Watches the clipboard under Wayland through <c>wl-paste</c>, falling back to GTK's clipboard
-///     signal elsewhere. Neither path blocks: Wayland hands the text to the child process, and GTK
-///     pulls it with an asynchronous request.
+///     Watches the clipboard on Linux: through Klipper when KDE's clipboard manager is running, then
+///     through <c>wl-paste</c> on Wayland, then through GTK's clipboard signal. None of the paths
+///     blocks: Klipper and wl-paste hand the text to a child process, and GTK pulls it with an
+///     asynchronous request.
 /// </summary>
 [SupportedOSPlatform("linux")]
 internal sealed class LinuxClipboardWatcher : Singleton<LinuxClipboardWatcher>, IClipboardWatcher
@@ -23,6 +24,9 @@ internal sealed class LinuxClipboardWatcher : Singleton<LinuxClipboardWatcher>, 
 
     private CancellationTokenSource? _cancellation;
 
+    /// <summary>The value last reported, so the two signals Klipper sends per copy only count once.</summary>
+    private string? _lastText;
+
     private Process? _process;
 
     public event Action<string>? TextCopied;
@@ -30,6 +34,11 @@ internal sealed class LinuxClipboardWatcher : Singleton<LinuxClipboardWatcher>, 
     public void Start()
     {
         if (_process is not null)
+            return;
+
+        // Klipper already holds the clipboard on KDE, so its signal is the one place that sees every
+        // copy, and asking it for the text needs no focus.
+        if (TryWatchWithKlipper())
             return;
 
         if (TryWatchWithWlPaste())
@@ -51,6 +60,7 @@ internal sealed class LinuxClipboardWatcher : Singleton<LinuxClipboardWatcher>, 
         }).OnFailure(ex => Log.Debug(ex, "Failed to stop the clipboard watcher"));
 
         _process = null;
+        _lastText = null;
         _cancellation?.Dispose();
         _cancellation = null;
 
@@ -61,11 +71,156 @@ internal sealed class LinuxClipboardWatcher : Singleton<LinuxClipboardWatcher>, 
 
     /// <summary>Reads the clipboard's text once, best-effort, without GTK's asynchronous request.</summary>
     public string? ReadText() =>
-        Try.Run(ReadWithCommand).GetOrElse(ex =>
+        Try.Run(() => ReadWithKlipper() ?? ReadWithCommand()).GetOrElse(ex =>
         {
             Log.Debug(ex, "Could not read the clipboard");
             return null;
         });
+
+    /// <summary>
+    ///     Watches through Klipper, KDE's clipboard manager. It already owns the clipboard there, so it
+    ///     is the one place that sees every copy — a background client cannot read the clipboard on
+    ///     Wayland otherwise.
+    /// </summary>
+    private bool TryWatchWithKlipper()
+    {
+        if (!HasKlipper())
+            return false;
+
+        return Try.Run(() =>
+        {
+            var process = Process.Start(Command("gdbus", "monitor", "--session", "--dest", "org.kde.klipper",
+                "--object-path", "/klipper"));
+
+            if (process is null)
+                return false;
+
+            _process = process;
+            _cancellation = new();
+
+            // The pump swallows everything it can throw, so the task needs no observer.
+            _ = Task.Run(() => PumpKlipperAsync(process, _cancellation.Token));
+
+            Log.Information("Watching the clipboard through Klipper");
+            return true;
+        }).GetOrElse(ex =>
+        {
+            Log.Information(ex, "Could not watch the clipboard through Klipper: {Message}", ex.Message);
+            return false;
+        });
+    }
+
+    /// <summary>Reports every copy Klipper announces, asking it for the text that came with it.</summary>
+    private async Task PumpKlipperAsync(Process process, CancellationToken token)
+    {
+        try
+        {
+            while (!token.IsCancellationRequested)
+            {
+                var line = await process.StandardOutput.ReadLineAsync(token);
+                if (line is null)
+                    break;
+
+                // Klipper sends this signal twice per copy; the text itself is asked for separately.
+                if (line.Contains("clipboardHistoryUpdated", StringComparison.Ordinal))
+                    ReportText(ReadWithKlipper());
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Stopping.
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "The Klipper clipboard watcher stopped");
+        }
+    }
+
+    /// <summary>Whether KDE's clipboard manager is running and answering.</summary>
+    private static bool HasKlipper() =>
+        Run("gdbus",
+                [
+                    "call", "--session", "--dest", "org.freedesktop.DBus", "--object-path",
+                    "/org/freedesktop/DBus", "--method", "org.freedesktop.DBus.NameHasOwner", "org.kde.klipper"
+                ])
+            ?.Contains("true", StringComparison.Ordinal) == true;
+
+    /// <summary>The text Klipper is holding, or null when it cannot be asked.</summary>
+    private static string? ReadWithKlipper() =>
+        Unwrap(Run("gdbus",
+            [
+                "call", "--session", "--dest", "org.kde.klipper", "--object-path", "/klipper",
+                "--method", "org.kde.klipper.klipper.getClipboardContents"
+            ]));
+
+    /// <summary>Unwraps gdbus' <c>('text',)</c> reply into the string it carries.</summary>
+    private static string? Unwrap(string? output)
+    {
+        var text = output?.Trim();
+        if (text is not { Length: >= 4 } || !text.StartsWith("('", StringComparison.Ordinal) ||
+            !text.EndsWith("',)", StringComparison.Ordinal))
+            return null;
+
+        return Unescape(text[2..^3]);
+    }
+
+    /// <summary>Turns GVariant's escapes back into the characters they stand for.</summary>
+    private static string Unescape(string value)
+    {
+        if (!value.Contains('\\'))
+            return value;
+
+        var builder = new StringBuilder(value.Length);
+        for (var index = 0; index < value.Length; index++)
+        {
+            if (value[index] != '\\' || index + 1 >= value.Length)
+            {
+                builder.Append(value[index]);
+                continue;
+            }
+
+            index++;
+            builder.Append(value[index] switch
+            {
+                'n' => '\n',
+                't' => '\t',
+                'r' => '\r',
+                '\\' => '\\',
+                '\'' => '\'',
+                '"' => '"',
+                _ => value[index]
+            });
+        }
+
+        return builder.ToString();
+    }
+
+    /// <summary>Reports a value once, no matter how many signals announced it.</summary>
+    private void ReportText(string? text)
+    {
+        if (string.IsNullOrEmpty(text) || text == _lastText)
+            return;
+
+        _lastText = text;
+        OnTextCopied(text);
+    }
+
+    /// <summary>A child process with its output captured, for the command-line clipboard paths.</summary>
+    private static ProcessStartInfo Command(string command, params string[] arguments)
+    {
+        var startInfo = new ProcessStartInfo(command)
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        foreach (var argument in arguments)
+            startInfo.ArgumentList.Add(argument);
+
+        return startInfo;
+    }
 
     private static string? ReadWithCommand()
     {
