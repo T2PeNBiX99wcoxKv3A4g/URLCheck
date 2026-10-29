@@ -419,6 +419,11 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
             _buttonAt = _platform.ShowSelectionButton(button, x, y, ButtonSize);
 
+            // Wayland hides the pointer from clients, so the compositor is the only one that can put
+            // the button next to it.
+            if (OperatingSystem.IsLinux())
+                LinuxOverlay.MoveToCursor(Constants.SelectionButtonTitle, ButtonOffset);
+
             // Placing it again shortly after gives anything that resized or moved the window while it
             // was coming back — a window manager, say — a chance to settle, so the button still ends
             // up the right size under the pointer.

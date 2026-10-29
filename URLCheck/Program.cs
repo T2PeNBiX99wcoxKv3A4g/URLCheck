@@ -122,7 +122,7 @@ internal static class Program
             // Wayland gives a window no way to stay above the others; on KDE that is KWin's script
             // interface instead, and the popup and the button are the windows that need it.
             if (OperatingSystem.IsLinux())
-                LinuxKeepAbove.Start(Constants.PopupTitle, Constants.SelectionButtonTitle);
+                LinuxOverlay.Start(Constants.PopupTitle, Constants.SelectionButtonTitle);
 
             // Needs the window manager: a forwarded URL is opened in the inspection popup.
             _ = ForwardService.Instance;
@@ -136,7 +136,7 @@ internal static class Program
         finally
         {
             if (OperatingSystem.IsLinux())
-                LinuxKeepAbove.Stop();
+                LinuxOverlay.Stop();
 
             Logging.Shutdown();
         }
