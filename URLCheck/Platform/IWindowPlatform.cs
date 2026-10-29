@@ -6,6 +6,22 @@ namespace URLCheck.Platform;
 /// <summary>Window operations that differ per platform (hide/show/always-on-top/drag).</summary>
 internal interface IWindowPlatform
 {
+    /// <summary>
+    ///     Whether the interface has to paint the window's rounded corners and border, because the
+    ///     platform leaves an undecorated window without either.
+    /// </summary>
+    bool DrawsWindowCorners { get; }
+
+    /// <summary>
+    ///     Hides the native title bar. Windows keeps its frame and only drops the non-client area;
+    ///     GTK has no such middle ground, so the window becomes undecorated and the interface draws
+    ///     the rest — corners included.
+    /// </summary>
+    void ConfigureMainWindow(PhotinoWindow window);
+
+    /// <summary>Called once the host window's native counterpart exists, before it is shown.</summary>
+    void OnMainWindowCreated(PhotinoWindow window);
+
     void Hide(PhotinoWindow window);
 
     void Show(PhotinoWindow window);

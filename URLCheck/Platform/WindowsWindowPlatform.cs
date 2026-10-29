@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Photino.NET;
 using PhotinoNetUtils.Interop;
+using PhotinoNetUtils.Platform;
 using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Platform;
@@ -11,6 +12,19 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("windows")]
 internal sealed class WindowsWindowPlatform : Singleton<WindowsWindowPlatform>, IWindowPlatform
 {
+    /// <summary>The native frame rounds the window and draws its border, so the interface does not.</summary>
+    public bool DrawsWindowCorners => false;
+
+    public void ConfigureMainWindow(PhotinoWindow window)
+    {
+    }
+
+    public void OnMainWindowCreated(PhotinoWindow window)
+    {
+        if (window.WindowHandle != IntPtr.Zero)
+            WindowFrame.RemoveTitleBar(window.WindowHandle);
+    }
+
     /// <summary>Hides the window outright, the way closing it to the tray always has.</summary>
     public void Hide(PhotinoWindow window) =>
         UseHandle(window, handle => NativeMethods.ShowWindow(handle, NativeMethods.SwHide));

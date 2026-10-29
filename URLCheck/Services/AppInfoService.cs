@@ -4,6 +4,7 @@ using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Platform;
 using PhotinoNetUtils.Utils;
 using URLCheck.Messaging;
+using URLCheck.Platform;
 
 namespace URLCheck.Services;
 
@@ -39,7 +40,8 @@ internal sealed class AppInfoService : Singleton<AppInfoService>
         });
 
     private static NativeResponse Info(NativeContext context) =>
-        context.Reply("app.info.result", new AppInfoPayload(Version, Platform, Constants.LogDirectory));
+        context.Reply("app.info.result", new AppInfoPayload(Version, Platform, Constants.LogDirectory,
+            PlatformServices.Window.DrawsWindowCorners));
 
     /// <summary>
     ///     Opens the log folder in the desktop's file manager, so a bug report can be made without

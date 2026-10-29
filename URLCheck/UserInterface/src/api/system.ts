@@ -94,11 +94,19 @@ export function resizePopup(height: number): void {
     Native.send({type: "popup.resize", payload: {height: Math.round(height)}});
 }
 
-/** Reads the app version declared in the csproj, plus the host platform id and where logs live. */
-export async function getAppInfo(): Promise<{ version: string; platform: string; logDirectory: string }> {
-    if (!Native.available) return {version: "dev", platform: "windows", logDirectory: ""};
+export interface AppInfo {
+    version: string;
+    platform: string;
+    logDirectory: string;
+    /** True when the interface has to paint the window's rounded corners itself (Linux). */
+    rounded: boolean;
+}
 
-    return await Native.request<{ version: string; platform: string; logDirectory: string }>("app.info");
+/** Reads the app version declared in the csproj, plus the host platform id and where logs live. */
+export async function getAppInfo(): Promise<AppInfo> {
+    if (!Native.available) return {version: "dev", platform: "windows", logDirectory: "", rounded: false};
+
+    return await Native.request<AppInfo>("app.info");
 }
 
 /** Opens the folder the app writes its log files to, in the desktop's file manager. */

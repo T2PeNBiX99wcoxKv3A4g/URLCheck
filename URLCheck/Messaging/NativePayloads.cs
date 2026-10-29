@@ -35,7 +35,7 @@ internal sealed record ProtocolStatusPayload(
 internal sealed record BrowsersPayload(IReadOnlyList<BrowserEntry> Browsers);
 
 /// <summary>Body for <c>app.info</c>: the build version, the platform id and where the logs live.</summary>
-internal sealed record AppInfoPayload(string Version, string Platform, string LogDirectory);
+internal sealed record AppInfoPayload(string Version, string Platform, string LogDirectory, bool Rounded);
 
 /// <summary>
 ///     Body for <c>app.checkUpdate</c>: the running version, the published one, and whether the

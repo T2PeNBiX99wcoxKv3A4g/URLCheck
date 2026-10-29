@@ -260,20 +260,14 @@ internal sealed class WindowManager : Singleton<WindowManager>
             });
 
         ApplyIcon(window);
-
-        // The interface draws its own title bar. On Windows the native frame stays and WindowFrame
-        // hides its non-client area, because a chromeless window is one no shell — or tiling window
-        // manager — will arrange; elsewhere chromeless is still the simplest way.
-        if (!OperatingSystem.IsWindows())
-            window.SetChromeless(true);
+        _platform.ConfigureMainWindow(window);
 
         window.Load(AppUrl);
         _mainWindow = window;
 
         window.RegisterWindowCreatedHandler((_, _) =>
         {
-            if (OperatingSystem.IsWindows())
-                WindowFrame.RemoveTitleBar(window.WindowHandle);
+            _platform.OnMainWindowCreated(window);
 
             ApplyClipboardWatching();
 

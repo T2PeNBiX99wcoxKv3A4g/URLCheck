@@ -10,6 +10,24 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("linux")]
 internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWindowPlatform
 {
+    private bool _transparent;
+
+    /// <summary>
+    ///     GTK windows get no frame at all without decorations, so the corners and the border are the
+    ///     interface's job — as long as the screen can make the window transparent behind them.
+    /// </summary>
+    public bool DrawsWindowCorners => _transparent;
+
+    public void ConfigureMainWindow(PhotinoWindow window) => window.SetChromeless(true);
+
+    public void OnMainWindowCreated(PhotinoWindow window)
+    {
+        _transparent = LinuxWindow.EnableTransparency(window.Title);
+
+        if (!_transparent)
+            Log.Warning("The window cannot be transparent; its corners stay square");
+    }
+
     public void Hide(PhotinoWindow window)
     {
         // Minimising leaves the window in the taskbar; hiding it outright does not.

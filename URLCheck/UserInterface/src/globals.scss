@@ -92,10 +92,14 @@ body {
 // A borderless popup is a transparent window on Linux, so the page must not paint a background there;
 // the popup's own root element carries it. PopupPage toggles this once it knows the setting. The
 // floating button's window is always transparent, so its page asks for the same treatment up front.
+// The main window is transparent for the same reason: its rounded corners and border are drawn by
+// the interface, because the compositor gives an undecorated window neither.
 html.popup-transparent,
 html.popup-transparent body,
 html.selection-transparent,
-html.selection-transparent body {
+html.selection-transparent body,
+html.window-rounded,
+html.window-rounded body {
   background-color: transparent;
 }
 
