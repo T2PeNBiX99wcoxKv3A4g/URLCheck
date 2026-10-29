@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.15.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.15.0..v0.15.1) - 2026-10-29
+
+### 🐛 Bug Fixes
+
+- Move the button once KWin has it - ([b2081e0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b2081e091025e1269a29413a90018404f1962591))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([2f42172](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2f421725f13acbdb70853f480468fb4f44989668))
+
+
 ## [0.15.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.14.1..v0.15.0) - 2026-10-29
 
 ### ⛰️  Features
