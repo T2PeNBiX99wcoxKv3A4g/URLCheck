@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.14.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.13.0..v0.14.0) - 2026-10-29
+
+### ⛰️  Features
+
+- Watch the clipboard through Klipper on KDE - ([a35ff1c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a35ff1c7104cd116fd9e3cd071286d9211bdf9ba))
+
+### 🐛 Bug Fixes
+
+- Let the interface draw the frame on Wayland - ([22d7f80](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/22d7f8011a74f3a37cb278658702a0b65b2b7c82))
+- Draw the window corners on Linux - ([20e6557](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/20e655778f0e23956bd279053a378500967fb73e))
+
+### 🚜 Refactor
+
+- Take the corner state from the shared hook - ([62b6fd5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/62b6fd53e9edc4c74fabfcfcc1e8925df22fe17d))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update PhotinoNETUtils.dll in URLCheck\Libs - ([772d2ba](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/772d2baa5c7adf5f5d9f47dd81cdbcc33002b985))
+- Refresh the shared library build - ([a1b5c57](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a1b5c57d4924344757419526dc1b48719f0221e6))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([e32ccf9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e32ccf98a30cd66754a590be8d9a12181fc217e2))
+
+
 ## [0.13.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.12.3..v0.13.0) - 2026-10-29
 
 ### ⛰️  Features
