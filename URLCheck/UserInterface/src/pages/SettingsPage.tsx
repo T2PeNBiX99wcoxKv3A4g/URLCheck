@@ -256,6 +256,68 @@ const UnsavedBanner = styled.div<{ $visible: boolean }>`
   pointer-events: ${(props) => (props.$visible ? "auto" : "none")};
 `;
 
+/** Content column and the quick-jump list side by side. */
+const SettingsBody = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+`;
+
+const SettingsSections = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  flex: 1;
+  min-width: 0;
+  max-width: 800px;
+`;
+
+/**
+ * The jump list. It stays put while the cards scroll, and marks the section being read, so it
+ * doubles as a position indicator rather than only a shortcut.
+ */
+const SettingsNav = styled.nav`
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 144px;
+  flex-shrink: 0;
+  padding-top: 2px;
+  user-select: none;
+
+  /* Too narrow to keep both columns readable: the list steps aside. */
+  @media (max-width: 900px) {
+    display: none;
+  }
+`;
+
+const NavItem = styled.button<{ $active: boolean }>`
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.16)" : "transparent")};
+  color: ${(props) => (props.$active ? "#93c5fd" : "#9ca3af")};
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: ${(props) => (props.$active ? "600" : "500")};
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #f9fafb;
+  }
+`;
+
+/** A settings card, with room above it for the jump to land. */
+const Section = styled(StackCard)`
+  scroll-margin-top: 28px;
+`;
+
 const PulseDot = styled.span`
   width: 8px;
   height: 8px;
@@ -786,9 +848,27 @@ const LOCALE_NAMES: Record<string, string> = {
   ja: "日本語",
 };
 
+/** The settings sections, in page order; the quick-jump list is built from this. */
+const SECTIONS = [
+  "settings.network",
+  "settings.userAgent",
+  "settings.browsers",
+  "settings.forwarding",
+  "settings.forwardDevices",
+  "settings.systemIntegration",
+  "settings.autoRedirect",
+  "settings.filterLists",
+  "settings.startup",
+  "settings.about",
+];
+
+/** Anchor id of a section; every card carries the matching one. */
+const anchorId = (key: string) => key.replace(".", "-");
+
 export const SettingsPage: React.FC = () => {
   const t = useTranslation();
   const locale = useLocale();
+  const [activeSection, setActiveSection] = useState(SECTIONS[0]);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   /** Last persisted snapshot; the form is "dirty" while it differs from this. */
   const [baseline, setBaseline] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -840,6 +920,30 @@ export const SettingsPage: React.FC = () => {
   const [addressInputs, setAddressInputs] = useState<Record<string, string>>({});
   /** Draft host for the auto-redirect list. */
   const [newAutoRedirectHost, setNewAutoRedirectHost] = useState("");
+
+  /* Marks the section being read, so the jump list also shows where the page is. */
+  useEffect(() => {
+    const sections = SECTIONS.map((key) => document.getElementById(anchorId(key)));
+    if (sections.some((section) => section === null)) return;
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+          const top = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+          if (top) setActiveSection(top.target.id);
+        },
+        {rootMargin: "-8% 0px -70% 0px"}
+    );
+
+    sections.forEach((section) => observer.observe(section!));
+    return () => observer.disconnect();
+  }, []);
+
+  const jumpTo = (id: string) => {
+    setActiveSection(id);
+    document.getElementById(id)?.scrollIntoView({behavior: "smooth", block: "start"});
+  };
 
   useEffect(() => {
     protocolStatus().then(setProtocols).catch(() => setProtocols(null));
@@ -1307,631 +1411,648 @@ export const SettingsPage: React.FC = () => {
   const fingerprint = (key: string) => (key ? `${key.slice(0, 16)}…` : "—");
 
   return (
-      <PageContainer $maxWidth={800}>
-        <UnsavedBanner $visible={unsaved}>
-          <PulseDot/>
-          <span>{t("settings.unsaved")}</span>
-        </UnsavedBanner>
+      <PageContainer $maxWidth={964}>
+        <SettingsBody>
+          <SettingsSections>
+            <UnsavedBanner $visible={unsaved}>
+              <PulseDot/>
+              <span>{t("settings.unsaved")}</span>
+            </UnsavedBanner>
 
-        {error && (
-            <ErrorBanner>
-              <AlertTriangleIcon size={16}/>
-              <span>{t(error)}</span>
-            </ErrorBanner>
-        )}
+            {error && (
+                <ErrorBanner>
+                  <AlertTriangleIcon size={16}/>
+                  <span>{t(error)}</span>
+                </ErrorBanner>
+            )}
 
-        <StackCard>
-          <SectionTitle>{t("settings.network")}</SectionTitle>
+            <Section id={anchorId("settings.network")}>
+              <SectionTitle>{t("settings.network")}</SectionTitle>
 
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.requestTimeout")}</SettingLabel>
-              <SettingDescription>{t("settings.requestTimeoutDescription")}</SettingDescription>
-            </SettingInfo>
-            <StyledRange>
-              <input
-                  type="range"
-                  min="1000"
-                  max="15000"
-                  step="500"
-                  disabled={busy}
-                  value={settings.requestTimeoutMs}
-                  onChange={(e) => update({requestTimeoutMs: Number(e.target.value)})}
-              />
-              <span>{settings.requestTimeoutMs / 1000}s</span>
-            </StyledRange>
-          </SettingRow>
-
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.language")}</SettingLabel>
-              <SettingDescription>{t("settings.languageDescription")}</SettingDescription>
-            </SettingInfo>
-            <Dropdown
-                variant="form"
-                disabled={busy || locales.length === 0}
-                value={settings.language}
-                options={locales.map((locale) => ({value: locale, label: LOCALE_NAMES[locale] ?? locale}))}
-                onChange={handleLanguageChange}
-            />
-          </SettingRow>
-
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.borderlessPopup")}</SettingLabel>
-              <SettingDescription>{t("settings.borderlessPopupDescription")}</SettingDescription>
-            </SettingInfo>
-            <Checkbox
-                disabled={busy}
-                checked={settings.borderlessPopup}
-                onChange={(e) => update({borderlessPopup: e.target.checked})}
-            />
-          </SettingRow>
-
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.autoStripTracking")}</SettingLabel>
-              <SettingDescription>{t("settings.autoStripTrackingDescription")}</SettingDescription>
-            </SettingInfo>
-            <Checkbox
-                disabled={busy}
-                checked={settings.autoStripTrackingParams}
-                onChange={(e) => update({autoStripTrackingParams: e.target.checked})}
-            />
-          </SettingRow>
-
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.showUrlButton")}</SettingLabel>
-              <SettingDescription>{t("settings.showUrlButtonDescription")}</SettingDescription>
-            </SettingInfo>
-            <Checkbox
-                disabled={busy}
-                checked={settings.showUrlButton}
-                onChange={(e) => update({showUrlButton: e.target.checked})}
-            />
-          </SettingRow>
-        </StackCard>
-
-        <StackCard>
-          <SectionTitle>{t("settings.userAgent")}</SectionTitle>
-
-          <SettingInfo>
-            <SettingDescription>
-              {t("settings.userAgentDescription")}
-            </SettingDescription>
-          </SettingInfo>
-
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.userAgentDefault")}</SettingLabel>
-            </SettingInfo>
-            <Dropdown
-                variant="form"
-                disabled={busy || settings.userAgents.length === 0}
-                value={settings.selectedUserAgentId}
-                options={settings.userAgents.map((agent) => ({value: agent.id, label: agent.name}))}
-                onChange={(selectedUserAgentId) => update({selectedUserAgentId})}
-            />
-          </SettingRow>
-
-          <ListEditor>
-            {settings.userAgents.map((agent) => (
-                <ListRow key={agent.id}>
-                  <ListInput
-                      className="name"
-                      placeholder={t("settings.browserNamePlaceholder")}
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.requestTimeout")}</SettingLabel>
+                  <SettingDescription>{t("settings.requestTimeoutDescription")}</SettingDescription>
+                </SettingInfo>
+                <StyledRange>
+                  <input
+                      type="range"
+                      min="1000"
+                      max="15000"
+                      step="500"
                       disabled={busy}
-                      value={agent.name}
-                      onChange={(e) => updateUserAgent(agent.id, {name: e.target.value})}
+                      value={settings.requestTimeoutMs}
+                      onChange={(e) => update({requestTimeoutMs: Number(e.target.value)})}
                   />
+                  <span>{settings.requestTimeoutMs / 1000}s</span>
+                </StyledRange>
+              </SettingRow>
+
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.language")}</SettingLabel>
+                  <SettingDescription>{t("settings.languageDescription")}</SettingDescription>
+                </SettingInfo>
+                <Dropdown
+                    variant="form"
+                    disabled={busy || locales.length === 0}
+                    value={settings.language}
+                    options={locales.map((locale) => ({value: locale, label: LOCALE_NAMES[locale] ?? locale}))}
+                    onChange={handleLanguageChange}
+                />
+              </SettingRow>
+
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.borderlessPopup")}</SettingLabel>
+                  <SettingDescription>{t("settings.borderlessPopupDescription")}</SettingDescription>
+                </SettingInfo>
+                <Checkbox
+                    disabled={busy}
+                    checked={settings.borderlessPopup}
+                    onChange={(e) => update({borderlessPopup: e.target.checked})}
+                />
+              </SettingRow>
+
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.autoStripTracking")}</SettingLabel>
+                  <SettingDescription>{t("settings.autoStripTrackingDescription")}</SettingDescription>
+                </SettingInfo>
+                <Checkbox
+                    disabled={busy}
+                    checked={settings.autoStripTrackingParams}
+                    onChange={(e) => update({autoStripTrackingParams: e.target.checked})}
+                />
+              </SettingRow>
+
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.showUrlButton")}</SettingLabel>
+                  <SettingDescription>{t("settings.showUrlButtonDescription")}</SettingDescription>
+                </SettingInfo>
+                <Checkbox
+                    disabled={busy}
+                    checked={settings.showUrlButton}
+                    onChange={(e) => update({showUrlButton: e.target.checked})}
+                />
+              </SettingRow>
+            </Section>
+
+            <Section id={anchorId("settings.userAgent")}>
+              <SectionTitle>{t("settings.userAgent")}</SectionTitle>
+
+              <SettingInfo>
+                <SettingDescription>
+                  {t("settings.userAgentDescription")}
+                </SettingDescription>
+              </SettingInfo>
+
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.userAgentDefault")}</SettingLabel>
+                </SettingInfo>
+                <Dropdown
+                    variant="form"
+                    disabled={busy || settings.userAgents.length === 0}
+                    value={settings.selectedUserAgentId}
+                    options={settings.userAgents.map((agent) => ({value: agent.id, label: agent.name}))}
+                    onChange={(selectedUserAgentId) => update({selectedUserAgentId})}
+                />
+              </SettingRow>
+
+              <ListEditor>
+                {settings.userAgents.map((agent) => (
+                    <ListRow key={agent.id}>
+                      <ListInput
+                          className="name"
+                          placeholder={t("settings.browserNamePlaceholder")}
+                          disabled={busy}
+                          value={agent.name}
+                          onChange={(e) => updateUserAgent(agent.id, {name: e.target.value})}
+                      />
+                      <ListInput
+                          className="path"
+                          placeholder={t("settings.userAgentValuePlaceholder")}
+                          disabled={busy}
+                          value={agent.value}
+                          onChange={(e) => updateUserAgent(agent.id, {value: e.target.value})}
+                      />
+                      <IconOnlyButton
+                          type="button"
+                          title={t("settings.removeUserAgent")}
+                          onClick={() => removeUserAgent(agent.id)}
+                      >
+                        <TrashIcon size={16}/>
+                      </IconOnlyButton>
+                    </ListRow>
+                ))}
+              </ListEditor>
+
+              <ButtonRow>
+                <GhostButton type="button" onClick={addUserAgent} disabled={busy}>
+                  {t("settings.addUserAgent")}
+                </GhostButton>
+              </ButtonRow>
+            </Section>
+
+            <Section id={anchorId("settings.browsers")}>
+              <SectionTitle>{t("settings.browsers")}</SectionTitle>
+
+              <SettingInfo>
+                <SettingDescription>
+                  {t("settings.browsersDescription")}
+                </SettingDescription>
+              </SettingInfo>
+
+              <ListEditor>
+                {settings.browsers.map((browser) => (
+                    <ListRow key={browser.id}>
+                      <ListInput
+                          className="name"
+                          placeholder={t("settings.browserNamePlaceholder")}
+                          disabled={busy}
+                          value={browser.name}
+                          onChange={(e) => updateBrowser(browser.id, {name: e.target.value})}
+                      />
+                      <ListInput
+                          className="path"
+                          placeholder={t("settings.browserPathPlaceholder")}
+                          disabled={busy}
+                          value={browser.executablePath}
+                          onChange={(e) => updateBrowser(browser.id, {executablePath: e.target.value})}
+                      />
+                      <ListInput
+                          className="args"
+                          placeholder={t("settings.browserArgsPlaceholder")}
+                          title={t("settings.browserArgsTitle")}
+                          disabled={busy}
+                          value={browser.arguments}
+                          onChange={(e) => updateBrowser(browser.id, {arguments: e.target.value})}
+                      />
+                      <IconOnlyButton
+                          type="button"
+                          title={t("settings.removeBrowser")}
+                          onClick={() => removeBrowser(browser.id)}
+                      >
+                        <TrashIcon size={16}/>
+                      </IconOnlyButton>
+                    </ListRow>
+                ))}
+              </ListEditor>
+
+              <ButtonRow>
+                <GhostButton type="button" onClick={addBrowser} disabled={busy}>
+                  {t("settings.addBrowser")}
+                </GhostButton>
+                <GhostButton type="button" onClick={handleDetectBrowsers} disabled={busy || detecting}>
+                  {detecting ? t("settings.detecting") : t("settings.detectInstalled")}
+                </GhostButton>
+              </ButtonRow>
+            </Section>
+
+            <Section id={anchorId("settings.forwarding")}>
+              <SectionTitle>{t("settings.forwarding")}</SectionTitle>
+
+              <SettingInfo>
+                <SettingDescription>{t("settings.forwardingDescription")}</SettingDescription>
+              </SettingInfo>
+
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.forwardingEnabled")}</SettingLabel>
+                  <SettingDescription>{t("settings.forwardingEnabledDescription")}</SettingDescription>
+                </SettingInfo>
+                <Checkbox
+                    disabled={busy}
+                    checked={settings.forwardingEnabled}
+                    onChange={(event) => update({forwardingEnabled: event.target.checked})}
+                />
+              </SettingRow>
+
+              {settings.forwardingEnabled && (
+                  <>
+                    <SettingRow>
+                      <SettingInfo>
+                        <SettingLabel>{t("settings.deviceName")}</SettingLabel>
+                        <SettingDescription>{t("settings.deviceNameDescription")}</SettingDescription>
+                      </SettingInfo>
+                      <ListInput
+                          className="name"
+                          disabled={busy}
+                          value={settings.deviceName}
+                          onChange={(event) => update({deviceName: event.target.value})}
+                      />
+                    </SettingRow>
+
+                    <SettingRow>
+                      <SettingInfo>
+                        <SettingLabel>{t("settings.forwardPort")}</SettingLabel>
+                        <SettingDescription>{t("settings.forwardPortDescription")}</SettingDescription>
+                      </SettingInfo>
+                      <ListInput
+                          className="port"
+                          type="number"
+                          disabled={busy}
+                          value={String(settings.forwardPort)}
+                          onChange={(event) => update({forwardPort: Number(event.target.value) || 0})}
+                      />
+                    </SettingRow>
+
+                    {forwardInfo && forwardInfo.addresses.length > 0 && (
+                        <InfoText>
+                          {t("settings.forwardAddresses", {
+                            port: settings.forwardPort,
+                            addresses: forwardInfo.addresses.join(", "),
+                          })}
+                        </InfoText>
+                    )}
+
+                    {forwardInfo && (
+                        <InfoText>{t("settings.forwardKey", {key: fingerprint(forwardInfo.publicKey)})}</InfoText>
+                    )}
+
+                    {forwardInfo?.enabled && !forwardInfo.listening && (
+                        <WarnText>
+                          <AlertTriangleIcon size={14}/>
+                          <span>{t("settings.forwardNotListening")}</span>
+                        </WarnText>
+                    )}
+                  </>
+              )}
+
+              {settings.forwardingEnabled !== forwardingActive && (
+                  <InfoText>{t("settings.forwardSaveFirst")}</InfoText>
+              )}
+            </Section>
+
+            <Section id={anchorId("settings.forwardDevices")}>
+              <SectionTitle>{t("settings.forwardDevices")}</SectionTitle>
+
+              <SettingInfo>
+                <SettingDescription>{t("settings.forwardDevicesDescription")}</SettingDescription>
+                <SettingDescription>{t("settings.forwardAddressesHint")}</SettingDescription>
+              </SettingInfo>
+
+              {settings.devices.length === 0 ? (
+                  <InfoText>{t("settings.forwardDevicesEmpty")}</InfoText>
+              ) : (
+                  <FilterList>
+                    {settings.devices.map((device) => (
+                        <FilterRow key={device.id}>
+                          <FilterBody>
+                            <DeviceNameRow>
+                              <StatusDot
+                                  $online={onlineDevices.has(device.id)}
+                                  title={t(onlineDevices.has(device.id) ? "settings.deviceOnline" : "settings.deviceOffline")}
+                              />
+                              <FilterName>{device.name || device.host}</FilterName>
+                            </DeviceNameRow>
+                            <FilterUrl>{device.host}:{device.port}</FilterUrl>
+
+                            {(device.addresses ?? []).map((address) => (
+                                <AddressRow key={address}>
+                                  <span>+ {address}:{device.port}</span>
+                                  <IconOnlyButton
+                                      type="button"
+                                      title={t("settings.removeAddress")}
+                                      onClick={() => removeDeviceAddress(device.id, address)}
+                                  >
+                                    <TrashIcon size={14}/>
+                                  </IconOnlyButton>
+                                </AddressRow>
+                            ))}
+
+                            <AddressAddRow>
+                              <ListInput
+                                  className="path"
+                                  placeholder={t("settings.deviceAddressPlaceholder")}
+                                  disabled={!forwardingActive}
+                                  value={addressInputs[device.id] ?? ""}
+                                  onChange={(event) => setAddressInputs((previous) => ({
+                                    ...previous,
+                                    [device.id]: event.target.value,
+                                  }))}
+                              />
+                              <GhostButton
+                                  type="button"
+                                  disabled={!forwardingActive || !(addressInputs[device.id] ?? "").trim()}
+                                  onClick={handleAddAddress(device.id)}
+                              >
+                                {t("settings.addAddress")}
+                              </GhostButton>
+                            </AddressAddRow>
+                          </FilterBody>
+                          <FilterActions>
+                            <IconOnlyButton
+                                type="button"
+                                title={t("settings.removeDevice")}
+                                onClick={() => removeDevice(device.id)}
+                            >
+                              <TrashIcon size={16}/>
+                            </IconOnlyButton>
+                          </FilterActions>
+                        </FilterRow>
+                    ))}
+                  </FilterList>
+              )}
+
+              <ButtonRow>
+                <GhostButton type="button" disabled={!forwardingActive} onClick={handleSearchOpen}>
+                  {t("settings.forwardSearch")}
+                </GhostButton>
+              </ButtonRow>
+
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.forwardManual")}</SettingLabel>
+                  <SettingDescription>{t("settings.forwardManualDescription")}</SettingDescription>
+                </SettingInfo>
+                <ButtonRow>
                   <ListInput
                       className="path"
-                      placeholder={t("settings.userAgentValuePlaceholder")}
-                      disabled={busy}
-                      value={agent.value}
-                      onChange={(e) => updateUserAgent(agent.id, {value: e.target.value})}
+                      placeholder={t("settings.deviceHostPlaceholder")}
+                      disabled={!forwardingActive}
+                      value={manualHost}
+                      onChange={(event) => setManualHost(event.target.value)}
                   />
-                  <IconOnlyButton
-                      type="button"
-                      title={t("settings.removeUserAgent")}
-                      onClick={() => removeUserAgent(agent.id)}
-                  >
-                    <TrashIcon size={16}/>
-                  </IconOnlyButton>
-                </ListRow>
-            ))}
-          </ListEditor>
-
-          <ButtonRow>
-            <GhostButton type="button" onClick={addUserAgent} disabled={busy}>
-              {t("settings.addUserAgent")}
-            </GhostButton>
-          </ButtonRow>
-        </StackCard>
-
-        <StackCard>
-          <SectionTitle>{t("settings.browsers")}</SectionTitle>
-
-          <SettingInfo>
-            <SettingDescription>
-              {t("settings.browsersDescription")}
-            </SettingDescription>
-          </SettingInfo>
-
-          <ListEditor>
-            {settings.browsers.map((browser) => (
-                <ListRow key={browser.id}>
-                  <ListInput
-                      className="name"
-                      placeholder={t("settings.browserNamePlaceholder")}
-                      disabled={busy}
-                      value={browser.name}
-                      onChange={(e) => updateBrowser(browser.id, {name: e.target.value})}
-                  />
-                  <ListInput
-                      className="path"
-                      placeholder={t("settings.browserPathPlaceholder")}
-                      disabled={busy}
-                      value={browser.executablePath}
-                      onChange={(e) => updateBrowser(browser.id, {executablePath: e.target.value})}
-                  />
-                  <ListInput
-                      className="args"
-                      placeholder={t("settings.browserArgsPlaceholder")}
-                      title={t("settings.browserArgsTitle")}
-                      disabled={busy}
-                      value={browser.arguments}
-                      onChange={(e) => updateBrowser(browser.id, {arguments: e.target.value})}
-                  />
-                  <IconOnlyButton
-                      type="button"
-                      title={t("settings.removeBrowser")}
-                      onClick={() => removeBrowser(browser.id)}
-                  >
-                    <TrashIcon size={16}/>
-                  </IconOnlyButton>
-                </ListRow>
-            ))}
-          </ListEditor>
-
-          <ButtonRow>
-            <GhostButton type="button" onClick={addBrowser} disabled={busy}>
-              {t("settings.addBrowser")}
-            </GhostButton>
-            <GhostButton type="button" onClick={handleDetectBrowsers} disabled={busy || detecting}>
-              {detecting ? t("settings.detecting") : t("settings.detectInstalled")}
-            </GhostButton>
-          </ButtonRow>
-        </StackCard>
-
-        <StackCard>
-          <SectionTitle>{t("settings.forwarding")}</SectionTitle>
-
-          <SettingInfo>
-            <SettingDescription>{t("settings.forwardingDescription")}</SettingDescription>
-          </SettingInfo>
-
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.forwardingEnabled")}</SettingLabel>
-              <SettingDescription>{t("settings.forwardingEnabledDescription")}</SettingDescription>
-            </SettingInfo>
-            <Checkbox
-                disabled={busy}
-                checked={settings.forwardingEnabled}
-                onChange={(event) => update({forwardingEnabled: event.target.checked})}
-            />
-          </SettingRow>
-
-          {settings.forwardingEnabled && (
-              <>
-                <SettingRow>
-                  <SettingInfo>
-                    <SettingLabel>{t("settings.deviceName")}</SettingLabel>
-                    <SettingDescription>{t("settings.deviceNameDescription")}</SettingDescription>
-                  </SettingInfo>
-                  <ListInput
-                      className="name"
-                      disabled={busy}
-                      value={settings.deviceName}
-                      onChange={(event) => update({deviceName: event.target.value})}
-                  />
-                </SettingRow>
-
-                <SettingRow>
-                  <SettingInfo>
-                    <SettingLabel>{t("settings.forwardPort")}</SettingLabel>
-                    <SettingDescription>{t("settings.forwardPortDescription")}</SettingDescription>
-                  </SettingInfo>
                   <ListInput
                       className="port"
                       type="number"
-                      disabled={busy}
-                      value={String(settings.forwardPort)}
-                      onChange={(event) => update({forwardPort: Number(event.target.value) || 0})}
+                      disabled={!forwardingActive}
+                      value={String(manualPort)}
+                      onChange={(event) => setManualPort(Number(event.target.value) || 0)}
                   />
-                </SettingRow>
-
-                {forwardInfo && forwardInfo.addresses.length > 0 && (
-                    <InfoText>
-                      {t("settings.forwardAddresses", {
-                        port: settings.forwardPort,
-                        addresses: forwardInfo.addresses.join(", "),
-                      })}
-                    </InfoText>
-                )}
-
-                {forwardInfo && (
-                    <InfoText>{t("settings.forwardKey", {key: fingerprint(forwardInfo.publicKey)})}</InfoText>
-                )}
-
-                {forwardInfo?.enabled && !forwardInfo.listening && (
-                    <WarnText>
-                      <AlertTriangleIcon size={14}/>
-                      <span>{t("settings.forwardNotListening")}</span>
-                    </WarnText>
-                )}
-              </>
-          )}
-
-          {settings.forwardingEnabled !== forwardingActive && (
-              <InfoText>{t("settings.forwardSaveFirst")}</InfoText>
-          )}
-        </StackCard>
-
-        <StackCard>
-          <SectionTitle>{t("settings.forwardDevices")}</SectionTitle>
-
-          <SettingInfo>
-            <SettingDescription>{t("settings.forwardDevicesDescription")}</SettingDescription>
-            <SettingDescription>{t("settings.forwardAddressesHint")}</SettingDescription>
-          </SettingInfo>
-
-          {settings.devices.length === 0 ? (
-              <InfoText>{t("settings.forwardDevicesEmpty")}</InfoText>
-          ) : (
-              <FilterList>
-                {settings.devices.map((device) => (
-                    <FilterRow key={device.id}>
-                      <FilterBody>
-                        <DeviceNameRow>
-                          <StatusDot
-                              $online={onlineDevices.has(device.id)}
-                              title={t(onlineDevices.has(device.id) ? "settings.deviceOnline" : "settings.deviceOffline")}
-                          />
-                          <FilterName>{device.name || device.host}</FilterName>
-                        </DeviceNameRow>
-                        <FilterUrl>{device.host}:{device.port}</FilterUrl>
-
-                        {(device.addresses ?? []).map((address) => (
-                            <AddressRow key={address}>
-                              <span>+ {address}:{device.port}</span>
-                              <IconOnlyButton
-                                  type="button"
-                                  title={t("settings.removeAddress")}
-                                  onClick={() => removeDeviceAddress(device.id, address)}
-                              >
-                                <TrashIcon size={14}/>
-                              </IconOnlyButton>
-                            </AddressRow>
-                        ))}
-
-                        <AddressAddRow>
-                          <ListInput
-                              className="path"
-                              placeholder={t("settings.deviceAddressPlaceholder")}
-                              disabled={!forwardingActive}
-                              value={addressInputs[device.id] ?? ""}
-                              onChange={(event) => setAddressInputs((previous) => ({
-                                ...previous,
-                                [device.id]: event.target.value,
-                              }))}
-                          />
-                          <GhostButton
-                              type="button"
-                              disabled={!forwardingActive || !(addressInputs[device.id] ?? "").trim()}
-                              onClick={handleAddAddress(device.id)}
-                          >
-                            {t("settings.addAddress")}
-                          </GhostButton>
-                        </AddressAddRow>
-                      </FilterBody>
-                      <FilterActions>
-                        <IconOnlyButton
-                            type="button"
-                            title={t("settings.removeDevice")}
-                            onClick={() => removeDevice(device.id)}
-                        >
-                          <TrashIcon size={16}/>
-                        </IconOnlyButton>
-                      </FilterActions>
-                    </FilterRow>
-                ))}
-              </FilterList>
-          )}
-
-          <ButtonRow>
-            <GhostButton type="button" disabled={!forwardingActive} onClick={handleSearchOpen}>
-              {t("settings.forwardSearch")}
-            </GhostButton>
-          </ButtonRow>
-
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.forwardManual")}</SettingLabel>
-              <SettingDescription>{t("settings.forwardManualDescription")}</SettingDescription>
-            </SettingInfo>
-            <ButtonRow>
-              <ListInput
-                  className="path"
-                  placeholder={t("settings.deviceHostPlaceholder")}
-                  disabled={!forwardingActive}
-                  value={manualHost}
-                  onChange={(event) => setManualHost(event.target.value)}
-              />
-              <ListInput
-                  className="port"
-                  type="number"
-                  disabled={!forwardingActive}
-                  value={String(manualPort)}
-                  onChange={(event) => setManualPort(Number(event.target.value) || 0)}
-              />
-              <GhostButton
-                  type="button"
-                  disabled={!forwardingActive || !manualHost.trim()}
-                  onClick={handleManualPair}
-              >
-                {t("settings.forwardPair")}
-              </GhostButton>
-            </ButtonRow>
-          </SettingRow>
-        </StackCard>
-
-        <StackCard>
-          <SectionTitle>{t("settings.systemIntegration")}</SectionTitle>
-          <SettingInfo>
-            <SettingDescription>
-              {t(platform === "windows"
-                  ? "settings.systemIntegrationDescription"
-                  : "settings.systemIntegrationDescriptionLinux")}
-            </SettingDescription>
-          </SettingInfo>
-
-          <ButtonRow>
-            <GhostButton type="button" onClick={handleRegisterProtocols} disabled={integrationBusy}>
-              <LinkIcon size={15}/>
-              {t("settings.registerHttp")}
-            </GhostButton>
-            <GhostButton type="button" onClick={handleRegisterCustomScheme} disabled={integrationBusy}>
-              <LinkIcon size={15}/>
-              {t("settings.registerUrlcheck")}
-            </GhostButton>
-            {platform === "windows" && (
-                <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
-                  {t("settings.openDefaultApps")}
-                </GhostButton>
-            )}
-            <DangerGhostButton type="button" onClick={handleUnregisterProtocols} disabled={integrationBusy}>
-              <TrashIcon size={15}/>
-              {t("settings.unregister")}
-            </DangerGhostButton>
-          </ButtonRow>
-
-          {protocols && (
-              <InfoText>
-                {t("settings.protocolStatus", {
-                  isDefault: protocols.isDefault && protocols.pathMatches ? t("settings.yes") : t("settings.no"),
-                  scheme: protocols.customSchemeRegistered ? t("settings.yes") : t("settings.no"),
-                })}
-              </InfoText>
-          )}
-
-          {protocols?.isDefault && !protocols.pathMatches && (
-              <WarnText>
-                <AlertTriangleIcon size={14}/>
-                <span>{t("settings.pathMismatch", {path: protocols.registeredPath ?? "?"})}</span>
-              </WarnText>
-          )}
-
-          {integrationMessage && <InfoText>{t(integrationMessage.key, integrationMessage.params)}</InfoText>}
-        </StackCard>
-
-        <StackCard>
-          <SectionTitle>{t("settings.autoRedirect")}</SectionTitle>
-
-          <SettingInfo>
-            <SettingDescription>{t("settings.autoRedirectDescription")}</SettingDescription>
-          </SettingInfo>
-
-          {settings.autoRedirectHosts.length === 0 ? (
-              <InfoText>{t("settings.autoRedirectEmpty")}</InfoText>
-          ) : (
-              <FilterList>
-                {settings.autoRedirectHosts.map((host) => (
-                    <FilterRow key={host}>
-                      <FilterBody>
-                        <FilterName>{host}</FilterName>
-                      </FilterBody>
-                      <FilterActions>
-                        <IconOnlyButton
-                            type="button"
-                            disabled={busy}
-                            title={t("settings.removeAutoRedirect")}
-                            onClick={() => removeAutoRedirectHost(host)}
-                        >
-                          <TrashIcon size={16}/>
-                        </IconOnlyButton>
-                      </FilterActions>
-                    </FilterRow>
-                ))}
-              </FilterList>
-          )}
-
-          <ButtonRow>
-            <ListInput
-                className="name"
-                disabled={busy}
-                placeholder={t("settings.autoRedirectPlaceholder")}
-                value={newAutoRedirectHost}
-                onChange={(event) => setNewAutoRedirectHost(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    addAutoRedirectHost();
-                  }
-                }}
-            />
-            <GhostButton type="button" disabled={busy || newAutoRedirectHost.trim().length === 0}
-                         onClick={addAutoRedirectHost}>
-              {t("settings.addAutoRedirect")}
-            </GhostButton>
-          </ButtonRow>
-        </StackCard>
-
-        <StackCard>
-          <SectionTitle>{t("settings.filterLists")}</SectionTitle>
-
-          <SettingInfo>
-            <SettingDescription>
-              {t("settings.filterListsDescription", {count: builtinRuleCount})}
-            </SettingDescription>
-          </SettingInfo>
-
-          {filterLists.length === 0 ? (
-              <InfoText>{t("settings.filterListsEmpty")}</InfoText>
-          ) : (
-              <FilterList>
-                {filterLists.map((list) => (
-                    <FilterRow key={list.id}>
-                      <FilterBody>
-                        <FilterName>{list.name}</FilterName>
-                        <FilterUrl>{list.url}</FilterUrl>
-                        <FilterMeta>
-                          <span>{t("settings.filterRules", {count: list.ruleCount})}</span>
-                          <span>
-                            {list.lastUpdated
-                                ? t("settings.filterUpdated", {date: new Date(list.lastUpdated).toLocaleString(locale)})
-                                : t("settings.filterNeverUpdated")}
-                          </span>
-                        </FilterMeta>
-                        {list.error && (
-                            <FilterError>
-                              <AlertTriangleIcon size={13}/>
-                              <span>{t(list.error)}</span>
-                            </FilterError>
-                        )}
-                      </FilterBody>
-
-                      <FilterActions>
-                        <Toggle
-                            type="button"
-                            $on={list.enabled}
-                            disabled={filtersBusy}
-                            aria-pressed={list.enabled}
-                            title={t(list.enabled ? "settings.filterDisable" : "settings.filterEnable")}
-                            onClick={() => handleToggleFilterList(list.id, !list.enabled)}
-                        />
-                        <IconOnlyButton
-                            type="button"
-                            disabled={filtersBusy}
-                            title={t("settings.removeFilterList")}
-                            onClick={() => handleRemoveFilterList(list.id)}
-                        >
-                          <TrashIcon size={16}/>
-                        </IconOnlyButton>
-                      </FilterActions>
-                    </FilterRow>
-                ))}
-              </FilterList>
-          )}
-
-          <ButtonRow>
-            <GhostButton type="button" disabled={filtersBusy} onClick={() => setAddOpen(true)}>
-              {t("settings.addFilterList")}
-            </GhostButton>
-            <GhostButton type="button" disabled={filtersBusy || filterLists.length === 0}
-                         onClick={handleCheckFilterUpdates}>
-              {filtersBusy ? t("settings.filterUpdating") : t("settings.checkFilterUpdates")}
-            </GhostButton>
-          </ButtonRow>
-        </StackCard>
-
-        <StackCard>
-          <SectionTitle>{t("settings.startup")}</SectionTitle>
-
-          <SettingInfo>
-            <SettingDescription>{t("settings.startupDescription")}</SettingDescription>
-          </SettingInfo>
-
-          {/* Only Windows has a per-user Startup folder, so the row is absent elsewhere. */}
-          {startup?.supported && (
-              <SettingRow>
-                <SettingInfo>
-                  <SettingLabel>{t("settings.startWithSession")}</SettingLabel>
-                  <SettingDescription>{t("settings.startWithSessionDescription")}</SettingDescription>
-                </SettingInfo>
-                <Checkbox
-                    disabled={startupBusy}
-                    checked={startup.enabled}
-                    onChange={(event) => handleStartupChange(event.target.checked)}
-                />
+                  <GhostButton
+                      type="button"
+                      disabled={!forwardingActive || !manualHost.trim()}
+                      onClick={handleManualPair}
+                  >
+                    {t("settings.forwardPair")}
+                  </GhostButton>
+                </ButtonRow>
               </SettingRow>
-          )}
+            </Section>
 
-          <SettingRow>
-            <SettingInfo>
-              <SettingLabel>{t("settings.hideOnLaunch")}</SettingLabel>
-              <SettingDescription>{t("settings.hideOnLaunchDescription")}</SettingDescription>
-            </SettingInfo>
-            <Checkbox
-                disabled={busy}
-                checked={settings.hideOnLaunch}
-                onChange={(event) => update({hideOnLaunch: event.target.checked})}
-            />
-          </SettingRow>
-        </StackCard>
+            <Section id={anchorId("settings.systemIntegration")}>
+              <SectionTitle>{t("settings.systemIntegration")}</SectionTitle>
+              <SettingInfo>
+                <SettingDescription>
+                  {t(platform === "windows"
+                      ? "settings.systemIntegrationDescription"
+                      : "settings.systemIntegrationDescriptionLinux")}
+                </SettingDescription>
+              </SettingInfo>
 
-        <StackCard>
-          <SectionTitle>{t("settings.about")}</SectionTitle>
-
-          <SettingInfo>
-            <SettingDescription>
-              {t("settings.aboutDescription", {version: appVersion || "…"})}
-            </SettingDescription>
-          </SettingInfo>
-
-          <ButtonRow>
-            <GhostButton type="button" disabled={updateBusy} onClick={handleCheckUpdate}>
-              {updateBusy ? t("settings.updateChecking") : t("settings.checkUpdates")}
-            </GhostButton>
-            {updateResult?.available && (
-                <GhostButton type="button" onClick={handleOpenRelease}>
-                  {t("settings.openRelease")}
+              <ButtonRow>
+                <GhostButton type="button" onClick={handleRegisterProtocols} disabled={integrationBusy}>
+                  <LinkIcon size={15}/>
+                  {t("settings.registerHttp")}
                 </GhostButton>
-            )}
-            <GhostButton type="button" onClick={handleOpenLogs}>
-              {t("settings.openLogs")}
-            </GhostButton>
-          </ButtonRow>
+                <GhostButton type="button" onClick={handleRegisterCustomScheme} disabled={integrationBusy}>
+                  <LinkIcon size={15}/>
+                  {t("settings.registerUrlcheck")}
+                </GhostButton>
+                {platform === "windows" && (
+                    <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
+                      {t("settings.openDefaultApps")}
+                    </GhostButton>
+                )}
+                <DangerGhostButton type="button" onClick={handleUnregisterProtocols} disabled={integrationBusy}>
+                  <TrashIcon size={15}/>
+                  {t("settings.unregister")}
+                </DangerGhostButton>
+              </ButtonRow>
 
-          {updateResult &&
-              (updateResult.available ? (
+              {protocols && (
+                  <InfoText>
+                    {t("settings.protocolStatus", {
+                      isDefault: protocols.isDefault && protocols.pathMatches ? t("settings.yes") : t("settings.no"),
+                      scheme: protocols.customSchemeRegistered ? t("settings.yes") : t("settings.no"),
+                    })}
+                  </InfoText>
+              )}
+
+              {protocols?.isDefault && !protocols.pathMatches && (
                   <WarnText>
                     <AlertTriangleIcon size={14}/>
-                    <span>{t("settings.updateAvailable", {version: updateResult.latest})}</span>
+                    <span>{t("settings.pathMismatch", {path: protocols.registeredPath ?? "?"})}</span>
                   </WarnText>
-              ) : (
-                  <InfoText>{t("settings.updateCurrent", {version: updateResult.current})}</InfoText>
-              ))}
+              )}
 
-          {logDirectory && (
-              <FileInfo>
-                <span>{t("settings.logsLocation")}</span>
-                <code>{logDirectory}</code>
-              </FileInfo>
-          )}
-        </StackCard>
+              {integrationMessage && <InfoText>{t(integrationMessage.key, integrationMessage.params)}</InfoText>}
+            </Section>
+
+            <Section id={anchorId("settings.autoRedirect")}>
+              <SectionTitle>{t("settings.autoRedirect")}</SectionTitle>
+
+              <SettingInfo>
+                <SettingDescription>{t("settings.autoRedirectDescription")}</SettingDescription>
+              </SettingInfo>
+
+              {settings.autoRedirectHosts.length === 0 ? (
+                  <InfoText>{t("settings.autoRedirectEmpty")}</InfoText>
+              ) : (
+                  <FilterList>
+                    {settings.autoRedirectHosts.map((host) => (
+                        <FilterRow key={host}>
+                          <FilterBody>
+                            <FilterName>{host}</FilterName>
+                          </FilterBody>
+                          <FilterActions>
+                            <IconOnlyButton
+                                type="button"
+                                disabled={busy}
+                                title={t("settings.removeAutoRedirect")}
+                                onClick={() => removeAutoRedirectHost(host)}
+                            >
+                              <TrashIcon size={16}/>
+                            </IconOnlyButton>
+                          </FilterActions>
+                        </FilterRow>
+                    ))}
+                  </FilterList>
+              )}
+
+              <ButtonRow>
+                <ListInput
+                    className="name"
+                    disabled={busy}
+                    placeholder={t("settings.autoRedirectPlaceholder")}
+                    value={newAutoRedirectHost}
+                    onChange={(event) => setNewAutoRedirectHost(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        addAutoRedirectHost();
+                      }
+                    }}
+                />
+                <GhostButton type="button" disabled={busy || newAutoRedirectHost.trim().length === 0}
+                             onClick={addAutoRedirectHost}>
+                  {t("settings.addAutoRedirect")}
+                </GhostButton>
+              </ButtonRow>
+            </Section>
+
+            <Section id={anchorId("settings.filterLists")}>
+              <SectionTitle>{t("settings.filterLists")}</SectionTitle>
+
+              <SettingInfo>
+                <SettingDescription>
+                  {t("settings.filterListsDescription", {count: builtinRuleCount})}
+                </SettingDescription>
+              </SettingInfo>
+
+              {filterLists.length === 0 ? (
+                  <InfoText>{t("settings.filterListsEmpty")}</InfoText>
+              ) : (
+                  <FilterList>
+                    {filterLists.map((list) => (
+                        <FilterRow key={list.id}>
+                          <FilterBody>
+                            <FilterName>{list.name}</FilterName>
+                            <FilterUrl>{list.url}</FilterUrl>
+                            <FilterMeta>
+                              <span>{t("settings.filterRules", {count: list.ruleCount})}</span>
+                              <span>
+                                {list.lastUpdated
+                                    ? t("settings.filterUpdated", {date: new Date(list.lastUpdated).toLocaleString(locale)})
+                                    : t("settings.filterNeverUpdated")}
+                              </span>
+                            </FilterMeta>
+                            {list.error && (
+                                <FilterError>
+                                  <AlertTriangleIcon size={13}/>
+                                  <span>{t(list.error)}</span>
+                                </FilterError>
+                            )}
+                          </FilterBody>
+
+                          <FilterActions>
+                            <Toggle
+                                type="button"
+                                $on={list.enabled}
+                                disabled={filtersBusy}
+                                aria-pressed={list.enabled}
+                                title={t(list.enabled ? "settings.filterDisable" : "settings.filterEnable")}
+                                onClick={() => handleToggleFilterList(list.id, !list.enabled)}
+                            />
+                            <IconOnlyButton
+                                type="button"
+                                disabled={filtersBusy}
+                                title={t("settings.removeFilterList")}
+                                onClick={() => handleRemoveFilterList(list.id)}
+                            >
+                              <TrashIcon size={16}/>
+                            </IconOnlyButton>
+                          </FilterActions>
+                        </FilterRow>
+                    ))}
+                  </FilterList>
+              )}
+
+              <ButtonRow>
+                <GhostButton type="button" disabled={filtersBusy} onClick={() => setAddOpen(true)}>
+                  {t("settings.addFilterList")}
+                </GhostButton>
+                <GhostButton type="button" disabled={filtersBusy || filterLists.length === 0}
+                             onClick={handleCheckFilterUpdates}>
+                  {filtersBusy ? t("settings.filterUpdating") : t("settings.checkFilterUpdates")}
+                </GhostButton>
+              </ButtonRow>
+            </Section>
+
+            <Section id={anchorId("settings.startup")}>
+              <SectionTitle>{t("settings.startup")}</SectionTitle>
+
+              <SettingInfo>
+                <SettingDescription>{t("settings.startupDescription")}</SettingDescription>
+              </SettingInfo>
+
+              {/* Only Windows has a per-user Startup folder, so the row is absent elsewhere. */}
+              {startup?.supported && (
+                  <SettingRow>
+                    <SettingInfo>
+                      <SettingLabel>{t("settings.startWithSession")}</SettingLabel>
+                      <SettingDescription>{t("settings.startWithSessionDescription")}</SettingDescription>
+                    </SettingInfo>
+                    <Checkbox
+                        disabled={startupBusy}
+                        checked={startup.enabled}
+                        onChange={(event) => handleStartupChange(event.target.checked)}
+                    />
+                  </SettingRow>
+              )}
+
+              <SettingRow>
+                <SettingInfo>
+                  <SettingLabel>{t("settings.hideOnLaunch")}</SettingLabel>
+                  <SettingDescription>{t("settings.hideOnLaunchDescription")}</SettingDescription>
+                </SettingInfo>
+                <Checkbox
+                    disabled={busy}
+                    checked={settings.hideOnLaunch}
+                    onChange={(event) => update({hideOnLaunch: event.target.checked})}
+                />
+              </SettingRow>
+            </Section>
+
+            <Section id={anchorId("settings.about")}>
+              <SectionTitle>{t("settings.about")}</SectionTitle>
+
+              <SettingInfo>
+                <SettingDescription>
+                  {t("settings.aboutDescription", {version: appVersion || "…"})}
+                </SettingDescription>
+              </SettingInfo>
+
+              <ButtonRow>
+                <GhostButton type="button" disabled={updateBusy} onClick={handleCheckUpdate}>
+                  {updateBusy ? t("settings.updateChecking") : t("settings.checkUpdates")}
+                </GhostButton>
+                {updateResult?.available && (
+                    <GhostButton type="button" onClick={handleOpenRelease}>
+                      {t("settings.openRelease")}
+                    </GhostButton>
+                )}
+                <GhostButton type="button" onClick={handleOpenLogs}>
+                  {t("settings.openLogs")}
+                </GhostButton>
+              </ButtonRow>
+
+              {updateResult &&
+                  (updateResult.available ? (
+                      <WarnText>
+                        <AlertTriangleIcon size={14}/>
+                        <span>{t("settings.updateAvailable", {version: updateResult.latest})}</span>
+                      </WarnText>
+                  ) : (
+                      <InfoText>{t("settings.updateCurrent", {version: updateResult.current})}</InfoText>
+                  ))}
+
+              {logDirectory && (
+                  <FileInfo>
+                    <span>{t("settings.logsLocation")}</span>
+                    <code>{logDirectory}</code>
+                  </FileInfo>
+              )}
+            </Section>
+          </SettingsSections>
+
+          <SettingsNav>
+            {SECTIONS.map((key) => (
+                <NavItem
+                    key={key}
+                    $active={activeSection === anchorId(key)}
+                    onClick={() => jumpTo(anchorId(key))}
+                    type="button"
+                >
+                  {t(key)}
+                </NavItem>
+            ))}
+          </SettingsNav>
+        </SettingsBody>
 
         <ActionRow>
           <SaveButton onClick={handleSave} disabled={busy}>
