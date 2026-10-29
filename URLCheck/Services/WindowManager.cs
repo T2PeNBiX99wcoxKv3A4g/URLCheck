@@ -2,6 +2,7 @@ using System.Drawing;
 using JetBrains.Annotations;
 using Photino.NET;
 using PhotinoNetUtils.Extensions;
+using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Platform;
 using URLCheck.Filters;
 using URLCheck.Inspect;
@@ -384,7 +385,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
             // A fresh window carries the URL in its fragment, or collects it from the pending field
             // once the page reports ready. A reused one gets the event, or replaces the pending URL.
             if (!created && _selectionReady)
-                TrySend(button, NativeProtocol.SerializeEvent("selection.show", new SelectionShowPayload(url)));
+                TrySend(button, NativeBridge.SerializeEvent("selection.show", new SelectionShowPayload(url)));
             else if (!created)
                 _pendingSelectionUrl = url;
 
@@ -528,7 +529,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
         Invoke(_mainWindow, _platform.Show);
 
         if (tab is { Length: > 0 })
-            _mainWindow?.SendWebMessage(NativeProtocol.SerializeEvent("app.navigate", new NavigatePayload(tab)));
+            _mainWindow?.SendWebMessage(NativeBridge.SerializeEvent("app.navigate", new NavigatePayload(tab)));
     }
 
     /// <summary>
@@ -608,7 +609,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
                 if (Try.Run(() =>
                     {
-                        existing.SendWebMessage(NativeProtocol.SerializeEvent("popup.navigate",
+                        existing.SendWebMessage(NativeBridge.SerializeEvent("popup.navigate",
                             new PopupNavigatePayload(url)));
                         _platform.Show(existing);
                         _platform.KeepOnTop(existing);
@@ -697,7 +698,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
     [PublicAPI]
     public void BroadcastEvent(string type, object? data)
     {
-        var json = NativeProtocol.SerializeEvent(type, data);
+        var json = NativeBridge.SerializeEvent(type, data);
         TrySend(_mainWindow, json);
         TrySend(_popupWindow, json);
     }
@@ -710,7 +711,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
         if (!_mainWindowReady)
             return;
 
-        TrySend(_mainWindow, NativeProtocol.SerializeEvent(type, data));
+        TrySend(_mainWindow, NativeBridge.SerializeEvent(type, data));
     }
 
     /// <summary>
@@ -719,7 +720,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
     /// </summary>
     public void BroadcastEventIfReady(string type, object? data)
     {
-        var json = NativeProtocol.SerializeEvent(type, data);
+        var json = NativeBridge.SerializeEvent(type, data);
         if (_mainWindowReady)
             TrySend(_mainWindow, json);
         if (_popupReady)
@@ -767,7 +768,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
             return;
 
         _pendingPopupUrl = null;
-        TrySend(window, NativeProtocol.SerializeEvent("popup.navigate", new PopupNavigatePayload(url)));
+        TrySend(window, NativeBridge.SerializeEvent("popup.navigate", new PopupNavigatePayload(url)));
     }
 
     /// <summary>Hands over a URL that was too long to travel in the button's start URL.</summary>
@@ -777,7 +778,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
             return;
 
         _pendingSelectionUrl = null;
-        TrySend(window, NativeProtocol.SerializeEvent("selection.show", new SelectionShowPayload(url)));
+        TrySend(window, NativeBridge.SerializeEvent("selection.show", new SelectionShowPayload(url)));
     }
 
     /// <summary>

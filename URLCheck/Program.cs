@@ -3,12 +3,14 @@ using System.Runtime.Versioning;
 using PhotinoNetUtils;
 using PhotinoNetUtils.Hosting;
 using PhotinoNetUtils.Interop;
+using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Platform;
 using PhotinoNetUtils.Services;
 using Serilog;
 using URLCheck.Filters;
 using URLCheck.Forward;
 using URLCheck.Inspect;
+using URLCheck.Messaging;
 using URLCheck.Platform;
 using URLCheck.Services;
 
@@ -28,6 +30,9 @@ internal static class Program
         // Main must stay synchronous: [STAThread] is ignored for an async entry point, and the
         // Photino message loop / WebView2 require an STA thread.
         Logging.Initialize(Constants.Name, "urlcheck");
+
+        // The bridge serializes through this context; it has to know it before the interface speaks.
+        NativeBridge.Initialize(AppJsonContext.Default);
 
         if (OperatingSystem.IsLinux())
         {
