@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.14.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.14.0..v0.14.1) - 2026-10-29
+
+### 🐛 Bug Fixes
+
+- Drop the frame from the popup and the button too - ([5e7b584](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5e7b584a378bbb79841327ca76188d6e67b09df0))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([5ed174c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5ed174cd1d9ffcc7747b4fbd1fbe6456247684e0))
+
+
 ## [0.14.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.13.0..v0.14.0) - 2026-10-29
 
 ### ⛰️  Features
