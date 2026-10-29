@@ -200,6 +200,30 @@ internal sealed class WindowManager : Singleton<WindowManager>
                 return null;
             }
 
+            case "window.minimize":
+                Invoke(context.Window ?? _mainWindow, window => window.SetMinimized(true));
+                return null;
+
+            case "window.toggleMaximize":
+                Invoke(context.Window ?? _mainWindow, ToggleMaximize);
+                return null;
+
+            case "window.close":
+                CloseWindow(context.Window ?? _mainWindow);
+                return null;
+
+            case "window.drag":
+                Invoke(context.Window ?? _mainWindow, BeginWindowDrag);
+                return null;
+
+            case "window.resize":
+            {
+                var direction = context.Payload<WindowResizeRequest>()?.Direction ?? "";
+                Invoke(context.Window ?? _mainWindow, window => BeginWindowResize(window, direction));
+
+                return null;
+            }
+
             default:
                 return null;
         }
@@ -236,11 +260,21 @@ internal sealed class WindowManager : Singleton<WindowManager>
             });
 
         ApplyIcon(window);
+
+        // The interface draws its own title bar. On Windows the native frame stays and WindowFrame
+        // hides its non-client area, because a chromeless window is one no shell — or tiling window
+        // manager — will arrange; elsewhere chromeless is still the simplest way.
+        if (!OperatingSystem.IsWindows())
+            window.SetChromeless(true);
+
         window.Load(AppUrl);
         _mainWindow = window;
 
         window.RegisterWindowCreatedHandler((_, _) =>
         {
+            if (OperatingSystem.IsWindows())
+                WindowFrame.RemoveTitleBar(window.WindowHandle);
+
             ApplyClipboardWatching();
 
             // Photino drops a Start Menu shortcut for the toast registration and never revisits it,
@@ -750,6 +784,49 @@ internal sealed class WindowManager : Singleton<WindowManager>
     {
         window?.Invoke(() => action(window));
     }
+
+    /// <summary>Starts a native move from the interface's own title bar.</summary>
+    private static void BeginWindowDrag(PhotinoWindow window)
+    {
+        if (OperatingSystem.IsWindows())
+            WindowDrag.Begin(window.WindowHandle);
+        else if (OperatingSystem.IsLinux())
+            LinuxWindow.BeginDrag(window.Title);
+    }
+
+    /// <summary>Starts a native resize from one of the interface's edge grips.</summary>
+    private static void BeginWindowResize(PhotinoWindow window, string direction)
+    {
+        if (OperatingSystem.IsWindows())
+            WindowResize.Begin(window.WindowHandle, direction);
+        else if (OperatingSystem.IsLinux())
+            LinuxWindow.BeginResize(window.Title, direction);
+    }
+
+    /// <summary>Maximizes or restores through the platform, then tells the interface which it did.</summary>
+    private void ToggleMaximize(PhotinoWindow window)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            if (window.WindowHandle != IntPtr.Zero)
+                NotifyWindowState(WindowZoom.Toggle(window.WindowHandle));
+
+            return;
+        }
+
+        if (OperatingSystem.IsLinux())
+        {
+            NotifyWindowState(LinuxWindow.ToggleMaximize(window.Title));
+            return;
+        }
+
+        var maximized = window.Maximized != true;
+        window.SetMaximized(maximized);
+        NotifyWindowState(maximized);
+    }
+
+    private void NotifyWindowState(bool maximized) =>
+        NotifyMainWindow("window.state", new WindowStatePayload(maximized));
 
     private void ReassertTopMost(PhotinoWindow popup) =>
         Try.Run(() =>

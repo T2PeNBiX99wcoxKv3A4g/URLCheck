@@ -1,13 +1,15 @@
 import {useEffect, useState} from "react";
 import styled from "styled-components";
 import {DEFAULT_TAB, findTab, type TabType} from "./tabs";
-import {Native} from "@photino-net-utils/bridge";
+import {Native, ResizeHandles} from "@photino-net-utils/bridge";
 import {NavigationContext} from "./navigation";
 import {Sidebar} from "./components/Sidebar";
 import {Header} from "./components/Header";
+import {TitleBar} from "./components/TitleBar";
 
 const AppContainer = styled.div`
     display: flex;
+    flex-direction: column;
     width: 100vw;
     height: 100vh;
     overflow: hidden;
@@ -16,12 +18,18 @@ const AppContainer = styled.div`
     color: #f9fafb;
 `;
 
+const Body = styled.div`
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+`;
+
 const MainLayout = styled.div`
     display: flex;
     flex-direction: column;
     flex: 1;
     min-width: 0;
-    height: 100vh;
     overflow: hidden;
 `;
 
@@ -56,16 +64,23 @@ export default function App() {
 
     return (
         <AppContainer>
-            <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab}/>
+            <TitleBar/>
 
-            <MainLayout>
-                <Header currentTab={currentTab}/>
-                <ContentArea>
-                    <NavigationContext.Provider value={setCurrentTab}>
-                        <CurrentPage/>
-                    </NavigationContext.Provider>
-                </ContentArea>
-            </MainLayout>
+            <Body>
+                <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab}/>
+
+                <MainLayout>
+                    <Header currentTab={currentTab}/>
+                    <ContentArea>
+                        <NavigationContext.Provider value={setCurrentTab}>
+                            <CurrentPage/>
+                        </NavigationContext.Provider>
+                    </ContentArea>
+                </MainLayout>
+            </Body>
+
+            {/* A chromeless window has no frame to grab, so the edges are resized from here. */}
+            <ResizeHandles/>
         </AppContainer>
     );
 }

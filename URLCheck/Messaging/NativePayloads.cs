@@ -49,6 +49,11 @@ internal sealed record UpdateCheckPayload(string Current, string Latest, bool Av
 /// </summary>
 internal sealed record StartupPayload(bool Supported, bool Enabled);
 
+/// <summary>Body for the <c>window.state</c> event: whether the window is maximized.</summary>
+internal sealed record WindowStatePayload(bool Maximized);
+
+/// <summary>Payload for <c>window.resize</c>: the edge the interface's grip was dragged from.</summary>
+internal sealed record WindowResizeRequest(string Direction);
 
 /// <summary>Body for <c>history.list</c>.</summary>
 internal sealed record HistoryListPayload(IReadOnlyList<HistoryItemPayload> Entries);

@@ -4,7 +4,6 @@ import {Native, useTranslation} from "@photino-net-utils/bridge";
 import {TABS, type TabType} from "../tabs";
 import {getAppInfo, getUpdateStatus, RELEASES_URL, type UpdateCheck} from "../api/system";
 import {openWithDefaultHandler} from "../api/browsers";
-import {LogoIcon} from "./Icons";
 
 interface SidebarProps {
     currentTab: TabType;
@@ -18,51 +17,13 @@ const SidebarContainer = styled.aside`
     border-right: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
     flex-shrink: 0;
     user-select: none;
 `;
 
-const LogoSection = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 24px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-`;
-
-const LogoIconWrapper = styled.div`
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
-`;
-
-const LogoText = styled.div`
-    display: flex;
-    flex-direction: column;
-`;
-
-const LogoTitle = styled.span`
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #f9fafb;
-    letter-spacing: -0.02em;
-`;
-
-const LogoBadge = styled.span`
-    font-size: 0.7rem;
-    color: #9ca3af;
-    font-weight: 500;
-`;
-
 const NavList = styled.nav`
-    padding: 16px 12px;
+    padding: 18px 12px 16px;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -166,16 +127,6 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
 
     return (
         <SidebarContainer>
-            <LogoSection>
-                <LogoIconWrapper>
-                    <LogoIcon size={40}/>
-                </LogoIconWrapper>
-                <LogoText>
-                    <LogoTitle>URLCheck</LogoTitle>
-                    <LogoBadge>{t("app.tagline")}</LogoBadge>
-                </LogoText>
-            </LogoSection>
-
             <NavList>
                 {TABS.map((tab) => {
                     const Icon = tab.icon;

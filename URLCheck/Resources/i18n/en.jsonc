@@ -221,6 +221,11 @@
   "popup.sendTo": "Send to",
   "popup.sendToTooltip": "Forward this URL to another device",
   "popup.sent": "Sent!",
+  // ---------------------------------------------------------------- window
+  "window.minimize": "Minimize",
+  "window.maximize": "Maximize",
+  "window.restore": "Restore",
+  "window.close": "Close",
   // ------------------------------------------------------------------ tray
   "tray.open": "Open URLCheck",
   "tray.settings": "Settings",

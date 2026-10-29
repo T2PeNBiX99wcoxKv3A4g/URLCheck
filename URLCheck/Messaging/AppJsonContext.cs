@@ -42,6 +42,8 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(AppInfoPayload))]
 [JsonSerializable(typeof(UpdateCheckPayload))]
 [JsonSerializable(typeof(StartupPayload))]
+[JsonSerializable(typeof(WindowStatePayload))]
+[JsonSerializable(typeof(WindowResizeRequest))]
 [JsonSerializable(typeof(StartupRequest))]
 [JsonSerializable(typeof(LocalePayload))]
 [JsonSerializable(typeof(HistoryListPayload))]
