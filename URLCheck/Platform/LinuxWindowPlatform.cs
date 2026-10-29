@@ -100,6 +100,10 @@ internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWin
         if (!borderless)
             return;
 
+        // Wayland leaves an undecorated window to the compositor's frame, so the popup asks GTK for
+        // client-side decorations without a titlebar — the same as the host window.
+        LinuxWindow.UseClientSideFrame(window.Title);
+
         if (!LinuxGtk.MakeTransparent(window.Title))
         {
             Log.Warning("The popup could not be made transparent after all");
@@ -135,6 +139,9 @@ internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWin
     public void ConfigureSelectionButtonWindow(PhotinoWindow window)
     {
         LinuxGtk.SkipTaskbar(window.Title);
+
+        // The pill is drawn by the interface, so it must not get the compositor's frame either.
+        LinuxWindow.UseClientSideFrame(window.Title);
 
         if (!LinuxGtk.MakeTransparent(window.Title))
             return;
