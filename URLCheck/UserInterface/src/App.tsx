@@ -1,8 +1,7 @@
 import {useEffect, useState} from "react";
 import styled from "styled-components";
 import {DEFAULT_TAB, findTab, type TabType} from "./tabs";
-import {Native, ResizeHandles, useWindowControls} from "@photino-net-utils/bridge";
-import {getAppInfo} from "./api/system";
+import {Native, ResizeHandles, useWindowCorners} from "@photino-net-utils/bridge";
 import {NavigationContext} from "./navigation";
 import {Sidebar} from "./components/Sidebar";
 import {Header} from "./components/Header";
@@ -47,18 +46,7 @@ const ContentArea = styled.main`
 
 export default function App() {
     const [currentTab, setCurrentTab] = useState<TabType>(DEFAULT_TAB);
-    /** Whether the window has no frame of its own, so the interface draws the corners (Linux). */
-    const [rounded, setRounded] = useState(false);
-    const {maximized} = useWindowControls();
-
-    useEffect(() => {
-        void getAppInfo().then((info) => setRounded(info.rounded), () => undefined);
-    }, []);
-
-    /* The window is transparent behind the rounded corners, so the page must not paint over them. */
-    useEffect(() => {
-        document.documentElement.classList.toggle("window-rounded", rounded);
-    }, [rounded]);
+    const corners = useWindowCorners();
 
     // The tray menu can request a specific tab (e.g. "Settings").
     useEffect(() => {
@@ -81,7 +69,7 @@ export default function App() {
     const CurrentPage = findTab(currentTab).page;
 
     return (
-        <AppContainer $rounded={rounded && !maximized}>
+        <AppContainer $rounded={corners}>
             <TitleBar/>
 
             <Body>
