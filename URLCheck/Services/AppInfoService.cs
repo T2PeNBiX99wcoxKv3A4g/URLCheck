@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using JetBrains.Annotations;
 using PhotinoNetUtils.Extensions;
+using PhotinoNetUtils.Platform;
 using PhotinoNetUtils.Utils;
 using URLCheck.Messaging;
 
@@ -48,12 +48,7 @@ internal sealed class AppInfoService : Singleton<AppInfoService>
     {
         var directory = Constants.LogDirectory;
 
-        var started = Try.Run(() => Process.Start(new ProcessStartInfo
-        {
-            FileName = OperatingSystem.IsWindows() ? "explorer.exe" : "xdg-open",
-            Arguments = $"\"{directory}\"",
-            UseShellExecute = false
-        }));
+        var started = Try.Run(() => SystemLauncher.Open(directory));
 
         if (started.Exception is not { } exception)
             return context.Reply("app.openLogs.result", new OkPayload());

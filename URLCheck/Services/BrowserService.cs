@@ -2,6 +2,7 @@ using System.Diagnostics;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Platform;
+using PhotinoNetUtils.Platform;
 using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Services;
@@ -63,14 +64,7 @@ internal sealed class BrowserService : Singleton<BrowserService>
     ///     configured browsers. When this app is the default handler the system starts it again, and
     ///     the URL comes back as a forwarded argument that opens the inspection popup.
     /// </summary>
-    public static void OpenWithDefaultHandler(string url) =>
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = OperatingSystem.IsWindows() ? url : "xdg-open",
-            Arguments = OperatingSystem.IsWindows() ? "" : $"\"{url}\"",
-            // ShellExecute is what makes Windows ask the shell for the default handler.
-            UseShellExecute = OperatingSystem.IsWindows()
-        });
+    public static void OpenWithDefaultHandler(string url) => SystemLauncher.Open(url);
 
     /// <summary>Handles the <c>browsers.*</c> messages.</summary>
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => Task.FromResult(
