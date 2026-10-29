@@ -30,6 +30,7 @@
     <ItemGroup>
         <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" />
+        <PackageReference Include="LuaCSharp" Version="0.5.8"/>
         <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.14" />
         <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.14" />
         <PackageReference Include="Photino.NET" Version="4.0.16" />
