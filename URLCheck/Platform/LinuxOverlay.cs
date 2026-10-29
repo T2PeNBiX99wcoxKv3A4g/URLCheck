@@ -40,8 +40,9 @@ internal static class LinuxOverlay
         if (!Load(MoveScript, BuildMoveScript(caption, offset)))
             return;
 
-        // It only moves the window that exists now, so there is no reason to leave it loaded.
-        Call("unloadScript", MoveScript);
+        // The window may still be on its way to the compositor when this runs, and the script moves it
+        // as soon as it appears; it is dropped again once that had its chance.
+        _ = Task.Delay(TimeSpan.FromSeconds(2)).ContinueWith(_ => Call("unloadScript", MoveScript));
     }
 
     /// <summary>Drops the keep-above script again, so nothing of ours keeps running inside KWin.</summary>
@@ -138,24 +139,32 @@ internal static class LinuxOverlay
     private static string BuildMoveScript(string caption, int offset) =>
         $$"""
           // Loaded by URLCheck. Wayland hides the pointer from clients, so only the compositor can put
-          // a window next to it.
+          // a window next to it. The window may only reach the compositor after this script starts, so
+          // it is moved when it appears as well as when it is already there.
           const appClass = "{{Constants.Name.ToLowerInvariant()}}";
           const caption = "{{caption}}";
           const offset = {{offset}};
 
-          const target = workspace.windowList().find(function (window) {
-              return window.resourceClass === appClass && window.caption === caption;
-          });
+          function moveToPointer(window) {
+              if (!window || window.resourceClass !== appClass || window.caption !== caption)
+                  return;
 
-          if (target) {
               const pointer = workspace.cursorPos;
-              const area = target.output.geometry;
-              const frame = Object.assign({}, target.frameGeometry);
+              const frame = Object.assign({}, window.frameGeometry);
 
-              frame.x = Math.min(Math.max(pointer.x + offset, area.x), area.x + area.width - frame.width);
-              frame.y = Math.min(Math.max(pointer.y + offset, area.y), area.y + area.height - frame.height);
+              frame.x = pointer.x + offset;
+              frame.y = pointer.y + offset;
 
-              target.frameGeometry = frame;
+              if (window.output) {
+                  const area = window.output.geometry;
+                  frame.x = Math.min(Math.max(frame.x, area.x), area.x + area.width - frame.width);
+                  frame.y = Math.min(Math.max(frame.y, area.y), area.y + area.height - frame.height);
+              }
+
+              window.frameGeometry = frame;
           }
+
+          workspace.windowAdded.connect(moveToPointer);
+          workspace.windowList().forEach(moveToPointer);
           """;
 }
