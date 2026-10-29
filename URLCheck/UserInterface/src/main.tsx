@@ -13,7 +13,7 @@ import "@fontsource/jetbrains-mono/latin-600.css";
 import "@fontsource/jetbrains-mono/latin-700.css";
 import App from "./App";
 import {ContextMenu} from "./components/ContextMenu";
-import {LocalizationProvider} from "./i18n";
+import {LocalizationProvider} from "@photino-net-utils/bridge";
 import {PopupPage} from "./pages/PopupPage";
 import {SelectionButtonPage} from "./pages/SelectionButtonPage";
 

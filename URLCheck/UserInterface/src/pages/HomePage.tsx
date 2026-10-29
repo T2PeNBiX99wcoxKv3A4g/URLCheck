@@ -3,7 +3,7 @@ import styled from "styled-components";
 import {isDefaultBrowser, showPopup} from "../api/system";
 import {AlertTriangleIcon, LinkIcon, SearchIcon, ShieldCheckIcon} from "../components/Icons";
 import {PageContainer, StackCard} from "../components/Layout";
-import {useTranslation} from "../i18n";
+import {useTranslation} from "@photino-net-utils/bridge";
 import {useNavigate} from "../navigation";
 
 const Title = styled.h3`

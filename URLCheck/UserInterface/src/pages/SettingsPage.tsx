@@ -3,10 +3,8 @@ import styled, {css} from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
 import {Dropdown} from "../components/Dropdown";
-import {useLocale, useTranslation} from "../i18n";
-import {loadStrings} from "../api/i18n";
+import {loadStrings, Native, useLocale, useTranslation} from "@photino-net-utils/bridge";
 import {AppSettings, BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
-import {Native} from "@photino-net-utils/bridge";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers, openWithDefaultHandler} from "../api/browsers";
 import {

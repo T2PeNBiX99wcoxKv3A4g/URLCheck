@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import styled from "styled-components";
 import {ATTRIBUTIONS} from "../data/attributions";
-import {useTranslation} from "../i18n";
+import {useTranslation} from "@photino-net-utils/bridge";
 
 /**
  * The open-source notices, shown as a full-page overlay from the settings. Each project is its own

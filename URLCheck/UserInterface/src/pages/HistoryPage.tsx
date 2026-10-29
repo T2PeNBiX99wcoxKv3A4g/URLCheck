@@ -3,9 +3,8 @@ import styled from "styled-components";
 import {HistoryItem} from "../types";
 import {AlertTriangleIcon, SearchIcon, TrashIcon} from "../components/Icons";
 import {Card, PageContainer} from "../components/Layout";
-import {useLocale, useTranslation} from "../i18n";
+import {Native, useLocale, useTranslation} from "@photino-net-utils/bridge";
 import {clearHistory, listHistory} from "../api/history";
-import {Native} from "@photino-net-utils/bridge";
 import {showPopup} from "../api/system";
 
 const ControlsCard = styled(Card)`

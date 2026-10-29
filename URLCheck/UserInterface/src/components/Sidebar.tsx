@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from "react";
 import styled, {keyframes} from "styled-components";
-import {Native} from "@photino-net-utils/bridge";
+import {Native, useTranslation} from "@photino-net-utils/bridge";
 import {TABS, type TabType} from "../tabs";
-import {useTranslation} from "../i18n";
 import {getAppInfo, getUpdateStatus, RELEASES_URL, type UpdateCheck} from "../api/system";
 import {openWithDefaultHandler} from "../api/browsers";
 import {LogoIcon} from "./Icons";

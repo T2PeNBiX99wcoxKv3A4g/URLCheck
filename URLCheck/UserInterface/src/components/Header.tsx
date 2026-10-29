@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import {findTab, type TabType} from "../tabs";
-import {useTranslation} from "../i18n";
+import {useTranslation} from "@photino-net-utils/bridge";
 
 interface HeaderProps {
     currentTab: TabType;
