@@ -13,6 +13,7 @@ using URLCheck.Forward;
 using URLCheck.Inspect;
 using URLCheck.Messaging;
 using URLCheck.Platform;
+using URLCheck.Scripting;
 using URLCheck.Services;
 
 namespace URLCheck;
@@ -100,6 +101,7 @@ internal static class Program
             _ = StartupService.Instance;
             _ = InspectService.Instance;
             _ = FilterService.Instance;
+            _ = ScriptsService.Instance;
 
             var manager = WindowManager.Instance;
             manager.AppUrl = appUrl;

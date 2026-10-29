@@ -12,14 +12,17 @@
   },
   "dependencies": {
     "@photino-net-utils/bridge": "file:../Libs/photino-net-utils-bridge-0.7.0.tgz",
+    "prismjs": "^1.30.0",
     "react": "^19",
     "react-dom": "^19",
+    "react-simple-code-editor": "^0.14.1",
     "styled-components": "^6.6.0"
   },
   "devDependencies": {
     "@fontsource/inter": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "@types/node": "^26",
+    "@types/prismjs": "^1.26.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.1.2",

@@ -1,9 +1,10 @@
 import type React from "react";
 import type {IconProps} from "./components/Icons";
-import {HistoryIcon, HomeIcon, SettingsIcon} from "./components/Icons";
+import {CodeIcon, HistoryIcon, HomeIcon, SettingsIcon} from "./components/Icons";
 import {HistoryPage} from "./pages/HistoryPage";
 import {HomePage} from "./pages/HomePage";
 import {SettingsPage} from "./pages/SettingsPage";
+import {ScriptsPage} from "./pages/ScriptsPage";
 
 /** A single entry in the app's tab registry. */
 export interface TabDefinition {
@@ -36,6 +37,14 @@ export const TABS = [
         subtitleKey: "tabs.history.subtitle",
         icon: HistoryIcon,
         page: HistoryPage,
+    },
+    {
+        id: "scripts",
+        labelKey: "tabs.scripts.label",
+        titleKey: "tabs.scripts.title",
+        subtitleKey: "tabs.scripts.subtitle",
+        icon: CodeIcon,
+        page: ScriptsPage,
     },
     {
         id: "settings",

@@ -17,6 +17,7 @@ import PlusSvg from "./icons/plus.svg?react";
 import TrashSvg from "./icons/trash.svg?react";
 import PlaySvg from "./icons/play.svg?react";
 import SendSvg from "./icons/send.svg?react";
+import CodeSvg from "./icons/code.svg?react";
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
     size?: number;
@@ -37,6 +38,7 @@ export const HomeIcon = sized(HomeSvg);
 export const LayersIcon = sized(LayersSvg);
 export const HistoryIcon = sized(HistorySvg);
 export const SettingsIcon = sized(SettingsSvg);
+export const CodeIcon = sized(CodeSvg);
 export const CheckCircleIcon = sized(CheckCircleSvg);
 export const AlertTriangleIcon = sized(AlertTriangleSvg);
 export const XCircleIcon = sized(XCircleSvg);

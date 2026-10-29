@@ -575,16 +575,22 @@ internal sealed class WindowManager : Singleton<WindowManager>
         if (string.IsNullOrWhiteSpace(url))
             return;
 
-        // The scripts see the URL as it came in, before the redirects are followed.
-        url = await ScriptService.Instance.ProcessAsync(url, AppInfoService.Version);
+        // The scripts only see the URL the popup will really open: after the redirects are followed.
+        var resolved = await ResolveAutoRedirectAsync(url);
+        var outcome = await ScriptEngine.Instance.ProcessAsync(resolved, AppInfoService.Version);
 
-        ShowPopup(await ResolveAutoRedirectAsync(url));
+        ShowPopup(outcome.Url, outcome.Error);
     }
+
+    /// <summary>Asks the user for script files; empty when they cancel or there is no window yet.</summary>
+    public Task<string[]> PickFilesAsync() =>
+        _mainWindow is { } window
+            ? window.ShowOpenFileAsync("Choose a script", null, true, [("Lua script", new[] { "lua" })])
+            : Task.FromResult(Array.Empty<string>());
 
     /// <summary>
     ///     Follows a short link through its redirects. Each hop is only followed when its own host is
-    ///     also on the list, so a chain cannot drag the app somewhere unexpected; with tracking-parameter
-    ///     stripping on, the URL is cleaned before every hop.
+    ///     also on the list, so a chain cannot drag the app somewhere unexpected.
     /// </summary>
     private async Task<string> ResolveAutoRedirectAsync(string url)
     {
@@ -597,9 +603,6 @@ internal sealed class WindowManager : Singleton<WindowManager>
                 uri.Scheme is not ("http" or "https") ||
                 !settings.ShouldAutoRedirect(uri))
                 break;
-
-            if (settings.AutoStripTrackingParams)
-                current = await FilterService.Instance.StripTrackingParamsAsync(current);
 
             var attempt = await Try.Run(() => InspectService.Instance.ResolveRedirectAsync(current));
             if (attempt.Exception is { } exception)
@@ -619,7 +622,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
     }
 
     /// <summary>Opens a popup for <paramref name="url" />, or navigates the existing popup to it.</summary>
-    public void ShowPopup(string url)
+    public void ShowPopup(string url, string? scriptError = null)
     {
         if (string.IsNullOrWhiteSpace(url))
             return;
@@ -647,7 +650,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
                 if (Try.Run(() =>
                     {
                         existing.SendWebMessage(NativeBridge.SerializeEvent("popup.navigate",
-                            new PopupNavigatePayload(url)));
+                            new PopupNavigatePayload(url, scriptError)));
                         _platform.Show(existing);
                         _platform.KeepOnTop(existing);
                     }))
@@ -691,6 +694,11 @@ internal sealed class WindowManager : Singleton<WindowManager>
             _pendingPopupUrl = FitsInStartUrl(startUrl, url) ? null : url;
             if (_pendingPopupUrl is null)
                 startUrl += $"&url={Uri.EscapeDataString(url)}";
+
+            // The popup says so when a script could not handle the URL, instead of silently showing
+            // the URL the script meant to change.
+            if (scriptError is { Length: > 0 })
+                startUrl += $"&scriptError={Uri.EscapeDataString(scriptError.Length > 300 ? scriptError[..300] : scriptError)}";
 
             ApplyIcon(popup);
             popup.Load(startUrl);
@@ -848,7 +856,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
             return;
 
         _pendingPopupUrl = null;
-        TrySend(window, NativeBridge.SerializeEvent("popup.navigate", new PopupNavigatePayload(url)));
+        TrySend(window, NativeBridge.SerializeEvent("popup.navigate", new PopupNavigatePayload(url, null)));
     }
 
     /// <summary>Hands over a URL that was too long to travel in the button's start URL.</summary>

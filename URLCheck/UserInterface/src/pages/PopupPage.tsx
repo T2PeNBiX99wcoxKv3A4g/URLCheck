@@ -93,6 +93,16 @@ function decode(value: string): string {
     }
 }
 
+/** A text value from the start URL's fragment, decoded; null when it is absent. */
+function readPopupText(name: string): string | null {
+    const hash = window.location.hash;
+    const queryIndex = hash.indexOf("?");
+    if (queryIndex < 0) return null;
+
+    const value = new URLSearchParams(hash.slice(queryIndex + 1)).get(name);
+    return value ? decode(value) : null;
+}
+
 /** The path without its leading slash, decoded the way it is shown. */
 function pathFrom(target: URL | null): string {
     return target ? decode(target.pathname).replace(/^\//, "") : "";
@@ -182,6 +192,35 @@ const HttpWarning = styled.div`
     color: #fbbf24;
     font-size: 0.74rem;
     animation: ${fadeIn} 0.15s ease;
+`;
+
+/** A script failed on this URL; the popup shows it rather than pretending the URL was handled. */
+const ScriptProblem = styled.div`
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.12);
+    color: #fca5a5;
+    font-size: 0.74rem;
+    line-height: 1.35;
+    animation: ${fadeIn} 0.15s ease;
+
+    span {
+        flex: 1;
+        overflow-wrap: anywhere;
+    }
+
+    button {
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+        padding: 0 2px;
+    }
 `;
 
 const Toolbar = styled.div`
@@ -634,6 +673,8 @@ export const PopupPage: React.FC = () => {
     const [copied, setCopied] = useState(false);
     const [borderless] = useState(() => readPopupFlag("borderless"));
     const [autoStrip] = useState(() => readPopupFlag("strip"));
+    /** A script failed on this URL; shown instead of silently pretending it was handled. */
+    const [scriptError, setScriptError] = useState<string | null>(() => readPopupText("scriptError"));
     /* The URL-cleaning rules come from the backend: the embedded list plus every enabled filter list. */
     const [rules, setRules] = useState<CompiledRules | null>(null);
 
@@ -730,11 +771,12 @@ export const PopupPage: React.FC = () => {
     /* a new URL arriving while the popup is open replaces the current one */
     useEffect(() => {
         return Native.on((message) => {
-            const event = message as { type?: string; data?: { url?: string } };
+            const event = message as { type?: string; data?: { url?: string; scriptError?: string | null } };
             if (event.type === "popup.navigate" && event.data?.url) {
                 dispatch({type: "commit", value: event.data.url});
                 setStatus(null);
                 setError(null);
+                setScriptError(event.data.scriptError ?? null);
             }
         });
     }, []);
@@ -1003,6 +1045,14 @@ export const PopupPage: React.FC = () => {
                     ✕
                 </CloseButton>
             </TopBar>
+
+            {scriptError && (
+                <ScriptProblem>
+                    <AlertTriangleIcon size={13}/>
+                    <span>{t("popup.scriptError", {error: scriptError})}</span>
+                    <button onClick={() => setScriptError(null)} title={t("popup.close")} type="button">×</button>
+                </ScriptProblem>
+            )}
 
             <Content ref={contentRef}>
                 <UrlInput
