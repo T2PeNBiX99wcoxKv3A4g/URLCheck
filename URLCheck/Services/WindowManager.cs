@@ -9,6 +9,7 @@ using URLCheck.Inspect;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Platform;
+using URLCheck.Scripting;
 using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Services;
@@ -573,6 +574,9 @@ internal sealed class WindowManager : Singleton<WindowManager>
     {
         if (string.IsNullOrWhiteSpace(url))
             return;
+
+        // The scripts see the URL as it came in, before the redirects are followed.
+        url = await ScriptService.Instance.ProcessAsync(url, AppInfoService.Version);
 
         ShowPopup(await ResolveAutoRedirectAsync(url));
     }
