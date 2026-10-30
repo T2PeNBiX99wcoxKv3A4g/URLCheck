@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.0.1..v1.1.0) - 2026-10-30
+
+### ⛰️  Features
+
+- Publish DEB and Arch Linux packages - ([521c2d5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/521c2d5f9b060a6784a6e82790310d458c9e9e8e))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([c9d1472](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/c9d1472d10783c4a23383a2e161a8e7656ea62e2))
+
+
 ## [1.0.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.0.0..v1.0.1) - 2026-10-30
 
 ### ⚙️ Miscellaneous Tasks
