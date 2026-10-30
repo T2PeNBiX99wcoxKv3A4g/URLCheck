@@ -2,10 +2,6 @@ name: Site
 
 on:
   workflow_dispatch:
-  # The docs are generated from the wiki, which lives in its own repository, so a push here cannot
-  # notice a wiki edit; the daily run picks those up.
-  schedule:
-    - cron: "0 3 * * *"
   push:
     branches:
       - master
