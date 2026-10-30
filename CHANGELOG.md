@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.1.0..v1.2.0) - 2026-10-30
+
+### ⛰️  Features
+
+- *(site)* List supported systems and inline the links - ([2859658](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2859658677e5c249b692414db4290f3d929d5670))
+- Turn the scripts site into the project site - ([77fcfe9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/77fcfe904850b9965de71b0cebd4beebc3c550b4))
+- Add a scripts site with one-click installs - ([a30784f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a30784f42b437f70d685c4dd4338e508f250af2f))
+
+### 📚 Documentation
+
+- Improve table formatting in Lua script README for better alignment and readability - ([9acb4c6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/9acb4c60d8d84f25e9c741afd922786a7a7fb25a))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([b0869fd](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b0869fd78e048b776c94013a5c4bd27c99deb161))
+
+
 ## [1.1.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.0.1..v1.1.0) - 2026-10-30
 
 ### ⛰️  Features
