@@ -28,4 +28,6 @@ jobs:
       version_file_path: './URLCheck/URLCheck.csproj'
       msi_script: 'installer/windows/build-msi.ps1'
       rpm_script: 'installer/linux/build-rpm.sh'
+      deb_script: 'installer/linux/build-deb.sh'
+      arch_script: 'installer/linux/build-arch.sh'
     secrets: inherit
