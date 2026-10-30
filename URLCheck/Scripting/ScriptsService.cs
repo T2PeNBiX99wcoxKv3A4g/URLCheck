@@ -131,7 +131,10 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
         if (path is null || !File.Exists(path))
             return context.Fail("scripts.open.result", "error.scriptMissing");
 
-        var started = Try.Run(() => Process.Start(new ProcessStartInfo(path) { UseShellExecute = true }));
+        var started = Try.Run(() => Process.Start(new ProcessStartInfo(path)
+        {
+            UseShellExecute = true
+        }));
 
         if (started.Exception is not { } exception)
             return context.Reply("scripts.open.result", new OkPayload());

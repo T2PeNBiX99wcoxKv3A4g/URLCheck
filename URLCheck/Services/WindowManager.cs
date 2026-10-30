@@ -4,13 +4,12 @@ using Photino.NET;
 using PhotinoNetUtils.Extensions;
 using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Platform;
-using URLCheck.Filters;
+using PhotinoNetUtils.Utils;
 using URLCheck.Inspect;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Platform;
 using URLCheck.Scripting;
-using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Services;
 
@@ -585,7 +584,12 @@ internal sealed class WindowManager : Singleton<WindowManager>
     /// <summary>Asks the user for script files; empty when they cancel or there is no window yet.</summary>
     public Task<string[]> PickFilesAsync() =>
         _mainWindow is { } window
-            ? window.ShowOpenFileAsync("Choose a script", null, true, [("Lua script", new[] { "lua" })])
+            ? window.ShowOpenFileAsync("Choose a script", null, true, [
+                ("Lua script", new[]
+                {
+                    "lua"
+                })
+            ])
             : Task.FromResult(Array.Empty<string>());
 
     /// <summary>
@@ -698,7 +702,8 @@ internal sealed class WindowManager : Singleton<WindowManager>
             // The popup says so when a script could not handle the URL, instead of silently showing
             // the URL the script meant to change.
             if (scriptError is { Length: > 0 })
-                startUrl += $"&scriptError={Uri.EscapeDataString(scriptError.Length > 300 ? scriptError[..300] : scriptError)}";
+                startUrl +=
+                    $"&scriptError={Uri.EscapeDataString(scriptError.Length > 300 ? scriptError[..300] : scriptError)}";
 
             ApplyIcon(popup);
             popup.Load(startUrl);
@@ -831,7 +836,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
             return;
         }
 
-        var maximized = window.Maximized != true;
+        var maximized = !window.Maximized;
         window.SetMaximized(maximized);
         NotifyWindowState(maximized);
     }

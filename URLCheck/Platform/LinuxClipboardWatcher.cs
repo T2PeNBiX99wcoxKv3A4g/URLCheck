@@ -139,19 +139,19 @@ internal sealed class LinuxClipboardWatcher : Singleton<LinuxClipboardWatcher>, 
     /// <summary>Whether KDE's clipboard manager is running and answering.</summary>
     private static bool HasKlipper() =>
         Run("gdbus",
-                [
-                    "call", "--session", "--dest", "org.freedesktop.DBus", "--object-path",
-                    "/org/freedesktop/DBus", "--method", "org.freedesktop.DBus.NameHasOwner", "org.kde.klipper"
-                ])
+            [
+                "call", "--session", "--dest", "org.freedesktop.DBus", "--object-path",
+                "/org/freedesktop/DBus", "--method", "org.freedesktop.DBus.NameHasOwner", "org.kde.klipper"
+            ])
             ?.Contains("true", StringComparison.Ordinal) == true;
 
     /// <summary>The text Klipper is holding, or null when it cannot be asked.</summary>
     private static string? ReadWithKlipper() =>
         Unwrap(Run("gdbus",
-            [
-                "call", "--session", "--dest", "org.kde.klipper", "--object-path", "/klipper",
-                "--method", "org.kde.klipper.klipper.getClipboardContents"
-            ]));
+        [
+            "call", "--session", "--dest", "org.kde.klipper", "--object-path", "/klipper",
+            "--method", "org.kde.klipper.klipper.getClipboardContents"
+        ]));
 
     /// <summary>Unwraps gdbus' <c>('text',)</c> reply into the string it carries.</summary>
     private static string? Unwrap(string? output)

@@ -4,10 +4,10 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text.Json;
 using PhotinoNetUtils.Extensions;
+using PhotinoNetUtils.Utils;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Services;
-using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Forward;
 

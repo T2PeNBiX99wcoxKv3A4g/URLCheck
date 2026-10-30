@@ -38,15 +38,42 @@ const Highlight = styled.pre`
     pointer-events: none;
     color: #e2e8f0;
 
-    .token.comment { color: #6b7280; font-style: italic; }
-    .token.keyword { color: #c792ea; }
-    .token.string { color: #a5d6a7; }
-    .token.number { color: #f9a825; }
-    .token.boolean { color: #f9a825; }
-    .token.function { color: #82aaff; }
-    .token.operator { color: #89ddff; }
-    .token.punctuation { color: #9ca3af; }
-    .token.property { color: #93c5fd; }
+    .token.comment {
+        color: #6b7280;
+        font-style: italic;
+    }
+
+    .token.keyword {
+        color: #c792ea;
+    }
+
+    .token.string {
+        color: #a5d6a7;
+    }
+
+    .token.number {
+        color: #f9a825;
+    }
+
+    .token.boolean {
+        color: #f9a825;
+    }
+
+    .token.function {
+        color: #82aaff;
+    }
+
+    .token.operator {
+        color: #89ddff;
+    }
+
+    .token.punctuation {
+        color: #9ca3af;
+    }
+
+    .token.property {
+        color: #93c5fd;
+    }
 `;
 
 const Input = styled.textarea`

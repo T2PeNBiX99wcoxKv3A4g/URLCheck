@@ -10,13 +10,11 @@ namespace URLCheck.Platform;
 [SupportedOSPlatform("linux")]
 internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWindowPlatform
 {
-    private bool _transparent;
-
     /// <summary>
     ///     GTK windows get no frame at all without decorations, so the corners and the border are the
     ///     interface's job — as long as the screen can make the window transparent behind them.
     /// </summary>
-    public bool DrawsWindowCorners => _transparent;
+    public bool DrawsWindowCorners { get; private set; }
 
     public void ConfigureMainWindow(PhotinoWindow window) => window.SetChromeless(true);
 
@@ -26,9 +24,9 @@ internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWin
         // any — and the compositor stops adding its own frame.
         LinuxWindow.UseClientSideFrame(window.Title);
 
-        _transparent = LinuxWindow.EnableTransparency(window.Title);
+        DrawsWindowCorners = LinuxWindow.EnableTransparency(window.Title);
 
-        if (!_transparent)
+        if (!DrawsWindowCorners)
             Log.Warning("The window cannot be transparent; its corners stay square");
     }
 

@@ -1,9 +1,9 @@
 using PhotinoNetUtils.Extensions;
 using PhotinoNetUtils.Messaging;
+using PhotinoNetUtils.Utils;
 using URLCheck.Messaging;
 using URLCheck.Models;
 using URLCheck.Services;
-using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Inspect;
 

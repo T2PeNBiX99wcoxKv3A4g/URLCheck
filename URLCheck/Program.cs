@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 using PhotinoNetUtils;
-using PhotinoNetUtils.Hosting;
 using PhotinoNetUtils.Interop;
 using PhotinoNetUtils.Localization;
 using PhotinoNetUtils.Messaging;
@@ -191,9 +190,9 @@ internal static class Program
             iconPath,
             () => manager.ShowMainWindow(),
             [
-                new TrayMenuItem(Localization.Get("tray.open"), () => manager.ShowMainWindow()),
-                new TrayMenuItem(Localization.Get("tray.settings"), () => manager.ShowMainWindow("settings")),
-                new TrayMenuItem(Localization.Get("tray.exit"), manager.Exit, SeparatorBefore: true)
+                new(Localization.Get("tray.open"), () => manager.ShowMainWindow()),
+                new(Localization.Get("tray.settings"), () => manager.ShowMainWindow("settings")),
+                new(Localization.Get("tray.exit"), manager.Exit, true)
             ]);
     }
 

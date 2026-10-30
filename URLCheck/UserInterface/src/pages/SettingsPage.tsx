@@ -41,14 +41,14 @@ import {
   openLogsFolder,
   protocolStatus,
   type ProtocolStatus,
-  type UpdateCheck,
   registerCustomScheme,
   registerProtocols,
   RELEASES_URL,
   setStartup,
   startupStatus,
   type StartupStatus,
-  unregisterProtocols
+  unregisterProtocols,
+  type UpdateCheck
 } from "../api/system";
 
 /* Loaded on demand: the licence texts are far too large to sit in the main bundle. */
@@ -1457,7 +1457,10 @@ export const SettingsPage: React.FC = () => {
                     variant="form"
                     disabled={busy || locales.length === 0}
                     value={settings.language}
-                    options={locales.map((locale) => ({value: locale, label: LOCALE_NAMES[locale] ?? locale}))}
+                    options={locales.map((locale) => ({
+                      value: locale,
+                      label: LOCALE_NAMES[locale] ?? locale
+                    }))}
                     onChange={handleLanguageChange}
                 />
               </SettingRow>
@@ -1818,7 +1821,8 @@ export const SettingsPage: React.FC = () => {
                       {t("settings.openDefaultApps")}
                     </GhostButton>
                 )}
-                <DangerGhostButton type="button" onClick={handleUnregisterProtocols} disabled={integrationBusy}>
+                <DangerGhostButton type="button" onClick={handleUnregisterProtocols}
+                                   disabled={integrationBusy}>
                   <TrashIcon size={15}/>
                   {t("settings.unregister")}
                 </DangerGhostButton>
@@ -1840,7 +1844,8 @@ export const SettingsPage: React.FC = () => {
                   </WarnText>
               )}
 
-              {integrationMessage && <InfoText>{t(integrationMessage.key, integrationMessage.params)}</InfoText>}
+              {integrationMessage &&
+                  <InfoText>{t(integrationMessage.key, integrationMessage.params)}</InfoText>}
             </Section>
 
             <Section id={anchorId("settings.autoRedirect")}>

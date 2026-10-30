@@ -18,7 +18,10 @@ internal sealed class UpdateService : Singleton<UpdateService>
         "https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/raw/refs/heads/master/.version";
 
     /// <summary>Shorter than the bridge's own request timeout, so the button always gets an answer.</summary>
-    private static readonly HttpClient Client = new() { Timeout = TimeSpan.FromSeconds(8) };
+    private static readonly HttpClient Client = new()
+    {
+        Timeout = TimeSpan.FromSeconds(8)
+    };
 
     /// <summary>How long an answer is reused. The sidebar asks on every start; the button forces one.</summary>
     private static readonly TimeSpan CacheLifetime = TimeSpan.FromHours(6);
@@ -41,11 +44,11 @@ internal sealed class UpdateService : Singleton<UpdateService>
     ///     nothing recent to answer with. A failure stays silent, since nobody asked for it.
     /// </summary>
     private async Task<NativeResponse?> StatusAsync(NativeContext context) =>
-        context.Reply("app.updateStatus.result", await ResolveAsync(force: false));
+        context.Reply("app.updateStatus.result", await ResolveAsync(false));
 
     /// <summary>The check the user asked for: always reads the version file, and reports a failure.</summary>
     private async Task<NativeResponse?> CheckAsync(NativeContext context) =>
-        await ResolveAsync(force: true) is { } result
+        await ResolveAsync(true) is { } result
             ? context.Reply("app.checkUpdate.result", result)
             : context.Fail("app.checkUpdate.result", "error.updateCheckFailed");
 
@@ -71,7 +74,7 @@ internal sealed class UpdateService : Singleton<UpdateService>
 
             var current = AppInfoService.Version;
             _cachedAt = DateTime.UtcNow;
-            _cached = new UpdateCheckPayload(current, latest, IsNewer(latest, current));
+            _cached = new(current, latest, IsNewer(latest, current));
 
             // A check the user started elsewhere updates the dot in the sidebar as well.
             WindowManager.Instance.NotifyMainWindow("app.update", _cached);

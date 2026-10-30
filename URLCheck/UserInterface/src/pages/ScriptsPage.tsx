@@ -14,11 +14,11 @@ import {
     openScript,
     readScript,
     saveScript,
-    scriptLogs,
-    testScript,
     type ScriptEntry,
     type ScriptLogEntry,
+    scriptLogs,
     type ScriptTestResult,
+    testScript,
 } from "../api/scripts";
 
 type Mode = "idle" | "new" | "download";
@@ -366,7 +366,8 @@ export const ScriptsPage: React.FC = () => {
                                     >
                                         {dirty ? t("scripts.save") : t("scripts.saved")}
                                     </GhostButton>
-                                    <DangerButton $armed={armed} disabled={busy} onClick={() => void remove()} type="button">
+                                    <DangerButton $armed={armed} disabled={busy} onClick={() => void remove()}
+                                                  type="button">
                                         {armed ? t("scripts.deleteConfirm") : <TrashIcon size={15}/>}
                                     </DangerButton>
                                 </EditorHeader>

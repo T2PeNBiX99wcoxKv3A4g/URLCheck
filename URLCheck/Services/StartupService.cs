@@ -4,9 +4,9 @@ using PhotinoNetUtils;
 using PhotinoNetUtils.Extensions;
 using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Platform;
+using PhotinoNetUtils.Utils;
 using URLCheck.Messaging;
 using URLCheck.Platform;
-using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Services;
 

@@ -91,7 +91,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         Load();
 
         if (_scripts.Count == 0)
-            return new ScriptOutcome(url, null);
+            return new(url, null);
 
         await _gate.WaitAsync();
 
@@ -107,7 +107,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                 error ??= problem;
             }
 
-            return new ScriptOutcome(current, error);
+            return new(current, error);
         }
         finally
         {
@@ -145,10 +145,10 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                 var saved = _scripts.FirstOrDefault(candidate => candidate.Name == name);
 
                 if (saved is null)
-                    return new ScriptTestResult(url, "error.scriptMissing", []);
+                    return new(url, "error.scriptMissing", []);
 
                 if (saved.Function is null)
-                    return new ScriptTestResult(url, saved.Info.Error, []);
+                    return new(url, saved.Info.Error, []);
 
                 script = saved;
             }
@@ -158,13 +158,13 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                 state = compiled;
 
                 if (state is null || function is null)
-                    return new ScriptTestResult(url, error ?? "error.scriptNoFunction", []);
+                    return new(url, error ?? "error.scriptNoFunction", []);
 
-                script = new Script(name, state, function, new FileInfo(PathFor(name)));
+                script = new(name, state, function, new(PathFor(name)));
             }
 
             var (next, problem) = await RunAsync(script, url, appVersion);
-            return new ScriptTestResult(next, problem, [.. _capture.Select(entry => entry.Message)]);
+            return new(next, problem, [.. _capture.Select(entry => entry.Message)]);
         }
         finally
         {
@@ -436,10 +436,8 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         var values = new Dictionary<string, string>(StringComparer.Ordinal);
 
         foreach (var pair in parameters)
-        {
             if (pair.Key.TryRead<string>(out var name) && name.Length > 0)
                 values[name] = pair.Value.TryRead<string>(out var text) ? text : pair.Value.ToString();
-        }
 
         var parts = new List<string>(values.Count);
 
@@ -489,14 +487,14 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         var source = Try.Run(() => File.ReadAllText(path)).GetOrNull();
 
         if (source is null)
-            return new Script(name, null, null, info, "error.scriptUnreadable");
+            return new(name, null, null, info, "error.scriptUnreadable");
 
         var (state, function, error) = Compile(name, source);
 
         if (error is not null)
             Serilog.Log.Warning("Lua script {Script} could not be loaded: {Error}", name, error);
 
-        return new Script(name, state, function, info, error);
+        return new(name, state, function, info, error);
     }
 
     /// <summary>
@@ -569,7 +567,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     ///     so tables are walked all the way down (and a table that contains itself is cut off).
     /// </summary>
     private static string Describe(LuaValue value) =>
-        Describe(value, MaxPrintDepth, new HashSet<LuaTable>(ReferenceEqualityComparer.Instance));
+        Describe(value, MaxPrintDepth, new(ReferenceEqualityComparer.Instance));
 
     private static string Describe(LuaValue value, int depth, HashSet<LuaTable> seen)
     {
