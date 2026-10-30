@@ -66,7 +66,14 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     /// <summary>How long one script may run before it is cancelled; it only handles a URL.</summary>
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
 
+    /// <summary>How long one regular expression may run; a URL script has to stay quick.</summary>
+    private static readonly TimeSpan RegexTimeout = TimeSpan.FromSeconds(1);
+
     private readonly SemaphoreSlim _gate = new(1, 1);
+
+    /// <summary>Two list requests can arrive together; only one of them may load the folder.</summary>
+    private readonly Lock _loadLock = new();
+
     private readonly ConcurrentQueue<ScriptLogEntry> _logs = new();
     private readonly List<Script> _scripts = [];
 
@@ -74,9 +81,6 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
 
     /// <summary>The folder as it was when the scripts were loaded, so a stale list can be spotted.</summary>
     private string _signature = "";
-
-    /// <summary>Two list requests can arrive together; only one of them may load the folder.</summary>
-    private readonly Lock _loadLock = new();
 
     /// <summary>Where the scripts live; created on demand, beside the settings.</summary>
     public static string ScriptsDirectory => Path.Combine(Constants.SettingsDirectory, "scripts");
@@ -474,12 +478,10 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         var builder = new StringBuilder(value.Length);
 
         foreach (var rune in value.EnumerateRunes())
-        {
             if (rune.Value is > 0x20 and < 0x7F && "\"<>\\^`{|}".IndexOf((char)rune.Value) < 0)
                 builder.Append((char)rune.Value);
             else
                 builder.Append(Uri.EscapeDataString(rune.ToString()));
-        }
 
         return builder.ToString();
     }
@@ -706,7 +708,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         // synchronous and only the successful path returns a task.
         if (!IsText(left) || !IsText(right))
             throw new LuaRuntimeException(context.State,
-                $"attempt to concatenate a {left.TypeToString()} value with a {right.TypeToString()} value", 1);
+                $"attempt to concatenate a {left.TypeToString()} value with a {right.TypeToString()} value");
 
         return Concat(context, left, right, cancellation);
     }
@@ -714,7 +716,10 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     private static async ValueTask<int> Concat(LuaFunctionExecutionContext context, LuaValue left, LuaValue right,
         CancellationToken cancellation)
     {
-        var result = await context.State.ConcatAsync(new[] { left, right }, cancellation);
+        var result = await context.State.ConcatAsync(new[]
+        {
+            left, right
+        }, cancellation);
 
         return context.Return(result);
     }
@@ -744,9 +749,6 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         return new(context.Return(result));
     }
 
-    /// <summary>How long one regular expression may run; a URL script has to stay quick.</summary>
-    private static readonly TimeSpan RegexTimeout = TimeSpan.FromSeconds(1);
-
     /// <summary>
     ///     <c>string.regexMatch(s, pattern [, init])</c> — like <c>string.match</c>, but with a .NET
     ///     regular expression. Returns the captures, or the whole match when there are none.
@@ -774,7 +776,11 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         if (Find(context) is not { } match)
             return new(context.Return(LuaValue.Nil));
 
-        var values = new List<LuaValue> { match.Index + 1, match.Index + match.Length };
+        var values = new List<LuaValue>
+        {
+            match.Index + 1,
+            match.Index + match.Length
+        };
         AddGroups(match, values);
 
         return new(context.Return(values.ToArray()));
@@ -892,7 +898,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         }
         catch (ArgumentException ex)
         {
-            throw new LuaRuntimeException(state, $"invalid pattern: {ex.Message}", 1);
+            throw new LuaRuntimeException(state, $"invalid pattern: {ex.Message}");
         }
     }
 
