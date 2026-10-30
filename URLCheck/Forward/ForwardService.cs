@@ -118,7 +118,7 @@ internal sealed class ForwardService : Singleton<ForwardService>
     ///     Reports which paired devices answer right now, rechecking them when the last answer is old.
     ///     A fresh check also arrives later as a <c>forward.presence</c> event.
     /// </summary>
-    private Task<NativeResponse?> PresenceAsync(NativeContext context)
+    private static Task<NativeResponse?> PresenceAsync(NativeContext context)
     {
         ForwardPresence.Instance.RequestRefresh();
         return Task.FromResult<NativeResponse?>(

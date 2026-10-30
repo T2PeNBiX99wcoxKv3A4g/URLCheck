@@ -175,7 +175,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     }
 
     /// <summary>The source of one script, or null when it is gone.</summary>
-    public string? Read(string name) =>
+    public static string? Read(string name) =>
         Try.Run(() => File.ReadAllText(PathFor(name))).GetOrNull();
 
     /// <summary>
@@ -480,7 +480,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
             Serilog.Log.Debug("No Lua scripts in {Path}", ScriptsDirectory);
     }
 
-    private Script LoadScript(string path)
+    private static Script LoadScript(string path)
     {
         var name = Path.GetFileName(path);
         var info = new FileInfo(path);

@@ -59,7 +59,7 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
     private static NativeResponse? Read(NativeContext context)
     {
         var name = context.Payload<ScriptNameRequest>()?.Name;
-        var content = name is { Length: > 0 } ? ScriptEngine.Instance.Read(name) : null;
+        var content = name is { Length: > 0 } ? ScriptEngine.Read(name) : null;
 
         return content is null
             ? context.Fail("scripts.read.result", "error.scriptMissing")
