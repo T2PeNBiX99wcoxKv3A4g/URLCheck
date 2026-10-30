@@ -1,11 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-
-const REPOSITORY = "https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck";
-const RELEASES = `${REPOSITORY}/releases/latest`;
-const WIKI = `${REPOSITORY}/wiki`;
-const ICON = "https://raw.githubusercontent.com/T2PeNBiX99wcoxKv3A4g/URLCheck/master/icon.svg";
-const SCREENSHOT = "https://raw.githubusercontent.com/T2PeNBiX99wcoxKv3A4g/URLCheck/master/docs/main-window.png";
+import {ICON, REPOSITORY, RELEASES, SCREENSHOT, WIKI} from "../constants";
 
 const Hero = styled.section`
     display: flex;

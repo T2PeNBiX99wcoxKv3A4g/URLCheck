@@ -3,6 +3,7 @@ import styled, {createGlobalStyle} from "styled-components";
 import {HomePage} from "./pages/Home";
 import {ScriptsPage} from "./pages/Scripts";
 import {DocsPage} from "./pages/Docs";
+import {ICON} from "./constants";
 
 const GlobalStyle = createGlobalStyle`
     :root {
@@ -55,11 +56,19 @@ const TopBar = styled.header`
 `;
 
 const Brand = styled.a`
+    display: flex;
+    align-items: center;
+    gap: 8px;
     color: #f9fafb;
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     text-decoration: none;
+`;
+
+const BrandIcon = styled.img`
+    width: 22px;
+    height: 22px;
 `;
 
 const Nav = styled.nav`
@@ -121,7 +130,10 @@ export const App: React.FC = () => {
             <GlobalStyle/>
             <Shell>
                 <TopBar>
-                    <Brand href="#/">URLCheck</Brand>
+                    <Brand href="#/">
+                        <BrandIcon src={ICON} alt=""/>
+                        URLCheck
+                    </Brand>
                     <Nav>
                         <NavLink $active={route.section === "home"} href="#/">
                             Home
