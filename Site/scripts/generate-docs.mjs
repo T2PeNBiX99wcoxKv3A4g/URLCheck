@@ -1,7 +1,9 @@
 // Builds src/docs.generated.ts from the project wiki, so the site always mirrors it.
 //
-// The pages are fetched from the wiki's raw URLs. Set WIKI_DIR to a local clone of the wiki to
-// build without network access.
+// The wiki is a separate repository. A local clone in ../Wiki (or the folder named by WIKI_DIR) is
+// used when it exists, so the site can be built offline and before the wiki is pushed; otherwise the
+// pages are fetched from the wiki's raw URLs.
+import {existsSync} from "node:fs";
 import {readFile, writeFile} from "node:fs/promises";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
@@ -9,7 +11,7 @@ import {fileURLToPath} from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.resolve(here, "..");
 const output = path.join(siteRoot, "src", "docs.generated.ts");
-const localWiki = process.env.WIKI_DIR;
+const localWiki = process.env.WIKI_DIR ?? (existsSync(path.join(siteRoot, "..", "Wiki")) ? path.join(siteRoot, "..", "Wiki") : null);
 
 const repository = "T2PeNBiX99wcoxKv3A4g/URLCheck";
 
