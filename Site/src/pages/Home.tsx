@@ -117,20 +117,59 @@ const FeatureText = styled.p`
     font-size: 0.84rem;
 `;
 
-const List = styled.ul`
-    margin: 0;
-    padding: 0;
-    list-style: none;
+const PlatformGrid = styled.div`
     display: grid;
-    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px;
+`;
 
-    li {
-        padding: 12px 14px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        background: rgba(17, 24, 39, 0.6);
-        color: #9ca3af;
-        font-size: 0.85rem;
+const Platform = styled.a`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(17, 24, 39, 0.6);
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+
+    &:hover {
+        border-color: rgba(99, 102, 241, 0.45);
+        background: rgba(30, 41, 59, 0.7);
+    }
+`;
+
+const PlatformName = styled.span`
+    color: #f9fafb;
+    font-size: 0.95rem;
+    font-weight: 600;
+`;
+
+const PlatformNote = styled.span`
+    color: #9ca3af;
+    font-size: 0.8rem;
+`;
+
+const Links = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+`;
+
+const Link = styled.a`
+    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    color: #d1d5db;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+
+    &:hover {
+        color: #f9fafb;
+        border-color: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.05);
     }
 `;
 
@@ -156,6 +195,13 @@ const features: [string, string][] = [
         "Send a URL to another URLCheck on the local network, end-to-end encrypted."
     ],
     ["History", "Every intercepted URL is recorded locally in SQLite and can be searched."]
+];
+
+const platforms: [string, string][] = [
+    ["Windows", "x64 installer (.msi)"],
+    ["Fedora", "x86_64 (.rpm)"],
+    ["Debian / Ubuntu", "amd64 (.deb)"],
+    ["Arch Linux", "x86_64 (.pkg.tar.zst)"]
 ];
 
 export const HomePage: React.FC = () => (
@@ -205,40 +251,27 @@ export const HomePage: React.FC = () => (
             <Lead>
                 Self-contained builds: the .NET runtime is bundled, so nothing else needs to be
                 installed. Windows also needs the WebView2 runtime; Linux needs WebKitGTK and the
-                AppIndicator library (see the <a href={REPOSITORY}>README</a>).
+                AppIndicator library (see the <a href={REPOSITORY}>README</a>). Pick your system to
+                open the latest release and download the matching file.
             </Lead>
-            <List>
-                <li>
-                    <code>URLCheck-&lt;version&gt;-win-x64.msi</code> — Windows installer
-                </li>
-                <li>
-                    <code>urlcheck-&lt;version&gt;-1.fcXX.x86_64.rpm</code> — Fedora
-                </li>
-                <li>
-                    <code>urlcheck_&lt;version&gt;_amd64.deb</code> — Debian / Ubuntu
-                </li>
-                <li>
-                    <code>urlcheck-&lt;version&gt;-1-x86_64.pkg.tar.zst</code> — Arch Linux
-                </li>
-            </List>
+            <PlatformGrid>
+                {platforms.map(([name, note]) => (
+                    <Platform href={RELEASES} key={name}>
+                        <PlatformName>{name}</PlatformName>
+                        <PlatformNote>{note}</PlatformNote>
+                    </Platform>
+                ))}
+            </PlatformGrid>
         </Section>
 
         <Section>
             <Heading>Links</Heading>
-            <List>
-                <li>
-                    <a href={REPOSITORY}>Source code</a>
-                </li>
-                <li>
-                    <a href={WIKI}>Wiki</a>
-                </li>
-                <li>
-                    <a href="#/scripts">Scripts</a>
-                </li>
-                <li>
-                    <a href={`${REPOSITORY}/releases`}>Releases</a>
-                </li>
-            </List>
+            <Links>
+                <Link href={REPOSITORY}>Source code</Link>
+                <Link href={WIKI}>Wiki</Link>
+                <Link href="#/scripts">Scripts</Link>
+                <Link href={`${REPOSITORY}/releases`}>Releases</Link>
+            </Links>
         </Section>
     </>
 );
