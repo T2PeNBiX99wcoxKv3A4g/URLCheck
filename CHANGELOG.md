@@ -1,5 +1,66 @@
 # Changelog
 
+## [1.0.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.15.1..v1.0.0) - 2026-10-30
+
+### **refactor
+
+- Make select methods static in ScriptEngine, ScriptsService, and ForwardService** - ([d1bfd18](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d1bfd185a4c83632ce2291184157363a2ff3472b))
+
+### ⛰️  Features
+
+- *(scripts)* Add .NET regex helpers to the string library - ([00b2355](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/00b23555214f0e463fbb619593b32c882ac8a476))
+- *(scripts)* Quote strings inside printed tables - ([ab25dee](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ab25dee1dd556fe4b38aab9375d20475cd96b1cd))
+- *(scripts)* Extend the string metatable and add string.split - ([daa33a7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/daa33a7be32d65f0d9f0b73bf9f193b8326bc6c5))
+- *(scripts)* Hand decoded text to Lua and encode the result - ([333ee4e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/333ee4eef23dd129e653dae9269d54ecb1c751ae))
+- *(scripts)* Pass the query to Lua as a decoded table - ([a84e8f2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a84e8f2c72cf2ab6bd22a3b4fe2bb8cff8483864))
+- *(scripts)* Watch the folder, rename scripts and scroll the list - ([84a9805](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/84a9805dd5af40fcd6eb24df4d666b2a692d60da))
+- *(scripts)* Add inline test runs, Ctrl+S saving and external opening - ([5f8657a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5f8657a58119d844ce507776f649751bcf037e79))
+- Install scripts from urlcheck:// links - ([bf4a7b7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/bf4a7b7b1ec52fd2e51d1d9e3ea13cdfc3141f98))
+- Add Lua script to remove query parameters from x.com URLs - ([55f6942](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/55f6942cb98f8945c2ecc85ea817b52f9d12c3c2))
+- Scripts page with an editor, logs and errors - ([8856b4e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8856b4ee62c37f29f787c8541a70b7225bdb1d50))
+- Run Lua scripts over every incoming URL - ([4e886ab](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4e886abd7ac6a50665ebff212673aeb632fe4c02))
+
+### 🐛 Bug Fixes
+
+- *(scripts)* Keep the folder watcher alive and rescan before listing - ([b7b6eb0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b7b6eb0ef6506cfc1278bff67743533027370d83))
+- *(scripts)* Show the final URL in a neutral test result - ([b5f096e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b5f096e01760521d930972cfae7f79ec0e62b10d))
+- *(scripts)* Render the Lua editor and rework the scripts layout - ([1808b19](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1808b19be07e7fcbc4c7aa40840cf111a53a8a39))
+
+### 🚜 Refactor
+
+- *(scripts)* Write the string metamethods in C# - ([05d9faf](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/05d9fafb87e513bc4c08d248b16aa0f4abcb79a7))
+- Reformat and align code blocks and styles in SettingsPage for consistency and readability - ([1c59ac5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1c59ac5e1685571bf39f52b0ccffeed6d7a5e67d))
+- Reorganize ScriptEngine fields and improve formatting consistency - ([240a1d3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/240a1d37dac322fab85e795ec914879acd1b8891))
+- Take every app folder from AppPaths - ([db349af](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/db349afee0b6f83d33d4178507563d70d15233ca))
+- Clean up imports, formatting, and style consistency across the project - ([2733c1d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2733c1d1d9db3bc3fd21aea2c796aecc4634171c))
+- Simplify LuaTable initialization in ScriptEngine - ([2d51909](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2d51909235feb81b7ab62ae4f038a225c232cc12))
+- Improve ScriptEngine with async file write and code cleanup - ([ac2d556](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ac2d55687c4b591ecbba29fac2f3285ad788f810))
+
+### 📚 Documentation
+
+- *(lua)* Match hosts and parameters with regex in the example scripts - ([8d2daae](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8d2daae9067aa74d53b1512c13e50f8ccf7e6fb6))
+- *(lua)* Split the generic tracking script from the x/twitter one - ([75470ee](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/75470eef6eea1798c5f208cdfcbc93d36dae914c))
+- *(lua)* Add more example scripts and their install links - ([3cf50eb](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/3cf50eb88bd00e801310cd527b6b75ff7d162baf))
+- [**breaking**] Update main-window and popup screenshots - ([a0701b2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a0701b2315bf542d900d16f4a0e9dcb9b9d9a1f7))
+- Improve table formatting in README for better alignment and readability - ([13937b3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/13937b3eab44736522a38634d072974a0391c687))
+- Mention the Lua scripts in the README - ([fef4f2a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/fef4f2ae2e86e3f92fa5529e015fd1135b1fc5cb))
+- Improve table formatting in Lua script README - ([f3e6c72](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f3e6c72ff54e09106a1d5fd57016324f7534e11d))
+- Remove deprecated Lua script documentation from README - ([2f24fc3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2f24fc3e9b79ed3c4fa0bc8f6933af017507d533))
+- Add README for Lua scripts - ([06d64f0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/06d64f046ca14c90387f958b85b355942b52e8f1))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update @photino-net-utils/bridge dependency to v0.8.1 and reformat SettingsPage styling for improved readability - ([7850102](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/785010231d854307461d13a6861f478317c33655))
+- Update PhotinoNETUtils.dll library - ([d7979ea](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d7979ea229218c72fe96c3ab6bb600bd47b81da3))
+- Update `.gitignore` - ([b4c23e9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b4c23e9105c13887f968af33d22db674f8e247db))
+- Update `.gitignore` - ([64eafc3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/64eafc3b74567538394b6bf498ded09175e4a029))
+- Update @photino-net-utils/bridge to v0.7.1 and PhotinoNETUtils.dll in URLCheck - ([8444362](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/844436217efeeead52348236b0fd49f112e1674a))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([cf20a65](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cf20a65e6a39280d9e31957e445fd37852a003e5))
+
+
 ## [0.15.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.15.0..v0.15.1) - 2026-10-29
 
 ### 🐛 Bug Fixes
