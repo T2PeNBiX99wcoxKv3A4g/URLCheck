@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.3.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.2.0..v1.3.0) - 2026-10-30
+
+### ⛰️  Features
+
+- *(site)* Copy the script URL instead of the app link - ([2aa455f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2aa455fadc4ee78a5c3317805f49da0d916c0735))
+- *(site)* Show the inspection popup on the home page - ([821c33b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/821c33b3083f8b7798df943d9e4bec9b32c0f480))
+- *(site)* Drop the redundant links section - ([0c4da08](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0c4da08473b009422f8bf2c098a8f6bd0485f615))
+- *(site)* Give the tab a real title and the app icon - ([f2e75f4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f2e75f49744da253c0f1c50dde7395fc592c35e7))
+- *(site)* Add icons to the feature and platform cards - ([32fa19c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/32fa19c5e79efa6462220e3ca80aa56e79cee53a))
+- *(site)* Show the icon next to the site title - ([632c7c2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/632c7c2ca6166b0ca3adc470d173965dc3f55515))
+
+### 🐛 Bug Fixes
+
+- Repair the urlcheck handler and show failed link installs - ([9d5b819](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/9d5b8196705a67a1496440465c7fc76407375868))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([fd286c5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/fd286c502cd4341257993e9966b5f09691868dad))
+
+
 ## [1.2.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.1.0..v1.2.0) - 2026-10-30
 
 ### ⛰️  Features
