@@ -11,7 +11,7 @@
     "upgrade": "node -e \"require('fs').rmSync('package-lock.json',{force:true})\" && npm-check-updates -u"
   },
   "dependencies": {
-    "@photino-net-utils/bridge": "file:../Libs/photino-net-utils-bridge-0.8.1.tgz",
+    "@photino-net-utils/bridge": "file:../Libs/photino-net-utils-bridge-0.8.2.tgz",
     "prismjs": "^1.30.0",
     "react": "^19",
     "react-dom": "^19",
