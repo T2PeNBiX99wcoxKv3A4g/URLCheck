@@ -57,6 +57,21 @@ const Description = styled.p`
     font-size: 0.85rem;
 `;
 
+const Source = styled.a`
+    display: block;
+    color: #6b7280;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover {
+        color: #93c5fd;
+    }
+`;
+
 const Actions = styled.div`
     display: flex;
     gap: 8px;
@@ -113,8 +128,8 @@ export const ScriptsPage: React.FC = () => {
                 <Title>Scripts</Title>
                 <Subtitle>
                     Click <strong>Install</strong> to hand the script to URLCheck. The app must be
-                    running and registered for <code>urlcheck://</code>; if nothing happens, use{" "}
-                    <strong>Copy link</strong> and open it manually.
+                    running and registered for <code>urlcheck://</code>. If nothing happens, copy the
+                    script URL and add it under <strong>Scripts → Download</strong> in the app.
                 </Subtitle>
             </Header>
 
@@ -123,10 +138,13 @@ export const ScriptsPage: React.FC = () => {
                     <Card key={script.name}>
                         <Name>{script.name}</Name>
                         <Description>{script.description}</Description>
+                        <Source href={script.source} title={script.source}>
+                            {script.source}
+                        </Source>
                         <Actions>
                             <Install href={script.install}>Install</Install>
-                            <Copy onClick={() => copy(script.name, script.install)} type="button">
-                                {copied === script.name ? "Copied" : "Copy link"}
+                            <Copy onClick={() => copy(script.name, script.source)} type="button">
+                                {copied === script.name ? "Copied" : "Copy URL"}
                             </Copy>
                         </Actions>
                     </Card>
