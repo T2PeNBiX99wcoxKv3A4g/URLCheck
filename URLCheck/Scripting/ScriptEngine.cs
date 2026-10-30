@@ -70,6 +70,12 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
 
     private bool _loaded;
 
+    /// <summary>The folder as it was when the scripts were loaded, so a stale list can be spotted.</summary>
+    private string _signature = "";
+
+    /// <summary>Two list requests can arrive together; only one of them may load the folder.</summary>
+    private readonly Lock _loadLock = new();
+
     /// <summary>Where the scripts live; created on demand, beside the settings file.</summary>
     public static string ScriptsDirectory => Path.Combine(Path.GetDirectoryName(Constants.LogDirectory)!, "scripts");
 
@@ -481,12 +487,43 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     /// <summary>Loads every script in the folder once; a broken one is listed with its error.</summary>
     private void Load()
     {
-        if (_loaded)
+        lock (_loadLock)
+        {
+            if (_loaded)
+                return;
+
+            _loaded = true;
+
+            var files = ReadFolder();
+            _signature = Signature(files);
+
+            foreach (var path in files)
+                _scripts.Add(LoadScript(path));
+
+            if (_scripts.Count > 0)
+                Serilog.Log.Information("Loaded {Count} Lua script(s) from {Path}", _scripts.Count, ScriptsDirectory);
+            else
+                Serilog.Log.Debug("No Lua scripts in {Path}", ScriptsDirectory);
+        }
+    }
+
+    /// <summary>
+    ///     Reloads when the folder no longer matches what was loaded. The file watcher normally does
+    ///     this, but it can miss events (and a list request is cheap), so the list stays honest.
+    /// </summary>
+    public async Task ReloadIfChangedAsync()
+    {
+        Load();
+
+        if (Signature(ReadFolder()) == _signature)
             return;
 
-        _loaded = true;
+        await ReloadAsync();
+    }
 
-        var files = Try.Run(() =>
+    /// <summary>The .lua files in the folder, in the order they are run.</summary>
+    private static string[] ReadFolder() =>
+        Try.Run(() =>
         {
             Directory.CreateDirectory(ScriptsDirectory);
             return Directory.EnumerateFiles(ScriptsDirectory, "*.lua")
@@ -498,14 +535,13 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
             return [];
         });
 
-        foreach (var path in files)
-            _scripts.Add(LoadScript(path));
-
-        if (_scripts.Count > 0)
-            Serilog.Log.Information("Loaded {Count} Lua script(s) from {Path}", _scripts.Count, ScriptsDirectory);
-        else
-            Serilog.Log.Debug("No Lua scripts in {Path}", ScriptsDirectory);
-    }
+    /// <summary>Names, sizes and write times, so two folder scans can be compared cheaply.</summary>
+    private static string Signature(IEnumerable<string> files) =>
+        Try.Run(() => string.Join('|', files.Select(path =>
+        {
+            var info = new FileInfo(path);
+            return $"{info.Name}:{info.Length}:{info.LastWriteTimeUtc.Ticks}";
+        }))).GetOrElse(_ => "");
 
     private static Script LoadScript(string path)
     {

@@ -20,6 +20,12 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
     /// <summary>Set while a folder change is waiting to be announced, so a burst sends one event.</summary>
     private static int _announcing;
 
+    /// <summary>
+    ///     The live watcher. It has to stay referenced: an unreferenced one gets collected and then
+    ///     silently stops reporting, which looks exactly like the folder never changing.
+    /// </summary>
+    private static FileSystemWatcher? _watcher;
+
     public ScriptsService()
     {
         NativeBridge.MessageReceived += HandleMessageAsync;
@@ -38,7 +44,7 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
     /// </summary>
     private static void WatchScriptsFolder()
     {
-        var watcher = Try.Run(() =>
+        var created = Try.Run(() =>
         {
             Directory.CreateDirectory(ScriptEngine.ScriptsDirectory);
 
@@ -57,8 +63,13 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
             return folder;
         });
 
-        if (watcher.Exception is { } exception)
+        if (created.Exception is { } exception)
+        {
             Serilog.Log.Warning(exception, "Could not watch the script folder {Path}", ScriptEngine.ScriptsDirectory);
+            return;
+        }
+
+        _watcher = created.Value;
     }
 
     /// <summary>A save is several file events; they collapse into one reload and refresh.</summary>
@@ -72,7 +83,7 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
             try
             {
                 await Task.Delay(250);
-                await ScriptEngine.Instance.ReloadAsync();
+                await ScriptEngine.Instance.ReloadIfChangedAsync();
                 WindowManager.Instance.BroadcastEventIfReady("scripts.changed", new OkPayload());
             }
             finally
@@ -85,8 +96,7 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
     private static Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
         context.Request.Type switch
         {
-            "scripts.list" => Task.FromResult<NativeResponse?>(context.Reply("scripts.list.result",
-                new ScriptListPayload([.. ScriptEngine.Instance.List().Select(Entry)], ScriptEngine.ScriptsDirectory))),
+            "scripts.list" => ListAsync(context),
 
             "scripts.read" => Task.FromResult(Read(context)),
             "scripts.save" => SaveAsync(context),
@@ -108,6 +118,14 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
 
     private static ScriptEntryPayload Entry(ScriptInfo script) =>
         new(script.Name, script.Size, script.Modified, script.Error);
+
+    private static async Task<NativeResponse?> ListAsync(NativeContext context)
+    {
+        await ScriptEngine.Instance.ReloadIfChangedAsync();
+
+        return context.Reply("scripts.list.result",
+            new ScriptListPayload([.. ScriptEngine.Instance.List().Select(Entry)], ScriptEngine.ScriptsDirectory));
+    }
 
     private static ScriptLogPayload ToPayload(ScriptLogEntry entry) =>
         new(entry.Time.ToString("HH:mm:ss"), entry.Level, entry.Script, entry.Message);
