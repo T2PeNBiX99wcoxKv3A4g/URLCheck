@@ -638,8 +638,14 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         state.Environment["loadfile"] = LuaValue.Nil;
 
         // The string library gains split, and the string metatable gains indexing and +.
-        state.Environment["string"].Read<LuaTable>()["split"] = new LuaFunction(Split);
-        state.ExecuteAsync(state.Load(StringExtensions, "string-extensions")).AsTask().GetAwaiter().GetResult();
+        var stringTable = state.Environment["string"].Read<LuaTable>();
+        stringTable["split"] = new LuaFunction(Split);
+
+        var metatable = state.ExecuteAsync(state.Load("return getmetatable(\"\")", "string-metatable"))
+            .AsTask().GetAwaiter().GetResult()[0].Read<LuaTable>();
+
+        metatable["__index"] = new LuaFunction((context, _) => Index(context, stringTable));
+        metatable["__add"] = new LuaFunction(Add);
 
         state.Environment["print"] = new LuaFunction((context, _) =>
         {
@@ -656,33 +662,57 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     }
 
     /// <summary>
-    ///     Extends the string metatable without losing the standard one: methods such as
-    ///     <c>s:sub(1, 1)</c> still work, and <c>s[1]</c> reads one character while <c>s + t</c>
-    ///     concatenates. Runs once for each sandbox.
+    ///     Indexes a string like a table: <c>s[1]</c> is the first character and <c>s[-1]</c> the
+    ///     last, exactly as <c>string.sub</c> counts. Any other key falls back to the string library,
+    ///     so methods such as <c>s:sub(1, 1)</c> keep working.
     /// </summary>
-    private const string StringExtensions = """
-                                           local metatable = getmetatable("")
-                                           local string = string
+    private static ValueTask<int> Index(LuaFunctionExecutionContext context, LuaTable stringTable)
+    {
+        var value = context.GetArgument(0).ToString();
+        var key = context.GetArgument(1);
 
-                                           metatable.__index = function(value, key)
-                                               if type(key) == "number" then
-                                                   local index = key
-                                                   if index < 0 then
-                                                       index = #value + index + 1
-                                                   end
-                                                   if index < 1 or index > #value then
-                                                       return nil
-                                                   end
-                                                   return string.sub(value, index, index)
-                                               end
+        if (key.TryRead<double>(out var number))
+        {
+            var index = (int)number;
 
-                                               return string[key]
-                                           end
+            if (index < 0)
+                index = value.Length + index + 1;
 
-                                           metatable.__add = function(a, b)
-                                               return a .. b
-                                           end
-                                           """;
+            return index is < 1 || index > value.Length
+                ? new(context.Return(LuaValue.Nil))
+                : new(context.Return(value.Substring(index - 1, 1)));
+        }
+
+        return new(context.Return(stringTable[key]));
+    }
+
+    /// <summary>
+    ///     <c>a + b</c> concatenates like <c>..</c>, using the VM's own concatenation so number
+    ///     formatting and the error for the wrong types stay identical.
+    /// </summary>
+    private static ValueTask<int> Add(LuaFunctionExecutionContext context, CancellationToken cancellation)
+    {
+        var left = context.GetArgument(0);
+        var right = context.GetArgument(1);
+
+        // A metamethod that throws before its first await is swallowed by the VM, so this stays
+        // synchronous and only the successful path returns a task.
+        if (!IsText(left) || !IsText(right))
+            throw new LuaRuntimeException(context.State,
+                $"attempt to concatenate a {left.TypeToString()} value with a {right.TypeToString()} value", 1);
+
+        return Concat(context, left, right, cancellation);
+    }
+
+    private static async ValueTask<int> Concat(LuaFunctionExecutionContext context, LuaValue left, LuaValue right,
+        CancellationToken cancellation)
+    {
+        var result = await context.State.ConcatAsync(new[] { left, right }, cancellation);
+
+        return context.Return(result);
+    }
+
+    private static bool IsText(LuaValue value) => value.Type is LuaValueType.String or LuaValueType.Number;
 
     /// <summary>
     ///     Splits a string on a literal separator, or on whitespace when there is none. The parts come
