@@ -14,6 +14,9 @@ using URLCheck.Messaging;
 using URLCheck.Platform;
 using URLCheck.Scripting;
 using URLCheck.Services;
+#if !DEBUG // Don't remove it !!!
+using PhotinoNetUtils.Hosting;
+#endif
 
 namespace URLCheck;
 //NOTE: To hide the console window, go to the project properties and change the Output Type to Windows Application.
