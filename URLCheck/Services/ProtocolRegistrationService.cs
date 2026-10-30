@@ -39,7 +39,6 @@ internal sealed class ProtocolRegistrationService : Singleton<ProtocolRegistrati
         var response = context.Request.Type switch
         {
             "app.registerProtocols" => RegisterBrowserReply(context),
-            "app.registerCustomScheme" => RegisterCustomSchemeReply(context),
             "app.unregisterProtocols" => UnregisterReply(context),
             "app.protocolStatus" => StatusReply(context),
             "app.openDefaultApps" => OpenDefaultAppsReply(context),
@@ -54,13 +53,6 @@ internal sealed class ProtocolRegistrationService : Singleton<ProtocolRegistrati
         _registrar.RegisterBrowser();
         InvalidateStatus();
         return context.Reply("app.registerProtocols.result", new RegisterPayload(true, ExecutablePath));
-    }
-
-    private NativeResponse RegisterCustomSchemeReply(NativeContext context)
-    {
-        _registrar.RegisterCustomScheme();
-        InvalidateStatus();
-        return context.Reply("app.registerCustomScheme.result", new RegisterPayload(true, ExecutablePath));
     }
 
     private NativeResponse UnregisterReply(NativeContext context)

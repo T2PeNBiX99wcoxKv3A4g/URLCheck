@@ -38,11 +38,6 @@ export async function registerProtocols(): Promise<{ executablePath: string }> {
     return await Native.request<{ executablePath: string }>("app.registerProtocols");
 }
 
-/** Registers URLCheck as the handler for the custom `urlcheck://` scheme. */
-export async function registerCustomScheme(): Promise<{ executablePath: string }> {
-    return await Native.request<{ executablePath: string }>("app.registerCustomScheme");
-}
-
 /** Removes every registry entry URLCheck created (for a clean uninstall). */
 export async function unregisterProtocols(): Promise<void> {
     await Native.request("app.unregisterProtocols");

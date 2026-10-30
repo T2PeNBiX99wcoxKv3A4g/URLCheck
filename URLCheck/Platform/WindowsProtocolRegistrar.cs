@@ -49,13 +49,17 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
         }
     }
 
-    /// <summary>Registers URLCheck as an http/https candidate browser.</summary>
+    /// <summary>Registers URLCheck as an http/https candidate browser and as the urlcheck:// handler.</summary>
     public void RegisterBrowser()
     {
         EnsureExecutable();
 
         RegisterProgId(HttpProgId, "URLCheck HTTP handler");
         RegisterProgId(HttpsProgId, "URLCheck HTTPS handler");
+
+        // Script links are part of the same integration, so they are registered together and cannot be
+        // left behind as a second, easily forgotten step.
+        RegisterProgId(CustomScheme, "URL:URLCheck Protocol");
 
         using var capabilities = Registry.CurrentUser.CreateSubKey(
             $@"Software\Clients\StartMenuInternet\{AppKeyName}\Capabilities");
@@ -75,27 +79,21 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
         registered.SetValue(AppKeyName, $@"Software\Clients\StartMenuInternet\{AppKeyName}\Capabilities");
     }
 
-    /// <summary>Registers the custom <c>urlcheck://</c> scheme handler.</summary>
-    public void RegisterCustomScheme()
-    {
-        EnsureExecutable();
-        RegisterProgId(CustomScheme, "URL:URLCheck Protocol");
-    }
-
     /// <summary>
-    ///     Repairs a missing or stale registration. The handler is stored as an absolute path, so after
-    ///     the app moves (or a debug build took the scheme over) every click on a <c>urlcheck://</c> link
-    ///     fails before the app is even started, with no visible error.
+    ///     Repairs a stale registration: the handler is stored as an absolute path, so after the app moves
+    ///     every click on a <c>urlcheck://</c> link fails before the app is even started, with no visible
+    ///     error. A scheme that was never registered is left alone; that is the user's choice.
     /// </summary>
     public void EnsureCustomScheme()
     {
         using var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{CustomScheme}\shell\open\command");
-        if (key?.GetValue(null) is string command &&
+        if (key?.GetValue(null) is not string command ||
             command.Trim().Equals(_command, StringComparison.OrdinalIgnoreCase))
             return;
 
-        Log.Information("Registering the urlcheck:// handler at {Path}", ExecutablePath);
-        RegisterCustomScheme();
+        Log.Information("Repointing the urlcheck:// handler to {Path}", ExecutablePath);
+        EnsureExecutable();
+        RegisterProgId(CustomScheme, "URL:URLCheck Protocol");
     }
 
     /// <summary>Removes every registry key this app created, so nothing is left behind after uninstalling.</summary>

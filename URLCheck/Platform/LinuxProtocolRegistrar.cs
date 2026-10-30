@@ -61,25 +61,22 @@ internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>
         WriteDesktopEntry();
         SetDefault("x-scheme-handler/http");
         SetDefault("x-scheme-handler/https");
-        UpdateDesktopDatabase();
-    }
-
-    public void RegisterCustomScheme()
-    {
-        EnsureExecutable();
-        WriteDesktopEntry();
         SetDefault(CustomSchemeMime);
         UpdateDesktopDatabase();
     }
 
-    /// <summary>Rewrites a stale desktop entry and the handler default, and does nothing when both are current.</summary>
+    /// <summary>
+    ///     Repairs a stale registration, and does nothing when the scheme is not registered at all: whether
+    ///     URLCheck handles <c>urlcheck://</c> is the user's choice.
+    /// </summary>
     public void EnsureCustomScheme()
     {
-        if (string.Equals(RegisteredExecutablePath, ExecutablePath, StringComparison.Ordinal) &&
-            IsCustomSchemeRegistered())
+        if (!IsCustomSchemeRegistered() ||
+            string.Equals(RegisteredExecutablePath, ExecutablePath, StringComparison.Ordinal))
             return;
 
-        RegisterCustomScheme();
+        WriteDesktopEntry();
+        UpdateDesktopDatabase();
     }
 
     public void Unregister()

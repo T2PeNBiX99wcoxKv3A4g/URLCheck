@@ -41,7 +41,6 @@ import {
     openLogsFolder,
     protocolStatus,
     type ProtocolStatus,
-    registerCustomScheme,
     registerProtocols,
     RELEASES_URL,
     setStartup,
@@ -1231,20 +1230,6 @@ export const SettingsPage: React.FC = () => {
         }
     };
 
-    const handleRegisterCustomScheme = async () => {
-        setIntegrationBusy(true);
-        setIntegrationMessage(null);
-        try {
-            const result = await registerCustomScheme();
-            setIntegrationMessage({key: "settings.registeredUrlcheck", params: {path: result.executablePath}});
-            setProtocols(await protocolStatus());
-        } catch (err) {
-            setError(err instanceof Error ? err.message : String(err));
-        } finally {
-            setIntegrationBusy(false);
-        }
-    };
-
     const handleUnregisterProtocols = async () => {
         setIntegrationBusy(true);
         setIntegrationMessage(null);
@@ -1811,10 +1796,6 @@ export const SettingsPage: React.FC = () => {
                             <GhostButton type="button" onClick={handleRegisterProtocols} disabled={integrationBusy}>
                                 <LinkIcon size={15}/>
                                 {t("settings.registerHttp")}
-                            </GhostButton>
-                            <GhostButton type="button" onClick={handleRegisterCustomScheme} disabled={integrationBusy}>
-                                <LinkIcon size={15}/>
-                                {t("settings.registerUrlcheck")}
                             </GhostButton>
                             {platform === "windows" && (
                                 <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
