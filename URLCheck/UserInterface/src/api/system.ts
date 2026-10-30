@@ -52,7 +52,7 @@ export interface ProtocolStatus {
     registeredPath: string | null;
 }
 
-/** Reports whether URLCheck is the default browser and whether urlcheck:// is registered. */
+/** Reports whether URLCheck is the default browser and whether checkurl:// is registered. */
 export async function protocolStatus(): Promise<ProtocolStatus> {
     if (!Native.available) {
         return {isDefault: false, customSchemeRegistered: false, pathMatches: false, registeredPath: null};

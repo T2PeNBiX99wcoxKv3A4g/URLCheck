@@ -25,7 +25,7 @@ internal sealed class ProtocolRegistrationService : Singleton<ProtocolRegistrati
     /// <summary>
     ///     Repairs the custom-scheme handler once at startup. The handler is an absolute path, so an app
     ///     that was moved, reinstalled or last registered by a build that is gone leaves every
-    ///     <c>urlcheck://</c> click doing nothing at all, without even starting the app.
+    ///     <c>checkurl://</c> click doing nothing at all, without even starting the app.
     /// </summary>
     public void EnsureCustomScheme()
     {

@@ -8,7 +8,7 @@ namespace URLCheck.Platform;
 
 /// <summary>
 ///     Registers URLCheck in the Windows registry as a candidate browser for <c>http</c>/<c>https</c>
-///     and as a handler for the custom <c>urlcheck://</c> scheme.
+///     and as a handler for the custom <c>checkurl://</c> scheme.
 /// </summary>
 /// <remarks>
 ///     Windows 10/11 protect the default-handler choice with a hash (UserChoice), so an app can never
@@ -20,7 +20,14 @@ namespace URLCheck.Platform;
 internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegistrar>, IProtocolRegistrar
 {
     private const string AppKeyName = "URLCheck";
-    private const string CustomScheme = "urlcheck";
+
+    // Windows' shell refuses any scheme whose name starts with "url" (ShellExecute returns
+    // SE_ERR_FNF and shows "cannot find program"), so the script links use "checkurl" instead.
+    private const string CustomScheme = "checkurl";
+
+    /// <summary>Links shared before the rename; still registered so they keep working where they can.</summary>
+    private const string LegacyScheme = "urlcheck";
+
     private const string HttpProgId = "URLCheck.HTTP";
     private const string HttpsProgId = "URLCheck.HTTPS";
 
@@ -49,7 +56,7 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
         }
     }
 
-    /// <summary>Registers URLCheck as an http/https candidate browser and as the urlcheck:// handler.</summary>
+    /// <summary>Registers URLCheck as an http/https candidate browser and as the checkurl:// handler.</summary>
     public void RegisterBrowser()
     {
         EnsureExecutable();
@@ -60,6 +67,7 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
         // Script links are part of the same integration, so they are registered together and cannot be
         // left behind as a second, easily forgotten step.
         RegisterProgId(CustomScheme, "URL:URLCheck Protocol");
+        RegisterProgId(LegacyScheme, "URL:URLCheck Protocol");
 
         using var capabilities = Registry.CurrentUser.CreateSubKey(
             $@"Software\Clients\StartMenuInternet\{AppKeyName}\Capabilities");
@@ -81,19 +89,26 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
 
     /// <summary>
     ///     Repairs a stale registration: the handler is stored as an absolute path, so after the app moves
-    ///     every click on a <c>urlcheck://</c> link fails before the app is even started, with no visible
+    ///     every click on a <c>checkurl://</c> link fails before the app is even started, with no visible
     ///     error. A scheme that was never registered is left alone; that is the user's choice.
     /// </summary>
     public void EnsureCustomScheme()
     {
-        using var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{CustomScheme}\shell\open\command");
+        RepointIfStale(CustomScheme);
+        RepointIfStale(LegacyScheme);
+    }
+
+    /// <summary>Rewrites the handler of one scheme when it points at another build.</summary>
+    private void RepointIfStale(string scheme)
+    {
+        using var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{scheme}\shell\open\command");
         if (key?.GetValue(null) is not string command ||
             command.Trim().Equals(_command, StringComparison.OrdinalIgnoreCase))
             return;
 
-        Log.Information("Repointing the urlcheck:// handler to {Path}", ExecutablePath);
+        Log.Information("Repointing the {Scheme}:// handler to {Path}", scheme, ExecutablePath);
         EnsureExecutable();
-        RegisterProgId(CustomScheme, "URL:URLCheck Protocol");
+        RegisterProgId(scheme, "URL:URLCheck Protocol");
     }
 
     /// <summary>Removes every registry key this app created, so nothing is left behind after uninstalling.</summary>
@@ -102,6 +117,7 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
         DeleteKey($@"Software\Classes\{HttpProgId}");
         DeleteKey($@"Software\Classes\{HttpsProgId}");
         DeleteKey($@"Software\Classes\{CustomScheme}");
+        DeleteKey($@"Software\Classes\{LegacyScheme}");
         DeleteKey($@"Software\Clients\StartMenuInternet\{AppKeyName}");
 
         using var registered = Registry.CurrentUser.OpenSubKey(@"Software\RegisteredApplications", true);

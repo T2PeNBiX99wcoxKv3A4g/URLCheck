@@ -128,7 +128,7 @@ export const ScriptsPage: React.FC = () => {
                 <Title>Scripts</Title>
                 <Subtitle>
                     Click <strong>Install</strong> to hand the script to URLCheck. The app must be
-                    running and registered for <code>urlcheck://</code>. If nothing happens, copy the
+                    running and registered for <code>checkurl://</code>. If nothing happens, copy the
                     script URL and add it under <strong>Scripts → Download</strong> in the app.
                 </Subtitle>
             </Header>

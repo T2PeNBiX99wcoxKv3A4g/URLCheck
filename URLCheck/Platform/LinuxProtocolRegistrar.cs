@@ -14,7 +14,10 @@ namespace URLCheck.Platform;
 internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>, IProtocolRegistrar
 {
     private const string DesktopFileName = "urlcheck.desktop";
-    private const string CustomSchemeMime = "x-scheme-handler/urlcheck";
+    private const string CustomSchemeMime = "x-scheme-handler/checkurl";
+
+    /// <summary>Links shared before the rename; still registered so they keep working.</summary>
+    private const string LegacySchemeMime = "x-scheme-handler/urlcheck";
 
     /// <summary>
     ///     The Wayland app id GTK reports for our windows. It has to match the desktop entry's file name
@@ -62,12 +65,13 @@ internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>
         SetDefault("x-scheme-handler/http");
         SetDefault("x-scheme-handler/https");
         SetDefault(CustomSchemeMime);
+        SetDefault(LegacySchemeMime);
         UpdateDesktopDatabase();
     }
 
     /// <summary>
     ///     Repairs a stale registration, and does nothing when the scheme is not registered at all: whether
-    ///     URLCheck handles <c>urlcheck://</c> is the user's choice.
+    ///     URLCheck handles <c>checkurl://</c> is the user's choice.
     /// </summary>
     public void EnsureCustomScheme()
     {
@@ -124,7 +128,7 @@ internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>
                        StartupWMClass={ProcessName}
                        Terminal=false
                        Categories=Network;WebBrowser;
-                       MimeType=x-scheme-handler/http;x-scheme-handler/https;{CustomSchemeMime};text/html;
+                       MimeType=x-scheme-handler/http;x-scheme-handler/https;{CustomSchemeMime};{LegacySchemeMime};text/html;
                        """;
 
         File.WriteAllText(DesktopFilePath, content + Environment.NewLine);

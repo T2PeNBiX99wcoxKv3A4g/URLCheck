@@ -241,7 +241,7 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
         return context.Reply("scripts.test.result", new ScriptTestPayload(result.Url, result.Error));
     }
 
-    /// <summary>Installs a script from a direct link, as used by the <c>urlcheck://</c> handler.</summary>
+    /// <summary>Installs a script from a direct link, as used by the <c>checkurl://</c> handler.</summary>
     public static async Task<string?> InstallAsync(string url) =>
         await ScriptEngine.Instance.DownloadAsync(url, Client);
 

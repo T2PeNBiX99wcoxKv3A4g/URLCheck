@@ -105,7 +105,7 @@ internal static class Program
             _ = FilterService.Instance;
             _ = ScriptsService.Instance;
 
-            // Repairs a urlcheck:// handler left pointing at an executable that no longer exists.
+            // Repairs a checkurl:// handler left pointing at an executable that no longer exists.
             ProtocolRegistrationService.Instance.EnsureCustomScheme();
 
             var manager = WindowManager.Instance;
@@ -156,13 +156,13 @@ internal static class Program
     }
 
     /// <summary>
-    ///     Sends one incoming link where it belongs: a <c>urlcheck://</c> script link installs it and
+    ///     Sends one incoming link where it belongs: a <c>checkurl://</c> script link installs it and
     ///     opens the Scripts page, anything else goes to the inspection popup.
     /// </summary>
     private static async Task DispatchUrlAsync(string url)
     {
         if (Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
-            string.Equals(uri.Scheme, "urlcheck", StringComparison.OrdinalIgnoreCase))
+            uri.Scheme is "checkurl" or "urlcheck")
         {
             await InstallFromLinkAsync(url);
             return;
@@ -171,12 +171,12 @@ internal static class Program
         await WindowManager.Instance.ShowPopupAsync(url);
     }
 
-    /// <summary>Handles <c>urlcheck://script?url=...</c>, the link that installs a script.</summary>
+    /// <summary>Handles <c>checkurl://script?url=...</c>, the link that installs a script.</summary>
     private static async Task InstallFromLinkAsync(string link)
     {
         if (ScriptLink.Parse(link) is not { } source)
         {
-            Log.Warning("Ignoring an unsupported urlcheck link: {Link}", link);
+            Log.Warning("Ignoring an unsupported script link: {Link}", link);
             return;
         }
 
@@ -238,11 +238,11 @@ internal static class Program
             ]);
     }
 
-    /// <summary>Pulls the http/https/urlcheck URLs out of a raw argument list.</summary>
+    /// <summary>Pulls the http/https/checkurl URLs out of a raw argument list.</summary>
     private static List<string> ExtractUrls(IEnumerable<string> args) =>
     [
         .. args.Where(arg =>
             Uri.TryCreate(arg, UriKind.Absolute, out var uri) &&
-            uri.Scheme is "http" or "https" or "urlcheck")
+            uri.Scheme is "http" or "https" or "checkurl" or "urlcheck")
     ];
 }

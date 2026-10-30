@@ -4,7 +4,7 @@ namespace URLCheck.Scripting;
 
 /// <summary>
 ///     Reads the custom-scheme links the app registers. Today there is one form:
-///     <c>urlcheck://script?url=&lt;encoded http(s) url&gt;</c> installs that script.
+///     <c>checkurl://script?url=&lt;encoded http(s) url&gt;</c> installs that script.
 /// </summary>
 internal static class ScriptLink
 {
@@ -12,7 +12,7 @@ internal static class ScriptLink
     public static string? Parse(string link)
     {
         if (!Uri.TryCreate(link, UriKind.Absolute, out var uri) ||
-            !string.Equals(uri.Scheme, "urlcheck", StringComparison.OrdinalIgnoreCase) ||
+            uri.Scheme is not ("checkurl" or "urlcheck") ||
             !string.Equals(uri.Host, "script", StringComparison.OrdinalIgnoreCase))
             return null;
 

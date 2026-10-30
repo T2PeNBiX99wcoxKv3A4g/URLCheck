@@ -31,7 +31,7 @@ for (const name of names) {
         name,
         description: describe(await readFile(path.join(luaDirectory, name), "utf8")),
         source: raw,
-        install: `urlcheck://script?url=${encodeURIComponent(raw)}`
+        install: `checkurl://script?url=${encodeURIComponent(raw)}`
     });
 }
 
