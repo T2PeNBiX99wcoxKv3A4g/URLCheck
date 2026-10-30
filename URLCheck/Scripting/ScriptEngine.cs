@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Text;
+using JetBrains.Annotations;
 using Lua;
 using Lua.Standard;
 using PhotinoNetUtils.Extensions;
@@ -29,11 +30,32 @@ internal sealed record ScriptLogEntry(DateTime Time, string Level, string Script
 /// </remarks>
 internal sealed class ScriptEngine : Singleton<ScriptEngine>
 {
-    /// <summary>How long one script may run before it is cancelled; it only handles a URL.</summary>
-    private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
-
     /// <summary>How many log lines are kept for the scripts page.</summary>
     private const int MaxLogEntries = 200;
+
+    /// <summary>The script a new one starts from.</summary>
+    [PublicAPI] public const string Template = """
+                                               -- Runs once for every URL that comes in.
+                                               --
+                                               -- u.url          the whole URL
+                                               -- u.scheme, u.host, u.port, u.path
+                                               -- u.query, u.fragment
+                                               -- u.params       decoded query parameters; set one to nil to drop it
+                                               -- u.app_version  the running version
+                                               --
+                                               -- Return u (or a URL string) to accept the changes, nil to leave the URL alone.
+
+                                               return function(u)
+                                                   if u.host == "example.com" then
+                                                       u.params["utm_source"] = nil
+                                                   end
+
+                                                   return u
+                                               end
+                                               """;
+
+    /// <summary>How long one script may run before it is cancelled; it only handles a URL.</summary>
+    private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
 
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly ConcurrentQueue<ScriptLogEntry> _logs = new();
@@ -41,34 +63,13 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
 
     private bool _loaded;
 
-    /// <summary>Raised for every line a script prints or fails with.</summary>
-    public event Action<ScriptLogEntry>? Logged;
-
     /// <summary>Where the scripts live; created on demand, beside the settings file.</summary>
     public static string ScriptsDirectory => Path.Combine(Path.GetDirectoryName(Constants.LogDirectory)!, "scripts");
 
-    /// <summary>The script a new one starts from.</summary>
-    public const string Template = """
-                                   -- Runs once for every URL that comes in.
-                                   --
-                                   -- u.url          the whole URL
-                                   -- u.scheme, u.host, u.port, u.path
-                                   -- u.query, u.fragment
-                                   -- u.params       decoded query parameters; set one to nil to drop it
-                                   -- u.app_version  the running version
-                                   --
-                                   -- Return u (or a URL string) to accept the changes, nil to leave the URL alone.
-
-                                   return function(u)
-                                       if u.host == "example.com" then
-                                           u.params["utm_source"] = nil
-                                       end
-
-                                       return u
-                                   end
-                                   """;
-
     public IReadOnlyList<ScriptLogEntry> Logs => [.. _logs];
+
+    /// <summary>Raised for every line a script prints or fails with.</summary>
+    public event Action<ScriptLogEntry>? Logged;
 
     /// <summary>
     ///     Runs every script over <paramref name="url" />, in file name order, and returns the URL the
@@ -127,7 +128,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         try
         {
             Directory.CreateDirectory(ScriptsDirectory);
-            File.WriteAllText(PathFor(name), content);
+            await File.WriteAllTextAsync(PathFor(name), content);
         }
         catch (Exception ex)
         {
@@ -472,7 +473,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
             var parts = new List<string>(context.ArgumentCount);
 
             for (var index = 0; index < context.ArgumentCount; index++)
-                parts.Add(context.GetArgument(index).ToString() ?? "");
+                parts.Add(context.GetArgument(index).ToString());
 
             Instance.Write("info", "print", string.Join("\t", parts));
             return new(0);
