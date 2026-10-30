@@ -67,15 +67,15 @@ installed for them. What the operating system still has to provide:
 
 Two package formats are published beside the plain archives:
 
-| File                                 | What it does                                                                        |
-|--------------------------------------|-------------------------------------------------------------------------------------|
-| `URLCheck-<version>-win-x64.msi`     | Per-user Windows installer: installs into `%LOCALAPPDATA%\Programs\URLCheck`, adds a Start menu entry and a desktop shortcut, and never asks for administrator rights. |
+| File                                   | What it does                                                                                                                                                              |
+|----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `URLCheck-<version>-win-x64.msi`       | Per-user Windows installer: installs into `%LOCALAPPDATA%\Programs\URLCheck`, adds a Start menu entry and a desktop shortcut, and never asks for administrator rights.    |
 | `urlcheck-<version>-1.fcXX.x86_64.rpm` | Fedora package for the same build: `sudo dnf install ./urlcheck-<version>-*.rpm`. It installs to `/opt/URLCheck` with a `urlcheck` command, a desktop entry and the icon. |
 
 ### Windows
 
 1. The Microsoft Edge **WebView2 Runtime**. If you are not using Windows 11, you need it.
-  [Microsoft's page](https://developer.microsoft.com/microsoft-edge/webview2/).
+   [Microsoft's page](https://developer.microsoft.com/microsoft-edge/webview2/).
 2. Any Windows version lower than 11 is not officially supported.
    If you have any issues, You need to fix by yourself.
 3. A tiling window manager has to be told to leave the floating button alone: its web view needs the
@@ -98,7 +98,7 @@ window_rules:
    clipboard from applications that are not focused, and `wl-paste --watch` is the way around it.
    Without it the button simply never appears there.
 4. Only tested on **Fedora 44 with KDE Plasma on Wayland**. Every other distribution is untested, and the
-  runtime libraries are the fiddly part, so start from the libraries rather than the package names.
+   runtime libraries are the fiddly part, so start from the libraries rather than the package names.
 5. Only support Wayland right now. If you are a super nerd running something like an old window manager on X11, you
    should fix any issues by yourself.
 
@@ -167,13 +167,13 @@ That produces a single self-contained executable per platform under
 
 ## Where things are stored
 
-|          | Windows                                  | Linux                                    |
-|----------|------------------------------------------|------------------------------------------|
-| Settings | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
-| Scripts  | `%APPDATA%\URLCheck\scripts`             | `~/.config/URLCheck/scripts`             |
-| History  | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
-| Device key | `%APPDATA%\URLCheck\device.key`        | `~/.config/URLCheck/device.key`          |
-| Logs     | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
+|            | Windows                                  | Linux                                    |
+|------------|------------------------------------------|------------------------------------------|
+| Settings   | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
+| Scripts    | `%APPDATA%\URLCheck\scripts`             | `~/.config/URLCheck/scripts`             |
+| History    | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
+| Device key | `%APPDATA%\URLCheck\device.key`          | `~/.config/URLCheck/device.key`          |
+| Logs       | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
 
 Logs are written to the file and mirrored to the console, so a log file is enough to report a
 problem. They roll daily and the last seven are kept.
