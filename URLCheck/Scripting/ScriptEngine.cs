@@ -350,9 +350,11 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     /// <summary>Parses the URL into the table a script sees, and remembers the parameter order.</summary>
     private static Context BuildContext(string url, string appVersion)
     {
-        var table = new LuaTable();
-        table["url"] = url;
-        table["app_version"] = appVersion;
+        var table = new LuaTable
+        {
+            ["url"] = url,
+            ["app_version"] = appVersion
+        };
 
         var parameters = new LuaTable();
         table["params"] = parameters;
