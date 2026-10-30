@@ -249,7 +249,7 @@
   "scripts.logsEmpty": "Nothing yet.",
   "scripts.test": "Test",
   "scripts.testPlaceholder": "https://example.com/?utm_source=test",
-  "scripts.testResult": "Result",
+  "scripts.testFinalUrl": "Final URL",
   "scripts.openExternal": "Open with the default app",
   "error.scriptExists": "A script with that name already exists.",
   "error.scriptMissing": "That script is gone.",

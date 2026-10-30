@@ -152,7 +152,7 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
 
         var result = await ScriptEngine.Instance.TestAsync(name, url, AppInfoService.Version, payload.Content);
 
-        return context.Reply("scripts.test.result", new ScriptTestPayload(result.Url, result.Error, result.Output));
+        return context.Reply("scripts.test.result", new ScriptTestPayload(result.Url, result.Error));
     }
 
     private static NativeResponse? ClearLogs(NativeContext context)

@@ -241,7 +241,7 @@
   "scripts.logsEmpty": "暂无。",
   "scripts.test": "测试",
   "scripts.testPlaceholder": "https://example.com/?utm_source=test",
-  "scripts.testResult": "结果",
+  "scripts.testFinalUrl": "最终 URL",
   "scripts.openExternal": "用默认应用打开",
   "error.scriptExists": "同名脚本已存在。",
   "error.scriptMissing": "找不到该脚本。",

@@ -241,7 +241,7 @@
   "scripts.logsEmpty": "まだありません。",
   "scripts.test": "テスト",
   "scripts.testPlaceholder": "https://example.com/?utm_source=test",
-  "scripts.testResult": "結果",
+  "scripts.testFinalUrl": "最終 URL",
   "scripts.openExternal": "既定のアプリで開く",
   "error.scriptExists": "同じ名前のスクリプトがすでにあります。",
   "error.scriptMissing": "そのスクリプトは見つかりません。",

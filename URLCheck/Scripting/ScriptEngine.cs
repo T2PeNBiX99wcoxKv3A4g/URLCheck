@@ -15,8 +15,8 @@ internal sealed record ScriptInfo(string Name, long Size, DateTime Modified, str
 /// <summary>What the scripts made of one URL, and the first failure to show in the popup.</summary>
 internal sealed record ScriptOutcome(string Url, string? Error);
 
-/// <summary>What one test run made of a URL: the result, any failure, and the lines it printed.</summary>
-internal sealed record ScriptTestResult(string Url, string? Error, IReadOnlyList<string> Output);
+/// <summary>What one test run made of a URL: the URL it produced, and the failure if there was one.</summary>
+internal sealed record ScriptTestResult(string Url, string? Error);
 
 /// <summary>One line of what the scripts printed or failed with.</summary>
 internal sealed record ScriptLogEntry(DateTime Time, string Level, string Script, string Message);
@@ -67,9 +67,6 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly ConcurrentQueue<ScriptLogEntry> _logs = new();
     private readonly List<Script> _scripts = [];
-
-    /// <summary>Collects the lines of the test run in progress; only touched while the gate is held.</summary>
-    private List<ScriptLogEntry>? _capture;
 
     private bool _loaded;
 
@@ -136,7 +133,6 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
 
         try
         {
-            _capture = [];
             Script script;
 
             if (source is null)
@@ -145,10 +141,10 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                 var saved = _scripts.FirstOrDefault(candidate => candidate.Name == name);
 
                 if (saved is null)
-                    return new(url, "error.scriptMissing", []);
+                    return new(url, "error.scriptMissing");
 
                 if (saved.Function is null)
-                    return new(url, saved.Info.Error, []);
+                    return new(url, saved.Info.Error);
 
                 script = saved;
             }
@@ -158,17 +154,16 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                 state = compiled;
 
                 if (state is null || function is null)
-                    return new(url, error ?? "error.scriptNoFunction", []);
+                    return new(url, error ?? "error.scriptNoFunction");
 
                 script = new(name, state, function, new(PathFor(name)));
             }
 
             var (next, problem) = await RunAsync(script, url, appVersion);
-            return new(next, problem, [.. _capture.Select(entry => entry.Message)]);
+            return new(next, problem);
         }
         finally
         {
-            _capture = null;
             state?.Dispose();
             _gate.Release();
         }
@@ -339,7 +334,6 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     {
         var entry = new ScriptLogEntry(DateTime.Now, level, script, message);
 
-        _capture?.Add(entry);
         _logs.Enqueue(entry);
         while (_logs.Count > MaxLogEntries)
             _logs.TryDequeue(out _);

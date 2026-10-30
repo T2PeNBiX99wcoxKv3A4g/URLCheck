@@ -81,13 +81,18 @@ export interface ScriptTestResult {
     url: string;
     /** The failure, when the script threw or could not be loaded. */
     error: string | null;
-    /** Everything it printed, oldest first. */
-    output: string[];
 }
 
-/** Runs one script over a test URL and returns what it produced. */
+/**
+ * Runs one script over a test URL and returns what it produced.
+ *
+ * The backend leaves null fields out of the payload, so `error` has to be filled in here; otherwise
+ * it arrives as `undefined` and every run looks like a failure.
+ */
 export async function testScript(name: string, url: string, content: string): Promise<ScriptTestResult> {
-    return await Native.request<ScriptTestResult>("scripts.test", {name, url, content});
+    const answer = await Native.request<Partial<ScriptTestResult>>("scripts.test", {name, url, content});
+
+    return {url: answer.url ?? url, error: answer.error ?? null};
 }
 
 /** The lines the scripts printed or failed with, newest last. */

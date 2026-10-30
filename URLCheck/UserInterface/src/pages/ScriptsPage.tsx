@@ -394,13 +394,14 @@ export const ScriptsPage: React.FC = () => {
 
                                 {test && (
                                     <TestOutput $error={test.error !== null}>
-                                        <ResultRow>
-                                            <ResultLabel>{t("scripts.testResult")}</ResultLabel>
-                                            <ResultUrl $error={test.error !== null}>{test.error ?? test.url}</ResultUrl>
-                                        </ResultRow>
-                                        {test.output.map((line, index) => (
-                                            <OutputLine key={index}>{line}</OutputLine>
-                                        ))}
+                                        {test.error === null ? (
+                                            <ResultRow>
+                                                <ResultLabel>{t("scripts.testFinalUrl")}</ResultLabel>
+                                                <ResultUrl>{test.url}</ResultUrl>
+                                            </ResultRow>
+                                        ) : (
+                                            <ResultUrl $error>{test.error}</ResultUrl>
+                                        )}
                                     </TestOutput>
                                 )}
 
@@ -657,7 +658,7 @@ const TestOutput = styled.div<{ $error: boolean }>`
     overflow-y: auto;
     flex-shrink: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    background: ${(props) => (props.$error ? "rgba(239, 68, 68, 0.08)" : "rgba(59, 130, 246, 0.06)")};
+    background: ${(props) => (props.$error ? "rgba(239, 68, 68, 0.1)" : "rgba(15, 23, 42, 0.55)")};
     font-family: var(--font-mono);
     font-size: 0.75rem;
 `;
@@ -673,14 +674,8 @@ const ResultLabel = styled.span`
     flex-shrink: 0;
 `;
 
-const ResultUrl = styled.span<{ $error: boolean }>`
+const ResultUrl = styled.span<{ $error?: boolean }>`
     color: ${(props) => (props.$error ? "#f87171" : "#93c5fd")};
-    overflow-wrap: anywhere;
-`;
-
-const OutputLine = styled.span`
-    color: #9ca3af;
-    white-space: pre-wrap;
     overflow-wrap: anywhere;
 `;
 

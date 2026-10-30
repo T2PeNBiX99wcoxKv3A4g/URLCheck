@@ -24,8 +24,8 @@ internal sealed record ScriptDownloadRequest(string? Url);
 /// <summary>Payload for <c>scripts.test</c>: the script to run, the URL to try it on, and the source to use.</summary>
 internal sealed record ScriptTestRequest(string? Name, string? Url, string? Content);
 
-/// <summary>Body for <c>scripts.test</c>: the URL it produced, any failure, and what it printed.</summary>
-internal sealed record ScriptTestPayload(string Url, string? Error, IReadOnlyList<string> Output);
+/// <summary>Body for <c>scripts.test</c>: the URL the script produced, or the failure.</summary>
+internal sealed record ScriptTestPayload(string Url, string? Error);
 
 /// <summary>Body for the messages that only report whether they worked.</summary>
 internal sealed record ScriptResultPayload(bool Ok, string? Error);
