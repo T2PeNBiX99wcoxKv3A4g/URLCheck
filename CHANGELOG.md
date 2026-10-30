@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.5.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.4.1..v1.5.0) - 2026-10-30
+
+### ⛰️  Features
+
+- *(site)* Build the docs from the local wiki clone and refresh them daily - ([4fda607](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4fda607f874c9709dca3481175b5a131df735f96))
+- Rename the script link scheme to checkurl - ([3a335b4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/3a335b47e9346dfcba27e60fe70b228db1090ae0))
+
+### 🚜 Refactor
+
+- Use only the checkurl scheme - ([ccbabbe](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ccbabbe99890f3958a09f9f26855e35ce3b1e79e))
+
+### ⚙️ Miscellaneous Tasks
+
+- Drop the scheduled site rebuild - ([bd76c6b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/bd76c6bd9f109cd5fd37dc215c9ffb0c83728172))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([a6bea5e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a6bea5e4c3a6c96a79da5681c440578950eca18a))
+
+
 ## [1.4.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.4.0..v1.4.1) - 2026-10-30
 
 ### ⚙️ Miscellaneous Tasks
