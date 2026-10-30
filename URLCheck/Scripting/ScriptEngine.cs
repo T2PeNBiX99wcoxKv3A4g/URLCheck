@@ -727,7 +727,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
             var parts = new List<string>(table.ArrayLength + table.HashMapCount);
 
             foreach (var (key, item) in table)
-                parts.Add($"{DescribeKey(key)} = {Describe(item, depth - 1, seen)}");
+                parts.Add($"{DescribeKey(key)} = {DescribeMember(item, depth - 1, seen)}");
 
             return parts.Count == 0 ? "{}" : $"{{ {string.Join(", ", parts)} }}";
         }
@@ -736,6 +736,14 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
             seen.Remove(table);
         }
     }
+
+    /// <summary>A string inside a table is quoted, so it cannot be taken for a name or a number.</summary>
+    private static string DescribeMember(LuaValue value, int depth, HashSet<LuaTable> seen) =>
+        value.TryRead<string>(out var text) ? Quote(text) : Describe(value, depth, seen);
+
+    /// <summary>Wraps a string in quotes and escapes whatever would break them.</summary>
+    private static string Quote(string value) =>
+        $"\"{value.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t")}\"";
 
     private static string DescribeScalar(LuaValue value)
     {
