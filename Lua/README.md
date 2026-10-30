@@ -2,7 +2,7 @@
 
 Install any of these from the scripts page with one click:
 
-**[Open the scripts page](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/)**
+**[Open the scripts page](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#/scripts)**
 
 | Script                         | What it does                                                                                          |
 |--------------------------------|-------------------------------------------------------------------------------------------------------|

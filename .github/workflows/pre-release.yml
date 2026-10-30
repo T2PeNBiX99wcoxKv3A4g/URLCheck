@@ -8,9 +8,9 @@ on:
     paths-ignore:
       - "README.md"
       - "Lua/**"
-      - "LuaSite/**"
+      - "Site/**"
       - "LICENSE*"
-      - ".github/workflows/scripts-site.yml"
+      - ".github/workflows/site.yml"
 
 permissions:
   contents: write
