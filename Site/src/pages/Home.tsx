@@ -1,5 +1,7 @@
 import React from "react";
 import styled from "styled-components";
+import {Eraser, FileCode2, History, MousePointerClick, ScanSearch, Send, type LucideIcon} from "lucide-react";
+import {siArchlinux, siFedora, siUbuntu} from "simple-icons";
 import {ICON, REPOSITORY, RELEASES, SCREENSHOT, WIKI} from "../constants";
 
 const Hero = styled.section`
@@ -11,7 +13,7 @@ const Hero = styled.section`
     text-align: center;
 `;
 
-const Icon = styled.img`
+const AppIcon = styled.img`
     width: 88px;
     height: 88px;
 `;
@@ -101,6 +103,18 @@ const Feature = styled.article`
     background: rgba(17, 24, 39, 0.6);
 `;
 
+const FeatureIcon = styled.span`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.14);
+    color: #93c5fd;
+`;
+
 const FeatureName = styled.h3`
     margin: 0 0 6px;
     font-size: 0.92rem;
@@ -136,9 +150,19 @@ const Platform = styled.a`
 `;
 
 const PlatformName = styled.span`
+    display: flex;
+    align-items: center;
+    gap: 8px;
     color: #f9fafb;
     font-size: 0.95rem;
     font-weight: 600;
+`;
+
+const BrandIcon = styled.svg`
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    fill: #93c5fd;
 `;
 
 const PlatformNote = styled.span`
@@ -168,41 +192,49 @@ const Link = styled.a`
     }
 `;
 
-const features: [string, string][] = [
+const features: [LucideIcon, string, string][] = [
     [
+        MousePointerClick,
         "Intercept links",
         "Installed as the default handler for http/https, so every clicked link passes through the popup. Stays in the tray."
     ],
     [
+        ScanSearch,
         "Inspect before opening",
         "A borderless popup shows the URL broken into scheme, host, parameters and fragment."
     ],
     [
+        Eraser,
         "Clean the URL",
         "Edit or remove any query parameter, clear the fragment, or strip tracking parameters in one click."
     ],
     [
+        FileCode2,
         "Script it",
         "Lua scripts can rewrite every URL before it opens; install them from the scripts page."
     ],
     [
+        Send,
         "Forward to another device",
         "Send a URL to another URLCheck on the local network, end-to-end encrypted."
     ],
-    ["History", "Every intercepted URL is recorded locally in SQLite and can be searched."]
+    [History, "History", "Every intercepted URL is recorded locally in SQLite and can be searched."]
 ];
 
-const platforms: [string, string][] = [
-    ["Windows", "x64 installer (.msi)"],
-    ["Fedora", "x86_64 (.rpm)"],
-    ["Debian / Ubuntu", "amd64 (.deb)"],
-    ["Arch Linux", "x86_64 (.pkg.tar.zst)"]
+/** simple-icons dropped the Windows mark, so the four squares are drawn here. */
+const windowsLogo = {path: "M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"};
+
+const platforms: [{path: string}, string, string][] = [
+    [windowsLogo, "Windows", "x64 installer (.msi)"],
+    [siFedora, "Fedora", "x86_64 (.rpm)"],
+    [siUbuntu, "Debian / Ubuntu", "amd64 (.deb)"],
+    [siArchlinux, "Arch Linux", "x86_64 (.pkg.tar.zst)"]
 ];
 
 export const HomePage: React.FC = () => (
     <>
         <Hero>
-            <Icon src={ICON} alt=""/>
+            <AppIcon src={ICON} alt=""/>
             <Title>URLCheck</Title>
             <Tagline>Check the URL before it opens in your browser.</Tagline>
             <Actions>
@@ -232,8 +264,11 @@ export const HomePage: React.FC = () => (
         <Section>
             <Heading>Features</Heading>
             <Grid>
-                {features.map(([name, text]) => (
+                {features.map(([Glyph, name, text]) => (
                     <Feature key={name}>
+                        <FeatureIcon>
+                            <Glyph size={18}/>
+                        </FeatureIcon>
                         <FeatureName>{name}</FeatureName>
                         <FeatureText>{text}</FeatureText>
                     </Feature>
@@ -250,9 +285,14 @@ export const HomePage: React.FC = () => (
                 open the latest release and download the matching file.
             </Lead>
             <PlatformGrid>
-                {platforms.map(([name, note]) => (
+                {platforms.map(([icon, name, note]) => (
                     <Platform href={RELEASES} key={name}>
-                        <PlatformName>{name}</PlatformName>
+                        <PlatformName>
+                            <BrandIcon viewBox="0 0 24 24" aria-hidden="true">
+                                <path d={icon.path}/>
+                            </BrandIcon>
+                            {name}
+                        </PlatformName>
                         <PlatformNote>{note}</PlatformNote>
                     </Platform>
                 ))}
