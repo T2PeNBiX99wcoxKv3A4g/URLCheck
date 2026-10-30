@@ -44,12 +44,13 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     [PublicAPI] public const string Template = """
                                                -- Runs once for every URL that comes in.
                                                --
-                                               -- u.url          the whole URL
+                                               -- u.url          the whole URL, decoded
                                                -- u.scheme, u.host, u.port, u.path
                                                -- u.fragment
                                                -- u.query        decoded query parameters as a table; set one to nil to drop it
                                                -- u.app_version  the running version
                                                --
+                                               -- Everything arrives URL-decoded; the URL is encoded again on the way out.
                                                -- Return u (or a URL string) to accept the changes, nil to leave the URL alone.
 
                                                return function(u)
@@ -345,7 +346,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
             var result = results[0];
 
             if (result.TryRead<string>(out var text))
-                return (Report(script, url, text), null);
+                return (Report(script, url, EncodeUrl(text)), null);
 
             if (result.TryRead<LuaTable>(out var table))
                 return (Report(script, url, BuildUrl(table, url, context.Order)), null);
@@ -385,7 +386,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     {
         var table = new LuaTable
         {
-            ["url"] = url,
+            ["url"] = Unescape(url),
             ["app_version"] = appVersion
         };
 
@@ -400,8 +401,8 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         table["scheme"] = uri.Scheme;
         table["host"] = uri.Host;
         table["port"] = uri.IsDefaultPort ? LuaValue.Nil : uri.Port;
-        table["path"] = uri.AbsolutePath;
-        table["fragment"] = uri.Fragment.Length > 1 ? uri.Fragment[1..] : LuaValue.Nil;
+        table["path"] = Unescape(uri.AbsolutePath);
+        table["fragment"] = uri.Fragment.Length > 1 ? Unescape(uri.Fragment[1..]) : LuaValue.Nil;
 
         foreach (var (name, value) in ReadParameters(uri.Query))
         {
@@ -413,6 +414,10 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
 
         return new(table, order);
     }
+
+    /// <summary>Percent-decodes text; a sequence that cannot be decoded is left as it was.</summary>
+    private static string Unescape(string value) =>
+        Try.Run(() => Uri.UnescapeDataString(value)).GetOrElse(_ => value);
 
     /// <summary>The query pairs of a URL, decoded; a parameter that repeats keeps its last value.</summary>
     private static IEnumerable<(string Name, string Value)> ReadParameters(string query)
@@ -427,8 +432,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                 yield return (name, value);
         }
 
-        static string Decode(string value) =>
-            Try.Run(() => Uri.UnescapeDataString(value.Replace("+", " "))).GetOrElse(_ => value);
+        static string Decode(string value) => Unescape(value.Replace("+", " "));
     }
 
     /// <summary>Reassembles a URL from the table a script returned.</summary>
@@ -444,14 +448,37 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
             builder.Append(':').Append((int)port);
 
         var path = table["path"].TryRead<string>(out var value) ? value : "/";
-        builder.Append(path.StartsWith('/') ? path : $"/{path}");
+        builder.Append(EncodePath(path));
 
         var query = BuildQuery(table, order);
         if (query.Length > 0)
             builder.Append('?').Append(query);
 
         if (table["fragment"].TryRead<string>(out var fragment) && fragment.Length > 0)
-            builder.Append('#').Append(fragment);
+            builder.Append('#').Append(Uri.EscapeDataString(fragment));
+
+        return builder.ToString();
+    }
+
+    /// <summary>Escapes one path segment at a time, so the slashes stay separators.</summary>
+    private static string EncodePath(string path) =>
+        $"/{string.Join('/', path.TrimStart('/').Split('/').Select(Uri.EscapeDataString))}";
+
+    /// <summary>
+    ///     Escapes the characters a URL cannot carry and leaves its structure alone. Used for a URL a
+    ///     script handed back as a string, which it saw decoded.
+    /// </summary>
+    private static string EncodeUrl(string value)
+    {
+        var builder = new StringBuilder(value.Length);
+
+        foreach (var rune in value.EnumerateRunes())
+        {
+            if (rune.Value is > 0x20 and < 0x7F && "\"<>\\^`{|}".IndexOf((char)rune.Value) < 0)
+                builder.Append((char)rune.Value);
+            else
+                builder.Append(Uri.EscapeDataString(rune.ToString()));
+        }
 
         return builder.ToString();
     }
