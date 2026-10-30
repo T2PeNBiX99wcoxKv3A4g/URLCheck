@@ -15,7 +15,6 @@
     "prismjs": "^1.30.0",
     "react": "^19",
     "react-dom": "^19",
-    "react-simple-code-editor": "^0.14.1",
     "styled-components": "^6.6.0"
   },
   "devDependencies": {

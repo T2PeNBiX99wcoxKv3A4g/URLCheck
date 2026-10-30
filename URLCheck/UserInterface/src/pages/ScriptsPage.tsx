@@ -1,11 +1,9 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import styled from "styled-components";
-import Editor from "react-simple-code-editor";
-import Prism from "prismjs";
-import "prismjs/components/prism-lua";
 import {Native, useTranslation} from "@photino-net-utils/bridge";
 import {PageContainer} from "../components/Layout";
-import {AlertTriangleIcon, TrashIcon} from "../components/Icons";
+import {CodeEditor} from "../components/CodeEditor";
+import {AlertTriangleIcon, CodeIcon, PlusIcon, TrashIcon} from "../components/Icons";
 import {
     clearScriptLogs,
     createScript,
@@ -22,6 +20,9 @@ import {
 
 type Mode = "idle" | "new" | "download";
 
+/** Adds the extension the backend expects, so the name we select afterwards is the one on disk. */
+const luaName = (name: string) => (/\.lua$/i.test(name) ? name : `${name}.lua`);
+
 export const ScriptsPage: React.FC = () => {
     const t = useTranslation();
     const [scripts, setScripts] = useState<ScriptEntry[]>([]);
@@ -35,28 +36,47 @@ export const ScriptsPage: React.FC = () => {
     const [draft, setDraft] = useState("");
     const [armed, setArmed] = useState(false);
     const [logs, setLogs] = useState<ScriptLogEntry[]>([]);
-    const logEnd = useRef<HTMLDivElement | null>(null);
+    const logBody = useRef<HTMLDivElement | null>(null);
 
     const dirty = content !== saved;
 
-    const refresh = async () => {
+    const close = () => {
+        setSelected(null);
+        setContent("");
+        setSaved("");
+        setArmed(false);
+    };
+
+    const select = async (name: string) => {
+        setError(null);
+        setArmed(false);
+
+        try {
+            const source = await readScript(name);
+            setSelected(name);
+            setContent(source);
+            setSaved(source);
+        } catch (problem) {
+            setError(problem instanceof Error ? problem.message : String(problem));
+        }
+    };
+
+    /** Reloads the list; `preferred` wins, then the current selection, then the first script. */
+    const refresh = async (preferred?: string) => {
         const list = await listScripts();
         setScripts(list.scripts);
         setDirectory(list.directory);
 
-        // A script that vanished (deleted elsewhere) must not stay selected, and the first one is a
-        // better landing place than an empty editor.
-        if (selected && list.scripts.some((script) => script.name === selected))
-            return;
+        const wanted = preferred ?? selected;
+        const next = list.scripts.find((script) => script.name === wanted)?.name ?? list.scripts[0]?.name;
 
-        const first = list.scripts[0];
-        if (first) {
-            await select(first.name);
-        } else {
-            setSelected(null);
-            setContent("");
-            setSaved("");
+        if (!next) {
+            close();
+            return;
         }
+
+        // Re-reading the script that is already open would throw away unsaved edits.
+        if (next !== selected) await select(next);
     };
 
     useEffect(() => {
@@ -72,22 +92,9 @@ export const ScriptsPage: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        logEnd.current?.scrollIntoView({block: "nearest"});
+        const body = logBody.current;
+        if (body) body.scrollTop = body.scrollHeight;
     }, [logs.length]);
-
-    const select = async (name: string) => {
-        setError(null);
-        setArmed(false);
-
-        try {
-            const source = await readScript(name);
-            setSelected(name);
-            setContent(source);
-            setSaved(source);
-        } catch (problem) {
-            setError(problem instanceof Error ? problem.message : String(problem));
-        }
-    };
 
     const save = async () => {
         if (!selected) return;
@@ -108,10 +115,15 @@ export const ScriptsPage: React.FC = () => {
     };
 
     const create = async () => {
+        const draftName = draft.trim();
+        if (draftName.length === 0) return;
+
+        const name = luaName(draftName);
+
         setBusy(true);
         setError(null);
 
-        const problem = await createScript(draft);
+        const problem = await createScript(name);
         setBusy(false);
 
         if (problem) {
@@ -121,15 +133,17 @@ export const ScriptsPage: React.FC = () => {
 
         setMode("idle");
         setDraft("");
-        await refresh();
-        await select(draft.endsWith(".lua") ? draft : `${draft}.lua`);
+        await refresh(name);
     };
 
     const download = async () => {
+        const url = draft.trim();
+        if (url.length === 0) return;
+
         setBusy(true);
         setError(null);
 
-        const problem = await downloadScript(draft);
+        const problem = await downloadScript(url);
         setBusy(false);
 
         if (problem) {
@@ -153,16 +167,13 @@ export const ScriptsPage: React.FC = () => {
         setBusy(true);
         const problem = await deleteScript(selected);
         setBusy(false);
-        setArmed(false);
 
         if (problem) {
             setError(problem);
             return;
         }
 
-        setSelected(null);
-        setContent("");
-        setSaved("");
+        close();
         await refresh();
     };
 
@@ -177,46 +188,10 @@ export const ScriptsPage: React.FC = () => {
         await refresh();
     };
 
-    const highlight = useMemo(
-        () => (code: string) => Prism.highlight(code, Prism.languages.lua, "lua"),
-        []
-    );
+    const submit = () => void (mode === "new" ? create() : download());
 
     return (
-        <PageContainer $maxWidth={1100}>
-            <Toolbar>
-                <ActionButton disabled={busy} onClick={() => { setMode("new"); setDraft(""); setError(null); }} type="button">
-                    {t("scripts.new")}
-                </ActionButton>
-                <ActionButton disabled={busy} onClick={() => void importFiles()} type="button">
-                    {t("scripts.import")}
-                </ActionButton>
-                <ActionButton disabled={busy} onClick={() => { setMode("download"); setDraft(""); setError(null); }} type="button">
-                    {t("scripts.download")}
-                </ActionButton>
-                <Spacer/>
-                <Hint title={directory}>{directory}</Hint>
-            </Toolbar>
-
-            {mode !== "idle" && (
-                <DraftRow>
-                    <DraftInput
-                        autoFocus
-                        onChange={(event) => setDraft(event.target.value)}
-                        placeholder={mode === "new" ? t("scripts.namePlaceholder") : t("scripts.downloadPlaceholder")}
-                        value={draft}
-                    />
-                    <ActionButton
-                        disabled={busy || draft.trim().length === 0}
-                        onClick={() => void (mode === "new" ? create() : download())}
-                        type="button"
-                    >
-                        {mode === "new" ? t("scripts.create") : t("scripts.download")}
-                    </ActionButton>
-                    <GhostButton onClick={() => setMode("idle")} type="button">{t("scripts.cancel")}</GhostButton>
-                </DraftRow>
-            )}
-
+        <Page $maxWidth={1180}>
             {error && (
                 <Banner>
                     <AlertTriangleIcon size={16}/>
@@ -224,152 +199,221 @@ export const ScriptsPage: React.FC = () => {
                 </Banner>
             )}
 
-            <Body>
-                <List>
-                    {scripts.length === 0 && <Empty>{t("scripts.empty")}</Empty>}
+            <Workspace>
+                <ListPane>
+                    <ListHeader>
+                        <span>{t("tabs.scripts.label")}</span>
+                        <Count>{scripts.length}</Count>
+                        <Spacer/>
+                        <Folder title={directory}>{directory.split(/[\\/]/).pop()}</Folder>
+                    </ListHeader>
 
-                    {scripts.map((script) => (
-                        <ListItem
-                            $active={script.name === selected}
-                            key={script.name}
-                            onClick={() => void select(script.name)}
-                            type="button"
-                        >
-                            <span>{script.name}</span>
-                            {script.error && (
-                                <Problem title={t(script.error)}>
-                                    <AlertTriangleIcon size={14}/>
-                                </Problem>
-                            )}
-                        </ListItem>
-                    ))}
-                </List>
+                    <List>
+                        {scripts.length === 0 && <Empty>{t("scripts.empty")}</Empty>}
 
-                <EditorPane>
-                    {selected ? (
-                        <>
-                            <EditorHeader>
-                                <Name>{selected}</Name>
-                                <GhostButton disabled={!dirty || busy} onClick={() => void save()} type="button">
-                                    {dirty ? t("scripts.save") : t("scripts.saved")}
-                                </GhostButton>
-                                <DangerButton $armed={armed} disabled={busy} onClick={() => void remove()} type="button">
-                                    {armed ? t("scripts.deleteConfirm") : <TrashIcon size={15}/>}
-                                </DangerButton>
-                            </EditorHeader>
+                        {scripts.map((script) => (
+                            <ListItem
+                                $active={script.name === selected}
+                                key={script.name}
+                                onClick={() => void select(script.name)}
+                                title={script.name}
+                                type="button"
+                            >
+                                <span>{script.name}</span>
+                                {script.error && (
+                                    <Problem title={t(script.error)}>
+                                        <AlertTriangleIcon size={14}/>
+                                    </Problem>
+                                )}
+                            </ListItem>
+                        ))}
+                    </List>
 
-                            <Editor
-                                highlight={highlight}
-                                onValueChange={setContent}
-                                padding={16}
-                                style={{
-                                    fontFamily: "var(--font-mono)",
-                                    fontSize: 13,
-                                    lineHeight: 1.55,
-                                    minHeight: 320,
-                                }}
-                                textareaClassName="script-editor-area"
-                                value={content}
-                            />
-                        </>
-                    ) : (
-                        <Empty>{t("scripts.noScript")}</Empty>
-                    )}
-                </EditorPane>
-            </Body>
+                    {/* Creation floats over the bottom of the list, out of the way until it is needed. */}
+                    <Dock>
+                        {mode === "idle" ? (
+                            <DockStack>
+                                <PrimaryButton
+                                    disabled={busy}
+                                    onClick={() => {
+                                        setMode("new");
+                                        setDraft("");
+                                        setError(null);
+                                    }}
+                                    type="button"
+                                >
+                                    <PlusIcon size={16}/>
+                                    {t("scripts.new")}
+                                </PrimaryButton>
+                                <DockRow>
+                                    <DockGhostButton disabled={busy} onClick={() => void importFiles()} type="button">
+                                        {t("scripts.import")}
+                                    </DockGhostButton>
+                                    <DockGhostButton
+                                        disabled={busy}
+                                        onClick={() => {
+                                            setMode("download");
+                                            setDraft("");
+                                            setError(null);
+                                        }}
+                                        type="button"
+                                    >
+                                        {t("scripts.download")}
+                                    </DockGhostButton>
+                                </DockRow>
+                            </DockStack>
+                        ) : (
+                            <DockStack>
+                                <DraftInput
+                                    autoFocus
+                                    onChange={(event) => setDraft(event.target.value)}
+                                    onKeyDown={(event) => {
+                                        if (event.key === "Enter") submit();
+                                        if (event.key === "Escape") setMode("idle");
+                                    }}
+                                    placeholder={mode === "new" ? t("scripts.namePlaceholder") : t("scripts.downloadPlaceholder")}
+                                    value={draft}
+                                />
+                                <DockRow>
+                                    <PrimaryButton
+                                        disabled={busy || draft.trim().length === 0}
+                                        onClick={submit}
+                                        type="button"
+                                    >
+                                        {mode === "new" ? t("scripts.create") : t("scripts.download")}
+                                    </PrimaryButton>
+                                    <GhostButton onClick={() => setMode("idle")} type="button">
+                                        {t("scripts.cancel")}
+                                    </GhostButton>
+                                </DockRow>
+                            </DockStack>
+                        )}
+                    </Dock>
+                </ListPane>
 
-            <Logs>
-                <LogHeader>
-                    <span>{t("scripts.logs")}</span>
-                    <GhostButton onClick={() => void clearScriptLogs().then(() => setLogs([]))} type="button">
-                        {t("scripts.clearLogs")}
-                    </GhostButton>
-                </LogHeader>
+                <Main>
+                    <EditorCard>
+                        {selected ? (
+                            <>
+                                <EditorHeader>
+                                    <CodeIcon size={16}/>
+                                    <Name>{selected}</Name>
+                                    {dirty && <Dirty title={t("settings.unsaved")}/>}
+                                    <GhostButton disabled={!dirty || busy} onClick={() => void save()} type="button">
+                                        {dirty ? t("scripts.save") : t("scripts.saved")}
+                                    </GhostButton>
+                                    <DangerButton $armed={armed} disabled={busy} onClick={() => void remove()} type="button">
+                                        {armed ? t("scripts.deleteConfirm") : <TrashIcon size={15}/>}
+                                    </DangerButton>
+                                </EditorHeader>
 
-                <LogBody>
-                    {logs.length === 0 && <Empty>{t("scripts.logsEmpty")}</Empty>}
-                    {logs.map((entry, index) => (
-                        <LogLine $error={entry.level === "error"} key={`${entry.time}-${index}`}>
-                            <time>{entry.time}</time>
-                            <ScriptName>{entry.script}</ScriptName>
-                            <span>{entry.message}</span>
-                        </LogLine>
-                    ))}
-                    <div ref={logEnd}/>
-                </LogBody>
-            </Logs>
-        </PageContainer>
+                                <CodeEditor onChange={setContent} value={content}/>
+                            </>
+                        ) : (
+                            <Placeholder>
+                                <CodeIcon size={30}/>
+                                <span>{t("scripts.noScript")}</span>
+                            </Placeholder>
+                        )}
+                    </EditorCard>
+
+                    <Logs>
+                        <LogHeader>
+                            <span>{t("scripts.logs")}</span>
+                            <GhostButton onClick={() => void clearScriptLogs().then(() => setLogs([]))} type="button">
+                                {t("scripts.clearLogs")}
+                            </GhostButton>
+                        </LogHeader>
+
+                        <LogBody ref={logBody}>
+                            {logs.length === 0 && <Empty>{t("scripts.logsEmpty")}</Empty>}
+                            {logs.map((entry, index) => (
+                                <LogLine $error={entry.level === "error"} key={`${entry.time}-${index}`}>
+                                    <time>{entry.time}</time>
+                                    <ScriptName>{entry.script}</ScriptName>
+                                    <span>{entry.message}</span>
+                                </LogLine>
+                            ))}
+                        </LogBody>
+                    </Logs>
+                </Main>
+            </Workspace>
+        </Page>
     );
 };
 
-const Toolbar = styled.div`
+const Page = styled(PageContainer)`
+    height: 100%;
+    min-height: 420px;
+    gap: 16px;
+`;
+
+const Workspace = styled.div`
+    display: flex;
+    flex: 1;
+    gap: 16px;
+    min-height: 0;
+`;
+
+const ListPane = styled.section`
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 280px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(17, 24, 39, 0.75);
+    overflow: hidden;
+`;
+
+const ListHeader = styled.div`
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #9ca3af;
     flex-shrink: 0;
+`;
+
+const Count = styled.span`
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 0.7rem;
+    color: #9ca3af;
 `;
 
 const Spacer = styled.div`
     flex: 1;
 `;
 
-const Hint = styled.span`
+const Folder = styled.span`
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
     color: #6b7280;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 420px;
-`;
-
-const DraftRow = styled.div`
-    display: flex;
-    gap: 10px;
-`;
-
-const DraftInput = styled.input`
-    flex: 1;
-    padding: 9px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(17, 24, 39, 0.8);
-    color: #f9fafb;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-
-    &:focus {
-        outline: none;
-        border-color: rgba(99, 102, 241, 0.6);
-    }
-`;
-
-const Banner = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-radius: 8px;
-    background: rgba(239, 68, 68, 0.12);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #f87171;
-    font-size: 0.85rem;
-`;
-
-const Body = styled.div`
-    display: flex;
-    gap: 16px;
-    min-height: 360px;
+    max-width: 110px;
 `;
 
 const List = styled.div`
     display: flex;
     flex-direction: column;
     gap: 4px;
-    width: 220px;
-    flex-shrink: 0;
+    flex: 1;
+    min-height: 0;
+    padding: 10px 10px 118px;
     overflow-y: auto;
-    max-height: 520px;
 `;
 
 const ListItem = styled.button<{ $active: boolean }>`
@@ -407,30 +451,48 @@ const Problem = styled.span`
     flex-shrink: 0;
 `;
 
-const EditorPane = styled.div`
+const Dock = styled.div`
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: rgba(17, 24, 39, 0.94);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+`;
+
+const DockStack = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+`;
+
+const DockRow = styled.div`
+    display: flex;
+    gap: 8px;
+`;
+
+const Main = styled.div`
     display: flex;
     flex-direction: column;
     flex: 1;
+    gap: 12px;
     min-width: 0;
+    min-height: 0;
+`;
+
+const EditorCard = styled.section`
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     background: rgba(17, 24, 39, 0.75);
     overflow: hidden;
-
-    .script-editor-area {
-        outline: none;
-        caret-color: #93c5fd;
-    }
-
-    .token.comment { color: #6b7280; font-style: italic; }
-    .token.keyword { color: #c792ea; }
-    .token.string { color: #a5d6a7; }
-    .token.number { color: #f9a825; }
-    .token.boolean { color: #f9a825; }
-    .token.function { color: #82aaff; }
-    .token.operator { color: #89ddff; }
-    .token.punctuation { color: #9ca3af; }
-    .token.property { color: #93c5fd; }
 `;
 
 const EditorHeader = styled.div`
@@ -439,6 +501,8 @@ const EditorHeader = styled.div`
     gap: 10px;
     padding: 10px 14px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: #9ca3af;
+    flex-shrink: 0;
 `;
 
 const Name = styled.strong`
@@ -450,9 +514,64 @@ const Name = styled.strong`
     white-space: nowrap;
 `;
 
+const Dirty = styled.span`
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #fbbf24;
+    flex-shrink: 0;
+`;
+
+const Placeholder = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex: 1;
+    padding: 32px;
+    color: #6b7280;
+    font-size: 0.85rem;
+    text-align: center;
+`;
+
+const Banner = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+`;
+
+const DraftInput = styled.input`
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.9);
+    color: #f9fafb;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+
+    &:focus {
+        outline: none;
+        border-color: rgba(99, 102, 241, 0.6);
+    }
+
+    &::placeholder {
+        color: #6b7280;
+    }
+`;
+
 const Logs = styled.section`
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     background: rgba(17, 24, 39, 0.75);
@@ -463,9 +582,9 @@ const LogHeader = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 14px;
+    padding: 8px 14px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: #f9fafb;
 `;
@@ -475,7 +594,7 @@ const LogBody = styled.div`
     flex-direction: column;
     gap: 2px;
     padding: 8px 0;
-    max-height: 180px;
+    height: 132px;
     overflow-y: auto;
     font-family: var(--font-mono);
     font-size: 0.76rem;
@@ -510,7 +629,11 @@ const Empty = styled.p`
     font-size: 0.82rem;
 `;
 
-const ActionButton = styled.button`
+const PrimaryButton = styled.button`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     padding: 9px 14px;
     border-radius: 8px;
     border: 1px solid rgba(99, 102, 241, 0.45);
@@ -551,6 +674,11 @@ const GhostButton = styled.button`
         opacity: 0.5;
         cursor: not-allowed;
     }
+`;
+
+/** The two secondary actions in the dock share the row evenly. */
+const DockGhostButton = styled(GhostButton)`
+    flex: 1;
 `;
 
 const DangerButton = styled(GhostButton)<{ $armed: boolean }>`

@@ -6,6 +6,7 @@ import {NavigationContext} from "./navigation";
 import {Sidebar} from "./components/Sidebar";
 import {Header} from "./components/Header";
 import {TitleBar} from "./components/TitleBar";
+import {ErrorBoundary} from "./components/ErrorBoundary";
 
 const AppContainer = styled.div<{ $rounded: boolean }>`
     display: flex;
@@ -79,7 +80,9 @@ export default function App() {
                     <Header currentTab={currentTab}/>
                     <ContentArea>
                         <NavigationContext.Provider value={setCurrentTab}>
-                            <CurrentPage/>
+                            <ErrorBoundary key={currentTab}>
+                                <CurrentPage/>
+                            </ErrorBoundary>
                         </NavigationContext.Provider>
                     </ContentArea>
                 </MainLayout>
