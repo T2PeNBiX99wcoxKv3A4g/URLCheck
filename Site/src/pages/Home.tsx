@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import {Eraser, FileCode2, History, MousePointerClick, ScanSearch, Send, type LucideIcon} from "lucide-react";
 import {siArchlinux, siFedora, siUbuntu} from "simple-icons";
-import {ICON, REPOSITORY, RELEASES, SCREENSHOT} from "../constants";
+import {ICON, POPUP, REPOSITORY, RELEASES, SCREENSHOT} from "../constants";
 
 const Hero = styled.section`
     display: flex;
@@ -59,6 +59,34 @@ const Button = styled.a<{ $primary?: boolean }>`
 const Shot = styled.figure`
     margin: 40px 0 0;
 
+    img {
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    figcaption {
+        margin-top: 10px;
+        color: #6b7280;
+        font-size: 0.78rem;
+    }
+`;
+
+/** The popup screenshot sits beside its explanation on wide screens. */
+const Popup = styled.section`
+    display: grid;
+    gap: 28px;
+    align-items: center;
+
+    @media (min-width: 880px) {
+        grid-template-columns: 560px minmax(0, 1fr);
+    }
+`;
+
+const PopupShot = styled.figure`
+    margin: 0;
+    max-width: 560px;
     img {
         width: 100%;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -237,6 +265,24 @@ export const HomePage: React.FC = () => (
                 the link really goes, strip the tracking junk, and only then hand it to the browser
                 you want.
             </Lead>
+        </Section>
+
+        <Section>
+            <Popup>
+                <PopupShot>
+                    <img alt="The URLCheck popup for an insecure link" src={POPUP}/>
+                    <figcaption>Inspecting http://www.google.com/?foo=bar#tag</figcaption>
+                </PopupShot>
+                <div>
+                    <Heading>The popup</Heading>
+                    <Lead>
+                        Every clicked link opens this before anything reaches the browser. The URL
+                        is split into domain, parameters and fragment; insecure links and known
+                        tracking parameters are flagged, and the button at the bottom picks which
+                        browser finally opens it.
+                    </Lead>
+                </div>
+            </Popup>
         </Section>
 
         <Section>
