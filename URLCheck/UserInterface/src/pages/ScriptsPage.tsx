@@ -3,7 +3,7 @@ import styled from "styled-components";
 import {Native, useTranslation} from "@photino-net-utils/bridge";
 import {PageContainer} from "../components/Layout";
 import {CodeEditor} from "../components/CodeEditor";
-import {AlertTriangleIcon, CodeIcon, PlusIcon, TrashIcon} from "../components/Icons";
+import {AlertTriangleIcon, CodeIcon, ExternalLinkIcon, PlayIcon, PlusIcon, TrashIcon} from "../components/Icons";
 import {
     clearScriptLogs,
     createScript,
@@ -11,11 +11,14 @@ import {
     downloadScript,
     importScripts,
     listScripts,
+    openScript,
     readScript,
     saveScript,
     scriptLogs,
+    testScript,
     type ScriptEntry,
     type ScriptLogEntry,
+    type ScriptTestResult,
 } from "../api/scripts";
 
 type Mode = "idle" | "new" | "download";
@@ -36,7 +39,11 @@ export const ScriptsPage: React.FC = () => {
     const [draft, setDraft] = useState("");
     const [armed, setArmed] = useState(false);
     const [logs, setLogs] = useState<ScriptLogEntry[]>([]);
+    const [testUrl, setTestUrl] = useState("");
+    const [test, setTest] = useState<ScriptTestResult | null>(null);
+    const [testing, setTesting] = useState(false);
     const logBody = useRef<HTMLDivElement | null>(null);
+    const saveRef = useRef<() => Promise<void>>(async () => undefined);
 
     const dirty = content !== saved;
 
@@ -45,11 +52,13 @@ export const ScriptsPage: React.FC = () => {
         setContent("");
         setSaved("");
         setArmed(false);
+        setTest(null);
     };
 
     const select = async (name: string) => {
         setError(null);
         setArmed(false);
+        setTest(null);
 
         try {
             const source = await readScript(name);
@@ -190,6 +199,48 @@ export const ScriptsPage: React.FC = () => {
 
     const submit = () => void (mode === "new" ? create() : download());
 
+    const open = async () => {
+        if (!selected) return;
+
+        const problem = await openScript(selected);
+        if (problem) setError(problem);
+    };
+
+    const runTest = async () => {
+        if (!selected) return;
+
+        const url = testUrl.trim();
+        if (url.length === 0) return;
+
+        setTesting(true);
+        setError(null);
+
+        try {
+            setTest(await testScript(selected, url, content));
+        } catch (problem) {
+            setError(problem instanceof Error ? problem.message : String(problem));
+        } finally {
+            setTesting(false);
+        }
+    };
+
+    // The save handler changes with every keystroke; the shortcut is registered once and reads it here.
+    useEffect(() => {
+        saveRef.current = save;
+    });
+
+    useEffect(() => {
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "s") return;
+
+            event.preventDefault();
+            void saveRef.current();
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, []);
+
     return (
         <Page $maxWidth={1180}>
             {error && (
@@ -299,13 +350,58 @@ export const ScriptsPage: React.FC = () => {
                                     <CodeIcon size={16}/>
                                     <Name>{selected}</Name>
                                     {dirty && <Dirty title={t("settings.unsaved")}/>}
-                                    <GhostButton disabled={!dirty || busy} onClick={() => void save()} type="button">
+                                    <GhostButton
+                                        disabled={busy}
+                                        onClick={() => void open()}
+                                        title={t("scripts.openExternal")}
+                                        type="button"
+                                    >
+                                        <ExternalLinkIcon size={15}/>
+                                    </GhostButton>
+                                    <GhostButton
+                                        disabled={!dirty || busy}
+                                        onClick={() => void save()}
+                                        title="Ctrl+S"
+                                        type="button"
+                                    >
                                         {dirty ? t("scripts.save") : t("scripts.saved")}
                                     </GhostButton>
                                     <DangerButton $armed={armed} disabled={busy} onClick={() => void remove()} type="button">
                                         {armed ? t("scripts.deleteConfirm") : <TrashIcon size={15}/>}
                                     </DangerButton>
                                 </EditorHeader>
+
+                                <TestBar>
+                                    <TestInput
+                                        onChange={(event) => setTestUrl(event.target.value)}
+                                        onKeyDown={(event) => {
+                                            if (event.key === "Enter") void runTest();
+                                        }}
+                                        placeholder={t("scripts.testPlaceholder")}
+                                        spellCheck={false}
+                                        value={testUrl}
+                                    />
+                                    <PrimaryButton
+                                        disabled={testing || busy || testUrl.trim().length === 0}
+                                        onClick={() => void runTest()}
+                                        type="button"
+                                    >
+                                        <PlayIcon size={14}/>
+                                        {t("scripts.test")}
+                                    </PrimaryButton>
+                                </TestBar>
+
+                                {test && (
+                                    <TestOutput $error={test.error !== null}>
+                                        <ResultRow>
+                                            <ResultLabel>{t("scripts.testResult")}</ResultLabel>
+                                            <ResultUrl $error={test.error !== null}>{test.error ?? test.url}</ResultUrl>
+                                        </ResultRow>
+                                        {test.output.map((line, index) => (
+                                            <OutputLine key={index}>{line}</OutputLine>
+                                        ))}
+                                    </TestOutput>
+                                )}
 
                                 <CodeEditor onChange={setContent} value={content}/>
                             </>
@@ -522,6 +618,71 @@ const Dirty = styled.span`
     flex-shrink: 0;
 `;
 
+const TestBar = styled.div`
+    display: flex;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+`;
+
+const TestInput = styled.input`
+    flex: 1;
+    min-width: 0;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.9);
+    color: #f9fafb;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+
+    &:focus {
+        outline: none;
+        border-color: rgba(99, 102, 241, 0.6);
+    }
+
+    &::placeholder {
+        color: #6b7280;
+    }
+`;
+
+const TestOutput = styled.div<{ $error: boolean }>`
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 14px;
+    max-height: 120px;
+    overflow-y: auto;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: ${(props) => (props.$error ? "rgba(239, 68, 68, 0.08)" : "rgba(59, 130, 246, 0.06)")};
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+`;
+
+const ResultRow = styled.div`
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+`;
+
+const ResultLabel = styled.span`
+    color: #6b7280;
+    flex-shrink: 0;
+`;
+
+const ResultUrl = styled.span<{ $error: boolean }>`
+    color: ${(props) => (props.$error ? "#f87171" : "#93c5fd")};
+    overflow-wrap: anywhere;
+`;
+
+const OutputLine = styled.span`
+    color: #9ca3af;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+`;
+
 const Placeholder = styled.div`
     display: flex;
     flex-direction: column;
@@ -656,6 +817,9 @@ const PrimaryButton = styled.button`
 `;
 
 const GhostButton = styled.button`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 7px 12px;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.12);

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Text;
 using JetBrains.Annotations;
 using Lua;
@@ -13,6 +14,9 @@ internal sealed record ScriptInfo(string Name, long Size, DateTime Modified, str
 
 /// <summary>What the scripts made of one URL, and the first failure to show in the popup.</summary>
 internal sealed record ScriptOutcome(string Url, string? Error);
+
+/// <summary>What one test run made of a URL: the result, any failure, and the lines it printed.</summary>
+internal sealed record ScriptTestResult(string Url, string? Error, IReadOnlyList<string> Output);
 
 /// <summary>One line of what the scripts printed or failed with.</summary>
 internal sealed record ScriptLogEntry(DateTime Time, string Level, string Script, string Message);
@@ -32,6 +36,9 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
 {
     /// <summary>How many log lines are kept for the scripts page.</summary>
     private const int MaxLogEntries = 200;
+
+    /// <summary>How deep <c>print</c> walks nested tables before it stops; a cycle stops it anyway.</summary>
+    private const int MaxPrintDepth = 6;
 
     /// <summary>The script a new one starts from.</summary>
     [PublicAPI] public const string Template = """
@@ -60,6 +67,9 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly ConcurrentQueue<ScriptLogEntry> _logs = new();
     private readonly List<Script> _scripts = [];
+
+    /// <summary>Collects the lines of the test run in progress; only touched while the gate is held.</summary>
+    private List<ScriptLogEntry>? _capture;
 
     private bool _loaded;
 
@@ -110,6 +120,58 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     {
         Load();
         return [.. _scripts.Select(script => script.Info)];
+    }
+
+    /// <summary>
+    ///     Runs one script over <paramref name="url" /> without touching the popup, and reports what it
+    ///     handed back plus everything it printed, so the scripts page can show it inline. When
+    ///     <paramref name="source" /> is given it is compiled instead of the copy on disk, so the test
+    ///     runs exactly what the editor shows.
+    /// </summary>
+    public async Task<ScriptTestResult> TestAsync(string name, string url, string appVersion, string? source)
+    {
+        await _gate.WaitAsync();
+
+        LuaState? state = null;
+
+        try
+        {
+            _capture = [];
+            Script script;
+
+            if (source is null)
+            {
+                Load();
+                var saved = _scripts.FirstOrDefault(candidate => candidate.Name == name);
+
+                if (saved is null)
+                    return new ScriptTestResult(url, "error.scriptMissing", []);
+
+                if (saved.Function is null)
+                    return new ScriptTestResult(url, saved.Info.Error, []);
+
+                script = saved;
+            }
+            else
+            {
+                var (compiled, function, error) = Compile(name, source);
+                state = compiled;
+
+                if (state is null || function is null)
+                    return new ScriptTestResult(url, error ?? "error.scriptNoFunction", []);
+
+                script = new Script(name, state, function, new FileInfo(PathFor(name)));
+            }
+
+            var (next, problem) = await RunAsync(script, url, appVersion);
+            return new ScriptTestResult(next, problem, [.. _capture.Select(entry => entry.Message)]);
+        }
+        finally
+        {
+            _capture = null;
+            state?.Dispose();
+            _gate.Release();
+        }
     }
 
     /// <summary>The source of one script, or null when it is gone.</summary>
@@ -199,7 +261,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     /// <summary>Parses a script without running it; null when it compiles.</summary>
     private static string? Validate(string content)
     {
-        var state = CreateSandbox();
+        var state = CreateSandbox("script");
 
         try
         {
@@ -277,6 +339,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     {
         var entry = new ScriptLogEntry(DateTime.Now, level, script, message);
 
+        _capture?.Add(entry);
         _logs.Enqueue(entry);
         while (_logs.Count > MaxLogEntries)
             _logs.TryDequeue(out _);
@@ -421,23 +484,40 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     {
         var name = Path.GetFileName(path);
         var info = new FileInfo(path);
-        var state = CreateSandbox();
+        var source = Try.Run(() => File.ReadAllText(path)).GetOrNull();
+
+        if (source is null)
+            return new Script(name, null, null, info, "error.scriptUnreadable");
+
+        var (state, function, error) = Compile(name, source);
+
+        if (error is not null)
+            Serilog.Log.Warning("Lua script {Script} could not be loaded: {Error}", name, error);
+
+        return new Script(name, state, function, info, error);
+    }
+
+    /// <summary>
+    ///     Compiles a source into the function it returns. The caller owns the state and must dispose
+    ///     it; on failure the state is already gone and the tuple's first item is null.
+    /// </summary>
+    private static (LuaState? State, LuaFunction? Function, string? Error) Compile(string name, string source)
+    {
+        var state = CreateSandbox(name);
 
         try
         {
-            var chunk = state.Load(File.ReadAllText(path), name);
+            var chunk = state.Load(source, name);
             var results = state.ExecuteAsync(chunk).AsTask().GetAwaiter().GetResult();
 
-            if (results.Length > 0 && results[0].TryRead<LuaFunction>(out var function))
-                return new Script(name, state, function, info);
-
-            return new Script(name, state, null, info, "error.scriptNoFunction");
+            return results.Length > 0 && results[0].TryRead<LuaFunction>(out var function)
+                ? (state, function, null)
+                : (state, null, "error.scriptNoFunction");
         }
         catch (Exception ex)
         {
-            Serilog.Log.Warning(ex, "Lua script {Script} could not be loaded", name);
             state.Dispose();
-            return new Script(name, null, null, info, ex.Message);
+            return (null, null, ex.Message);
         }
     }
 
@@ -453,7 +533,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     ///     A state that can work on text and numbers and nothing else: no file access, no OS calls, no
     ///     debug hooks and no module loader.
     /// </summary>
-    private static LuaState CreateSandbox()
+    private static LuaState CreateSandbox(string script)
     {
         var state = LuaState.Create();
 
@@ -473,16 +553,74 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
             var parts = new List<string>(context.ArgumentCount);
 
             for (var index = 0; index < context.ArgumentCount; index++)
-                parts.Add(context.GetArgument(index).ToString());
+                parts.Add(Describe(context.GetArgument(index)));
 
-            Instance.Write("info", "print", string.Join("\t", parts));
+            Instance.Write("info", script, string.Join("\t", parts));
             return new(0);
         });
 
         return state;
     }
 
-    private static string PathFor(string name) => Path.Combine(ScriptsDirectory, Path.GetFileName(name));
+    /// <summary>
+    ///     Lua's <c>print</c> shows a table's address; in a log line the contents are far more useful,
+    ///     so tables are walked all the way down (and a table that contains itself is cut off).
+    /// </summary>
+    private static string Describe(LuaValue value) =>
+        Describe(value, MaxPrintDepth, new HashSet<LuaTable>(ReferenceEqualityComparer.Instance));
+
+    private static string Describe(LuaValue value, int depth, HashSet<LuaTable> seen)
+    {
+        if (!value.TryRead<LuaTable>(out var table))
+            return DescribeScalar(value);
+
+        if (depth == 0 || !seen.Add(table))
+            return "{...}";
+
+        try
+        {
+            var parts = new List<string>(table.ArrayLength + table.HashMapCount);
+
+            foreach (var (key, item) in table)
+                parts.Add($"{DescribeKey(key)} = {Describe(item, depth - 1, seen)}");
+
+            return parts.Count == 0 ? "{}" : $"{{ {string.Join(", ", parts)} }}";
+        }
+        finally
+        {
+            seen.Remove(table);
+        }
+    }
+
+    private static string DescribeScalar(LuaValue value)
+    {
+        if (value.TryRead<string>(out var text))
+            return text;
+
+        if (value.TryRead<bool>(out var flag))
+            return flag ? "true" : "false";
+
+        if (value.TryRead<double>(out var number))
+            return number.ToString(CultureInfo.InvariantCulture);
+
+        return value.TypeToString();
+    }
+
+    /// <summary>A key that is a plain name is written as `name`, anything else as `[value]`.</summary>
+    private static string DescribeKey(LuaValue key)
+    {
+        if (!key.TryRead<string>(out var name))
+            return $"[{DescribeScalar(key)}]";
+
+        if (name.Length == 0 || !(char.IsLetter(name[0]) || name[0] == '_'))
+            return $"[\"{name}\"]";
+
+        return name.Skip(1).All(character => char.IsLetterOrDigit(character) || character == '_')
+            ? name
+            : $"[\"{name}\"]";
+    }
+
+    public static string PathFor(string name) => Path.Combine(ScriptsDirectory, Path.GetFileName(name));
 
     private sealed record Context(LuaTable Table, List<string> Order);
 

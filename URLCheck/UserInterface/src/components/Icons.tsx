@@ -18,6 +18,7 @@ import TrashSvg from "./icons/trash.svg?react";
 import PlaySvg from "./icons/play.svg?react";
 import SendSvg from "./icons/send.svg?react";
 import CodeSvg from "./icons/code.svg?react";
+import ExternalLinkSvg from "./icons/external-link.svg?react";
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
     size?: number;
@@ -51,3 +52,4 @@ export const PlusIcon = sized(PlusSvg);
 export const TrashIcon = sized(TrashSvg);
 export const PlayIcon = sized(PlaySvg);
 export const SendIcon = sized(SendSvg);
+export const ExternalLinkIcon = sized(ExternalLinkSvg);

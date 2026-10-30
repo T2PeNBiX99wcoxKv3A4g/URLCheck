@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Utils;
 using URLCheck.Messaging;
@@ -38,6 +39,8 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
             "scripts.delete" => DeleteAsync(context),
             "scripts.import" => ImportAsync(context),
             "scripts.download" => DownloadAsync(context),
+            "scripts.open" => Task.FromResult(Open(context)),
+            "scripts.test" => TestAsync(context),
 
             "scripts.logs" => Task.FromResult<NativeResponse?>(context.Reply("scripts.logs.result",
                 new ScriptLogsPayload([.. ScriptEngine.Instance.Logs.Select(ToPayload)]))),
@@ -117,6 +120,36 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
 
         return Result(context, "scripts.download.result",
             await ScriptEngine.Instance.DownloadAsync(url, Client));
+    }
+
+    /// <summary>Opens the script's file with whatever the system has registered for .lua files.</summary>
+    private static NativeResponse? Open(NativeContext context)
+    {
+        var name = context.Payload<ScriptNameRequest>()?.Name;
+        var path = name is { Length: > 0 } ? ScriptEngine.PathFor(name) : null;
+
+        if (path is null || !File.Exists(path))
+            return context.Fail("scripts.open.result", "error.scriptMissing");
+
+        var started = Try.Run(() => Process.Start(new ProcessStartInfo(path) { UseShellExecute = true }));
+
+        if (started.Exception is not { } exception)
+            return context.Reply("scripts.open.result", new OkPayload());
+
+        Constants.Logger.Warning(exception, "Failed to open {Script} with the system handler", path);
+        return context.Fail("scripts.open.result", "error.openFailed");
+    }
+
+    /// <summary>Runs the script over a URL without opening anything, for the test box.</summary>
+    private static async Task<NativeResponse?> TestAsync(NativeContext context)
+    {
+        var payload = context.Payload<ScriptTestRequest>();
+        if (payload?.Name is not { Length: > 0 } name || payload.Url is not { Length: > 0 } url)
+            return context.Fail("scripts.test.result", "error.invalidScript");
+
+        var result = await ScriptEngine.Instance.TestAsync(name, url, AppInfoService.Version, payload.Content);
+
+        return context.Reply("scripts.test.result", new ScriptTestPayload(result.Url, result.Error, result.Output));
     }
 
     private static NativeResponse? ClearLogs(NativeContext context)

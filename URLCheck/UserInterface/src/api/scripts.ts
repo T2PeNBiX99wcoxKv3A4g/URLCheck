@@ -70,6 +70,26 @@ export async function downloadScript(url: string): Promise<string | null> {
     return await result("scripts.download", {url});
 }
 
+/** Opens the script's file with whatever the system uses for .lua files. */
+export async function openScript(name: string): Promise<string | null> {
+    return await result("scripts.open", {name});
+}
+
+/** One run of a script over a test URL, without opening anything. */
+export interface ScriptTestResult {
+    /** The URL the script handed back (the input when it left it alone). */
+    url: string;
+    /** The failure, when the script threw or could not be loaded. */
+    error: string | null;
+    /** Everything it printed, oldest first. */
+    output: string[];
+}
+
+/** Runs one script over a test URL and returns what it produced. */
+export async function testScript(name: string, url: string, content: string): Promise<ScriptTestResult> {
+    return await Native.request<ScriptTestResult>("scripts.test", {name, url, content});
+}
+
 /** The lines the scripts printed or failed with, newest last. */
 export async function scriptLogs(): Promise<ScriptLogEntry[]> {
     if (!Native.available) return [];
