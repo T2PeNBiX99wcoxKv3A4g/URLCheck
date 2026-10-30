@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import {Eraser, FileCode2, History, MousePointerClick, ScanSearch, Send, type LucideIcon} from "lucide-react";
 import {siArchlinux, siFedora, siUbuntu} from "simple-icons";
-import {ICON, REPOSITORY, RELEASES, SCREENSHOT, WIKI} from "../constants";
+import {ICON, REPOSITORY, RELEASES, SCREENSHOT} from "../constants";
 
 const Hero = styled.section`
     display: flex;
@@ -170,28 +170,6 @@ const PlatformNote = styled.span`
     font-size: 0.8rem;
 `;
 
-const Links = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-`;
-
-const Link = styled.a`
-    padding: 8px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 999px;
-    color: #d1d5db;
-    font-size: 0.85rem;
-    text-decoration: none;
-    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
-
-    &:hover {
-        color: #f9fafb;
-        border-color: rgba(255, 255, 255, 0.25);
-        background: rgba(255, 255, 255, 0.05);
-    }
-`;
-
 const features: [LucideIcon, string, string][] = [
     [
         MousePointerClick,
@@ -297,16 +275,6 @@ export const HomePage: React.FC = () => (
                     </Platform>
                 ))}
             </PlatformGrid>
-        </Section>
-
-        <Section>
-            <Heading>Links</Heading>
-            <Links>
-                <Link href={REPOSITORY}>Source code</Link>
-                <Link href={WIKI}>Wiki</Link>
-                <Link href="#/scripts">Scripts</Link>
-                <Link href={`${REPOSITORY}/releases`}>Releases</Link>
-            </Links>
         </Section>
     </>
 );
