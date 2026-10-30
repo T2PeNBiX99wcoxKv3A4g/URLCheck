@@ -3,6 +3,7 @@ import styled, {createGlobalStyle} from "styled-components";
 import {HomePage} from "./pages/Home";
 import {ScriptsPage} from "./pages/Scripts";
 import {DocsPage} from "./pages/Docs";
+import {docs} from "./docs.generated";
 import {ICON} from "./constants";
 
 const GlobalStyle = createGlobalStyle`
@@ -122,8 +123,18 @@ function useRoute() {
     return {section: section || "home", page: rest.join("/")};
 }
 
+/** Keeps the browser tab in step with the current page. */
+function useTitle(section: string, page: string) {
+    useEffect(() => {
+        const doc = docs.find((entry) => entry.slug === page);
+        const name = section === "scripts" ? "Scripts" : section === "docs" ? doc?.title ?? "Docs" : "";
+        document.title = name ? `${name} — URLCheck` : "URLCheck";
+    }, [section, page]);
+}
+
 export const App: React.FC = () => {
     const route = useRoute();
+    useTitle(route.section, route.page);
 
     return (
         <>
