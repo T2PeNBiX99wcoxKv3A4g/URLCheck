@@ -1,29 +1,43 @@
 -- Removes common tracking parameters from every URL, whatever the host.
 --
--- Only the parameters below are touched; everything else is left alone.
+-- Each entry is a .NET regex tested against the parameter name. A pattern without `$` also matches
+-- longer names, which is how the prefixes work.
 
--- Prefixes that only exist for tracking.
-local prefixes = { "utm_", "pk_", "mtm_", "matomo_", "hsa_" }
-
--- Exact names that only exist for tracking.
-local exact = {
-    ["fbclid"] = true, ["gclid"] = true, ["dclid"] = true, ["gbraid"] = true,
-    ["wbraid"] = true, ["msclkid"] = true, ["twclid"] = true, ["yclid"] = true,
-    ["ttclid"] = true, ["igshid"] = true, ["li_fat_id"] = true,
-    ["mc_cid"] = true, ["mc_eid"] = true, ["mkt_tok"] = true,
-    ["_hsenc"] = true, ["_hsmi"] = true,
-    ["vero_id"] = true, ["vero_conv"] = true,
-    ["oly_anon_id"] = true, ["oly_enc_id"] = true,
-    ["rb_clickid"] = true, ["s_cid"] = true, ["wickedid"] = true, ["epik"] = true
+local tracking = {
+    "^utm_",
+    "^pk_",
+    "^mtm_",
+    "^matomo_",
+    "^hsa_",
+    "^fbclid$",
+    "^gclid$",
+    "^dclid$",
+    "^gbraid$",
+    "^wbraid$",
+    "^msclkid$",
+    "^twclid$",
+    "^yclid$",
+    "^ttclid$",
+    "^igshid$",
+    "^li_fat_id$",
+    "^mc_cid$",
+    "^mc_eid$",
+    "^mkt_tok$",
+    "^_hsenc$",
+    "^_hsmi$",
+    "^vero_id$",
+    "^vero_conv$",
+    "^oly_anon_id$",
+    "^oly_enc_id$",
+    "^rb_clickid$",
+    "^s_cid$",
+    "^wickedid$",
+    "^epik$"
 }
 
 local function isTracking(name)
-    if exact[name] then
-        return true
-    end
-
-    for _, prefix in ipairs(prefixes) do
-        if name:sub(1, #prefix) == prefix then
+    for _, pattern in ipairs(tracking) do
+        if name:regexMatch(pattern) then
             return true
         end
     end
