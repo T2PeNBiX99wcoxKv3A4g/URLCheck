@@ -72,6 +72,16 @@ internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>
         UpdateDesktopDatabase();
     }
 
+    /// <summary>Rewrites a stale desktop entry and the handler default, and does nothing when both are current.</summary>
+    public void EnsureCustomScheme()
+    {
+        if (string.Equals(RegisteredExecutablePath, ExecutablePath, StringComparison.Ordinal) &&
+            IsCustomSchemeRegistered())
+            return;
+
+        RegisterCustomScheme();
+    }
+
     public void Unregister()
     {
         TryDelete(DesktopFilePath);

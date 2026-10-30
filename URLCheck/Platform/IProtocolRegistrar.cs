@@ -15,6 +15,12 @@ internal interface IProtocolRegistrar
     /// <summary>Registers the custom <c>urlcheck://</c> scheme handler.</summary>
     void RegisterCustomScheme();
 
+    /// <summary>
+    ///     Registers the custom scheme only when it is missing or points at another build, so a moved or
+    ///     reinstalled app repairs itself instead of leaving clicks on a <c>urlcheck://</c> link dead.
+    /// </summary>
+    void EnsureCustomScheme();
+
     /// <summary>Removes everything <see cref="RegisterBrowser" />/<see cref="RegisterCustomScheme" /> created.</summary>
     void Unregister();
 

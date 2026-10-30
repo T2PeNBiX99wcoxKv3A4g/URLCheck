@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
 using PhotinoNetUtils.Utils;
+using Serilog;
 
 namespace URLCheck.Platform;
 
@@ -79,6 +80,22 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
     {
         EnsureExecutable();
         RegisterProgId(CustomScheme, "URL:URLCheck Protocol");
+    }
+
+    /// <summary>
+    ///     Repairs a missing or stale registration. The handler is stored as an absolute path, so after
+    ///     the app moves (or a debug build took the scheme over) every click on a <c>urlcheck://</c> link
+    ///     fails before the app is even started, with no visible error.
+    /// </summary>
+    public void EnsureCustomScheme()
+    {
+        using var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{CustomScheme}\shell\open\command");
+        if (key?.GetValue(null) is string command &&
+            command.Trim().Equals(_command, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        Log.Information("Registering the urlcheck:// handler at {Path}", ExecutablePath);
+        RegisterCustomScheme();
     }
 
     /// <summary>Removes every registry key this app created, so nothing is left behind after uninstalling.</summary>

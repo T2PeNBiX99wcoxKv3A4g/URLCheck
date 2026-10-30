@@ -105,6 +105,9 @@ internal static class Program
             _ = FilterService.Instance;
             _ = ScriptsService.Instance;
 
+            // Repairs a urlcheck:// handler left pointing at an executable that no longer exists.
+            ProtocolRegistrationService.Instance.EnsureCustomScheme();
+
             var manager = WindowManager.Instance;
             manager.AppUrl = appUrl;
             manager.ShowMainWindowOnStartup = showMainWindow;
@@ -180,12 +183,11 @@ internal static class Program
         var error = await ScriptsService.InstallAsync(source);
 
         if (error is not null)
-        {
             Log.Warning("Could not install the script from {Url}: {Error}", source, error);
-            return;
-        }
+        else
+            Log.Information("Installed the script from {Url}", source);
 
-        Log.Information("Installed the script from {Url}", source);
+        // The page opens either way: a failed download used to leave the click with no visible result.
         WindowManager.Instance.ShowMainWindow("scripts");
     }
 

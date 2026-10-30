@@ -22,6 +22,17 @@ internal sealed class ProtocolRegistrationService : Singleton<ProtocolRegistrati
 
     [PublicAPI] public string ExecutablePath => _registrar.ExecutablePath;
 
+    /// <summary>
+    ///     Repairs the custom-scheme handler once at startup. The handler is an absolute path, so an app
+    ///     that was moved, reinstalled or last registered by a build that is gone leaves every
+    ///     <c>urlcheck://</c> click doing nothing at all, without even starting the app.
+    /// </summary>
+    public void EnsureCustomScheme()
+    {
+        _registrar.EnsureCustomScheme();
+        InvalidateStatus();
+    }
+
     /// <summary>Handles the <c>app.*</c> messages.</summary>
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context)
     {
