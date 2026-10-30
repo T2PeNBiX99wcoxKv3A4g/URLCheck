@@ -3,7 +3,15 @@ import styled from "styled-components";
 import {Native, useTranslation} from "@photino-net-utils/bridge";
 import {PageContainer} from "../components/Layout";
 import {CodeEditor} from "../components/CodeEditor";
-import {AlertTriangleIcon, CodeIcon, EditIcon, ExternalLinkIcon, PlayIcon, PlusIcon, TrashIcon} from "../components/Icons";
+import {
+    AlertTriangleIcon,
+    CodeIcon,
+    EditIcon,
+    ExternalLinkIcon,
+    PlayIcon,
+    PlusIcon,
+    TrashIcon
+} from "../components/Icons";
 import {
     clearScriptLogs,
     createScript,
