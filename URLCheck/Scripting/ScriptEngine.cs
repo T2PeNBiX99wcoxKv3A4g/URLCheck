@@ -637,6 +637,10 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         state.Environment["dofile"] = LuaValue.Nil;
         state.Environment["loadfile"] = LuaValue.Nil;
 
+        // The string library gains split, and the string metatable gains indexing and +.
+        state.Environment["string"].Read<LuaTable>()["split"] = new LuaFunction(Split);
+        state.ExecuteAsync(state.Load(StringExtensions, "string-extensions")).AsTask().GetAwaiter().GetResult();
+
         state.Environment["print"] = new LuaFunction((context, _) =>
         {
             var parts = new List<string>(context.ArgumentCount);
@@ -649,6 +653,58 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         });
 
         return state;
+    }
+
+    /// <summary>
+    ///     Extends the string metatable without losing the standard one: methods such as
+    ///     <c>s:sub(1, 1)</c> still work, and <c>s[1]</c> reads one character while <c>s + t</c>
+    ///     concatenates. Runs once for each sandbox.
+    /// </summary>
+    private const string StringExtensions = """
+                                           local metatable = getmetatable("")
+                                           local string = string
+
+                                           metatable.__index = function(value, key)
+                                               if type(key) == "number" then
+                                                   local index = key
+                                                   if index < 0 then
+                                                       index = #value + index + 1
+                                                   end
+                                                   if index < 1 or index > #value then
+                                                       return nil
+                                                   end
+                                                   return string.sub(value, index, index)
+                                               end
+
+                                               return string[key]
+                                           end
+
+                                           metatable.__add = function(a, b)
+                                               return a .. b
+                                           end
+                                           """;
+
+    /// <summary>
+    ///     Splits a string on a literal separator, or on whitespace when there is none. The parts come
+    ///     back as a list, so <c>("a,b"):split(",")</c> is <c>{ "a", "b" }</c>.
+    /// </summary>
+    private static ValueTask<int> Split(LuaFunctionExecutionContext context, CancellationToken cancellation)
+    {
+        var text = context.HasArgument(0) ? context.GetArgument(0).ToString() : "";
+        var separator = context.HasArgument(1) && context.GetArgument(1).Type != LuaValueType.Nil
+            ? context.GetArgument(1).ToString()
+            : null;
+
+        var parts = string.IsNullOrEmpty(separator)
+            ? text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)
+            : text.Split(separator);
+
+        var result = new LuaTable();
+
+        for (var index = 0; index < parts.Length; index++)
+            result[index + 1] = parts[index];
+
+        return new(context.Return(result));
     }
 
     /// <summary>
