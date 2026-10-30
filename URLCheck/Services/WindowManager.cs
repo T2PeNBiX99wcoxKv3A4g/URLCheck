@@ -92,6 +92,9 @@ internal sealed class WindowManager : Singleton<WindowManager>
     /// <summary>The button's URL when it did not fit in the start URL, or arrived before it was ready.</summary>
     private string? _pendingSelectionUrl;
 
+    /// <summary>The tab the interface should open once it has reported in.</summary>
+    private string? _pendingTab;
+
     /// <summary>Whether the popup's page is listening for <c>popup.navigate</c> yet.</summary>
     private bool _popupReady;
 
@@ -175,6 +178,13 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
             case "app.ready":
                 _mainWindowReady = true;
+
+                if (_pendingTab is { } pending)
+                {
+                    _pendingTab = null;
+                    TrySend(_mainWindow, NativeBridge.SerializeEvent("app.navigate", new NavigatePayload(pending)));
+                }
+
                 HideWhenRendered();
                 return null;
 
@@ -559,10 +569,29 @@ internal sealed class WindowManager : Singleton<WindowManager>
     public void ShowMainWindow(string? tab = null)
     {
         Log.Information("Showing the main window");
+
+        // A link or tray action that asks for the window wins over a hidden start.
+        _hideWhenRendered = false;
+
         Invoke(_mainWindow, _platform.Show);
 
         if (tab is { Length: > 0 })
-            _mainWindow?.SendWebMessage(NativeBridge.SerializeEvent("app.navigate", new NavigatePayload(tab)));
+            Navigate(tab);
+    }
+
+    /// <summary>
+    ///     Asks the interface to switch tabs. Before the page has reported in the request waits: a
+    ///     message sent to a web view that is still loading aborts the process.
+    /// </summary>
+    private void Navigate(string tab)
+    {
+        if (!_mainWindowReady)
+        {
+            _pendingTab = tab;
+            return;
+        }
+
+        TrySend(_mainWindow, NativeBridge.SerializeEvent("app.navigate", new NavigatePayload(tab)));
     }
 
     /// <summary>

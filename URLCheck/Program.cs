@@ -115,7 +115,7 @@ internal static class Program
                 singleInstance.StartServer(DispatchUrls);
 
                 if (startupUrls.Count > 0)
-                    _ = Task.Run(() => Task.WhenAll(startupUrls.Select(manager.ShowPopupAsync)));
+                    _ = Task.Run(() => Task.WhenAll(startupUrls.Select(DispatchUrlAsync)));
             };
 
             manager.CreateMainWindow();
@@ -146,7 +146,44 @@ internal static class Program
     private static void DispatchUrls(IReadOnlyList<string> args)
     {
         foreach (var url in ExtractUrls(args))
-            _ = WindowManager.Instance.ShowPopupAsync(url);
+            _ = DispatchUrlAsync(url);
+    }
+
+    /// <summary>
+    ///     Sends one incoming link where it belongs: a <c>urlcheck://</c> script link installs it and
+    ///     opens the Scripts page, anything else goes to the inspection popup.
+    /// </summary>
+    private static async Task DispatchUrlAsync(string url)
+    {
+        if (Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
+            string.Equals(uri.Scheme, "urlcheck", StringComparison.OrdinalIgnoreCase))
+        {
+            await InstallFromLinkAsync(url);
+            return;
+        }
+
+        await WindowManager.Instance.ShowPopupAsync(url);
+    }
+
+    /// <summary>Handles <c>urlcheck://script?url=...</c>, the link that installs a script.</summary>
+    private static async Task InstallFromLinkAsync(string link)
+    {
+        if (ScriptLink.Parse(link) is not { } source)
+        {
+            Log.Warning("Ignoring an unsupported urlcheck link: {Link}", link);
+            return;
+        }
+
+        var error = await ScriptsService.InstallAsync(source);
+
+        if (error is not null)
+        {
+            Log.Warning("Could not install the script from {Url}: {Error}", source, error);
+            return;
+        }
+
+        Log.Information("Installed the script from {Url}", source);
+        WindowManager.Instance.ShowMainWindow("scripts");
     }
 
     /// <summary>
