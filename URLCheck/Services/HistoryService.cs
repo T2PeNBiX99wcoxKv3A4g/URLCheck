@@ -31,10 +31,7 @@ internal sealed class HistoryService : Singleton<HistoryService>
 
     public HistoryService()
     {
-        var directory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.Name);
-        Directory.CreateDirectory(directory);
-        DatabasePath = Path.Combine(directory, "history.db");
+        DatabasePath = Path.Combine(Constants.SettingsDirectory, "history.db");
         _connectionString = new SqliteConnectionStringBuilder
         {
             DataSource = DatabasePath

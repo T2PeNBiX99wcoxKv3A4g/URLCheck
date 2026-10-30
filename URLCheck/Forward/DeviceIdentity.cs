@@ -13,13 +13,10 @@ internal sealed class DeviceIdentity : Singleton<DeviceIdentity>
 {
     private const string FileName = "device.key";
 
-    /// <summary>Reads the key from the config folder, generating one on first use.</summary>
+    /// <summary>Reads the key from the settings folder, generating one on first use.</summary>
     public DeviceIdentity()
     {
-        var directory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.Name);
-        Directory.CreateDirectory(directory);
-        var path = Path.Combine(directory, FileName);
+        var path = Path.Combine(Constants.SettingsDirectory, FileName);
 
         var privateKey = File.Exists(path) ? Read(path) : null;
         if (privateKey is null)

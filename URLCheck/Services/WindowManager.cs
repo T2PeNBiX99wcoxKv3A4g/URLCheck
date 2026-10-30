@@ -51,8 +51,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
     ///     Per-app web view data folder. On Windows, Photino defaults to a WebView2 folder shared by
     ///     every Photino app, which breaks when another app holds it, so keep URLCheck's separate.
     /// </summary>
-    private static readonly string WebViewDataPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Constants.Name, "webview");
+    private static readonly string WebViewDataPath = Path.Combine(Constants.DataDirectory, "webview");
 
     /// <summary>How often the pointer is checked while the button is visible.</summary>
     private static readonly TimeSpan PointerPollInterval = TimeSpan.FromMilliseconds(90);

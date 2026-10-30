@@ -28,10 +28,7 @@ internal sealed class SettingsService : Singleton<SettingsService>
 
     public SettingsService()
     {
-        var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            Constants.Name);
-        Directory.CreateDirectory(directory);
-        SettingsFilePath = Path.Combine(directory, "settings.json");
+        SettingsFilePath = Path.Combine(Constants.SettingsDirectory, "settings.json");
         NativeBridge.MessageReceived += HandleMessageAsync;
     }
 

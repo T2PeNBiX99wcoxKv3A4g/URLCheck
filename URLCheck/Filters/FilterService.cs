@@ -42,8 +42,7 @@ internal sealed class FilterService : Singleton<FilterService>
 
     public FilterService()
     {
-        _directory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.Name, "filters");
+        _directory = Path.Combine(Constants.SettingsDirectory, "filters");
         Directory.CreateDirectory(_directory);
         _manifestPath = Path.Combine(_directory, "filters.json");
         _builtinRules = FilterParser.Parse(ReadBuiltin());

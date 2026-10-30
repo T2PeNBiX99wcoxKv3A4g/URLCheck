@@ -78,8 +78,8 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     /// <summary>Two list requests can arrive together; only one of them may load the folder.</summary>
     private readonly Lock _loadLock = new();
 
-    /// <summary>Where the scripts live; created on demand, beside the settings file.</summary>
-    public static string ScriptsDirectory => Path.Combine(Path.GetDirectoryName(Constants.LogDirectory)!, "scripts");
+    /// <summary>Where the scripts live; created on demand, beside the settings.</summary>
+    public static string ScriptsDirectory => Path.Combine(Constants.SettingsDirectory, "scripts");
 
     public IReadOnlyList<ScriptLogEntry> Logs => [.. _logs];
 

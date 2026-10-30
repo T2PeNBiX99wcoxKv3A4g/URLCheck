@@ -29,12 +29,18 @@ public static class Constants
     /// </summary>
     internal static ILogger Logger => Log.Logger.ForContext("SourceContext", "Core");
 
-    /// <summary>Where the rolling log files are written, beside the settings.</summary>
+    /// <summary>
+    ///     Where the settings and other user data live: <c>%APPDATA%\URLCheck</c> (roaming), beside the
+    ///     scripts, filters and history.
+    /// </summary>
+    internal static string SettingsDirectory => AppPaths.SettingsDirectory(Name);
+
+    /// <summary>Where the rolling log files are written, under the settings folder.</summary>
     internal static string LogDirectory => AppPaths.LogDirectory(Name);
 
     /// <summary>
-    ///     A directory we own, used as the host's content root. The static server creates a <c>wwwroot</c>
-    ///     web root under it when missing, which without this would land next to the executable.
+    ///     A local folder for disposable files: the host's content root, the extracted icon and the
+    ///     web view cache. Nothing here needs to roam.
     /// </summary>
     internal static string DataDirectory => AppPaths.DataDirectory(Name);
 }
