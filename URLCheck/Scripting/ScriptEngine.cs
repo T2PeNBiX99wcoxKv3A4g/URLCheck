@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Lua;
 using Lua.Standard;
@@ -637,9 +638,15 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         state.Environment["dofile"] = LuaValue.Nil;
         state.Environment["loadfile"] = LuaValue.Nil;
 
-        // The string library gains split, and the string metatable gains indexing and +.
+        // The string library gains split and the .NET regex helpers, and the string metatable gains
+        // indexing and +.
         var stringTable = state.Environment["string"].Read<LuaTable>();
         stringTable["split"] = new LuaFunction(Split);
+        stringTable["regexMatch"] = new LuaFunction(RegexMatch);
+        stringTable["regexFind"] = new LuaFunction(RegexFind);
+        stringTable["regexGsub"] = new LuaFunction(RegexGsub);
+        stringTable["regexGmatch"] = new LuaFunction(RegexGmatch);
+        stringTable["regexSplit"] = new LuaFunction(RegexSplit);
 
         var metatable = state.ExecuteAsync(state.Load("return getmetatable(\"\")", "string-metatable"))
             .AsTask().GetAwaiter().GetResult()[0].Read<LuaTable>();
@@ -735,6 +742,167 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
             result[index + 1] = parts[index];
 
         return new(context.Return(result));
+    }
+
+    /// <summary>How long one regular expression may run; a URL script has to stay quick.</summary>
+    private static readonly TimeSpan RegexTimeout = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    ///     <c>string.regexMatch(s, pattern [, init])</c> — like <c>string.match</c>, but with a .NET
+    ///     regular expression. Returns the captures, or the whole match when there are none.
+    /// </summary>
+    private static ValueTask<int> RegexMatch(LuaFunctionExecutionContext context, CancellationToken cancellation)
+    {
+        if (Find(context) is not { } match)
+            return new(context.Return(LuaValue.Nil));
+
+        if (match.Groups.Count <= 1)
+            return new(context.Return(match.Value));
+
+        var values = new List<LuaValue>(match.Groups.Count - 1);
+        AddGroups(match, values);
+
+        return new(context.Return(values.ToArray()));
+    }
+
+    /// <summary>
+    ///     <c>string.regexFind(s, pattern [, init])</c> — like <c>string.find</c>, but with a .NET
+    ///     regular expression. Returns the start and end positions, then the captures.
+    /// </summary>
+    private static ValueTask<int> RegexFind(LuaFunctionExecutionContext context, CancellationToken cancellation)
+    {
+        if (Find(context) is not { } match)
+            return new(context.Return(LuaValue.Nil));
+
+        var values = new List<LuaValue> { match.Index + 1, match.Index + match.Length };
+        AddGroups(match, values);
+
+        return new(context.Return(values.ToArray()));
+    }
+
+    /// <summary>
+    ///     <c>string.regexGsub(s, pattern, repl [, n])</c> — like <c>string.gsub</c>, but with a .NET
+    ///     regular expression. <paramref name="repl" /> is a replacement string (<c>$1</c>, <c>$0</c>,
+    ///     <c>${name}</c>) or a table looked up by the whole match.
+    /// </summary>
+    private static ValueTask<int> RegexGsub(LuaFunctionExecutionContext context, CancellationToken cancellation)
+    {
+        var text = context.GetArgument(0).ToString();
+        var regex = RegexPattern(context.State, context.GetArgument(1).ToString());
+        var replacement = context.GetArgument(2);
+        var limit = context.HasArgument(3) && context.GetArgument(3).TryRead<double>(out var count)
+            ? (int)count
+            : int.MaxValue;
+
+        var replaced = 0;
+
+        string Replace(Match match)
+        {
+            replaced++;
+
+            if (replacement.TryRead<string>(out var format))
+                return match.Result(format);
+
+            if (!replacement.TryRead<LuaTable>(out var table))
+                return match.Value;
+
+            var key = match.Groups.Count > 1 && match.Groups[1].Success ? match.Groups[1].Value : match.Value;
+            var value = table[key];
+
+            if (value.TryRead<string>(out var text))
+                return text;
+
+            return value.TryRead<double>(out var number)
+                ? number.ToString(CultureInfo.InvariantCulture)
+                : match.Value;
+        }
+
+        var result = regex.Replace(text, Replace, limit);
+
+        return new(context.Return(result, replaced));
+    }
+
+    /// <summary>
+    ///     <c>string.regexGmatch(s, pattern)</c> — like <c>string.gmatch</c>, but with a .NET regular
+    ///     expression. Yields the captures, or the whole match when there are none.
+    /// </summary>
+    private static ValueTask<int> RegexGmatch(LuaFunctionExecutionContext context, CancellationToken cancellation)
+    {
+        var text = context.GetArgument(0).ToString();
+        var matches = RegexPattern(context.State, context.GetArgument(1).ToString()).Matches(text);
+        var index = 0;
+
+        var iterator = new LuaFunction((inner, _) =>
+        {
+            if (index >= matches.Count)
+                return new(inner.Return());
+
+            var match = matches[index++];
+
+            if (match.Groups.Count <= 1)
+                return new(inner.Return(match.Value));
+
+            var values = new List<LuaValue>(match.Groups.Count - 1);
+            AddGroups(match, values);
+
+            return new(inner.Return(values.ToArray()));
+        });
+
+        return new(context.Return(iterator));
+    }
+
+    /// <summary>
+    ///     <c>string.regexSplit(s, pattern)</c> — splits on a .NET regular expression and returns the
+    ///     parts as a list.
+    /// </summary>
+    private static ValueTask<int> RegexSplit(LuaFunctionExecutionContext context, CancellationToken cancellation)
+    {
+        var text = context.GetArgument(0).ToString();
+        var parts = RegexPattern(context.State, context.GetArgument(1).ToString()).Split(text);
+        var result = new LuaTable();
+
+        for (var index = 0; index < parts.Length; index++)
+            result[index + 1] = parts[index];
+
+        return new(context.Return(result));
+    }
+
+    /// <summary>The first regex match, honouring the optional 1-based <c>init</c> argument.</summary>
+    private static Match? Find(LuaFunctionExecutionContext context)
+    {
+        var text = context.GetArgument(0).ToString();
+        var start = 0;
+
+        if (context.HasArgument(2) && context.GetArgument(2).TryRead<double>(out var init))
+        {
+            var position = (int)init;
+            start = Math.Clamp(position < 0 ? text.Length + position : position - 1, 0, text.Length);
+        }
+
+        var match = RegexPattern(context.State, context.GetArgument(1).ToString()).Match(text, start);
+
+        return match.Success ? match : null;
+    }
+
+    private static Regex RegexPattern(LuaState state, string pattern)
+    {
+        try
+        {
+            return new(pattern, RegexOptions.CultureInvariant, RegexTimeout);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new LuaRuntimeException(state, $"invalid pattern: {ex.Message}", 1);
+        }
+    }
+
+    private static void AddGroups(Match match, List<LuaValue> values)
+    {
+        for (var index = 1; index < match.Groups.Count; index++)
+        {
+            var group = match.Groups[index];
+            values.Add(group.Success ? group.Value : LuaValue.Nil);
+        }
     }
 
     /// <summary>
