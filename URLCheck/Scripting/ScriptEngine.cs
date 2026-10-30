@@ -46,15 +46,15 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                                                --
                                                -- u.url          the whole URL
                                                -- u.scheme, u.host, u.port, u.path
-                                               -- u.query, u.fragment
-                                               -- u.params       decoded query parameters; set one to nil to drop it
+                                               -- u.fragment
+                                               -- u.query        decoded query parameters as a table; set one to nil to drop it
                                                -- u.app_version  the running version
                                                --
                                                -- Return u (or a URL string) to accept the changes, nil to leave the URL alone.
 
                                                return function(u)
                                                    if u.host == "example.com" then
-                                                       u.params["utm_source"] = nil
+                                                       u.query["utm_source"] = nil
                                                    end
 
                                                    return u
@@ -390,7 +390,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         };
 
         var parameters = new LuaTable();
-        table["params"] = parameters;
+        table["query"] = parameters;
 
         var order = new List<string>();
 
@@ -401,7 +401,6 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         table["host"] = uri.Host;
         table["port"] = uri.IsDefaultPort ? LuaValue.Nil : uri.Port;
         table["path"] = uri.AbsolutePath;
-        table["query"] = uri.Query.Length > 1 ? uri.Query[1..] : LuaValue.Nil;
         table["fragment"] = uri.Fragment.Length > 1 ? uri.Fragment[1..] : LuaValue.Nil;
 
         foreach (var (name, value) in ReadParameters(uri.Query))
@@ -463,7 +462,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     /// </summary>
     private static string BuildQuery(LuaTable table, List<string> order)
     {
-        if (!table["params"].TryRead<LuaTable>(out var parameters))
+        if (!table["query"].TryRead<LuaTable>(out var parameters))
             return "";
 
         var values = new Dictionary<string, string>(StringComparer.Ordinal);
