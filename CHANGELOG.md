@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.4.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.3.0..v1.4.0) - 2026-10-30
+
+### ⛰️  Features
+
+- Register the urlcheck scheme together with http/https - ([57e7fe5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/57e7fe5b213e7561a73c2b1c9ff3c6a1e5a0f803))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([0df1ebd](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0df1ebd43ce81026378a732fb21c8b2cf73408b5))
+
+
 ## [1.3.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.2.0..v1.3.0) - 2026-10-30
 
 ### ⛰️  Features
