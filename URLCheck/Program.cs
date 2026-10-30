@@ -162,7 +162,7 @@ internal static class Program
     private static async Task DispatchUrlAsync(string url)
     {
         if (Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
-            uri.Scheme is "checkurl" or "urlcheck")
+            uri.Scheme is "checkurl")
         {
             await InstallFromLinkAsync(url);
             return;
@@ -243,6 +243,6 @@ internal static class Program
     [
         .. args.Where(arg =>
             Uri.TryCreate(arg, UriKind.Absolute, out var uri) &&
-            uri.Scheme is "http" or "https" or "checkurl" or "urlcheck")
+            uri.Scheme is "http" or "https" or "checkurl")
     ];
 }

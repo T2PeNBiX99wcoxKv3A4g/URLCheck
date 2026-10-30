@@ -21,11 +21,13 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
 {
     private const string AppKeyName = "URLCheck";
 
-    // Windows' shell refuses any scheme whose name starts with "url" (ShellExecute returns
-    // SE_ERR_FNF and shows "cannot find program"), so the script links use "checkurl" instead.
+    // The Windows shell refuses every scheme whose name starts with "url". Verified with throwaway
+    // schemes that differed only in the name: ShellExecute returns SE_ERR_FNF (2) and Explorer shows
+    // "cannot find program", so the app is never started, while the same key named "zzurl..." works.
+    // The script links therefore use "checkurl://"; nothing explains the rule, so keep the prefix off.
     private const string CustomScheme = "checkurl";
 
-    /// <summary>Links shared before the rename; still registered so they keep working where they can.</summary>
+    /// <summary>The scheme used before the rename. It is never registered, only cleaned up.</summary>
     private const string LegacyScheme = "urlcheck";
 
     private const string HttpProgId = "URLCheck.HTTP";
@@ -67,7 +69,9 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
         // Script links are part of the same integration, so they are registered together and cannot be
         // left behind as a second, easily forgotten step.
         RegisterProgId(CustomScheme, "URL:URLCheck Protocol");
-        RegisterProgId(LegacyScheme, "URL:URLCheck Protocol");
+
+        // Earlier builds registered "urlcheck"; drop it so the old handler cannot point at a stale exe.
+        DeleteKey($@"Software\Classes\{LegacyScheme}");
 
         using var capabilities = Registry.CurrentUser.CreateSubKey(
             $@"Software\Clients\StartMenuInternet\{AppKeyName}\Capabilities");
@@ -92,11 +96,7 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
     ///     every click on a <c>checkurl://</c> link fails before the app is even started, with no visible
     ///     error. A scheme that was never registered is left alone; that is the user's choice.
     /// </summary>
-    public void EnsureCustomScheme()
-    {
-        RepointIfStale(CustomScheme);
-        RepointIfStale(LegacyScheme);
-    }
+    public void EnsureCustomScheme() => RepointIfStale(CustomScheme);
 
     /// <summary>Rewrites the handler of one scheme when it points at another build.</summary>
     private void RepointIfStale(string scheme)

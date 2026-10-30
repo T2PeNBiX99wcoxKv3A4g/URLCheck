@@ -12,7 +12,7 @@ internal static class ScriptLink
     public static string? Parse(string link)
     {
         if (!Uri.TryCreate(link, UriKind.Absolute, out var uri) ||
-            uri.Scheme is not ("checkurl" or "urlcheck") ||
+            uri.Scheme is not "checkurl" ||
             !string.Equals(uri.Host, "script", StringComparison.OrdinalIgnoreCase))
             return null;
 

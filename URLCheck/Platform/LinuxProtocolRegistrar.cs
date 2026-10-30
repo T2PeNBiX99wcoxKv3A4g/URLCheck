@@ -16,9 +16,6 @@ internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>
     private const string DesktopFileName = "urlcheck.desktop";
     private const string CustomSchemeMime = "x-scheme-handler/checkurl";
 
-    /// <summary>Links shared before the rename; still registered so they keep working.</summary>
-    private const string LegacySchemeMime = "x-scheme-handler/urlcheck";
-
     /// <summary>
     ///     The Wayland app id GTK reports for our windows. It has to match the desktop entry's file name
     ///     for the compositor to associate the two, which is how the window gets its icon.
@@ -65,7 +62,6 @@ internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>
         SetDefault("x-scheme-handler/http");
         SetDefault("x-scheme-handler/https");
         SetDefault(CustomSchemeMime);
-        SetDefault(LegacySchemeMime);
         UpdateDesktopDatabase();
     }
 
@@ -128,7 +124,7 @@ internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>
                        StartupWMClass={ProcessName}
                        Terminal=false
                        Categories=Network;WebBrowser;
-                       MimeType=x-scheme-handler/http;x-scheme-handler/https;{CustomSchemeMime};{LegacySchemeMime};text/html;
+                       MimeType=x-scheme-handler/http;x-scheme-handler/https;{CustomSchemeMime};text/html;
                        """;
 
         File.WriteAllText(DesktopFilePath, content + Environment.NewLine);
