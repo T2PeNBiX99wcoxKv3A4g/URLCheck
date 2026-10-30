@@ -1,0 +1,24 @@
+{
+  "name": "urlcheck-scripts-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "node scripts/generate-scripts.mjs",
+    "dev": "npm run generate && vite",
+    "build": "npm run generate && tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19",
+    "react-dom": "^19",
+    "styled-components": "^6.6.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.2",
+    "typescript": "^7",
+    "vite": "^8.3.5"
+  }
+}

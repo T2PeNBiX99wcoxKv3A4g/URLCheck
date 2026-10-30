@@ -7,7 +7,10 @@ on:
       - "dev/**"
     paths-ignore:
       - "README.md"
+      - "Lua/**"
+      - "LuaSite/**"
       - "LICENSE*"
+      - ".github/workflows/scripts-site.yml"
 
 permissions:
   contents: write

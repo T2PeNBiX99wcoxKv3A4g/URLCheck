@@ -9,9 +9,12 @@ on:
       - "maven"
     paths-ignore:
       - "README.md"
+      - "Lua/**"
+      - "LuaSite/**"
       - ".gitignore"
       - "LICENSE*"
       - ".github/workflows/dependabot-auto-merge.yml"
+      - ".github/workflows/scripts-site.yml"
 
 permissions:
   contents: write

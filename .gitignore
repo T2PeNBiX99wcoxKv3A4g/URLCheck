@@ -27,6 +27,7 @@ nul
 .temp/
 **/dist/
 **/build/
+LuaSite/src/scripts.generated.ts
 *.tsbuildinfo
 **/package-lock.json
 **/node_modules/
