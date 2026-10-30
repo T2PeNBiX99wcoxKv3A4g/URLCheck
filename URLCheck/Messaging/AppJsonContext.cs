@@ -50,6 +50,7 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(ScriptContentPayload))]
 [JsonSerializable(typeof(ScriptSaveRequest))]
 [JsonSerializable(typeof(ScriptDownloadRequest))]
+[JsonSerializable(typeof(ScriptRenameRequest))]
 [JsonSerializable(typeof(ScriptTestRequest))]
 [JsonSerializable(typeof(ScriptTestPayload))]
 [JsonSerializable(typeof(ScriptResultPayload))]

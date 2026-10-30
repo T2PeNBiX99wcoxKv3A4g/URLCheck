@@ -3,7 +3,7 @@ import styled from "styled-components";
 import {Native, useTranslation} from "@photino-net-utils/bridge";
 import {PageContainer} from "../components/Layout";
 import {CodeEditor} from "../components/CodeEditor";
-import {AlertTriangleIcon, CodeIcon, ExternalLinkIcon, PlayIcon, PlusIcon, TrashIcon} from "../components/Icons";
+import {AlertTriangleIcon, CodeIcon, EditIcon, ExternalLinkIcon, PlayIcon, PlusIcon, TrashIcon} from "../components/Icons";
 import {
     clearScriptLogs,
     createScript,
@@ -13,6 +13,7 @@ import {
     listScripts,
     openScript,
     readScript,
+    renameScript,
     saveScript,
     type ScriptEntry,
     type ScriptLogEntry,
@@ -23,8 +24,12 @@ import {
 
 type Mode = "idle" | "new" | "download";
 
-/** Adds the extension the backend expects, so the name we select afterwards is the one on disk. */
-const luaName = (name: string) => (/\.lua$/i.test(name) ? name : `${name}.lua`);
+/** Adds the extension the backend expects; the backend drops any folder part the same way. */
+const luaName = (name: string) => {
+    const file = name.split(/[\\/]/).pop() ?? name;
+
+    return /\.lua$/i.test(file) ? file : `${file}.lua`;
+};
 
 export const ScriptsPage: React.FC = () => {
     const t = useTranslation();
@@ -42,10 +47,19 @@ export const ScriptsPage: React.FC = () => {
     const [testUrl, setTestUrl] = useState("");
     const [test, setTest] = useState<ScriptTestResult | null>(null);
     const [testing, setTesting] = useState(false);
+    const [renaming, setRenaming] = useState(false);
+    const [renameDraft, setRenameDraft] = useState("");
     const logBody = useRef<HTMLDivElement | null>(null);
     const saveRef = useRef<() => Promise<void>>(async () => undefined);
+    /** The open script and its dirty flag, for the callbacks registered once. */
+    const openRef = useRef({name: null as string | null, dirty: false});
 
     const dirty = content !== saved;
+    const gone = selected !== null && !scripts.some((script) => script.name === selected);
+
+    useEffect(() => {
+        openRef.current = {name: selected, dirty};
+    });
 
     const close = () => {
         setSelected(null);
@@ -53,12 +67,14 @@ export const ScriptsPage: React.FC = () => {
         setSaved("");
         setArmed(false);
         setTest(null);
+        setRenaming(false);
     };
 
     const select = async (name: string) => {
         setError(null);
         setArmed(false);
         setTest(null);
+        setRenaming(false);
 
         try {
             const source = await readScript(name);
@@ -70,22 +86,35 @@ export const ScriptsPage: React.FC = () => {
         }
     };
 
-    /** Reloads the list; `preferred` wins, then the current selection, then the first script. */
+    /**
+     * Reloads the list; `preferred` wins, then the current selection, then the first script. A
+     * script that disappeared from disk while it had unsaved edits stays open, so the edits can
+     * still be saved (which writes the file again).
+     */
     const refresh = async (preferred?: string) => {
         const list = await listScripts();
         setScripts(list.scripts);
         setDirectory(list.directory);
 
-        const wanted = preferred ?? selected;
-        const next = list.scripts.find((script) => script.name === wanted)?.name ?? list.scripts[0]?.name;
+        const current = openRef.current.name;
+        const wanted = preferred ?? current;
+        const next = list.scripts.find((script) => script.name === wanted)?.name;
 
-        if (!next) {
-            close();
+        if (next) {
+            // Re-reading the script that is already open would throw away unsaved edits.
+            if (next !== current) await select(next);
             return;
         }
 
-        // Re-reading the script that is already open would throw away unsaved edits.
-        if (next !== selected) await select(next);
+        if (current !== null && openRef.current.dirty) return;
+
+        const first = list.scripts[0];
+        if (first) {
+            await select(first.name);
+            return;
+        }
+
+        close();
     };
 
     useEffect(() => {
@@ -93,10 +122,13 @@ export const ScriptsPage: React.FC = () => {
         void scriptLogs().then(setLogs).catch(() => setLogs([]));
 
         return Native.on((message) => {
-            if (message.type !== "scripts.log") return;
+            if (message.type === "scripts.log") {
+                const entry = message.data as ScriptLogEntry | undefined;
+                if (entry) setLogs((current) => [...current.slice(-199), entry]);
+                return;
+            }
 
-            const entry = message.data as ScriptLogEntry | undefined;
-            if (entry) setLogs((current) => [...current.slice(-199), entry]);
+            if (message.type === "scripts.changed") void refresh();
         });
     }, []);
 
@@ -195,6 +227,42 @@ export const ScriptsPage: React.FC = () => {
 
         if (problem) setError(problem);
         await refresh();
+    };
+
+    const startRename = () => {
+        if (!selected) return;
+
+        setRenaming(true);
+        setRenameDraft(selected);
+    };
+
+    const commitRename = async () => {
+        if (!selected) return;
+
+        const draftName = renameDraft.trim();
+        const name = draftName.length === 0 ? "" : luaName(draftName);
+
+        if (name.length === 0 || name === selected) {
+            setRenaming(false);
+            return;
+        }
+
+        setBusy(true);
+        setError(null);
+
+        const problem = await renameScript(selected, name);
+        setBusy(false);
+
+        if (problem) {
+            setError(problem);
+            return;
+        }
+
+        // The file moved, not its contents: keep the buffer (and any unsaved edits) as it is.
+        setRenaming(false);
+        setSelected(name);
+        openRef.current = {name, dirty: openRef.current.dirty};
+        await refresh(name);
     };
 
     const submit = () => void (mode === "new" ? create() : download());
@@ -348,8 +416,35 @@ export const ScriptsPage: React.FC = () => {
                             <>
                                 <EditorHeader>
                                     <CodeIcon size={16}/>
-                                    <Name>{selected}</Name>
+                                    {renaming ? (
+                                        <RenameInput
+                                            autoFocus
+                                            onBlur={() => setRenaming(false)}
+                                            onChange={(event) => setRenameDraft(event.target.value)}
+                                            onKeyDown={(event) => {
+                                                if (event.key === "Enter") void commitRename();
+                                                if (event.key === "Escape") setRenaming(false);
+                                            }}
+                                            spellCheck={false}
+                                            value={renameDraft}
+                                        />
+                                    ) : (
+                                        <Name>{selected}</Name>
+                                    )}
+                                    {gone && (
+                                        <Gone title={t("scripts.fileGone")}>
+                                            <AlertTriangleIcon size={14}/>
+                                        </Gone>
+                                    )}
                                     {dirty && <Dirty title={t("settings.unsaved")}/>}
+                                    <GhostButton
+                                        disabled={busy}
+                                        onClick={startRename}
+                                        title={t("scripts.rename")}
+                                        type="button"
+                                    >
+                                        <EditIcon size={15}/>
+                                    </GhostButton>
                                     <GhostButton
                                         disabled={busy}
                                         onClick={() => void open()}
@@ -512,6 +607,22 @@ const List = styled.div`
     min-height: 0;
     padding: 10px 10px 118px;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.28);
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.45);
+    }
 `;
 
 const ListItem = styled.button<{ $active: boolean }>`
@@ -610,6 +721,31 @@ const Name = styled.strong`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+`;
+
+const RenameInput = styled.input`
+    flex: 1;
+    min-width: 0;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(99, 102, 241, 0.6);
+    background: rgba(15, 23, 42, 0.9);
+    color: #f9fafb;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+
+    &:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+`;
+
+const Gone = styled.span`
+    display: grid;
+    place-items: center;
+    color: #fbbf24;
+    flex-shrink: 0;
 `;
 
 const Dirty = styled.span`

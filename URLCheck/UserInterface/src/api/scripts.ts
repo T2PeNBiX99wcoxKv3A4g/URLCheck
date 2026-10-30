@@ -60,6 +60,11 @@ export async function deleteScript(name: string): Promise<string | null> {
     return await result("scripts.delete", {name});
 }
 
+/** Renames a script on disk. */
+export async function renameScript(name: string, newName: string): Promise<string | null> {
+    return await result("scripts.rename", {name, newName});
+}
+
 /** Asks the user for files and copies them in; the backend opens the dialog. */
 export async function importScripts(): Promise<string | null> {
     return await result("scripts.import");

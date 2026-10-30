@@ -242,6 +242,8 @@
   "scripts.test": "テスト",
   "scripts.testPlaceholder": "https://example.com/?utm_source=test",
   "scripts.testFinalUrl": "最終 URL",
+  "scripts.rename": "名前を変更",
+  "scripts.fileGone": "ファイルがありません。保存すると作り直します。",
   "scripts.openExternal": "既定のアプリで開く",
   "error.scriptExists": "同じ名前のスクリプトがすでにあります。",
   "error.scriptMissing": "そのスクリプトは見つかりません。",

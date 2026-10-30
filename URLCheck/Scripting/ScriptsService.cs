@@ -17,6 +17,9 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
         Timeout = TimeSpan.FromSeconds(30)
     };
 
+    /// <summary>Set while a folder change is waiting to be announced, so a burst sends one event.</summary>
+    private static int _announcing;
+
     public ScriptsService()
     {
         NativeBridge.MessageReceived += HandleMessageAsync;
@@ -25,6 +28,58 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
         // have to poll for it.
         ScriptEngine.Instance.Logged += entry => WindowManager.Instance.BroadcastEventIfReady("scripts.log",
             new ScriptLogPayload(entry.Time.ToString("HH:mm:ss"), entry.Level, entry.Script, entry.Message));
+
+        WatchScriptsFolder();
+    }
+
+    /// <summary>
+    ///     Tells the interface when the folder changes behind its back, so a script dropped in,
+    ///     renamed or deleted with another program shows up without reopening the page.
+    /// </summary>
+    private static void WatchScriptsFolder()
+    {
+        var watcher = Try.Run(() =>
+        {
+            Directory.CreateDirectory(ScriptEngine.ScriptsDirectory);
+
+            var folder = new FileSystemWatcher(ScriptEngine.ScriptsDirectory, "*.lua")
+            {
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size,
+                IncludeSubdirectories = false
+            };
+
+            folder.Created += (_, _) => Announce();
+            folder.Changed += (_, _) => Announce();
+            folder.Deleted += (_, _) => Announce();
+            folder.Renamed += (_, _) => Announce();
+            folder.EnableRaisingEvents = true;
+
+            return folder;
+        });
+
+        if (watcher.Exception is { } exception)
+            Serilog.Log.Warning(exception, "Could not watch the script folder {Path}", ScriptEngine.ScriptsDirectory);
+    }
+
+    /// <summary>A save is several file events; they collapse into one reload and refresh.</summary>
+    private static void Announce()
+    {
+        if (Interlocked.Exchange(ref _announcing, 1) == 1)
+            return;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(250);
+                await ScriptEngine.Instance.ReloadAsync();
+                WindowManager.Instance.BroadcastEventIfReady("scripts.changed", new OkPayload());
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _announcing, 0);
+            }
+        });
     }
 
     private static Task<NativeResponse?> HandleMessageAsync(NativeContext context) =>
@@ -37,6 +92,7 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
             "scripts.save" => SaveAsync(context),
             "scripts.create" => CreateAsync(context),
             "scripts.delete" => DeleteAsync(context),
+            "scripts.rename" => RenameAsync(context),
             "scripts.import" => ImportAsync(context),
             "scripts.download" => DownloadAsync(context),
             "scripts.open" => Task.FromResult(Open(context)),
@@ -96,6 +152,18 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
 
         return Result(context, "scripts.delete.result",
             await ScriptEngine.Instance.DeleteAsync(name) ? null : "error.scriptMissing");
+    }
+
+    private static async Task<NativeResponse?> RenameAsync(NativeContext context)
+    {
+        var payload = context.Payload<ScriptRenameRequest>();
+        if (payload?.Name is not { Length: > 0 } name || payload.NewName is not { Length: > 0 } newName)
+            return context.Fail("scripts.rename.result", "error.invalidScript");
+
+        var target = newName.EndsWith(".lua", StringComparison.OrdinalIgnoreCase) ? newName : $"{newName}.lua";
+
+        return Result(context, "scripts.rename.result",
+            await ScriptEngine.Instance.RenameAsync(name, target));
     }
 
     private static async Task<NativeResponse?> ImportAsync(NativeContext context)

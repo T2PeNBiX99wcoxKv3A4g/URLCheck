@@ -18,6 +18,7 @@ import TrashSvg from "./icons/trash.svg?react";
 import PlaySvg from "./icons/play.svg?react";
 import SendSvg from "./icons/send.svg?react";
 import CodeSvg from "./icons/code.svg?react";
+import EditSvg from "./icons/edit.svg?react";
 import ExternalLinkSvg from "./icons/external-link.svg?react";
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
@@ -53,3 +54,4 @@ export const TrashIcon = sized(TrashSvg);
 export const PlayIcon = sized(PlaySvg);
 export const SendIcon = sized(SendSvg);
 export const ExternalLinkIcon = sized(ExternalLinkSvg);
+export const EditIcon = sized(EditSvg);

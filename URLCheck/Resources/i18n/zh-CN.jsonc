@@ -242,6 +242,8 @@
   "scripts.test": "测试",
   "scripts.testPlaceholder": "https://example.com/?utm_source=test",
   "scripts.testFinalUrl": "最终 URL",
+  "scripts.rename": "重命名",
+  "scripts.fileGone": "文件已不存在，保存会重新创建。",
   "scripts.openExternal": "用默认应用打开",
   "error.scriptExists": "同名脚本已存在。",
   "error.scriptMissing": "找不到该脚本。",

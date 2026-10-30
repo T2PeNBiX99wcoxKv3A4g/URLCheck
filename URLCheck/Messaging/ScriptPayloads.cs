@@ -21,6 +21,9 @@ internal sealed record ScriptSaveRequest(string? Name, string? Content);
 /// <summary>Payload for <c>scripts.download</c>: where the script comes from.</summary>
 internal sealed record ScriptDownloadRequest(string? Url);
 
+/// <summary>Payload for <c>scripts.rename</c>: the script's current name and the new one.</summary>
+internal sealed record ScriptRenameRequest(string? Name, string? NewName);
+
 /// <summary>Payload for <c>scripts.test</c>: the script to run, the URL to try it on, and the source to use.</summary>
 internal sealed record ScriptTestRequest(string? Name, string? Url, string? Content);
 

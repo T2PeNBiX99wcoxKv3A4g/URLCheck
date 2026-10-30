@@ -218,6 +218,38 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         return deleted;
     }
 
+    /// <summary>
+    ///     Renames a script on disk; returns an error when the old one is gone or the new name is
+    ///     taken. A rename that only changes the case is left alone, because Windows treats the two
+    ///     paths as the same file.
+    /// </summary>
+    public async Task<string?> RenameAsync(string name, string newName)
+    {
+        var from = PathFor(name);
+        var to = PathFor(newName);
+
+        if (string.Equals(from, to, StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        if (!File.Exists(from))
+            return "error.scriptMissing";
+
+        if (File.Exists(to))
+            return "error.scriptExists";
+
+        var moved = Try.Run(() =>
+        {
+            File.Move(from, to);
+            return true;
+        });
+
+        if (moved.Exception is { } exception)
+            return exception.Message;
+
+        await ReloadAsync();
+        return null;
+    }
+
     /// <summary>Copies a script from somewhere else on disk, after checking that it parses.</summary>
     public async Task<string?> ImportAsync(string source)
     {
@@ -273,7 +305,8 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         }
     }
 
-    private async Task ReloadAsync()
+    /// <summary>Drops the compiled scripts and reads the folder again; used when it changes on disk.</summary>
+    public async Task ReloadAsync()
     {
         await _gate.WaitAsync();
 

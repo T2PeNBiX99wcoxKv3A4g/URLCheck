@@ -250,6 +250,8 @@
   "scripts.test": "Test",
   "scripts.testPlaceholder": "https://example.com/?utm_source=test",
   "scripts.testFinalUrl": "Final URL",
+  "scripts.rename": "Rename",
+  "scripts.fileGone": "The file is gone; saving recreates it.",
   "scripts.openExternal": "Open with the default app",
   "error.scriptExists": "A script with that name already exists.",
   "error.scriptMissing": "That script is gone.",
