@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.0.0..v1.0.1) - 2026-10-30
+
+### ⚙️ Miscellaneous Tasks
+
+- Update ui - ([54bef0c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/54bef0cbeecced61d378dd76602fc8de1a7e0097))
+- Conditionally include `PhotinoNetUtils.Hosting` in non-debug builds - ([984f14b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/984f14b06f21161ff317f33f70273f810ce853b4))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([2fc81c4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2fc81c4db36d0ff4387da319a0fb96d122e72dd1))
+
+
 ## [1.0.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v0.15.1..v1.0.0) - 2026-10-30
 
 ### **refactor
