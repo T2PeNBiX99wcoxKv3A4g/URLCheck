@@ -9,6 +9,7 @@ on:
       - "maven"
     paths-ignore:
       - "README.md"
+      - "README.*.md"
       - "Lua/**"
       - "Site/**"
       - ".gitignore"

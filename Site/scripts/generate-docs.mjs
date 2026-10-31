@@ -32,10 +32,11 @@ const pages = [
 
 const known = new Set(pages.map((page) => page.slug));
 
-/** Wiki links point at page names; on the site they become hash routes. */
+/** Wiki links point at page names; on the site they become hash routes. A translated page links to
+ * `Lua-Scripts.ja` in the wiki, which is the same page on the site. */
 function rewriteLinks(body) {
     return body.replace(/\]\(([^)\s]+)\)/g, (match, target) => {
-        const page = target.split("#")[0];
+        const page = target.split("#")[0].replace(/\.(?:ja|zh-CN|zh-TW)$/, "");
         return known.has(page) ? `](#/docs/${page})` : match;
     });
 }
