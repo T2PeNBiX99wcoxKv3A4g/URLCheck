@@ -14,6 +14,6 @@ Install any of these from the scripts page with one click:
 | `amazon-remove-tracking.lua`   | Removes Amazon's `pf_rd_*`, `ref` and `ref_` parameters.                                              |
 | `old-reddit.lua`               | Opens Reddit on the old interface (`old.reddit.com`).                                                 |
 | `remove-empty-params.lua`      | Drops query parameters that have an empty value.                                                      |
-| `skip-redirects.lua`           | Jumps straight to the destination hidden in a redirect link (`?q=`, `?url=`, `?u=`, `?uddg=` …).       |
+| `skip-redirects.lua`           | Jumps straight to the destination hidden in a redirect link (`?q=`, `?url=`, `?u=`, `?uddg=` …).      |
 
 The page is generated from this folder, so it always lists the current files.

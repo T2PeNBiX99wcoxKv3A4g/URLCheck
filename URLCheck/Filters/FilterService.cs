@@ -36,16 +36,17 @@ internal sealed class FilterService : Singleton<FilterService>
     private readonly string _directory;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly string _manifestPath;
-    private CompiledRules? _compiledRules;
-
-    private List<RemoveParamRule>? _effectiveRules;
-    private List<FilterListEntry>? _lists;
 
     /// <summary>The running background refresh, or null when the settings have it off.</summary>
     private CancellationTokenSource? _autoUpdate;
 
     /// <summary>The settings the running refresh was started from, so unrelated saves leave it alone.</summary>
     private string? _autoUpdateKey;
+
+    private CompiledRules? _compiledRules;
+
+    private List<RemoveParamRule>? _effectiveRules;
+    private List<FilterListEntry>? _lists;
 
     public FilterService()
     {

@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
 using PhotinoNetUtils.Utils;
-using Serilog;
 
 namespace URLCheck.Platform;
 
@@ -98,19 +97,6 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
     /// </summary>
     public void EnsureCustomScheme() => RepointIfStale(CustomScheme);
 
-    /// <summary>Rewrites the handler of one scheme when it points at another build.</summary>
-    private void RepointIfStale(string scheme)
-    {
-        using var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{scheme}\shell\open\command");
-        if (key?.GetValue(null) is not string command ||
-            command.Trim().Equals(_command, StringComparison.OrdinalIgnoreCase))
-            return;
-
-        Log.Information("Repointing the {Scheme}:// handler to {Path}", scheme, ExecutablePath);
-        EnsureExecutable();
-        RegisterProgId(scheme, "URL:URLCheck Protocol");
-    }
-
     /// <summary>Removes every registry key this app created, so nothing is left behind after uninstalling.</summary>
     public void Unregister()
     {
@@ -143,6 +129,19 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
     {
         using var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{CustomScheme}\shell\open\command");
         return key?.GetValue(null) is string command && command.Length > 0;
+    }
+
+    /// <summary>Rewrites the handler of one scheme when it points at another build.</summary>
+    private void RepointIfStale(string scheme)
+    {
+        using var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{scheme}\shell\open\command");
+        if (key?.GetValue(null) is not string command ||
+            command.Trim().Equals(_command, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        Log.Information("Repointing the {Scheme}:// handler to {Path}", scheme, ExecutablePath);
+        EnsureExecutable();
+        RegisterProgId(scheme, "URL:URLCheck Protocol");
     }
 
     private static void DeleteKey(string path) =>

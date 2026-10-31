@@ -9,7 +9,10 @@ internal interface IProtocolRegistrar
     /// <summary>The executable the registered handlers currently point at, or null when unregistered.</summary>
     string? RegisteredExecutablePath { get; }
 
-    /// <summary>Makes URLCheck an http/https handler (and, where possible, the default one), together with the <c>checkurl://</c> scheme.</summary>
+    /// <summary>
+    ///     Makes URLCheck an http/https handler (and, where possible, the default one), together with the
+    ///     <c>checkurl://</c> scheme.
+    /// </summary>
     void RegisterBrowser();
 
     /// <summary>
