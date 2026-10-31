@@ -39,7 +39,7 @@ URLCheck 會將自己註冊為連結處理程式，因此點擊 `http`/`https` �
 - **清理 URL** — 編輯或移除任何查詢參數、清除 fragment、捨棄整份參數清單，
   或一鍵移除常見的追蹤參數。
 - **以腳本處理** — Lua 腳本可以在每個 URL 開啟前改寫它；範例與一鍵安裝請見
-  [Lua/README.md](Lua/README.md)。
+  [腳本頁面](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#%2Fscripts)。
 - **信任前先檢查** — 查詢 URL 的 HTTP 狀態（會跟隨重新導向），或逐跳檢視重新導向，
   看看短網址會導向何處。
 - **在想要的地方開啟** — 每個連結都能選擇瀏覽器，並可選擇以私密／無痕視窗開啟。

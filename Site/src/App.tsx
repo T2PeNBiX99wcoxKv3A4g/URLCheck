@@ -125,6 +125,15 @@ const Footer = styled.footer`
     text-align: center;
 `;
 
+/** `#/scripts` and `#%2Fscripts` both mean the same page; a stray encoding must not break the route. */
+function decodeHash(value: string) {
+    try {
+        return decodeURIComponent(value);
+    } catch {
+        return value;
+    }
+}
+
 /** `#/section/page` — the site is static, so the hash keeps deep links working on Pages. */
 function useRoute() {
     const [hash, setHash] = useState(() => window.location.hash);
@@ -135,7 +144,7 @@ function useRoute() {
         return () => window.removeEventListener("hashchange", update);
     }, []);
 
-    const path = hash.replace(/^#\/?/, "");
+    const path = decodeHash(hash.replace(/^#\/?/, "")).replace(/^\/+/, "");
     const [section, ...rest] = path.split("/");
 
     return {section: section || "home", page: rest.join("/")};

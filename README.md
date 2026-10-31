@@ -39,8 +39,8 @@ desktop version.
   other windows, showing the URL broken into scheme, host, parameters, and fragment.
 - **Clean the URL** — edit or remove any query parameter, clear the fragment, drop the whole
   parameter list, or strip well-known tracking parameters in one click.
-- **Script it** — Lua scripts can rewrite every URL before it opens; see
-  [Lua/README.md](Lua/README.md) for the examples and one-click installs.
+- **Script it** — Lua scripts can rewrite every URL before it opens; see the
+  [scripts page](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#%2Fscripts) for the examples and one-click installs.
 - **Check before trusting** — ask for the HTTP status of the URL (following redirects), or step
   through redirects one hop at a time to see where a shortener leads.
 - **Open where you want** — pick a browser per link, optionally in a private/incognito window.
