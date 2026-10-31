@@ -4,7 +4,7 @@
     "scripts": "脚本",
     "docs": "文档"
   },
-  "footer": "URLCheck 采用 MIT 许可证。文档就在本仓库中。",
+  "footer": "URLCheck 采用 MIT 许可证。",
   "home": {
     "tagline": "在浏览器打开之前，先看清楚这个链接。",
     "download": "下载",

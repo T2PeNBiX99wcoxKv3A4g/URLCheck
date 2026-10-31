@@ -4,7 +4,7 @@
     "scripts": "腳本",
     "docs": "文件"
   },
-  "footer": "URLCheck 採用 MIT 授權。文件就在本專案中。",
+  "footer": "URLCheck 採用 MIT 授權。",
   "home": {
     "tagline": "在瀏覽器開啟之前，先看清楚這個連結。",
     "download": "下載",

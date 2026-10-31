@@ -4,7 +4,7 @@
     "scripts": "Scripts",
     "docs": "Docs"
   },
-  "footer": "URLCheck is MIT licensed. The docs live in this repository.",
+  "footer": "URLCheck is under the MIT license.",
   "home": {
     "tagline": "Check the URL before it opens in your browser.",
     "download": "Download",
