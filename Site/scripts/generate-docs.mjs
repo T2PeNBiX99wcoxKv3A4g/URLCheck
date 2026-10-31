@@ -1,7 +1,7 @@
 // Builds src/docs.generated.ts from the markdown in Site/docs, in every language the app supports.
 //
-// The pages live next to the site: `<page>.md` is English, `<page>.<language>.md` is a translation.
-// A missing translation falls back to English.
+// Each language has its own folder (`docs/en`, `docs/ja`, ...) with the same page names, so a page is
+// `docs/<language>/<page>.md`. A missing translation falls back to English.
 import {existsSync} from "node:fs";
 import {readFile, writeFile} from "node:fs/promises";
 import path from "node:path";
@@ -29,11 +29,10 @@ const pages = [
 
 const known = new Set(pages.map((page) => page.slug));
 
-/** Links point at page names; on the site they become hash routes. A translated page links to
- * `Lua-Scripts.ja`, which is the same page on the site. */
+/** Links point at page names; on the site they become hash routes. */
 function rewriteLinks(body) {
     return body.replace(/\]\(([^)\s]+)\)/g, (match, target) => {
-        const page = target.split("#")[0].replace(/\.(?:ja|zh-CN|zh-TW)$/, "");
+        const page = target.split("#")[0];
         return known.has(page) ? `](#/docs/${page})` : match;
     });
 }
@@ -45,8 +44,8 @@ function titleOf(body, fallback) {
 }
 
 async function read(slug, language) {
-    const translated = path.join(docsDirectory, `${slug}.${language}.md`);
-    const file = language === "en" || !existsSync(translated) ? path.join(docsDirectory, `${slug}.md`) : translated;
+    const translated = path.join(docsDirectory, language, `${slug}.md`);
+    const file = language === "en" || !existsSync(translated) ? path.join(docsDirectory, "en", `${slug}.md`) : translated;
 
     return await readFile(file, "utf8");
 }

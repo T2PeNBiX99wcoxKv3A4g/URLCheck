@@ -5,15 +5,15 @@ URLCheck は **Lua 5.2** を実行します。このセクションでは、サ�
 
 | ページ                 | 内容                                                             |
 |------------------------|------------------------------------------------------------------|
-| [_G](_G.ja)               | 基本ライブラリ: `assert`、`pairs`、`pcall`、`type`、`print` など  |
-| [table](table.ja)         | `table.concat`、`table.insert`、`table.sort` など                |
-| [string](string.ja)       | `string.find`、`string.gsub`、`string.format`、Lua パターンなど  |
-| [math](math.ja)           | `math.floor`、`math.random`、三角関数など                        |
-| [coroutine](coroutine.ja) | `coroutine.create`、`coroutine.wrap` など                        |
-| [bit32](bit32.ja)         | 32 ビットのビット演算（Lua 5.2 にはビット演算子がありません）。   |
+| [_G](_G)               | 基本ライブラリ: `assert`、`pairs`、`pcall`、`type`、`print` など  |
+| [table](table)         | `table.concat`、`table.insert`、`table.sort` など                |
+| [string](string)       | `string.find`、`string.gsub`、`string.format`、Lua パターンなど  |
+| [math](math)           | `math.floor`、`math.random`、三角関数など                        |
+| [coroutine](coroutine) | `coroutine.create`、`coroutine.wrap` など                        |
+| [bit32](bit32)         | 32 ビットのビット演算（Lua 5.2 にはビット演算子がありません）。   |
 
-リファレンス ページ [Lua スクリプト](Lua-Scripts.ja) では、スクリプトの構成、`u` テーブルの内容、
-URL エンコーディングの仕組みを説明しています。[Lua スクリプトの例](Lua-Script-Examples.ja) には、
+リファレンス ページ [Lua スクリプト](Lua-Scripts) では、スクリプトの構成、`u` テーブルの内容、
+URL エンコーディングの仕組みを説明しています。[Lua スクリプトの例](Lua-Script-Examples) には、
 コピーして使える完全なスクリプトがあります。
 
 ## 利用できないもの
@@ -30,13 +30,13 @@ URL エンコーディングの仕組みを説明しています。[Lua スク�
 インタープリターは Lua 5.2 であるため、いくつかの新しい機能は存在しません。
 
 - `//` による整数除算はありません。`math.floor(a / b)` を使ってください。
-- ビット演算子（`&`、`|`、`~`、`<<`、`>>`）はありません。[bit32](bit32.ja) の関数を使ってください。
+- ビット演算子（`&`、`|`、`~`、`<<`、`>>`）はありません。[bit32](bit32) の関数を使ってください。
 - `utf8` ライブラリも整数サブタイプもありません。すべての数値は double です。
 - `goto` とラベルは **利用できます**。
 - `#`（長さ）、`..`（連結）、`and`/`or`/`not`、`==`/`~=`、および通常の制御フローは期待どおりに
   動作します。
 - 文字列は少し拡張されています。`s[i]` は 1 文字を読み取り、`s + t` は `..` と同様に連結します。
-  [string](string.ja) を参照してください。
+  [string](string) を参照してください。
 
-すべては [Lua スクリプト](Lua-Scripts.ja) で説明されているサンドボックス内で実行されます。ファイルや
+すべては [Lua スクリプト](Lua-Scripts) で説明されているサンドボックス内で実行されます。ファイルや
 ネットワークへのアクセスはなく、各スクリプトは URL ごとに 2 秒の制限があります。

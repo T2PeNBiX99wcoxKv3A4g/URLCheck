@@ -2,7 +2,7 @@
 
 每個範例都是完整的腳本檔：將它存成 `scripts` 資料夾中的 `something.lua`（腳本頁面會顯示
 該資料夾在哪），它就會從下一個 URL 開始運作。API 參考請見
-[Lua 腳本](Lua-Scripts.zh-TW)。
+[Lua 腳本](Lua-Scripts)。
 
 腳本依檔案名稱順序執行，因此用數字前綴是控制順序的簡單方法（`01-strip-tracking.lua`、
 `02-force-https.lua`、…）。

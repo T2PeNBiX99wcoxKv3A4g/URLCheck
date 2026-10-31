@@ -3,7 +3,7 @@
 URLCheck 可以对进入的每个 URL 运行小型 Lua 脚本。脚本可以检查 URL、修改它，然后交回 —— 这一切都发生在
 检查弹窗打开之前、任何内容到达浏览器之前。
 
-本页说明脚本如何工作。沙盒提供的所有函数见 [API 参考](API.zh-CN)。现成的脚本见 [Lua 脚本示例](Lua-Script-Examples.zh-CN)。
+本页说明脚本如何工作。沙盒提供的所有函数见 [API 参考](API)。现成的脚本见 [Lua 脚本示例](Lua-Script-Examples)。
 
 ## 脚本存放位置
 
@@ -186,8 +186,8 @@ end
 
 脚本运行在一个只能处理文本和数字的沙盒中，别无其他：
 
-- **可用：** 基础库（[_G](_G.zh-CN)）、[string](string.zh-CN)、[table](table.zh-CN)、[math](math.zh-CN)、
-  [bit32](bit32.zh-CN) 和 [coroutine](coroutine.zh-CN)。
+- **可用：** 基础库（[_G](_G)）、[string](string)、[table](table)、[math](math)、
+  [bit32](bit32) 和 [coroutine](coroutine)。
 - **不可用：** `io`、`os`、`debug`、`package`、`require`、`dofile` 和 `loadfile`。脚本
   无法读取文件、访问网络或启动程序。
 - 每个脚本处理一个 URL 有 **2 秒**。运行更久的脚本会被停止并按

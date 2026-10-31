@@ -1,13 +1,13 @@
-# Lua 脚本示例
+# Lua スクリプトの例
 
-每个示例都是一个完整的脚本文件：把它保存为 `scripts` 文件夹中的 `something.lua`（
-脚本页面会显示该文件夹的位置），它就会对下一个 URL 生效。API 参考见
-[Lua 脚本](Lua-Scripts.zh-CN)。
+どの例も完全なスクリプト ファイルです。`scripts` フォルダー（場所は Scripts ページに表示されます）に
+`something.lua` として保存すれば、次の URL から動作します。API リファレンスについては
+[Lua スクリプト](Lua-Scripts) を参照してください。
 
-脚本按文件名顺序运行，因此用数字前缀是控制顺序的简便方法（`01-strip-tracking.lua`、
-`02-force-https.lua` 等）。
+スクリプトはファイル名順に実行されるため、数値の接頭辞を付けるのが順序を制御する簡単な方法です
+（`01-strip-tracking.lua`、`02-force-https.lua` など）。
 
-## 剥离跟踪参数
+## トラッキング パラメーターを削除する
 
 ```lua
 local tracking = {
@@ -24,7 +24,7 @@ return function(u)
 end
 ```
 
-## 丢弃某个站点的整个查询
+## サイトのクエリ全体を削除する
 
 ```lua
 return function(u)
@@ -36,7 +36,7 @@ return function(u)
 end
 ```
 
-## 强制使用 HTTPS
+## HTTPS を強制する
 
 ```lua
 return function(u)
@@ -46,7 +46,7 @@ return function(u)
 end
 ```
 
-## 重写主机
+## ホストを書き換える
 
 ```lua
 return function(u)
@@ -58,7 +58,7 @@ return function(u)
 end
 ```
 
-## 只保留少数参数
+## 一部のパラメーターだけを残す
 
 ```lua
 local keep = { id = true, q = true }
@@ -74,7 +74,7 @@ return function(u)
 end
 ```
 
-## 添加一个参数
+## パラメーターを追加する
 
 ```lua
 return function(u)
@@ -84,7 +84,7 @@ return function(u)
 end
 ```
 
-## 移除值为空的参数
+## 空のパラメーターを削除する
 
 ```lua
 return function(u)
@@ -98,7 +98,7 @@ return function(u)
 end
 ```
 
-## 限制数值参数的范围
+## 数値パラメーターを制限する
 
 ```lua
 return function(u)
@@ -112,10 +112,10 @@ return function(u)
 end
 ```
 
-## 完全替换 URL
+## URL を完全に置き換える
 
-返回字符串会替换 URL。该字符串会为你转义，但其结构（`/`、`?`、
-`&` 等）会按原样保留。
+文字列を返すと URL が置き換えられます。文字列は自動的にエスケープされますが、その構造
+（`/`、`?`、`&` など）は書いたとおりに保持されます。
 
 ```lua
 return function(u)
@@ -127,10 +127,10 @@ return function(u)
 end
 ```
 
-## 查看脚本收到什么
+## スクリプトが受け取る内容を確認する
 
-脚本页面有一个测试框，因此这个示例很容易尝试，而且不会打开任何东西。它打印的所有内容
-都会出现在 Lua 日志中。
+Scripts ページにはテスト ボックスがあるため、何も開かずにこれを簡単に試せます。出力したものは
+すべて Lua ログに表示されます。
 
 ```lua
 return function(u)
@@ -144,9 +144,9 @@ return function(u)
 end
 ```
 
-## 组合多个步骤
+## 複数の手順を組み合わせる
 
-一个脚本可以做任意多的事，这往往比多个文件更简单：
+1 つのスクリプトで好きなだけ処理を行えます。多くの場合、複数のファイルに分けるより簡単です。
 
 ```lua
 local tracking = { "utm_source", "utm_medium", "utm_campaign", "fbclid", "gclid" }
