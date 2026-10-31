@@ -1,5 +1,7 @@
 # スクリプト
 
+[English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
+
 スクリプト ページから、どれでもワンクリックでインストールできます。
 
 **[スクリプト ページを開く](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#/scripts)**

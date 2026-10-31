@@ -1,5 +1,7 @@
 # 脚本
 
+[English](README.md) · [日本語](README.ja.md) · [繁體中文](README.zh-TW.md)
+
 在脚本页面一键安装其中任意一个：
 
 **[打开脚本页面](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#/scripts)**

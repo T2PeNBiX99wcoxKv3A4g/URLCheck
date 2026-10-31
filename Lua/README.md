@@ -1,5 +1,7 @@
 # Scripts
 
+[日本語](README.ja.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
+
 Install any of these from the scripts page with one click:
 
 **[Open the scripts page](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#/scripts)**
