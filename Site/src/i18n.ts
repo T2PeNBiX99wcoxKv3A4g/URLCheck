@@ -52,7 +52,7 @@ export interface Copy {
 export const COPY: Record<Language, Copy> = {
     en: {
         nav: {home: "Home", scripts: "Scripts", docs: "Docs"},
-        footer: "URLCheck is MIT licensed. The docs are generated from the project wiki.",
+        footer: "URLCheck is MIT licensed. The docs live in this repository.",
         home: {
             tagline: "Check the URL before it opens in your browser.",
             download: "Download",
@@ -127,7 +127,7 @@ export const COPY: Record<Language, Copy> = {
 
     ja: {
         nav: {home: "ホーム", scripts: "スクリプト", docs: "ドキュメント"},
-        footer: "URLCheck は MIT ライセンスです。ドキュメントはプロジェクトの Wiki から生成されています。",
+        footer: "URLCheck は MIT ライセンスです。ドキュメントはこのリポジトリに含まれています。",
         home: {
             tagline: "ブラウザで開く前に、URL を確認できます。",
             download: "ダウンロード",
@@ -202,7 +202,7 @@ export const COPY: Record<Language, Copy> = {
 
     "zh-CN": {
         nav: {home: "首页", scripts: "脚本", docs: "文档"},
-        footer: "URLCheck 采用 MIT 许可证。文档由项目 Wiki 生成。",
+        footer: "URLCheck 采用 MIT 许可证。文档就在本仓库中。",
         home: {
             tagline: "在浏览器打开之前，先看清楚这个链接。",
             download: "下载",
@@ -259,7 +259,7 @@ export const COPY: Record<Language, Copy> = {
 
     "zh-TW": {
         nav: {home: "首頁", scripts: "腳本", docs: "文件"},
-        footer: "URLCheck 採用 MIT 授權。文件由專案 Wiki 產生。",
+        footer: "URLCheck 採用 MIT 授權。文件就在本專案中。",
         home: {
             tagline: "在瀏覽器開啟之前，先看清楚這個連結。",
             download: "下載",
