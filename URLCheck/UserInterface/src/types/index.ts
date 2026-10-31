@@ -32,8 +32,8 @@ export interface AppSettings {
     forwardPort: number;
     /** Check the installed filter lists on startup and keep refreshing them while the app runs. */
     filterAutoUpdate: boolean;
-    /** Hours between automatic filter list refreshes; -1 turns the timer off (startup check only). */
-    filterAutoUpdateHours: number;
+    /** Minutes between automatic filter list refreshes; -1 turns the timer off (startup check only). */
+    filterAutoUpdateMinutes: number;
     /** Paired devices URLs can be forwarded to; the popup hides its button while this is empty. */
     devices: DeviceEntry[];
 }

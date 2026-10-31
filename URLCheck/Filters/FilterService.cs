@@ -191,13 +191,13 @@ internal sealed class FilterService : Singleton<FilterService>
 
     /// <summary>
     ///     Starts, restarts or stops the background refresh the settings ask for: one check at startup
-    ///     whenever auto-update is on, then one every <see cref="AppSettings.FilterAutoUpdateHours" />
-    ///     hours while that is positive. <c>-1</c> keeps the startup check and drops the timer.
+    ///     whenever auto-update is on, then one every <see cref="AppSettings.FilterAutoUpdateMinutes" />
+    ///     minutes while that is positive. <c>-1</c> keeps the startup check and drops the timer.
     /// </summary>
     public void ApplyAutoUpdate(AppSettings? settings)
     {
         // Saving any other setting must not restart the timer and fire a refresh.
-        var key = settings is { FilterAutoUpdate: true } ? settings.FilterAutoUpdateHours.ToString() : null;
+        var key = settings is { FilterAutoUpdate: true } ? settings.FilterAutoUpdateMinutes.ToString() : null;
         if (key == _autoUpdateKey)
             return;
 
@@ -212,17 +212,17 @@ internal sealed class FilterService : Singleton<FilterService>
 
         var source = new CancellationTokenSource();
         _autoUpdate = source;
-        _ = RunAutoUpdateAsync(settings!.FilterAutoUpdateHours, source.Token);
+        _ = RunAutoUpdateAsync(settings!.FilterAutoUpdateMinutes, source.Token);
     }
 
-    private async Task RunAutoUpdateAsync(int hours, CancellationToken token)
+    private async Task RunAutoUpdateAsync(int minutes, CancellationToken token)
     {
         await UpdateAllAsync(token);
 
-        if (hours < 1)
+        if (minutes < 1)
             return;
 
-        using var timer = new PeriodicTimer(TimeSpan.FromHours(hours));
+        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(minutes));
 
         try
         {

@@ -895,7 +895,7 @@ export const SettingsPage: React.FC = () => {
     const [builtinRuleCount, setBuiltinRuleCount] = useState(0);
     const [filtersBusy, setFiltersBusy] = useState(false);
     /** The interval field while it is being typed in, so "-1" and an empty box survive a render. */
-    const [hoursDraft, setHoursDraft] = useState<string | null>(null);
+    const [minutesDraft, setMinutesDraft] = useState<string | null>(null);
     const [addOpen, setAddOpen] = useState(false);
     const [addTab, setAddTab] = useState<"catalog" | "custom">("catalog");
     const [newFilterName, setNewFilterName] = useState("");
@@ -1915,22 +1915,22 @@ export const SettingsPage: React.FC = () => {
                                 className="port"
                                 type="number"
                                 min={-1}
-                                max={168}
+                                max={10080}
                                 disabled={busy || !settings.filterAutoUpdate}
-                                value={hoursDraft ?? String(settings.filterAutoUpdateHours)}
+                                value={minutesDraft ?? String(settings.filterAutoUpdateMinutes)}
                                 onChange={(event) => {
                                     const raw = event.target.value;
-                                    setHoursDraft(raw);
+                                    setMinutesDraft(raw);
 
                                     const value = Number(raw);
                                     if (raw.trim().length > 0 && Number.isInteger(value))
-                                        update({filterAutoUpdateHours: value});
+                                        update({filterAutoUpdateMinutes: value});
                                 }}
-                                onBlur={() => setHoursDraft(null)}
+                                onBlur={() => setMinutesDraft(null)}
                             />
                         </SettingRow>
 
-                        {settings.filterAutoUpdate && settings.filterAutoUpdateHours === -1 && (
+                        {settings.filterAutoUpdate && settings.filterAutoUpdateMinutes === -1 && (
                             <InfoText>{t("settings.filterAutoUpdateTimerOff")}</InfoText>
                         )}
 

@@ -17,7 +17,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     forwardingEnabled: false,
     forwardPort: 45454,
     filterAutoUpdate: false,
-    filterAutoUpdateHours: 24,
+    filterAutoUpdateMinutes: 1440,
     devices: [],
 };
 
@@ -32,12 +32,12 @@ function clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
 }
 
-/** -1 turns the timed refresh off; anything else is clamped into a usable number of hours. */
-function normalizeFilterHours(hours: number | undefined): number {
-    if (hours === -1) return -1;
-    if (hours === undefined || !Number.isFinite(hours)) return DEFAULT_SETTINGS.filterAutoUpdateHours;
+/** -1 turns the timed refresh off; anything else is clamped into a usable number of minutes. */
+function normalizeFilterMinutes(minutes: number | undefined): number {
+    if (minutes === -1) return -1;
+    if (minutes === undefined || !Number.isFinite(minutes)) return DEFAULT_SETTINGS.filterAutoUpdateMinutes;
 
-    return clamp(hours, 1, 168);
+    return clamp(minutes, 1, 10080);
 }
 
 function normalize(settings: AppSettings): AppSettings {
@@ -71,7 +71,7 @@ function normalize(settings: AppSettings): AppSettings {
         forwardPort: settings.forwardPort ?? DEFAULT_SETTINGS.forwardPort,
         filterAutoUpdate: settings.filterAutoUpdate ?? DEFAULT_SETTINGS.filterAutoUpdate,
         // -1 is the "startup only" marker; every other value is a usable interval.
-        filterAutoUpdateHours: normalizeFilterHours(settings.filterAutoUpdateHours),
+        filterAutoUpdateMinutes: normalizeFilterMinutes(settings.filterAutoUpdateMinutes),
         devices: (Array.isArray(settings.devices) ? settings.devices : []).map((device) => ({
             ...device,
             host: device.host ?? "",

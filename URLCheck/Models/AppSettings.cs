@@ -17,11 +17,11 @@ internal sealed class AppSettings
     /// <summary>Port the device-forwarding listener uses unless the user picks another one.</summary>
     public const int DefaultForwardPort = 45_454;
 
-    /// <summary>Hours between filter list refreshes unless the user picks another interval.</summary>
-    public const int DefaultFilterAutoUpdateHours = 24;
+    /// <summary>Minutes between filter list refreshes unless the user picks another interval (one day).</summary>
+    public const int DefaultFilterAutoUpdateMinutes = 1_440;
 
-    /// <summary>Longest allowed refresh interval; anything longer is clamped to this.</summary>
-    public const int FilterAutoUpdateMaxHours = 168;
+    /// <summary>Longest allowed refresh interval; anything longer is clamped to this (one week).</summary>
+    public const int FilterAutoUpdateMaxMinutes = 10_080;
 
     /// <summary>Maximum milliseconds to wait for a single URL response.</summary>
     public int RequestTimeoutMs { get; set; } = 5_000;
@@ -87,15 +87,15 @@ internal sealed class AppSettings
 
     /// <summary>
     ///     Check the installed filter lists when URLCheck starts, and keep refreshing them while it runs.
-    ///     The timer part is controlled by <see cref="FilterAutoUpdateHours" />.
+    ///     The timer part is controlled by <see cref="FilterAutoUpdateMinutes" />.
     /// </summary>
     public bool FilterAutoUpdate { get; set; }
 
     /// <summary>
-    ///     Hours between automatic filter list refreshes. <c>-1</c> turns the timer off, so the lists are
+    ///     Minutes between automatic filter list refreshes. <c>-1</c> turns the timer off, so the lists are
     ///     only checked when the app starts; the startup check still follows <see cref="FilterAutoUpdate" />.
     /// </summary>
-    public int FilterAutoUpdateHours { get; set; } = DefaultFilterAutoUpdateHours;
+    public int FilterAutoUpdateMinutes { get; set; } = DefaultFilterAutoUpdateMinutes;
 
     /// <summary>Paired devices URLs can be forwarded to; the popup hides its button while this is empty.</summary>
     public List<DeviceEntry> Devices { get; set; } = [];
@@ -178,8 +178,8 @@ internal sealed class AppSettings
         ForwardPort = Math.Clamp(ForwardPort, 1_024, 65_535);
 
         // -1 means "startup only"; every other value is a usable interval.
-        if (FilterAutoUpdateHours != -1)
-            FilterAutoUpdateHours = Math.Clamp(FilterAutoUpdateHours, 1, FilterAutoUpdateMaxHours);
+        if (FilterAutoUpdateMinutes != -1)
+            FilterAutoUpdateMinutes = Math.Clamp(FilterAutoUpdateMinutes, 1, FilterAutoUpdateMaxMinutes);
 
         // Only the host is matched, so a pasted URL is reduced to its host here as well.
         AutoRedirectHosts ??= [];
