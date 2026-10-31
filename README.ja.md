@@ -2,6 +2,11 @@
   <img src="icon.svg" alt="" width="120">
   <h1>URLCheck</h1>
   <p><strong>ブラウザで開く前に URL を確認できます。</strong></p>
+  <p>
+    <a href="README.md">English</a> ·
+    <a href="README.zh-CN.md">简体中文</a> ·
+    <a href="README.zh-TW.md">繁體中文</a>
+  </p>
 </div>
 
 URLCheck は自分自身をリンクハンドラーとして登録するため、`http`/`https` のリンクをクリックすると

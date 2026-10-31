@@ -2,6 +2,11 @@
   <img src="icon.svg" alt="" width="120">
   <h1>URLCheck</h1>
   <p><strong>Check the URL before it opens in your browser.</strong></p>
+  <p>
+    <a href="README.ja.md">日本語</a> ·
+    <a href="README.zh-CN.md">简体中文</a> ·
+    <a href="README.zh-TW.md">繁體中文</a>
+  </p>
 </div>
 
 URLCheck registers itself as a link handler, so clicking an `http`/`https` link opens a small

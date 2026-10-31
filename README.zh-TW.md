@@ -2,6 +2,11 @@
   <img src="icon.svg" alt="" width="120">
   <h1>URLCheck</h1>
   <p><strong>在 URL 進入瀏覽器之前先檢查它。</strong></p>
+  <p>
+    <a href="README.md">English</a> ·
+    <a href="README.ja.md">日本語</a> ·
+    <a href="README.zh-CN.md">简体中文</a>
+  </p>
 </div>
 
 URLCheck 會將自己註冊為連結處理程式，因此點擊 `http`/`https` 連結時，會先開啟一個小小的
