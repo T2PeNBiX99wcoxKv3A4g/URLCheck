@@ -17,6 +17,12 @@ internal sealed class AppSettings
     /// <summary>Port the device-forwarding listener uses unless the user picks another one.</summary>
     public const int DefaultForwardPort = 45_454;
 
+    /// <summary>Hours between filter list refreshes unless the user picks another interval.</summary>
+    public const int DefaultFilterAutoUpdateHours = 24;
+
+    /// <summary>Longest allowed refresh interval; anything longer is clamped to this.</summary>
+    public const int FilterAutoUpdateMaxHours = 168;
+
     /// <summary>Maximum milliseconds to wait for a single URL response.</summary>
     public int RequestTimeoutMs { get; set; } = 5_000;
 
@@ -78,6 +84,18 @@ internal sealed class AppSettings
 
     /// <summary>Port this device listens on for pairing and incoming forwarded URLs.</summary>
     public int ForwardPort { get; set; } = DefaultForwardPort;
+
+    /// <summary>
+    ///     Check the installed filter lists when URLCheck starts, and keep refreshing them while it runs.
+    ///     The timer part is controlled by <see cref="FilterAutoUpdateHours" />.
+    /// </summary>
+    public bool FilterAutoUpdate { get; set; }
+
+    /// <summary>
+    ///     Hours between automatic filter list refreshes. <c>-1</c> turns the timer off, so the lists are
+    ///     only checked when the app starts; the startup check still follows <see cref="FilterAutoUpdate" />.
+    /// </summary>
+    public int FilterAutoUpdateHours { get; set; } = DefaultFilterAutoUpdateHours;
 
     /// <summary>Paired devices URLs can be forwarded to; the popup hides its button while this is empty.</summary>
     public List<DeviceEntry> Devices { get; set; } = [];
@@ -158,6 +176,10 @@ internal sealed class AppSettings
             DeviceName = Environment.MachineName;
 
         ForwardPort = Math.Clamp(ForwardPort, 1_024, 65_535);
+
+        // -1 means "startup only"; every other value is a usable interval.
+        if (FilterAutoUpdateHours != -1)
+            FilterAutoUpdateHours = Math.Clamp(FilterAutoUpdateHours, 1, FilterAutoUpdateMaxHours);
 
         // Only the host is matched, so a pasted URL is reduced to its host here as well.
         AutoRedirectHosts ??= [];

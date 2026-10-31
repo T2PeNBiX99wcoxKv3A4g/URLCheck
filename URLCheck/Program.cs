@@ -108,6 +108,9 @@ internal static class Program
             // Repairs a checkurl:// handler left pointing at an executable that no longer exists.
             ProtocolRegistrationService.Instance.EnsureCustomScheme();
 
+            // The settings decide whether the filter lists are refreshed now and on a timer.
+            FilterService.Instance.ApplyAutoUpdate(settings.Current);
+
             var manager = WindowManager.Instance;
             manager.AppUrl = appUrl;
             manager.ShowMainWindowOnStartup = showMainWindow;

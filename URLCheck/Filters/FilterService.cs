@@ -9,6 +9,7 @@ using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Utils;
 using URLCheck.Messaging;
 using URLCheck.Models;
+using URLCheck.Services;
 
 namespace URLCheck.Filters;
 
@@ -40,6 +41,12 @@ internal sealed class FilterService : Singleton<FilterService>
     private List<RemoveParamRule>? _effectiveRules;
     private List<FilterListEntry>? _lists;
 
+    /// <summary>The running background refresh, or null when the settings have it off.</summary>
+    private CancellationTokenSource? _autoUpdate;
+
+    /// <summary>The settings the running refresh was started from, so unrelated saves leave it alone.</summary>
+    private string? _autoUpdateKey;
+
     public FilterService()
     {
         _directory = Path.Combine(Constants.SettingsDirectory, "filters");
@@ -47,6 +54,9 @@ internal sealed class FilterService : Singleton<FilterService>
         _manifestPath = Path.Combine(_directory, "filters.json");
         _builtinRules = FilterParser.Parse(ReadBuiltin());
         NativeBridge.MessageReceived += HandleMessageAsync;
+
+        // Saving the settings can turn the timer on, off or move its interval.
+        SettingsService.Changed += payload => ApplyAutoUpdate(payload.Settings);
     }
 
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch
@@ -172,6 +182,95 @@ internal sealed class FilterService : Singleton<FilterService>
             InvalidateRules();
 
             return context.Reply("filters.update.result", new FilterListPayload(lists, _builtinRules.Count));
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    /// <summary>
+    ///     Starts, restarts or stops the background refresh the settings ask for: one check at startup
+    ///     whenever auto-update is on, then one every <see cref="AppSettings.FilterAutoUpdateHours" />
+    ///     hours while that is positive. <c>-1</c> keeps the startup check and drops the timer.
+    /// </summary>
+    public void ApplyAutoUpdate(AppSettings? settings)
+    {
+        // Saving any other setting must not restart the timer and fire a refresh.
+        var key = settings is { FilterAutoUpdate: true } ? settings.FilterAutoUpdateHours.ToString() : null;
+        if (key == _autoUpdateKey)
+            return;
+
+        _autoUpdateKey = key;
+
+        _autoUpdate?.Cancel();
+        _autoUpdate?.Dispose();
+        _autoUpdate = null;
+
+        if (key is null)
+            return;
+
+        var source = new CancellationTokenSource();
+        _autoUpdate = source;
+        _ = RunAutoUpdateAsync(settings!.FilterAutoUpdateHours, source.Token);
+    }
+
+    private async Task RunAutoUpdateAsync(int hours, CancellationToken token)
+    {
+        await UpdateAllAsync(token);
+
+        if (hours < 1)
+            return;
+
+        using var timer = new PeriodicTimer(TimeSpan.FromHours(hours));
+
+        try
+        {
+            while (await timer.WaitForNextTickAsync(token))
+                await UpdateAllAsync(token);
+        }
+        catch (OperationCanceledException)
+        {
+            // The settings changed, or the app is closing.
+        }
+    }
+
+    /// <summary>
+    ///     Re-downloads every list, keeping the cached copy when the server reports nothing new. Failures
+    ///     stay on the entry, so the settings page shows them the next time it is opened.
+    /// </summary>
+    private async Task UpdateAllAsync(CancellationToken token)
+    {
+        try
+        {
+            await _gate.WaitAsync(token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        try
+        {
+            var lists = await LoadListsAsync();
+            if (lists.Count == 0)
+                return;
+
+            foreach (var entry in lists)
+            {
+                if (token.IsCancellationRequested)
+                    return;
+
+                entry.Error = await DownloadAsync(entry);
+            }
+
+            await SaveListsAsync(lists);
+            InvalidateRules();
+            Log.Information("Refreshed {Count} filter list(s)", lists.Count);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to refresh the filter lists");
         }
         finally
         {

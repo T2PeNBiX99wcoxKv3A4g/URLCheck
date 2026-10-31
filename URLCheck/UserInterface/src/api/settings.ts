@@ -16,6 +16,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
     deviceId: "",
     forwardingEnabled: false,
     forwardPort: 45454,
+    filterAutoUpdate: false,
+    filterAutoUpdateHours: 24,
     devices: [],
 };
 
@@ -28,6 +30,14 @@ const STORAGE_KEY = "urlcheck.settings";
 
 function clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
+}
+
+/** -1 turns the timed refresh off; anything else is clamped into a usable number of hours. */
+function normalizeFilterHours(hours: number | undefined): number {
+    if (hours === -1) return -1;
+    if (hours === undefined || !Number.isFinite(hours)) return DEFAULT_SETTINGS.filterAutoUpdateHours;
+
+    return clamp(hours, 1, 168);
 }
 
 function normalize(settings: AppSettings): AppSettings {
@@ -59,6 +69,9 @@ function normalize(settings: AppSettings): AppSettings {
         deviceId: settings.deviceId ?? DEFAULT_SETTINGS.deviceId,
         forwardingEnabled: settings.forwardingEnabled ?? DEFAULT_SETTINGS.forwardingEnabled,
         forwardPort: settings.forwardPort ?? DEFAULT_SETTINGS.forwardPort,
+        filterAutoUpdate: settings.filterAutoUpdate ?? DEFAULT_SETTINGS.filterAutoUpdate,
+        // -1 is the "startup only" marker; every other value is a usable interval.
+        filterAutoUpdateHours: normalizeFilterHours(settings.filterAutoUpdateHours),
         devices: (Array.isArray(settings.devices) ? settings.devices : []).map((device) => ({
             ...device,
             host: device.host ?? "",

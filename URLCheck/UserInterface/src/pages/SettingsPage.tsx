@@ -894,6 +894,8 @@ export const SettingsPage: React.FC = () => {
     const [filterLists, setFilterLists] = useState<FilterListEntry[]>([]);
     const [builtinRuleCount, setBuiltinRuleCount] = useState(0);
     const [filtersBusy, setFiltersBusy] = useState(false);
+    /** The interval field while it is being typed in, so "-1" and an empty box survive a render. */
+    const [hoursDraft, setHoursDraft] = useState<string | null>(null);
     const [addOpen, setAddOpen] = useState(false);
     const [addTab, setAddTab] = useState<"catalog" | "custom">("catalog");
     const [newFilterName, setNewFilterName] = useState("");
@@ -1889,6 +1891,48 @@ export const SettingsPage: React.FC = () => {
                                 {t("settings.filterListsDescription", {count: builtinRuleCount})}
                             </SettingDescription>
                         </SettingInfo>
+
+                        <SettingRow>
+                            <SettingInfo>
+                                <SettingLabel>{t("settings.filterAutoUpdate")}</SettingLabel>
+                                <SettingDescription>{t("settings.filterAutoUpdateDescription")}</SettingDescription>
+                            </SettingInfo>
+                            <Checkbox
+                                disabled={busy}
+                                checked={settings.filterAutoUpdate}
+                                onChange={(event) => update({filterAutoUpdate: event.target.checked})}
+                            />
+                        </SettingRow>
+
+                        <SettingRow>
+                            <SettingInfo>
+                                <SettingLabel>{t("settings.filterAutoUpdateInterval")}</SettingLabel>
+                                <SettingDescription>
+                                    {t("settings.filterAutoUpdateIntervalDescription")}
+                                </SettingDescription>
+                            </SettingInfo>
+                            <ListInput
+                                className="port"
+                                type="number"
+                                min={-1}
+                                max={168}
+                                disabled={busy || !settings.filterAutoUpdate}
+                                value={hoursDraft ?? String(settings.filterAutoUpdateHours)}
+                                onChange={(event) => {
+                                    const raw = event.target.value;
+                                    setHoursDraft(raw);
+
+                                    const value = Number(raw);
+                                    if (raw.trim().length > 0 && Number.isInteger(value))
+                                        update({filterAutoUpdateHours: value});
+                                }}
+                                onBlur={() => setHoursDraft(null)}
+                            />
+                        </SettingRow>
+
+                        {settings.filterAutoUpdate && settings.filterAutoUpdateHours === -1 && (
+                            <InfoText>{t("settings.filterAutoUpdateTimerOff")}</InfoText>
+                        )}
 
                         {filterLists.length === 0 ? (
                             <InfoText>{t("settings.filterListsEmpty")}</InfoText>
