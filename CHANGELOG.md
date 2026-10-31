@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.6.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.5.0..v1.6.0) - 2026-10-31
+
+### ⛰️  Features
+
+- *(lua)* Add a script that skips redirect links - ([d3961b1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d3961b1d0ceb1bc9ddd6f4368f29f82e34be3133))
+- *(site)* Translate the site and the docs into Japanese and Chinese - ([1fd7abf](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1fd7abff41d384de0ff919faee63aae3470b5f9e))
+- Use minutes for the filter auto-update interval - ([36ccc57](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/36ccc5706eb88884efa33e722c7650707316639a))
+- Auto-update the filter lists - ([dbfc82e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/dbfc82e8dca99d98563024987fb27ac9cfc2fef8))
+
+### 🚜 Refactor
+
+- Reorder and align fields, methods, and comments for consistency - ([096f1d0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/096f1d0960b45e409039fab240ae866fb6a9cb80))
+
+### ⚙️ Miscellaneous Tasks
+
+- Ignore translated readmes in the release workflows - ([0720243](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0720243b580388e2f4b4c82f703918a22f48b08c))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([e86f74a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e86f74ab5b9c45f5b2d56763568f0dd8710c2773))
+
+
 ## [1.5.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.4.1..v1.5.0) - 2026-10-30
 
 ### ⛰️  Features
