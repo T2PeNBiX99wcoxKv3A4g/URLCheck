@@ -1,0 +1,82 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "scripts": "スクリプト",
+    "docs": "ドキュメント"
+  },
+  "footer": "URLCheck は MIT ライセンスです。ドキュメントはこのリポジトリに含まれています。",
+  "home": {
+    "tagline": "ブラウザで開く前に、URL を確認できます。",
+    "download": "ダウンロード",
+    "installScript": "スクリプトを追加",
+    "documentation": "ドキュメント",
+    "mainWindow": "メイン ウィンドウ",
+    "mainWindowAlt": "URLCheck のメイン ウィンドウ",
+    "whatTitle": "できること",
+    "whatText": "URLCheck はリンク ハンドラーとして登録されるので、http/https のリンクをクリックするとブラウザに直接渡す代わりに小さな確認ポップアップが開きます。リンクの本当の行き先を確かめ、追跡用のパラメーターを削除してから、好きなブラウザで開けます。",
+    "popupTitle": "ポップアップ",
+    "popupText": "クリックしたリンクは、ブラウザに届く前に必ずここを通ります。URL はドメイン、パラメーター、フラグメントに分解され、安全でないリンクや既知の追跡パラメーターには印が付きます。最後に開くブラウザは下部のボタンで選べます。",
+    "popupCaption": "http://www.google.com/?foo=bar#tag を確認中",
+    "popupAlt": "安全でないリンクに対する URLCheck のポップアップ",
+    "featuresTitle": "機能",
+    "features": [
+      {
+        "name": "リンクを横取り",
+        "text": "http/https の既定のハンドラーとして登録されるので、クリックしたリンクはすべてポップアップを通ります。常駐してトレイに残ります。"
+      },
+      {
+        "name": "開く前に確認",
+        "text": "枠なしのポップアップが、URL をスキーム、ホスト、パラメーター、フラグメントに分けて表示します。"
+      },
+      {
+        "name": "URL を整理",
+        "text": "クエリ パラメーターの編集・削除、フラグメントの消去、追跡パラメーターの削除をワンクリックで行えます。"
+      },
+      {
+        "name": "スクリプトで拡張",
+        "text": "Lua スクリプトは開く前の URL を書き換えられます。スクリプト ページから追加できます。"
+      },
+      {
+        "name": "別のデバイスへ転送",
+        "text": "同じローカル ネットワーク上の別の URLCheck へ URL を送れます。通信は端末間で暗号化されます。"
+      },
+      {
+        "name": "履歴",
+        "text": "横取りした URL はすべてローカルの SQLite に記録され、検索できます。"
+      }
+    ],
+    "installTitle": "インストール",
+    "installBefore": "自己完結したビルドです。.NET ランタイムを同梱しているので、ほかに何もインストールする必要はありません。Windows では WebView2 ランタイム、Linux では WebKitGTK と AppIndicator ライブラリも必要です（",
+    "readme": "README",
+    "installAfter": " を参照）。お使いのシステムを選ぶと最新リリースが開くので、対応するファイルをダウンロードしてください。",
+    "platforms": [
+      {
+        "name": "Windows",
+        "note": "x64 インストーラー（.msi）"
+      },
+      {
+        "name": "Fedora",
+        "note": "x86_64（.rpm）"
+      },
+      {
+        "name": "Debian / Ubuntu",
+        "note": "amd64（.deb）"
+      },
+      {
+        "name": "Arch Linux",
+        "note": "x86_64（.pkg.tar.zst）"
+      }
+    ]
+  },
+  "scripts": {
+    "title": "スクリプト",
+    "subtitle": "「Install」を押すとスクリプトが URLCheck に渡されます。アプリが起動していて {scheme} が登録されている必要があります。何も起きない場合は、スクリプトの URL をコピーして、アプリの「スクリプト」タブの「ダウンロード」から追加してください。",
+    "install": "インストール",
+    "copy": "URL をコピー",
+    "copied": "コピーしました"
+  },
+  "docs": {
+    "scripting": "スクリプト",
+    "libraries": "ライブラリ"
+  }
+}

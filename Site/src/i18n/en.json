@@ -1,0 +1,82 @@
+{
+  "nav": {
+    "home": "Home",
+    "scripts": "Scripts",
+    "docs": "Docs"
+  },
+  "footer": "URLCheck is MIT licensed. The docs live in this repository.",
+  "home": {
+    "tagline": "Check the URL before it opens in your browser.",
+    "download": "Download",
+    "installScript": "Install a script",
+    "documentation": "Documentation",
+    "mainWindow": "The main window",
+    "mainWindowAlt": "The URLCheck main window",
+    "whatTitle": "What it does",
+    "whatText": "URLCheck registers itself as a link handler, so clicking an http/https link opens a small inspection popup instead of going straight to a browser. You get to see where the link really goes, strip the tracking junk, and only then hand it to the browser you want.",
+    "popupTitle": "The popup",
+    "popupText": "Every clicked link opens this before anything reaches the browser. The URL is split into domain, parameters and fragment; insecure links and known tracking parameters are flagged, and the button at the bottom picks which browser finally opens it.",
+    "popupCaption": "Inspecting http://www.google.com/?foo=bar#tag",
+    "popupAlt": "The URLCheck popup for an insecure link",
+    "featuresTitle": "Features",
+    "features": [
+      {
+        "name": "Intercept links",
+        "text": "Installed as the default handler for http/https, so every clicked link passes through the popup. Stays in the tray."
+      },
+      {
+        "name": "Inspect before opening",
+        "text": "A borderless popup shows the URL broken into scheme, host, parameters and fragment."
+      },
+      {
+        "name": "Clean the URL",
+        "text": "Edit or remove any query parameter, clear the fragment, or strip tracking parameters in one click."
+      },
+      {
+        "name": "Script it",
+        "text": "Lua scripts can rewrite every URL before it opens; install them from the scripts page."
+      },
+      {
+        "name": "Forward to another device",
+        "text": "Send a URL to another URLCheck on the local network, end-to-end encrypted."
+      },
+      {
+        "name": "History",
+        "text": "Every intercepted URL is recorded locally in SQLite and can be searched."
+      }
+    ],
+    "installTitle": "Install",
+    "installBefore": "Self-contained builds: the .NET runtime is bundled, so nothing else needs to be installed. Windows also needs the WebView2 runtime; Linux needs WebKitGTK and the AppIndicator library (see the ",
+    "readme": "README",
+    "installAfter": "). Pick your system to open the latest release and download the matching file.",
+    "platforms": [
+      {
+        "name": "Windows",
+        "note": "x64 installer (.msi)"
+      },
+      {
+        "name": "Fedora",
+        "note": "x86_64 (.rpm)"
+      },
+      {
+        "name": "Debian / Ubuntu",
+        "note": "amd64 (.deb)"
+      },
+      {
+        "name": "Arch Linux",
+        "note": "x86_64 (.pkg.tar.zst)"
+      }
+    ]
+  },
+  "scripts": {
+    "title": "Scripts",
+    "subtitle": "Click Install to hand the script to URLCheck. The app must be running and registered for {scheme}. If nothing happens, copy the script URL and add it under Scripts → Download in the app.",
+    "install": "Install",
+    "copy": "Copy URL",
+    "copied": "Copied"
+  },
+  "docs": {
+    "scripting": "Scripting",
+    "libraries": "Libraries"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "nav": {
+    "home": "首頁",
+    "scripts": "腳本",
+    "docs": "文件"
+  },
+  "footer": "URLCheck 採用 MIT 授權。文件就在本專案中。",
+  "home": {
+    "tagline": "在瀏覽器開啟之前，先看清楚這個連結。",
+    "download": "下載",
+    "installScript": "安裝腳本",
+    "documentation": "文件",
+    "mainWindow": "主視窗",
+    "mainWindowAlt": "URLCheck 主視窗",
+    "whatTitle": "它能做什麼",
+    "whatText": "URLCheck 會把自己註冊為連結處理常式，點擊 http/https 連結時先開啟一個小視窗，而不是直接交給瀏覽器。你可以看清連結真正要去哪裡、去掉追蹤參數，再交給想用的瀏覽器開啟。",
+    "popupTitle": "彈窗",
+    "popupText": "點擊的每個連結都會先經過這裡。URL 會被拆成網域、參數與片段；不安全的連結和已知的追蹤參數會被標示出來，最後由底部的按鈕決定用哪個瀏覽器開啟。",
+    "popupCaption": "正在檢查 http://www.google.com/?foo=bar#tag",
+    "popupAlt": "URLCheck 針對不安全連結的彈窗",
+    "featuresTitle": "功能",
+    "features": [
+      {
+        "name": "攔截連結",
+        "text": "註冊為 http/https 的預設處理常式，點擊的連結都會先經過彈窗。常駐系統匣。"
+      },
+      {
+        "name": "開啟前檢查",
+        "text": "無邊框彈窗會把 URL 拆成通訊協定、主機、參數與片段顯示。"
+      },
+      {
+        "name": "清理 URL",
+        "text": "編輯或刪除任意查詢參數、清除片段，或一鍵刪除追蹤參數。"
+      },
+      {
+        "name": "腳本擴充",
+        "text": "Lua 腳本可以在開啟前改寫每個 URL；在腳本頁面一鍵安裝。"
+      },
+      {
+        "name": "轉送到其他裝置",
+        "text": "把 URL 傳送到同一區域網路上的另一台 URLCheck，端對端加密。"
+      },
+      {
+        "name": "歷史記錄",
+        "text": "攔截過的 URL 都會記錄在本機 SQLite 中，可以搜尋。"
+      }
+    ],
+    "installTitle": "安裝",
+    "installBefore": "自包含建置：已內建 .NET 執行階段，不需要另外安裝。Windows 還需要 WebView2 執行階段；Linux 需要 WebKitGTK 與 AppIndicator 函式庫（請見 ",
+    "readme": "README",
+    "installAfter": "）。選擇你的系統會開啟最新版本頁面，下載對應的檔案即可。",
+    "platforms": [
+      {
+        "name": "Windows",
+        "note": "x64 安裝程式（.msi）"
+      },
+      {
+        "name": "Fedora",
+        "note": "x86_64（.rpm）"
+      },
+      {
+        "name": "Debian / Ubuntu",
+        "note": "amd64（.deb）"
+      },
+      {
+        "name": "Arch Linux",
+        "note": "x86_64（.pkg.tar.zst）"
+      }
+    ]
+  },
+  "scripts": {
+    "title": "腳本",
+    "subtitle": "按下「Install」會把腳本交給 URLCheck。應用程式必須在執行中，且已註冊 {scheme}。如果沒有反應，請複製腳本 URL，在應用程式的「腳本 → 下載」中加入。",
+    "install": "安裝",
+    "copy": "複製 URL",
+    "copied": "已複製"
+  },
+  "docs": {
+    "scripting": "腳本",
+    "libraries": "函式庫"
+  }
+}

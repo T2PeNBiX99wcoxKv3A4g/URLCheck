@@ -250,7 +250,7 @@ export const HomePage: React.FC = () => {
             <Section>
                 <Heading>{home.featuresTitle}</Heading>
                 <Grid>
-                    {home.features.map(([name, text], index) => {
+                    {home.features.map(({name, text}, index) => {
                         const Glyph = featureIcons[index] ?? MousePointerClick;
 
                         return (
@@ -274,7 +274,7 @@ export const HomePage: React.FC = () => {
                     {home.installAfter}
                 </Lead>
                 <PlatformGrid>
-                    {home.platforms.map(([name, note], index) => {
+                    {home.platforms.map(({name, note}, index) => {
                         const icon = platformIcons[index] ?? windowsLogo;
 
                         return (
