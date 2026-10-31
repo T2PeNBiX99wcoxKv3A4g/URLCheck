@@ -3,6 +3,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import styled from "styled-components";
 import {docs} from "../docs.generated";
+import {useCopy, useLanguage} from "../language";
 
 const Layout = styled.div`
     display: flex;
@@ -177,22 +178,27 @@ const Body = styled.div`
     }
 `;
 
-const groups = [...new Set(docs.map((page) => page.group))];
+const GROUPS = ["scripting", "libraries"] as const;
 
 interface DocsPageProps {
     page: string;
 }
 
 export const DocsPage: React.FC<DocsPageProps> = ({page}) => {
-    const current = docs.find((doc) => doc.slug === page) ?? docs[0];
+    const {language} = useLanguage();
+    const copy = useCopy();
+
+    // A language without its own pages falls back to the English ones the generator always emits.
+    const pages = docs[language] ?? docs.en;
+    const current = pages.find((doc) => doc.slug === page) ?? pages[0];
 
     return (
         <Layout>
             <Sidebar>
-                {groups.map((group) => (
+                {GROUPS.map((group) => (
                     <Group key={group}>
-                        <GroupTitle>{group}</GroupTitle>
-                        {docs
+                        <GroupTitle>{copy.docs[group]}</GroupTitle>
+                        {pages
                             .filter((doc) => doc.group === group)
                             .map((doc) => (
                                 <SideLink

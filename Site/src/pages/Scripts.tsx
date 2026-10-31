@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import styled from "styled-components";
 import {scripts} from "../scripts.generated";
+import {useCopy} from "../language";
+import {fill} from "../text";
 
 const Header = styled.header`
     margin-bottom: 28px;
@@ -113,9 +115,10 @@ const Copy = styled.button`
 `;
 
 export const ScriptsPage: React.FC = () => {
+    const copy = useCopy().scripts;
     const [copied, setCopied] = useState<string | null>(null);
 
-    const copy = (name: string, link: string) => {
+    const remember = (name: string, link: string) => {
         void navigator.clipboard.writeText(link).then(() => {
             setCopied(name);
             window.setTimeout(() => setCopied((current) => (current === name ? null : current)), 1500);
@@ -125,12 +128,8 @@ export const ScriptsPage: React.FC = () => {
     return (
         <>
             <Header>
-                <Title>Scripts</Title>
-                <Subtitle>
-                    Click <strong>Install</strong> to hand the script to URLCheck. The app must be
-                    running and registered for <code>checkurl://</code>. If nothing happens, copy the
-                    script URL and add it under <strong>Scripts → Download</strong> in the app.
-                </Subtitle>
+                <Title>{copy.title}</Title>
+                <Subtitle>{fill(copy.subtitle, "{scheme}", <code>checkurl://</code>)}</Subtitle>
             </Header>
 
             <Grid>
@@ -142,9 +141,9 @@ export const ScriptsPage: React.FC = () => {
                             {script.source}
                         </Source>
                         <Actions>
-                            <Install href={script.install}>Install</Install>
-                            <Copy onClick={() => copy(script.name, script.source)} type="button">
-                                {copied === script.name ? "Copied" : "Copy URL"}
+                            <Install href={script.install}>{copy.install}</Install>
+                            <Copy onClick={() => remember(script.name, script.source)} type="button">
+                                {copied === script.name ? copy.copied : copy.copy}
                             </Copy>
                         </Actions>
                     </Card>

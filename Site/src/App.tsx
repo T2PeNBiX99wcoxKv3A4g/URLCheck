@@ -5,6 +5,8 @@ import {ScriptsPage} from "./pages/Scripts";
 import {DocsPage} from "./pages/Docs";
 import {docs} from "./docs.generated";
 import {ICON} from "./constants";
+import {LANGUAGES, type Copy, type Language} from "./i18n";
+import {LanguageProvider, useCopy, useLanguage} from "./language";
 
 const GlobalStyle = createGlobalStyle`
     :root {
@@ -92,6 +94,22 @@ const NavLink = styled.a<{ $active?: boolean }>`
     }
 `;
 
+const LanguageSelect = styled.select`
+    padding: 6px 8px;
+    border-radius: 7px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(17, 24, 39, 0.9);
+    color: #d1d5db;
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &:hover {
+        color: #f9fafb;
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+`;
+
 const Content = styled.main`
     flex: 1;
     width: 100%;
@@ -123,56 +141,71 @@ function useRoute() {
     return {section: section || "home", page: rest.join("/")};
 }
 
-/** Keeps the browser tab in step with the current page. */
-function useTitle(section: string, page: string) {
+/** Keeps the browser tab in step with the current page and language. */
+function useTitle(section: string, page: string, language: Language, copy: Copy) {
     useEffect(() => {
-        const doc = docs.find((entry) => entry.slug === page);
-        const name = section === "scripts" ? "Scripts" : section === "docs" ? doc?.title ?? "Docs" : "";
+        const doc = (docs[language] ?? docs.en).find((entry) => entry.slug === page);
+        const name = section === "scripts" ? copy.nav.scripts : section === "docs" ? doc?.title ?? copy.nav.docs : "";
         document.title = name ? `${name} — URLCheck` : "URLCheck";
-    }, [section, page]);
+    }, [section, page, language, copy]);
 }
 
-export const App: React.FC = () => {
+const Site: React.FC = () => {
     const route = useRoute();
-    useTitle(route.section, route.page);
+    const {language, setLanguage} = useLanguage();
+    const copy = useCopy();
+    useTitle(route.section, route.page, language, copy);
 
     return (
-        <>
-            <GlobalStyle/>
-            <Shell>
-                <TopBar>
-                    <Brand href="#/">
-                        <BrandIcon src={ICON} alt=""/>
-                        URLCheck
-                    </Brand>
-                    <Nav>
-                        <NavLink $active={route.section === "home"} href="#/">
-                            Home
-                        </NavLink>
-                        <NavLink $active={route.section === "scripts"} href="#/scripts">
-                            Scripts
-                        </NavLink>
-                        <NavLink $active={route.section === "docs"} href="#/docs/Lua-Scripts">
-                            Docs
-                        </NavLink>
-                        <NavLink href="https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck">GitHub</NavLink>
-                    </Nav>
-                </TopBar>
+        <Shell>
+            <TopBar>
+                <Brand href="#/">
+                    <BrandIcon src={ICON} alt=""/>
+                    URLCheck
+                </Brand>
+                <Nav>
+                    <NavLink $active={route.section === "home"} href="#/">
+                        {copy.nav.home}
+                    </NavLink>
+                    <NavLink $active={route.section === "scripts"} href="#/scripts">
+                        {copy.nav.scripts}
+                    </NavLink>
+                    <NavLink $active={route.section === "docs"} href="#/docs/Lua-Scripts">
+                        {copy.nav.docs}
+                    </NavLink>
+                    <NavLink href="https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck">GitHub</NavLink>
+                    <LanguageSelect
+                        aria-label="Language"
+                        value={language}
+                        onChange={(event) => setLanguage(event.target.value as Language)}
+                    >
+                        {LANGUAGES.map((entry) => (
+                            <option value={entry.id} key={entry.id}>
+                                {entry.label}
+                            </option>
+                        ))}
+                    </LanguageSelect>
+                </Nav>
+            </TopBar>
 
-                <Content>
-                    {route.section === "scripts" ? (
-                        <ScriptsPage/>
-                    ) : route.section === "docs" ? (
-                        <DocsPage page={route.page}/>
-                    ) : (
-                        <HomePage/>
-                    )}
-                </Content>
+            <Content>
+                {route.section === "scripts" ? (
+                    <ScriptsPage/>
+                ) : route.section === "docs" ? (
+                    <DocsPage page={route.page}/>
+                ) : (
+                    <HomePage/>
+                )}
+            </Content>
 
-                <Footer>
-                    URLCheck is MIT licensed. The docs are generated from the project wiki.
-                </Footer>
-            </Shell>
-        </>
+            <Footer>{copy.footer}</Footer>
+        </Shell>
     );
 };
+
+export const App: React.FC = () => (
+    <LanguageProvider>
+        <GlobalStyle/>
+        <Site/>
+    </LanguageProvider>
+);
