@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from "react";
 import styled, {createGlobalStyle} from "styled-components";
+import {BookOpen, FileCode2, Globe, House} from "lucide-react";
+import {siGithub} from "simple-icons";
 import {HomePage} from "./pages/Home";
 import {ScriptsPage} from "./pages/Scripts";
 import {DocsPage} from "./pages/Docs";
@@ -81,6 +83,9 @@ const Nav = styled.nav`
 `;
 
 const NavLink = styled.a<{ $active?: boolean }>`
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 6px 12px;
     border-radius: 7px;
     color: ${(props) => (props.$active ? "#f9fafb" : "#9ca3af")};
@@ -94,8 +99,30 @@ const NavLink = styled.a<{ $active?: boolean }>`
     }
 `;
 
+/** Keeps a brand mark (simple-icons has no React wrapper) in step with the lucide glyphs beside it. */
+const BrandMark = styled.svg`
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    fill: currentColor;
+`;
+
+const LanguagePicker = styled.label`
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+
+    svg {
+        position: absolute;
+        left: 8px;
+        color: #9ca3af;
+        pointer-events: none;
+    }
+`;
+
 const LanguageSelect = styled.select`
-    padding: 6px 8px;
+    padding: 6px 8px 6px 28px;
     border-radius: 7px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(17, 24, 39, 0.9);
@@ -174,26 +201,37 @@ const Site: React.FC = () => {
                 </Brand>
                 <Nav>
                     <NavLink $active={route.section === "home"} href="#/">
+                        <House size={15}/>
                         {copy.nav.home}
                     </NavLink>
                     <NavLink $active={route.section === "scripts"} href="#/scripts">
+                        <FileCode2 size={15}/>
                         {copy.nav.scripts}
                     </NavLink>
                     <NavLink $active={route.section === "docs"} href="#/docs/Lua-Scripts">
+                        <BookOpen size={15}/>
                         {copy.nav.docs}
                     </NavLink>
-                    <NavLink href="https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck">GitHub</NavLink>
-                    <LanguageSelect
-                        aria-label="Language"
-                        value={language}
-                        onChange={(event) => setLanguage(event.target.value as Language)}
-                    >
-                        {LANGUAGES.map((entry) => (
-                            <option value={entry.id} key={entry.id}>
-                                {entry.label}
-                            </option>
-                        ))}
-                    </LanguageSelect>
+                    <NavLink href="https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck">
+                        <BrandMark viewBox="0 0 24 24" aria-hidden="true">
+                            <path d={siGithub.path}/>
+                        </BrandMark>
+                        GitHub
+                    </NavLink>
+                    <LanguagePicker>
+                        <Globe size={14}/>
+                        <LanguageSelect
+                            aria-label="Language"
+                            value={language}
+                            onChange={(event) => setLanguage(event.target.value as Language)}
+                        >
+                            {LANGUAGES.map((entry) => (
+                                <option value={entry.id} key={entry.id}>
+                                    {entry.label}
+                                </option>
+                            ))}
+                        </LanguageSelect>
+                    </LanguagePicker>
                 </Nav>
             </TopBar>
 

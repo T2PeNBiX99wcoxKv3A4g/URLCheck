@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import {Eraser, FileCode2, History, MousePointerClick, ScanSearch, Send, type LucideIcon} from "lucide-react";
+import {BookOpen, Download, Eraser, FileCode2, History, MousePointerClick, ScanSearch, Send, type LucideIcon} from "lucide-react";
 import {siArchlinux, siFedora, siUbuntu} from "simple-icons";
 import {ICON, POPUP, REPOSITORY, RELEASES, SCREENSHOT} from "../constants";
 import {useCopy} from "../language";
@@ -41,6 +41,9 @@ const Actions = styled.div`
 `;
 
 const Button = styled.a<{ $primary?: boolean }>`
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 10px 18px;
     border-radius: 9px;
     border: 1px solid ${(props) => (props.$primary ? "rgba(99, 102, 241, 0.5)" : "rgba(255, 255, 255, 0.12)")};
@@ -217,10 +220,17 @@ export const HomePage: React.FC = () => {
                 <Tagline>{home.tagline}</Tagline>
                 <Actions>
                     <Button $primary href={RELEASES}>
+                        <Download size={17}/>
                         {home.download}
                     </Button>
-                    <Button href="#/scripts">{home.installScript}</Button>
-                    <Button href="#/docs/Lua-Scripts">{home.documentation}</Button>
+                    <Button href="#/scripts">
+                        <FileCode2 size={17}/>
+                        {home.installScript}
+                    </Button>
+                    <Button href="#/docs/Lua-Scripts">
+                        <BookOpen size={17}/>
+                        {home.documentation}
+                    </Button>
                 </Actions>
             </Hero>
 
