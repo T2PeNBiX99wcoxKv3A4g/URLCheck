@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.7.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.6.0..v1.7.0) - 2026-11-01
+
+### ⛰️  Features
+
+- *(site)* Keep the docs in the repository - ([dc82a45](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/dc82a45e3d8108597b0b973bfe0dfe7d49b1daea))
+
+### 🐛 Bug Fixes
+
+- *(ui)* Tidy the settings list rows and the attribution panel - ([6cbbe37](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6cbbe37cb645dc561747ea4b4ceb743ce9399586))
+
+### 🚜 Refactor
+
+- *(site)* Move the interface text into json files - ([766deaa](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/766deaa1ff411e6601587b97710dfe11069161b8))
+- *(site)* Give each language its own docs folder - ([89511bb](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/89511bbc2f55920d389e5fd214d8a817b98a7f23))
+
+### 📚 Documentation
+
+- Point the readmes at the scripts page - ([183f306](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/183f306ae6e94e18923a685ffb53b09dc7f84c51))
+- Remove Lua README files in all languages - ([b355ace](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b355ace020895c0a930fb39e4e50fe9d6c5dadd9))
+- Link the translated script readmes - ([c784d01](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/c784d01ceb923b58df6b0f43bdb376dc29baf3ee))
+- Link the translated readmes from the header - ([8322907](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8322907ac80b3e60910d8a688ee71a7b7bcf0853))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(site)* Shorten the footer - ([f12a5cb](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f12a5cb53edac8a2b73f583360e443a0f573dd8c))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([afbb70d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/afbb70d7b6678e1c1116bc5107af74a6f331904c))
+
+
 ## [1.6.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.5.0..v1.6.0) - 2026-10-31
 
 ### ⛰️  Features
