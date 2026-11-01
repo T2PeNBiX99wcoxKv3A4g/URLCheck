@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import styled from "styled-components";
+import {Check, Copy, Download} from "lucide-react";
 import {scripts} from "../scripts.generated";
 import {useCopy} from "../language";
 import {fill} from "../text";
@@ -82,6 +83,10 @@ const Actions = styled.div`
 
 const Install = styled.a`
     flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
     padding: 9px 14px;
     border-radius: 8px;
     border: 1px solid rgba(99, 102, 241, 0.45);
@@ -98,7 +103,10 @@ const Install = styled.a`
     }
 `;
 
-const Copy = styled.button`
+const CopyButton = styled.button`
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 9px 12px;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -141,10 +149,14 @@ export const ScriptsPage: React.FC = () => {
                             {script.source}
                         </Source>
                         <Actions>
-                            <Install href={script.install}>{copy.install}</Install>
-                            <Copy onClick={() => remember(script.name, script.source)} type="button">
+                            <Install href={script.install}>
+                                <Download size={15}/>
+                                {copy.install}
+                            </Install>
+                            <CopyButton onClick={() => remember(script.name, script.source)} type="button">
+                                {copied === script.name ? <Check size={15}/> : <Copy size={15}/>}
                                 {copied === script.name ? copy.copied : copy.copy}
-                            </Copy>
+                            </CopyButton>
                         </Actions>
                     </Card>
                 ))}
