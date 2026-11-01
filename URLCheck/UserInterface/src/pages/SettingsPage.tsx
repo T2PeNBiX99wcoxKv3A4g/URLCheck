@@ -378,6 +378,7 @@ const ListEditor = styled.div`
 
 const ListRow = styled.div`
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
 `;
@@ -399,17 +400,19 @@ const ListInput = styled.input`
     }
 
     &.name {
-        width: 150px;
-        flex-shrink: 0;
+        flex: 1 1 130px;
+        min-width: 0;
     }
 
     &.path {
-        flex: 1;
+        flex: 2 1 220px;
+        min-width: 0;
         font-family: var(--font-mono);
     }
 
     &.args {
-        flex: 0 0 160px;
+        flex: 1 1 120px;
+        min-width: 0;
         font-family: var(--font-mono);
     }
 

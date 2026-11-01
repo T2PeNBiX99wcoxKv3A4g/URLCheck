@@ -1,22 +1,25 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {ATTRIBUTIONS} from "../data/attributions";
 import {useTranslation} from "@photino-net-utils/bridge";
 
 /**
- * The open-source notices, shown as a full-page overlay from the settings. Each project is its own
- * collapsible entry because the licence texts are long.
+ * The open-source notices, shown as a floating panel from the settings: the projects are listed on
+ * the left and the selected licence fills the right, because the texts are long.
  */
-const Page = styled.div`
+const Backdrop = styled.div`
     position: fixed;
     inset: 0;
     z-index: 70;
     display: flex;
-    flex-direction: column;
-    background: #0b0f19;
-    animation: attributionIn 0.22s ease;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(2, 6, 23, 0.65);
+    backdrop-filter: blur(3px);
+    animation: attributionFade 0.16s ease;
 
-    @keyframes attributionIn {
+    @keyframes attributionFade {
         from {
             opacity: 0;
         }
@@ -26,22 +29,53 @@ const Page = styled.div`
     }
 `;
 
+const Panel = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: min(920px, 100%);
+    max-height: min(680px, 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    background: #0f172a;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+    animation: attributionIn 0.18s ease;
+
+    @keyframes attributionIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+`;
+
 const Header = styled.header`
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
     flex-shrink: 0;
-    padding: 20px 32px;
+    padding: 18px 22px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(17, 24, 39, 0.75);
-    backdrop-filter: blur(16px);
 `;
 
 const Title = styled.h2`
-    font-size: 1.15rem;
+    margin: 0;
+    font-size: 1.05rem;
     font-weight: 700;
     color: #f9fafb;
+`;
+
+const Intro = styled.p`
+    margin: 6px 0 0;
+    max-width: 620px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #9ca3af;
 `;
 
 const CloseButton = styled.button`
@@ -63,86 +97,91 @@ const CloseButton = styled.button`
     }
 `;
 
-const Content = styled.div`
+const Body = styled.div`
     display: flex;
-    flex-direction: column;
-    gap: 12px;
     flex: 1;
-    width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 24px 32px 40px;
-    overflow-y: auto;
-`;
+    min-height: 0;
 
-const Intro = styled.p`
-    font-size: 0.85rem;
-    line-height: 1.6;
-    color: #9ca3af;
-`;
-
-const List = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-`;
-
-const Section = styled.div`
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    background: rgba(17, 24, 39, 0.6);
-    overflow: hidden;
-    transition: border-color 0.2s ease;
-
-    &:hover {
-        border-color: rgba(255, 255, 255, 0.16);
+    @media (max-width: 700px) {
+        flex-direction: column;
     }
 `;
 
-const SectionHeader = styled.button`
+const Sidebar = styled.nav`
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 2px;
+    width: 260px;
+    flex-shrink: 0;
+    padding: 10px;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-y: auto;
+
+    @media (max-width: 700px) {
+        width: 100%;
+        max-height: 150px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+`;
+
+const Item = styled.button<{ $active: boolean }>`
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
     width: 100%;
-    padding: 12px 14px;
+    padding: 8px 10px;
     border: none;
-    background: none;
-    color: #f9fafb;
-    font-size: 0.9rem;
+    border-radius: 8px;
+    background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.16)" : "transparent")};
+    color: ${(props) => (props.$active ? "#f9fafb" : "#cbd5e1")};
+    font: inherit;
     text-align: left;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
-        background: rgba(255, 255, 255, 0.04);
+        background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.2)" : "rgba(255, 255, 255, 0.05)")};
+        color: #f9fafb;
     }
 `;
 
-const Chevron = styled.span<{ $open: boolean }>`
-    flex-shrink: 0;
-    font-size: 0.7rem;
-    color: #60a5fa;
-    transition: transform 0.18s ease;
-    transform: rotate(${(props) => (props.$open ? "90deg" : "0")});
-`;
-
-const Name = styled.span`
+const ItemName = styled.span`
+    font-size: 0.85rem;
     font-weight: 600;
     word-break: break-word;
 `;
 
 const Meta = styled.span`
-    margin-left: auto;
-    flex-shrink: 0;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #6b7280;
 `;
 
-const Body = styled.pre`
+const Article = styled.article`
+    flex: 1;
+    min-width: 0;
+    padding: 18px 22px 22px;
+    overflow-y: auto;
+`;
+
+const ArticleHead = styled.div`
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-bottom: 12px;
+`;
+
+const ArticleName = styled.h3`
     margin: 0;
-    padding: 12px 14px 14px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f9fafb;
+`;
+
+const Licence = styled.pre`
+    margin: 0;
     font-family: var(--font-mono);
     font-size: 0.72rem;
     line-height: 1.6;
@@ -151,47 +190,61 @@ const Body = styled.pre`
     word-break: break-word;
 `;
 
+const meta = (entry: { version: string; license: string }) =>
+    [entry.version, entry.license].filter(Boolean).join(" · ");
+
 export const AttributionPage: React.FC<{ onClose: () => void }> = ({onClose}) => {
     const t = useTranslation();
-    const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set());
+    const [selected, setSelected] = useState(0);
+    const entry = ATTRIBUTIONS[selected] ?? ATTRIBUTIONS[0];
 
-    const toggle = (name: string) =>
-        setExpanded((previous) => {
-            const next = new Set(previous);
-            if (!next.delete(name)) next.add(name);
-            return next;
-        });
+    // Escape closes the panel, like the other overlays.
+    useEffect(() => {
+        const close = (event: KeyboardEvent) => {
+            if (event.key === "Escape") onClose();
+        };
+
+        window.addEventListener("keydown", close);
+        return () => window.removeEventListener("keydown", close);
+    }, [onClose]);
 
     return (
-        <Page>
-            <Header>
-                <Title>{t("attribution.title")}</Title>
-                <CloseButton type="button" onClick={onClose} title={t("attribution.close")}>
-                    ✕
-                </CloseButton>
-            </Header>
+        <Backdrop onClick={onClose}>
+            <Panel onClick={(event) => event.stopPropagation()}>
+                <Header>
+                    <div>
+                        <Title>{t("attribution.title")}</Title>
+                        <Intro>{t("attribution.description", {count: ATTRIBUTIONS.length})}</Intro>
+                    </div>
+                    <CloseButton type="button" onClick={onClose} title={t("attribution.close")}>
+                        ✕
+                    </CloseButton>
+                </Header>
 
-            <Content>
-                <Intro>{t("attribution.description", {count: ATTRIBUTIONS.length})}</Intro>
+                <Body>
+                    <Sidebar>
+                        {ATTRIBUTIONS.map((item, position) => (
+                            <Item
+                                $active={position === selected}
+                                key={`${item.name}@${item.version}`}
+                                onClick={() => setSelected(position)}
+                                type="button"
+                            >
+                                <ItemName>{item.name}</ItemName>
+                                <Meta>{meta(item)}</Meta>
+                            </Item>
+                        ))}
+                    </Sidebar>
 
-                <List>
-                    {ATTRIBUTIONS.map((entry) => {
-                        const open = expanded.has(entry.name);
-
-                        return (
-                            <Section key={`${entry.name}@${entry.version}`}>
-                                <SectionHeader type="button" aria-expanded={open} onClick={() => toggle(entry.name)}>
-                                    <Chevron $open={open}>▶</Chevron>
-                                    <Name>{entry.name}</Name>
-                                    <Meta>{[entry.version, entry.license].filter(Boolean).join(" · ")}</Meta>
-                                </SectionHeader>
-
-                                {open && <Body>{entry.text}</Body>}
-                            </Section>
-                        );
-                    })}
-                </List>
-            </Content>
-        </Page>
+                    <Article>
+                        <ArticleHead>
+                            <ArticleName>{entry.name}</ArticleName>
+                            <Meta>{meta(entry)}</Meta>
+                        </ArticleHead>
+                        <Licence>{entry.text}</Licence>
+                    </Article>
+                </Body>
+            </Panel>
+        </Backdrop>
     );
 };

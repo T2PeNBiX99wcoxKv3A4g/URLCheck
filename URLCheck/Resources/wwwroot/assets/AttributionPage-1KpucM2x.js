@@ -1,4 +1,4 @@
-import{a as e,i as t,n,r,t as i}from"./index-5z_C0p74.js";var a=e(t(),1),o=[{name:`@fontsource/inter`,version:`5.3.0`,license:`OFL-1.1`,text:`Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter) Inter-Italic[opsz,wght].ttf: Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter)
+import{a as e,i as t,n,r,t as i}from"./index-CW6yotjI.js";var a=e(t(),1),o=[{name:`@fontsource/inter`,version:`5.3.0`,license:`OFL-1.1`,text:`Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter) Inter-Italic[opsz,wght].ttf: Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
@@ -202,6 +202,26 @@ OTHER DEALINGS IN THE FONT SOFTWARE.`},{name:`@types/node`,version:`26.6.5`,lice
     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE`},{name:`@types/prismjs`,version:`1.26.6`,license:`MIT`,text:`MIT License
+
+    Copyright (c) Microsoft Corporation.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE`},{name:`@types/react`,version:`19.3.0`,license:`MIT`,text:`MIT License
 
     Copyright (c) Microsoft Corporation.
@@ -286,6 +306,27 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTI
 USE OR OTHER DEALINGS IN THE SOFTWARE.`},{name:`JetBrains.Annotations`,version:`2026.2.0`,license:`MIT`,text:`Licensed under MIT.
 Authors: JetBrains
 Project: https://www.jetbrains.com/help/resharper/Code_Analysis__Code_Annotations.html
+
+MIT License
+
+Copyright (c) <year> <copyright holders>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+associated documentation files (the "Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+USE OR OTHER DEALINGS IN THE SOFTWARE.`},{name:`LuaCSharp`,version:`0.5.8`,license:`MIT`,text:`Licensed under MIT.
+Authors: nuskey,Akeit0
+Project: https://github.com/nuskey8/Lua-CSharp
 
 MIT License
 
@@ -622,7 +663,27 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License.`},{name:`react`,version:`19.3.1`,license:`MIT`,text:`MIT License
+limitations under the License.`},{name:`prismjs`,version:`1.30.0`,license:`MIT`,text:`MIT LICENSE
+
+Copyright (c) 2012 Lea Verou
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.`},{name:`react`,version:`19.3.1`,license:`MIT`,text:`MIT License
 
 Copyright (c) Meta Platforms, Inc. and affiliates.
 
@@ -4830,11 +4891,14 @@ SOFTWARE.`}],s=n(),c=r.div`
     inset: 0;
     z-index: 70;
     display: flex;
-    flex-direction: column;
-    background: #0b0f19;
-    animation: attributionIn 0.22s ease;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(2, 6, 23, 0.65);
+    backdrop-filter: blur(3px);
+    animation: attributionFade 0.16s ease;
 
-    @keyframes attributionIn {
+    @keyframes attributionFade {
         from {
             opacity: 0;
         }
@@ -4842,21 +4906,48 @@ SOFTWARE.`}],s=n(),c=r.div`
             opacity: 1;
         }
     }
-`,l=r.header`
+`,l=r.div`
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    width: min(920px, 100%);
+    max-height: min(680px, 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    background: #0f172a;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+    animation: attributionIn 0.18s ease;
+
+    @keyframes attributionIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+`,u=r.header`
+    display: flex;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
     flex-shrink: 0;
-    padding: 20px 32px;
+    padding: 18px 22px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(17, 24, 39, 0.75);
-    backdrop-filter: blur(16px);
-`,u=r.h2`
-    font-size: 1.15rem;
+`,d=r.h2`
+    margin: 0;
+    font-size: 1.05rem;
     font-weight: 700;
     color: #f9fafb;
-`,d=r.button`
+`,f=r.p`
+    margin: 6px 0 0;
+    max-width: 620px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #9ca3af;
+`,p=r.button`
     width: 30px;
     height: 30px;
     border-radius: 8px;
@@ -4873,74 +4964,79 @@ SOFTWARE.`}],s=n(),c=r.div`
         border-color: rgba(239, 68, 68, 0.35);
         color: #f87171;
     }
-`,f=r.div`
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    flex: 1;
-    width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 24px 32px 40px;
-    overflow-y: auto;
-`,p=r.p`
-    font-size: 0.85rem;
-    line-height: 1.6;
-    color: #9ca3af;
 `,m=r.div`
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-`,h=r.div`
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    background: rgba(17, 24, 39, 0.6);
-    overflow: hidden;
-    transition: border-color 0.2s ease;
+    flex: 1;
+    min-height: 0;
 
-    &:hover {
-        border-color: rgba(255, 255, 255, 0.16);
+    @media (max-width: 700px) {
+        flex-direction: column;
+    }
+`,h=r.nav`
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 260px;
+    flex-shrink: 0;
+    padding: 10px;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-y: auto;
+
+    @media (max-width: 700px) {
+        width: 100%;
+        max-height: 150px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 `,g=r.button`
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 2px;
     width: 100%;
-    padding: 12px 14px;
+    padding: 8px 10px;
     border: none;
-    background: none;
-    color: #f9fafb;
-    font-size: 0.9rem;
+    border-radius: 8px;
+    background: ${e=>e.$active?`rgba(59, 130, 246, 0.16)`:`transparent`};
+    color: ${e=>e.$active?`#f9fafb`:`#cbd5e1`};
+    font: inherit;
     text-align: left;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
-        background: rgba(255, 255, 255, 0.04);
+        background: ${e=>e.$active?`rgba(59, 130, 246, 0.2)`:`rgba(255, 255, 255, 0.05)`};
+        color: #f9fafb;
     }
 `,_=r.span`
-    flex-shrink: 0;
-    font-size: 0.7rem;
-    color: #60a5fa;
-    transition: transform 0.18s ease;
-    transform: rotate(${e=>e.$open?`90deg`:`0`});
-`,v=r.span`
+    font-size: 0.85rem;
     font-weight: 600;
     word-break: break-word;
-`,y=r.span`
-    margin-left: auto;
-    flex-shrink: 0;
+`,v=r.span`
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #6b7280;
-`,b=r.pre`
+`,y=r.article`
+    flex: 1;
+    min-width: 0;
+    padding: 18px 22px 22px;
+    overflow-y: auto;
+`,b=r.div`
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-bottom: 12px;
+`,x=r.h3`
     margin: 0;
-    padding: 12px 14px 14px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f9fafb;
+`,S=r.pre`
+    margin: 0;
     font-family: var(--font-mono);
     font-size: 0.72rem;
     line-height: 1.6;
     color: #9ca3af;
     white-space: pre-wrap;
     word-break: break-word;
-`,x=({onClose:e})=>{let t=i(),[n,r]=(0,a.useState)(new Set),x=e=>r(t=>{let n=new Set(t);return n.delete(e)||n.add(e),n});return(0,s.jsxs)(c,{children:[(0,s.jsxs)(l,{children:[(0,s.jsx)(u,{children:t(`attribution.title`)}),(0,s.jsx)(d,{type:`button`,onClick:e,title:t(`attribution.close`),children:`✕`})]}),(0,s.jsxs)(f,{children:[(0,s.jsx)(p,{children:t(`attribution.description`,{count:o.length})}),(0,s.jsx)(m,{children:o.map(e=>{let t=n.has(e.name);return(0,s.jsxs)(h,{children:[(0,s.jsxs)(g,{type:`button`,"aria-expanded":t,onClick:()=>x(e.name),children:[(0,s.jsx)(_,{$open:t,children:`▶`}),(0,s.jsx)(v,{children:e.name}),(0,s.jsx)(y,{children:[e.version,e.license].filter(Boolean).join(` · `)})]}),t&&(0,s.jsx)(b,{children:e.text})]},`${e.name}@${e.version}`)})})]})]})};export{x as AttributionPage};
+`,C=e=>[e.version,e.license].filter(Boolean).join(` · `),w=({onClose:e})=>{let t=i(),[n,r]=(0,a.useState)(0),w=o[n]??o[0];return(0,a.useEffect)(()=>{let t=t=>{t.key===`Escape`&&e()};return window.addEventListener(`keydown`,t),()=>window.removeEventListener(`keydown`,t)},[e]),(0,s.jsx)(c,{onClick:e,children:(0,s.jsxs)(l,{onClick:e=>e.stopPropagation(),children:[(0,s.jsxs)(u,{children:[(0,s.jsxs)(`div`,{children:[(0,s.jsx)(d,{children:t(`attribution.title`)}),(0,s.jsx)(f,{children:t(`attribution.description`,{count:o.length})})]}),(0,s.jsx)(p,{type:`button`,onClick:e,title:t(`attribution.close`),children:`✕`})]}),(0,s.jsxs)(m,{children:[(0,s.jsx)(h,{children:o.map((e,t)=>(0,s.jsxs)(g,{$active:t===n,onClick:()=>r(t),type:`button`,children:[(0,s.jsx)(_,{children:e.name}),(0,s.jsx)(v,{children:C(e)})]},`${e.name}@${e.version}`))}),(0,s.jsxs)(y,{children:[(0,s.jsxs)(b,{children:[(0,s.jsx)(x,{children:w.name}),(0,s.jsx)(v,{children:C(w)})]}),(0,s.jsx)(S,{children:w.text})]})]})]})})};export{w as AttributionPage};
