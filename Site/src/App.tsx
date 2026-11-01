@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import styled, {createGlobalStyle} from "styled-components";
+import styled, {createGlobalStyle, keyframes} from "styled-components";
 import {BookOpen, FileCode2, Globe, House} from "lucide-react";
 import {siGithub} from "simple-icons";
 import {HomePage} from "./pages/Home";
@@ -14,8 +14,22 @@ import {LanguageProvider, useCopy, useLanguage} from "./language";
 const GlobalStyle = createGlobalStyle`
     :root {
         color-scheme: dark;
-        --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
-        --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, "SFMono-Regular", Menlo, monospace;
+        --font-cjk: sans-serif;
+        --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial;
+        --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, "SFMono-Regular", Menlo, var(--font-cjk);
+    }
+
+    /* The app picks the CJK face per language; the site does the same so the text matches. */
+    html:lang(zh-TW) {
+        --font-cjk: "Noto Sans TC", "Microsoft JhengHei UI", "PingFang TC";
+    }
+
+    html:lang(zh-CN) {
+        --font-cjk: "Noto Sans SC", "Microsoft YaHei UI", "PingFang SC";
+    }
+
+    html:lang(ja) {
+        --font-cjk: "Noto Sans JP", "Yu Gothic UI", "Hiragino Kaku Gothic ProN";
     }
 
     * {
@@ -28,7 +42,7 @@ const GlobalStyle = createGlobalStyle`
         background-color: #0b0f19;
         background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.14), transparent 70%);
         color: #f9fafb;
-        font-family: var(--font-sans);
+        font-family: var(--font-sans), var(--font-cjk);
         line-height: 1.5;
         -webkit-font-smoothing: antialiased;
     }
@@ -39,6 +53,32 @@ const GlobalStyle = createGlobalStyle`
 
     code {
         font-family: var(--font-mono);
+    }
+
+    ::selection {
+        background: rgba(59, 130, 246, 0.35);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.001ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.001ms !important;
+        }
+    }
+`;
+
+/** The app fades its panels in the same way, so the site uses the same curve. */
+const fadeIn = keyframes`
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 `;
 
@@ -59,6 +99,7 @@ const TopBar = styled.header`
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(11, 15, 25, 0.85);
     backdrop-filter: blur(14px);
+    animation: ${fadeIn} 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
 const Brand = styled.a`
@@ -75,6 +116,11 @@ const Brand = styled.a`
 const BrandIcon = styled.img`
     width: 22px;
     height: 22px;
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+    ${Brand}:hover & {
+        transform: rotate(-6deg) scale(1.06);
+    }
 `;
 
 /** The brand and its release badge travel together; the nav keeps the rest of the row. */
@@ -93,6 +139,7 @@ const VersionBadge = styled.a`
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     text-decoration: none;
+    transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
 
     &:hover {
         color: #f9fafb;
@@ -117,6 +164,7 @@ const NavLink = styled.a<{ $active?: boolean }>`
     background: ${(props) => (props.$active ? "rgba(255, 255, 255, 0.08)" : "transparent")};
     font-size: 0.85rem;
     text-decoration: none;
+    transition: background 120ms ease, color 120ms ease;
 
     &:hover {
         color: #f9fafb;
@@ -155,10 +203,12 @@ const LanguageSelect = styled.select`
     font: inherit;
     font-size: 0.8rem;
     cursor: pointer;
+    transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
 
     &:hover {
         color: #f9fafb;
         border-color: rgba(255, 255, 255, 0.25);
+        background: rgba(31, 41, 55, 0.95);
     }
 `;
 
@@ -168,6 +218,7 @@ const Content = styled.main`
     max-width: 1080px;
     margin: 0 auto;
     padding: 40px 24px 64px;
+    animation: ${fadeIn} 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
 const Footer = styled.footer`
@@ -272,7 +323,7 @@ const Site: React.FC = () => {
                 </Nav>
             </TopBar>
 
-            <Content>
+            <Content key={`${route.section}/${route.page}/${language}`}>
                 {route.section === "scripts" ? (
                     <ScriptsPage/>
                 ) : route.section === "docs" ? (

@@ -37,11 +37,13 @@ const Card = styled.article`
     border-radius: 12px;
     background: rgba(17, 24, 39, 0.75);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
 
     &:hover {
         border-color: rgba(99, 102, 241, 0.4);
+        background: rgba(30, 41, 59, 0.7);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        transform: translateY(-2px);
     }
 `;
 
@@ -96,10 +98,16 @@ const Install = styled.a`
     font-weight: 600;
     text-align: center;
     text-decoration: none;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 
     &:hover {
         background: rgba(59, 130, 246, 0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 0 24px rgba(99, 102, 241, 0.3);
+    }
+
+    &:active {
+        transform: translateY(0);
     }
 `;
 
@@ -115,10 +123,12 @@ const CopyButton = styled.button`
     font: inherit;
     font-size: 0.8rem;
     cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 
     &:hover {
         color: #f9fafb;
         border-color: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.05);
     }
 `;
 

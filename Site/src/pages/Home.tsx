@@ -1,9 +1,19 @@
 import React from "react";
-import styled from "styled-components";
+import styled, {keyframes} from "styled-components";
 import {BookOpen, Download, Eraser, FileCode2, History, MousePointerClick, ScanSearch, Send, type LucideIcon} from "lucide-react";
 import {siArchlinux, siFedora, siUbuntu} from "simple-icons";
 import {ICON, POPUP, REPOSITORY, RELEASES, SCREENSHOT} from "../constants";
 import {useCopy} from "../language";
+
+/** The icon drifts a little, which keeps the hero from feeling like a static screenshot. */
+const float = keyframes`
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+`;
 
 const Hero = styled.section`
     display: flex;
@@ -17,6 +27,8 @@ const Hero = styled.section`
 const AppIcon = styled.img`
     width: 88px;
     height: 88px;
+    filter: drop-shadow(0 12px 32px rgba(99, 102, 241, 0.35));
+    animation: ${float} 6s ease-in-out infinite;
 `;
 
 const Title = styled.h1`
@@ -52,11 +64,18 @@ const Button = styled.a<{ $primary?: boolean }>`
     font-size: 0.9rem;
     font-weight: 600;
     text-decoration: none;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
 
     &:hover {
         background: ${(props) => (props.$primary ? "rgba(59, 130, 246, 0.32)" : "rgba(255, 255, 255, 0.06)")};
         border-color: rgba(255, 255, 255, 0.25);
+        color: ${(props) => (props.$primary ? "#eff6ff" : "#f9fafb")};
+        transform: translateY(-1px);
+        box-shadow: ${(props) => (props.$primary ? "0 0 28px rgba(99, 102, 241, 0.35)" : "none")};
+    }
+
+    &:active {
+        transform: translateY(0);
     }
 `;
 
@@ -133,6 +152,14 @@ const Feature = styled.article`
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     background: rgba(17, 24, 39, 0.6);
+    transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+
+    &:hover {
+        border-color: rgba(99, 102, 241, 0.4);
+        background: rgba(30, 41, 59, 0.7);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
 `;
 
 const FeatureIcon = styled.span`
@@ -145,6 +172,12 @@ const FeatureIcon = styled.span`
     border-radius: 8px;
     background: rgba(59, 130, 246, 0.14);
     color: #93c5fd;
+    transition: background 0.18s ease, transform 0.18s ease;
+
+    ${Feature}:hover & {
+        background: rgba(59, 130, 246, 0.24);
+        transform: scale(1.08);
+    }
 `;
 
 const FeatureName = styled.h3`
@@ -173,11 +206,13 @@ const Platform = styled.a`
     border-radius: 12px;
     background: rgba(17, 24, 39, 0.6);
     text-decoration: none;
-    transition: border-color 0.2s ease, background 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 
     &:hover {
         border-color: rgba(99, 102, 241, 0.45);
         background: rgba(30, 41, 59, 0.7);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
     }
 `;
 

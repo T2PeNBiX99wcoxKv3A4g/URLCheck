@@ -1,14 +1,26 @@
 import React from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import styled from "styled-components";
+import styled, {keyframes} from "styled-components";
 import {docs} from "../docs.generated";
 import {useCopy, useLanguage} from "../language";
+
+const fadeIn = keyframes`
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+`;
 
 const Layout = styled.div`
     display: flex;
     gap: 32px;
     align-items: flex-start;
+    animation: ${fadeIn} 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 
     @media (max-width: 760px) {
         flex-direction: column;
@@ -53,6 +65,7 @@ const SideLink = styled.a<{ $active: boolean }>`
     background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.14)" : "transparent")};
     font-size: 0.85rem;
     text-decoration: none;
+    transition: background 120ms ease, color 120ms ease;
 
     &:hover {
         color: #f9fafb;
