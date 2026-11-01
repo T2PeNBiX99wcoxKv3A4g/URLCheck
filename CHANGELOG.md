@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.8.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.7.0..v1.8.0) - 2026-11-01
+
+### ⛰️  Features
+
+- *(site)* Add icons to the script card buttons - ([73fe434](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/73fe4345371e75804d905bddc61520dc0f1df009))
+- *(site)* Show the latest release version in the top bar - ([983dd92](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/983dd924379dc206ef180adfc47ce85e334e9118))
+- *(site)* Add icons to the navigation, language picker and hero buttons - ([2acdd67](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2acdd6795a0c6ef328c9974d3e70e1d5dfae72f4))
+
+### 🐛 Bug Fixes
+
+- Log and rethrow unhandled exceptions in Program startup - ([2720291](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/272029110b8c15585ec1199cd498717da972a1a4))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update @photino-net-utils/bridge to v0.8.3 - ([e62299e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e62299edf293cc295537c7da36bafef23819100e))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([3acdd77](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/3acdd7748e299935e9dc7f6f31b0d472ad55b07f))
+
+
 ## [1.7.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.6.0..v1.7.0) - 2026-11-01
 
 ### ⛰️  Features
