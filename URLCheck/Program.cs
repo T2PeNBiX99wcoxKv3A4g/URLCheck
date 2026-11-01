@@ -143,6 +143,13 @@ internal static class Program
 
             Log.Information("Exiting");
         }
+        catch (Exception ex)
+        {
+            // The window procedure runs native code, so a failure there surfaces here. Record it
+            // before the runtime prints its own crash dialog.
+            Log.Fatal(ex, "Unhandled exception");
+            throw;
+        }
         finally
         {
             if (OperatingSystem.IsLinux())
