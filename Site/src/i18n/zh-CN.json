@@ -4,6 +4,7 @@
     "scripts": "脚本",
     "docs": "文档"
   },
+  "version": "版本",
   "footer": "URLCheck 采用 MIT 许可证。",
   "home": {
     "tagline": "在浏览器打开之前，先看清楚这个链接。",

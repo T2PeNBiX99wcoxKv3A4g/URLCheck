@@ -20,6 +20,8 @@ export const DEFAULT_LANGUAGE: Language = "en";
 
 export interface Copy {
     nav: { home: string; scripts: string; docs: string };
+    /** Label for the release badge, read out with the version number. */
+    version: string;
     footer: string;
     home: {
         tagline: string;

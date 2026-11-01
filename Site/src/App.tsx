@@ -6,7 +6,8 @@ import {HomePage} from "./pages/Home";
 import {ScriptsPage} from "./pages/Scripts";
 import {DocsPage} from "./pages/Docs";
 import {docs} from "./docs.generated";
-import {ICON} from "./constants";
+import {ICON, RELEASES} from "./constants";
+import {useVersion} from "./version";
 import {LANGUAGES, type Copy, type Language} from "./i18n";
 import {LanguageProvider, useCopy, useLanguage} from "./language";
 
@@ -74,6 +75,30 @@ const Brand = styled.a`
 const BrandIcon = styled.img`
     width: 22px;
     height: 22px;
+`;
+
+/** The brand and its release badge travel together; the nav keeps the rest of the row. */
+const BrandGroup = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+`;
+
+const VersionBadge = styled.a`
+    padding: 2px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    color: #9ca3af;
+    font-size: 0.68rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+
+    &:hover {
+        color: #f9fafb;
+        border-color: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.06);
+    }
 `;
 
 const Nav = styled.nav`
@@ -190,15 +215,27 @@ const Site: React.FC = () => {
     const route = useRoute();
     const {language, setLanguage} = useLanguage();
     const copy = useCopy();
+    const version = useVersion();
     useTitle(route.section, route.page, language, copy);
 
     return (
         <Shell>
             <TopBar>
-                <Brand href="#/">
-                    <BrandIcon src={ICON} alt=""/>
-                    URLCheck
-                </Brand>
+                <BrandGroup>
+                    <Brand href="#/">
+                        <BrandIcon src={ICON} alt=""/>
+                        URLCheck
+                    </Brand>
+                    {version && (
+                        <VersionBadge
+                            href={RELEASES}
+                            aria-label={`${copy.version} ${version}`}
+                            title={`${copy.version} ${version}`}
+                        >
+                            v{version}
+                        </VersionBadge>
+                    )}
+                </BrandGroup>
                 <Nav>
                     <NavLink $active={route.section === "home"} href="#/">
                         <House size={15}/>

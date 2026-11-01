@@ -4,6 +4,7 @@
     "scripts": "スクリプト",
     "docs": "ドキュメント"
   },
+  "version": "バージョン",
   "footer": "URLCheck は MIT ライセンスです。",
   "home": {
     "tagline": "ブラウザで開く前に、URL を確認できます。",
