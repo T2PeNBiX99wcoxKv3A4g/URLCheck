@@ -61,12 +61,6 @@ desktop version.
   network, where it opens in its own inspection popup. Devices find each other automatically and
   pair by confirming a one-time code, and every transfer is end-to-end encrypted; nothing leaves
   the network.
-- **Start with the system** — optionally launch together with your session, so clicking a link
-  never waits for a cold start. Combined with "Start hidden" it stays in the tray until needed.
-- **Speak your language** — the interface and the backend strings are translated into English,
-  Japanese, Simplified Chinese and Traditional Chinese.
-- **Check for updates from inside** — the About panel compares the running version with the
-  published one and links to the release page.
 
 ## Built with
 
