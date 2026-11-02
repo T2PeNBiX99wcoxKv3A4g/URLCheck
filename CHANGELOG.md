@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.9.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.9.0..v1.9.1) - 2026-11-02
+
+### 🐛 Bug Fixes
+
+- Shut down cleanly on SIGTERM - ([1c06688](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1c0668839cd654cf3fa1ac40d8b019a443fc2ac7))
+
+### 📚 Documentation
+
+- Link the website and documentation from the readme header - ([059f8a3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/059f8a394b265c8454b1b6a8fe28988c7439b027))
+- Remove junks - ([62bfc08](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/62bfc08581f30aa18ffa066b4f8e8c7e16721614))
+- Sync translated READMEs with the English one - ([93c9804](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/93c9804fc8685f3d1ed46b8dd6d36aecc341fedc))
+- Document filter lists, startup, languages and Arch Linux dependencies - ([36c1ed6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/36c1ed6d0a502665d002bb5cb560d6c5319230de))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([062ff35](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/062ff3556804dff194588d6692a9318ff033081b))
+
+
 ## [1.9.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.8.0..v1.9.0) - 2026-11-02
 
 ### ⛰️  Features
