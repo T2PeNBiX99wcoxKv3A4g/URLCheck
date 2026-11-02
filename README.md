@@ -39,10 +39,17 @@ desktop version.
   other windows, showing the URL broken into scheme, host, parameters, and fragment.
 - **Clean the URL** — edit or remove any query parameter, clear the fragment, drop the whole
   parameter list, or strip well-known tracking parameters in one click.
+- **Bring your own filter lists** — beyond the built-in rules, install lists and enable or disable
+  each one separately. AdGuard and uBlock Origin lists built on `$removeparam`, ClearURLs' JSON
+  catalog and Firefox's query-stripping records are all understood, and the lists can refresh on a
+  timer.
 - **Script it** — Lua scripts can rewrite every URL before it opens; see the
   [scripts page](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#%2Fscripts) for the examples and one-click installs.
-- **Check before trusting** — ask for the HTTP status of the URL (following redirects), or step
-  through redirects one hop at a time to see where a shortener leads.
+  Those installs are `checkurl://` links, which URLCheck handles itself.
+- **Check before trusting** — ask for the HTTP status of the URL (following redirects) with a
+  User-Agent picked from your own list, or step through redirects one hop at a time to see where a
+  shortener leads. Hosts on the auto-redirect list are followed before the popup opens, so the
+  destination is what gets inspected and written to the history.
 - **Open where you want** — pick a browser per link, optionally in a private/incognito window.
   The most-used browser becomes the default button.
 - **History** — every intercepted URL is recorded locally in SQLite and can be searched, and
@@ -54,6 +61,12 @@ desktop version.
   network, where it opens in its own inspection popup. Devices find each other automatically and
   pair by confirming a one-time code, and every transfer is end-to-end encrypted; nothing leaves
   the network.
+- **Start with the system** — optionally launch together with your session, so clicking a link
+  never waits for a cold start. Combined with "Start hidden" it stays in the tray until needed.
+- **Speak your language** — the interface and the backend strings are translated into English,
+  Japanese, Simplified Chinese and Traditional Chinese.
+- **Check for updates from inside** — the About panel compares the running version with the
+  published one and links to the release page.
 
 ## Built with
 
@@ -113,6 +126,7 @@ window_rules:
 |-----------------|-------------------------------------------------------------------|
 | Fedora 44       | `sudo dnf install webkit2gtk4.1 libayatana-appindicator-gtk3`     |
 | Debian / Ubuntu | `sudo apt install libwebkit2gtk-4.1-0 libayatana-appindicator3-1` |
+| Arch Linux      | `sudo pacman -S webkit2gtk-4.1 libayatana-appindicator`           |
 | anything else   | find whatever provides the libraries below                        |
 
 ```
@@ -178,6 +192,7 @@ That produces a single self-contained executable per platform under
 |------------|------------------------------------------|------------------------------------------|
 | Settings   | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
 | Scripts    | `%APPDATA%\URLCheck\scripts`             | `~/.config/URLCheck/scripts`             |
+| Filters    | `%APPDATA%\URLCheck\filters`             | `~/.config/URLCheck/filters`             |
 | History    | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
 | Device key | `%APPDATA%\URLCheck\device.key`          | `~/.config/URLCheck/device.key`          |
 | Logs       | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
