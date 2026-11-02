@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using PhotinoNetUtils;
 using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Platform;
 using PhotinoNetUtils.Utils;
@@ -15,18 +16,16 @@ internal sealed class AppInfoService : Singleton<AppInfoService>
 {
     /// <summary>The version declared in the csproj (<c>&lt;Version&gt;</c>).</summary>
     [PublicAPI] public static readonly string Version =
-        typeof(AppInfoService).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
+        BuildInfo.VersionOf(typeof(AppInfoService).Assembly);
 
     /// <summary>Lower-case platform id, so the UI can adapt platform-specific actions.</summary>
-    [PublicAPI] public static readonly string Platform =
-        OperatingSystem.IsWindows() ? "windows" :
-        OperatingSystem.IsLinux() ? "linux" : "unknown";
+    [PublicAPI] public static readonly string Platform = BuildInfo.Platform;
 
     /// <summary>
     ///     Changes whenever this build does. The interface is always served from the same address, so
     ///     this is what tells the web view that what it cached belongs to an older build.
     /// </summary>
-    [PublicAPI] public static readonly string BuildToken = ResolveBuildToken();
+    [PublicAPI] public static readonly string BuildToken = BuildInfo.BuildTokenFor(typeof(AppInfoService).Assembly);
 
     public AppInfoService() => NativeBridge.MessageReceived += HandleMessageAsync;
 
@@ -57,14 +56,5 @@ internal sealed class AppInfoService : Singleton<AppInfoService>
 
         Log.Warning(exception, "Failed to open the log folder {Path}", directory);
         return context.Fail("app.openLogs.result", "error.openLogsFailed");
-    }
-
-    /// <summary>The executable's write time, which a replacement binary always changes.</summary>
-    private static string ResolveBuildToken()
-    {
-        var executable = Environment.ProcessPath;
-        return string.IsNullOrEmpty(executable)
-            ? Version
-            : File.GetLastWriteTimeUtc(executable).Ticks.ToString();
     }
 }

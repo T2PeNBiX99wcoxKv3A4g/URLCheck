@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Versioning;
 using PhotinoNetUtils;
 using PhotinoNetUtils.Interop;
 using PhotinoNetUtils.Localization;
@@ -207,45 +206,25 @@ internal static class Program
     /// </summary>
     private static void StartTray(ITrayIcon tray)
     {
-        if (!OperatingSystem.IsLinux())
-        {
-            WindowManager.Instance.CloseToTray = tray.Start();
-            return;
-        }
-
-        StartLinuxTrayWhenReady(tray);
+        var manager = WindowManager.Instance;
+        TrayIconFactory.StartWhenReady(tray, manager.RunOnMainWindow, started => manager.CloseToTray = started);
     }
-
-    /// <summary>
-    ///     On GTK the tray can only be built on the UI thread and only once the toolkit has a display
-    ///     connection, which appears when the message loop starts. libayatana-appindicator aborts the
-    ///     process if it is asked any earlier, so it waits for the toolkit to report ready.
-    /// </summary>
-    [SupportedOSPlatform("linux")]
-    private static void StartLinuxTrayWhenReady(ITrayIcon tray) =>
-        _ = Task.Run(async () =>
-        {
-            for (var attempt = 0; attempt < 100 && !TrayIconFactory.IsToolkitReady; attempt++)
-                await Task.Delay(100);
-
-            WindowManager.Instance.RunOnMainWindow(() => { WindowManager.Instance.CloseToTray = tray.Start(); });
-        });
 
     /// <summary>The platform's tray icon, or a no-op stand-in when there is none.</summary>
     private static ITrayIcon CreateTray(string? iconPath)
     {
         var manager = WindowManager.Instance;
 
-        return TrayIconFactory.Create(
+        return TrayIconFactory.CreateStandard(
             Constants.Name,
             Constants.WindowTitle,
             iconPath,
+            Localization.Get("tray.open"),
+            Localization.Get("tray.settings"),
+            Localization.Get("tray.exit"),
             () => manager.ShowMainWindow(),
-            [
-                new(Localization.Get("tray.open"), () => manager.ShowMainWindow()),
-                new(Localization.Get("tray.settings"), () => manager.ShowMainWindow("settings")),
-                new(Localization.Get("tray.exit"), manager.Exit, true)
-            ]);
+            () => manager.ShowMainWindow("settings"),
+            manager.Exit);
     }
 
     /// <summary>Pulls the http/https/checkurl URLs out of a raw argument list.</summary>
