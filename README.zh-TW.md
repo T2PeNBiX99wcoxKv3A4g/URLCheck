@@ -3,6 +3,10 @@
   <h1>URLCheck</h1>
   <p><strong>在 URL 進入瀏覽器之前先檢查它。</strong></p>
   <p>
+    <a href="https://t2penbix99wcoxkv3a4g.github.io/URLCheck/">網站</a> ·
+    <a href="https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#/docs/Lua-Scripts">文件</a>
+  </p>
+  <p>
     <a href="README.md">English</a> ·
     <a href="README.ja.md">日本語</a> ·
     <a href="README.zh-CN.md">简体中文</a>
