@@ -6,7 +6,7 @@
   "scripts": {
     "generate": "node scripts/generate-scripts.mjs && node scripts/generate-docs.mjs",
     "dev": "npm run generate && vite",
-    "build": "npm run generate && tsc --noEmit && vite build && node scripts/generate-static-pages.mjs",
+    "build": "npm run generate && tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
