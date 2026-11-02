@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.9.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.8.0..v1.9.0) - 2026-11-02
+
+### ⛰️  Features
+
+- *(site)* Match the app's fonts and animate the pages - ([d0a265e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d0a265e7a884fbb4fb2ac66ce04b6257dbd8d207))
+
+### 🚜 Refactor
+
+- Use shared Photino helpers - ([d00416d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d00416d5b88a1ea3463ec2b77f01efc0af7c4274))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update @photino-net-utils/bridge to v0.9.0 and refresh associated libraries - ([5e0c862](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5e0c862ef4c0dd414aaaf08157185bcceeda5930))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([7a1bd5f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/7a1bd5ff45e42a4a4378f95825fb2b090ae9491a))
+
+
 ## [1.8.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.7.0..v1.8.0) - 2026-11-01
 
 ### ⛰️  Features
