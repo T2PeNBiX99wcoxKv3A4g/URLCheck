@@ -3,6 +3,7 @@ import styled, {keyframes} from "styled-components";
 import {BookOpen, Download, Eraser, FileCode2, History, MousePointerClick, ScanSearch, Send, type LucideIcon} from "lucide-react";
 import {siArchlinux, siFedora, siUbuntu} from "simple-icons";
 import {ICON, POPUP, REPOSITORY, RELEASES, SCREENSHOT} from "../constants";
+import {docsHref, scriptsHref} from "../links";
 import {useCopy} from "../language";
 
 /** The icon drifts a little, which keeps the hero from feeling like a static screenshot. */
@@ -258,11 +259,11 @@ export const HomePage: React.FC = () => {
                         <Download size={17}/>
                         {home.download}
                     </Button>
-                    <Button href="#/scripts">
+                    <Button href={scriptsHref()}>
                         <FileCode2 size={17}/>
                         {home.installScript}
                     </Button>
-                    <Button href="#/docs/Lua-Scripts">
+                    <Button href={docsHref("Lua-Scripts")}>
                         <BookOpen size={17}/>
                         {home.documentation}
                     </Button>

@@ -3,6 +3,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import styled, {keyframes} from "styled-components";
 import {docs} from "../docs.generated";
+import {docsHref} from "../links";
 import {useCopy, useLanguage} from "../language";
 
 const fadeIn = keyframes`
@@ -216,7 +217,7 @@ export const DocsPage: React.FC<DocsPageProps> = ({page}) => {
                             .map((doc) => (
                                 <SideLink
                                     $active={doc.slug === current.slug}
-                                    href={`#/docs/${doc.slug}`}
+                                    href={docsHref(doc.slug)}
                                     key={doc.slug}
                                 >
                                     {doc.title}

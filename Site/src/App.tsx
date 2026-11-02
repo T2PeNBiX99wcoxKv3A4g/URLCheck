@@ -7,6 +7,7 @@ import {ScriptsPage} from "./pages/Scripts";
 import {DocsPage} from "./pages/Docs";
 import {docs} from "./docs.generated";
 import {ICON, RELEASES} from "./constants";
+import {docsHref, homeHref, scriptsHref} from "./links";
 import {useVersion} from "./version";
 import {LANGUAGES, type Copy, type Language} from "./i18n";
 import {LanguageProvider, useCopy, useLanguage} from "./language";
@@ -273,7 +274,7 @@ const Site: React.FC = () => {
         <Shell>
             <TopBar>
                 <BrandGroup>
-                    <Brand href="#/">
+                    <Brand href={homeHref()}>
                         <BrandIcon src={ICON} alt=""/>
                         URLCheck
                     </Brand>
@@ -288,15 +289,15 @@ const Site: React.FC = () => {
                     )}
                 </BrandGroup>
                 <Nav>
-                    <NavLink $active={route.section === "home"} href="#/">
+                    <NavLink $active={route.section === "home"} href={homeHref()}>
                         <House size={15}/>
                         {copy.nav.home}
                     </NavLink>
-                    <NavLink $active={route.section === "scripts"} href="#/scripts">
+                    <NavLink $active={route.section === "scripts"} href={scriptsHref()}>
                         <FileCode2 size={15}/>
                         {copy.nav.scripts}
                     </NavLink>
-                    <NavLink $active={route.section === "docs"} href="#/docs/Lua-Scripts">
+                    <NavLink $active={route.section === "docs"} href={docsHref("Lua-Scripts")}>
                         <BookOpen size={15}/>
                         {copy.nav.docs}
                     </NavLink>
