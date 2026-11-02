@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.9.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.9.1..v1.9.2) - 2026-11-02
+
+### 📚 Documentation
+
+- Improve table formatting and spacing in localized README files for better readability - ([04d4b11](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/04d4b11914b40ccc44910afc79350e213c1561bb))
+
+### ⚙️ Miscellaneous Tasks
+
+- Ensure consistent file endings across source files - ([272d567](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/272d567d476a8536f436470128f49c426a0398c5))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([57f78d7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/57f78d73b9fcaddeb1df7f0fd7982c8bdae4ff9c))
+
+
 ## [1.9.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.9.0..v1.9.1) - 2026-11-02
 
 ### 🐛 Bug Fixes
