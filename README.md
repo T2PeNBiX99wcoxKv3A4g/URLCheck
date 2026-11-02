@@ -83,12 +83,12 @@ installed for them. What the operating system still has to provide:
 
 Four package formats are published beside the plain archives:
 
-| File                                      | What it does                                                                                                                                                              |
-|-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `URLCheck-<version>-win-x64.msi`          | Per-user Windows installer: installs into `%LOCALAPPDATA%\Programs\URLCheck`, adds a Start menu entry and a desktop shortcut, and never asks for administrator rights.    |
-| `urlcheck-<version>-1.fcXX.x86_64.rpm`    | Fedora package: `sudo dnf install ./urlcheck-<version>-*.rpm`. Installs to `/opt/URLCheck` with a `urlcheck` command, a desktop entry and the icon.                       |
-| `urlcheck_<version>_amd64.deb`            | Debian/Ubuntu package: `sudo apt install ./urlcheck_<version>_amd64.deb`. Same layout as the RPM.                                                                        |
-| `urlcheck-<version>-1-x86_64.pkg.tar.zst` | Arch Linux package: `sudo pacman -U urlcheck-<version>-1-x86_64.pkg.tar.zst`. Same layout as the RPM.                                                                    |
+| File                                      | What it does                                                                                                                                                           |
+|-------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `URLCheck-<version>-win-x64.msi`          | Per-user Windows installer: installs into `%LOCALAPPDATA%\Programs\URLCheck`, adds a Start menu entry and a desktop shortcut, and never asks for administrator rights. |
+| `urlcheck-<version>-1.fcXX.x86_64.rpm`    | Fedora package: `sudo dnf install ./urlcheck-<version>-*.rpm`. Installs to `/opt/URLCheck` with a `urlcheck` command, a desktop entry and the icon.                    |
+| `urlcheck_<version>_amd64.deb`            | Debian/Ubuntu package: `sudo apt install ./urlcheck_<version>_amd64.deb`. Same layout as the RPM.                                                                      |
+| `urlcheck-<version>-1-x86_64.pkg.tar.zst` | Arch Linux package: `sudo pacman -U urlcheck-<version>-1-x86_64.pkg.tar.zst`. Same layout as the RPM.                                                                  |
 
 ### Windows
 

@@ -72,17 +72,17 @@ URLCheck 會將自己註冊為連結處理程式，因此點擊 `http`/`https` �
 
 ## 執行
 
-已發佈的建置版本是**自包含**的 — 它們捆綁了 .NET 執行階段，因此不需要額外安裝任何東西。
+已發佈的建置版本是 **自包含**的 — 它們捆綁了 .NET 執行階段，因此不需要額外安裝任何東西。
 作業系統仍須提供的是：
 
 除了純封存檔之外，另外發佈了四種套件格式：
 
-| 檔案                                      | 用途                                                                                                                                                                      |
-|-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `URLCheck-<version>-win-x64.msi`          | 每位使用者的 Windows 安裝程式：安裝到 `%LOCALAPPDATA%\Programs\URLCheck`，加入開始功能表項目與桌面捷徑，且從不要求系統管理員權限。                                        |
-| `urlcheck-<version>-1.fcXX.x86_64.rpm`    | Fedora 套件：`sudo dnf install ./urlcheck-<version>-*.rpm`。安裝到 `/opt/URLCheck`，並提供 `urlcheck` 指令、桌面項目與圖示。                                                 |
-| `urlcheck_<version>_amd64.deb`            | Debian/Ubuntu 套件：`sudo apt install ./urlcheck_<version>_amd64.deb`。配置與 RPM 相同。                                                                                  |
-| `urlcheck-<version>-1-x86_64.pkg.tar.zst` | Arch Linux 套件：`sudo pacman -U urlcheck-<version>-1-x86_64.pkg.tar.zst`。配置與 RPM 相同。                                                                               |
+| 檔案                                      | 用途                                                                                                                               |
+|-------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| `URLCheck-<version>-win-x64.msi`          | 每位使用者的 Windows 安裝程式：安裝到 `%LOCALAPPDATA%\Programs\URLCheck`，加入開始功能表項目與桌面捷徑，且從不要求系統管理員權限。 |
+| `urlcheck-<version>-1.fcXX.x86_64.rpm`    | Fedora 套件：`sudo dnf install ./urlcheck-<version>-*.rpm`。安裝到 `/opt/URLCheck`，並提供 `urlcheck` 指令、桌面項目與圖示。       |
+| `urlcheck_<version>_amd64.deb`            | Debian/Ubuntu 套件：`sudo apt install ./urlcheck_<version>_amd64.deb`。配置與 RPM 相同。                                           |
+| `urlcheck-<version>-1-x86_64.pkg.tar.zst` | Arch Linux 套件：`sudo pacman -U urlcheck-<version>-1-x86_64.pkg.tar.zst`。配置與 RPM 相同。                                       |
 
 ### Windows
 
@@ -179,14 +179,14 @@ cd ../.. && ./URLCheck/publish.sh          # publish.bat on Windows
 
 ## 資料存放位置
 
-|            | Windows                                  | Linux                                    |
-|------------|------------------------------------------|------------------------------------------|
-| 設定       | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
-| 腳本       | `%APPDATA%\URLCheck\scripts`             | `~/.config/URLCheck/scripts`             |
-| 規則清單   | `%APPDATA%\URLCheck\filters`             | `~/.config/URLCheck/filters`             |
-| 歷史紀錄   | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
-| 裝置金鑰   | `%APPDATA%\URLCheck\device.key`          | `~/.config/URLCheck/device.key`          |
-| 日誌       | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
+|          | Windows                                  | Linux                                    |
+|----------|------------------------------------------|------------------------------------------|
+| 設定     | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
+| 腳本     | `%APPDATA%\URLCheck\scripts`             | `~/.config/URLCheck/scripts`             |
+| 規則清單 | `%APPDATA%\URLCheck\filters`             | `~/.config/URLCheck/filters`             |
+| 歷史紀錄 | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
+| 裝置金鑰 | `%APPDATA%\URLCheck\device.key`          | `~/.config/URLCheck/device.key`          |
+| 日誌     | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
 
 日誌會寫入檔案並同步輸出到主控台，因此只要有日誌檔就足以回報問題。日誌每日輪替，
 並保留最近七份。

@@ -49,7 +49,8 @@ URL を確認せずにリンクを開くのは危険です。このソフトウ�
   ClearURLs の JSON カタログ、Firefox のクエリ パラメーター除去レコードに対応し、リストは
   定期的に更新できます。
 - **スクリプトで拡張** — Lua スクリプトは、開かれる前のすべての URL を書き換えられます。例と
-  ワンクリック インストールについては [スクリプト ページ](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#%2Fscripts) を参照してください。
+  ワンクリック インストールについては [スクリプト ページ](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#%2Fscripts)
+  を参照してください。
   これらのワンクリック インストールは `checkurl://` リンクで、URLCheck 自身が処理します。
 - **信頼する前に確認** — URL の HTTP ステータスを問い合わせたり（リダイレクトを追跡）、
   自前のリストから User-Agent を選んだりできます。リダイレクトを 1 ホップずつたどって
@@ -70,7 +71,7 @@ URL を確認せずにリンクを開くのは危険です。このソフトウ�
 
 - **.NET 10 上の C#** — リンクのインターセプト、トレイ、URL の解析とクリーンアップ、
   ブラウザの起動、履歴といったすべてのロジック。
-- **React 19 + TypeScript**、**Vite** でバンドルし、**styled-components** でスタイルを適用 —
+- **React 19 + TypeScript**、 **Vite** でバンドルし、 **styled-components** でスタイルを適用 —
   インターフェース部分。表示専用で、C# 側と JSON メッセージをやり取りするだけで、それ自体では
   何の処理も行いません。
 - **Photino.NET** — デスクトップ シェル。オペレーティング システム自身の web view で
@@ -84,12 +85,12 @@ URL を確認せずにリンクを開くのは危険です。このソフトウ�
 
 通常のアーカイブとは別に、4 種類のパッケージ形式が公開されています。
 
-| ファイル                                  | 内容                                                                                                                                                                      |
-|-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ファイル                                  | 内容                                                                                                                                                                                     |
+|-------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `URLCheck-<version>-win-x64.msi`          | ユーザーごとの Windows インストーラー: `%LOCALAPPDATA%\Programs\URLCheck` にインストールし、スタート メニューの項目とデスクトップ ショートカットを追加します。管理者権限は要求しません。 |
-| `urlcheck-<version>-1.fcXX.x86_64.rpm`    | Fedora パッケージ: `sudo dnf install ./urlcheck-<version>-*.rpm`。`/opt/URLCheck` にインストールし、`urlcheck` コマンド、デスクトップ エントリ、アイコンを追加します。      |
-| `urlcheck_<version>_amd64.deb`            | Debian/Ubuntu パッケージ: `sudo apt install ./urlcheck_<version>_amd64.deb`。構成は RPM と同じです。                                                                     |
-| `urlcheck-<version>-1-x86_64.pkg.tar.zst` | Arch Linux パッケージ: `sudo pacman -U urlcheck-<version>-1-x86_64.pkg.tar.zst`。構成は RPM と同じです。                                                                 |
+| `urlcheck-<version>-1.fcXX.x86_64.rpm`    | Fedora パッケージ: `sudo dnf install ./urlcheck-<version>-*.rpm`。`/opt/URLCheck` にインストールし、`urlcheck` コマンド、デスクトップ エントリ、アイコンを追加します。                   |
+| `urlcheck_<version>_amd64.deb`            | Debian/Ubuntu パッケージ: `sudo apt install ./urlcheck_<version>_amd64.deb`。構成は RPM と同じです。                                                                                     |
+| `urlcheck-<version>-1-x86_64.pkg.tar.zst` | Arch Linux パッケージ: `sudo pacman -U urlcheck-<version>-1-x86_64.pkg.tar.zst`。構成は RPM と同じです。                                                                                 |
 
 ### Windows
 
@@ -124,11 +125,11 @@ window_rules:
    超マニアの方は、問題を自分で修正してください。
 
 | ディストリビューション | パッケージ                                                        |
-|-----------------|-------------------------------------------------------------------|
-| Fedora 44       | `sudo dnf install webkit2gtk4.1 libayatana-appindicator-gtk3`     |
-| Debian / Ubuntu | `sudo apt install libwebkit2gtk-4.1-0 libayatana-appindicator3-1` |
-| Arch Linux      | `sudo pacman -S webkit2gtk-4.1 libayatana-appindicator`           |
-| その他          | 下記のライブラリを提供するものを探してください                    |
+|------------------------|-------------------------------------------------------------------|
+| Fedora 44              | `sudo dnf install webkit2gtk4.1 libayatana-appindicator-gtk3`     |
+| Debian / Ubuntu        | `sudo apt install libwebkit2gtk-4.1-0 libayatana-appindicator3-1` |
+| Arch Linux             | `sudo pacman -S webkit2gtk-4.1 libayatana-appindicator`           |
+| その他                 | 下記のライブラリを提供するものを探してください                    |
 
 ```
 libwebkit2gtk-4.1.so.0          libjavascriptcoregtk-4.1.so.0
@@ -189,14 +190,14 @@ cd ../.. && ./URLCheck/publish.sh          # publish.bat on Windows
 
 ## データの保存場所
 
-|            | Windows                                  | Linux                                    |
-|------------|------------------------------------------|------------------------------------------|
-| 設定       | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
-| スクリプト | `%APPDATA%\URLCheck\scripts`             | `~/.config/URLCheck/scripts`             |
-| フィルター リスト | `%APPDATA%\URLCheck\filters`      | `~/.config/URLCheck/filters`             |
-| 履歴       | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
-| デバイス キー | `%APPDATA%\URLCheck\device.key`       | `~/.config/URLCheck/device.key`          |
-| ログ       | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
+|                   | Windows                                  | Linux                                    |
+|-------------------|------------------------------------------|------------------------------------------|
+| 設定              | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
+| スクリプト        | `%APPDATA%\URLCheck\scripts`             | `~/.config/URLCheck/scripts`             |
+| フィルター リスト | `%APPDATA%\URLCheck\filters`             | `~/.config/URLCheck/filters`             |
+| 履歴              | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
+| デバイス キー     | `%APPDATA%\URLCheck\device.key`          | `~/.config/URLCheck/device.key`          |
+| ログ              | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
 
 ログはファイルに書き込まれ、コンソールにも複製されるため、問題を報告するにはログ ファイルだけで
 十分です。毎日ローテーションされ、直近 7 日分が保持されます。

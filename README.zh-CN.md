@@ -64,16 +64,16 @@ URLCheck 会把自身注册为链接处理器，因此点击 `http`/`https` 链�
 
 ## 运行
 
-已发布的构建是**自包含**的 —— 它们打包了 .NET 运行时，因此无需额外安装任何东西。操作系统仍需提供以下内容：
+已发布的构建是 **自包含**的 —— 它们打包了 .NET 运行时，因此无需额外安装任何东西。操作系统仍需提供以下内容：
 
 除普通压缩包外，还发布四种包格式：
 
-| 文件                                      | 作用                                                                                                                                                                      |
-|-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `URLCheck-<version>-win-x64.msi`          | 单用户 Windows 安装包：安装到 `%LOCALAPPDATA%\Programs\URLCheck`，添加开始菜单项和桌面快捷方式，且从不请求管理员权限。    |
-| `urlcheck-<version>-1.fcXX.x86_64.rpm`    | Fedora 包：`sudo dnf install ./urlcheck-<version>-*.rpm`。安装到 `/opt/URLCheck`，并提供 `urlcheck` 命令、桌面项和图标。                       |
-| `urlcheck_<version>_amd64.deb`            | Debian/Ubuntu 包：`sudo apt install ./urlcheck_<version>_amd64.deb`。布局与 RPM 相同。                                                                        |
-| `urlcheck-<version>-1-x86_64.pkg.tar.zst` | Arch Linux 包：`sudo pacman -U urlcheck-<version>-1-x86_64.pkg.tar.zst`。布局与 RPM 相同。                                                                    |
+| 文件                                      | 作用                                                                                                                     |
+|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| `URLCheck-<version>-win-x64.msi`          | 单用户 Windows 安装包：安装到 `%LOCALAPPDATA%\Programs\URLCheck`，添加开始菜单项和桌面快捷方式，且从不请求管理员权限。   |
+| `urlcheck-<version>-1.fcXX.x86_64.rpm`    | Fedora 包：`sudo dnf install ./urlcheck-<version>-*.rpm`。安装到 `/opt/URLCheck`，并提供 `urlcheck` 命令、桌面项和图标。 |
+| `urlcheck_<version>_amd64.deb`            | Debian/Ubuntu 包：`sudo apt install ./urlcheck_<version>_amd64.deb`。布局与 RPM 相同。                                   |
+| `urlcheck-<version>-1-x86_64.pkg.tar.zst` | Arch Linux 包：`sudo pacman -U urlcheck-<version>-1-x86_64.pkg.tar.zst`。布局与 RPM 相同。                               |
 
 ### Windows
 
@@ -164,14 +164,14 @@ cd ../.. && ./URLCheck/publish.sh          # publish.bat on Windows
 
 ## 文件存放位置
 
-|            | Windows                                  | Linux                                    |
-|------------|------------------------------------------|------------------------------------------|
-| 设置       | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
-| 脚本       | `%APPDATA%\URLCheck\scripts`             | `~/.config/URLCheck/scripts`             |
-| 规则列表   | `%APPDATA%\URLCheck\filters`             | `~/.config/URLCheck/filters`             |
-| 历史记录   | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
-| 设备密钥   | `%APPDATA%\URLCheck\device.key`          | `~/.config/URLCheck/device.key`          |
-| 日志       | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
+|          | Windows                                  | Linux                                    |
+|----------|------------------------------------------|------------------------------------------|
+| 设置     | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
+| 脚本     | `%APPDATA%\URLCheck\scripts`             | `~/.config/URLCheck/scripts`             |
+| 规则列表 | `%APPDATA%\URLCheck\filters`             | `~/.config/URLCheck/filters`             |
+| 历史记录 | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
+| 设备密钥 | `%APPDATA%\URLCheck\device.key`          | `~/.config/URLCheck/device.key`          |
+| 日志     | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
 
 日志写入文件并同步到控制台，因此仅凭一个日志文件就足以报告问题。日志按天轮转，保留最近七天。
 
