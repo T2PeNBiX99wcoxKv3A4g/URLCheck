@@ -138,6 +138,7 @@ internal static class Program
 
             StartTray(tray);
 
+            using var termination = TerminationSignals.Handle(manager.Exit);
             manager.Run();
 
             Log.Information("Exiting");
