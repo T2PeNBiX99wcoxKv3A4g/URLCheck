@@ -38,10 +38,15 @@ URLCheck 會將自己註冊為連結處理程式，因此點擊 `http`/`https` �
   將 URL 拆解成 scheme、host、參數與 fragment 顯示。
 - **清理 URL** — 編輯或移除任何查詢參數、清除 fragment、捨棄整份參數清單，
   或一鍵移除常見的追蹤參數。
+- **自備規則清單** — 除了內建規則，還可以安裝規則清單並逐一啟用或停用。支援以 `$removeparam`
+  為基礎的 AdGuard 與 uBlock Origin 清單、ClearURLs 的 JSON 目錄，以及 Firefox 的查詢參數
+  剝除記錄，清單也能依排程自動更新。
 - **以腳本處理** — Lua 腳本可以在每個 URL 開啟前改寫它；範例與一鍵安裝請見
-  [腳本頁面](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#%2Fscripts)。
-- **信任前先檢查** — 查詢 URL 的 HTTP 狀態（會跟隨重新導向），或逐跳檢視重新導向，
-  看看短網址會導向何處。
+  [腳本頁面](https://t2penbix99wcoxkv3a4g.github.io/URLCheck/#%2Fscripts)。這些一鍵安裝使用
+  `checkurl://` 連結，由 URLCheck 自行處理。
+- **信任前先檢查** — 查詢 URL 的 HTTP 狀態（會跟隨重新導向），並可改用自選清單中的
+  User-Agent；或逐跳檢視重新導向，看看短網址會導向何處。自動重新導向清單中的主機會在彈窗
+  開啟前就被跟隨，因此被檢查與寫入歷史的是最終位址。
 - **在想要的地方開啟** — 每個連結都能選擇瀏覽器，並可選擇以私密／無痕視窗開啟。
   最常使用的瀏覽器會成為預設按鈕。
 - **歷史紀錄** — 每個被攔截的 URL 都會以 SQLite 記錄在本機，可搜尋，
@@ -51,6 +56,10 @@ URLCheck 會將自己註冊為連結處理程式，因此點擊 `http`/`https` �
 - **轉送到另一台裝置** — 從彈窗將 URL 傳送到區域網路上另一台 URLCheck，
   由對方以自己的檢查彈窗開啟。裝置會自動找到彼此，並透過確認一次性代碼進行配對，
   每次傳輸都經過端對端加密；資料不會離開該網路。
+- **隨系統啟動** — 可選擇隨登入啟動，點擊連結時不必等待冷啟動；搭配「啟動時隱藏」則可一直
+  待在系統匣裡。
+- **使用你的語言** — 介面與後端文字都提供英文、日文、簡體中文與繁體中文。
+- **在應用程式內檢查更新** — 「關於」面板會比對目前版本與已發佈版本，並提供發佈頁面連結。
 
 ## 技術組成
 
@@ -109,6 +118,7 @@ window_rules:
 |-----------------|-------------------------------------------------------------------|
 | Fedora 44       | `sudo dnf install webkit2gtk4.1 libayatana-appindicator-gtk3`     |
 | Debian / Ubuntu | `sudo apt install libwebkit2gtk-4.1-0 libayatana-appindicator3-1` |
+| Arch Linux      | `sudo pacman -S webkit2gtk-4.1 libayatana-appindicator`           |
 | 其他            | 找出任何提供下列函式庫的套件                                      |
 
 ```
@@ -173,6 +183,7 @@ cd ../.. && ./URLCheck/publish.sh          # publish.bat on Windows
 |------------|------------------------------------------|------------------------------------------|
 | 設定       | `%APPDATA%\URLCheck\settings.json`       | `~/.config/URLCheck/settings.json`       |
 | 腳本       | `%APPDATA%\URLCheck\scripts`             | `~/.config/URLCheck/scripts`             |
+| 規則清單   | `%APPDATA%\URLCheck\filters`             | `~/.config/URLCheck/filters`             |
 | 歷史紀錄   | `%APPDATA%\URLCheck\history.db`          | `~/.config/URLCheck/history.db`          |
 | 裝置金鑰   | `%APPDATA%\URLCheck\device.key`          | `~/.config/URLCheck/device.key`          |
 | 日誌       | `%APPDATA%\URLCheck\logs\urlcheck-*.log` | `~/.config/URLCheck/logs/urlcheck-*.log` |
