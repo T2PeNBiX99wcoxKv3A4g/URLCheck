@@ -1,7 +1,10 @@
-/** Links to the generated static pages in a build, and to the SPA routes in dev. */
-export const docsHref = (slug: string) =>
-    import.meta.env.DEV ? `#/docs/${slug}` : `docs/${slug}/`;
+/**
+ * Navigation inside the site stays in the SPA. The generated static pages exist for search
+ * engines; opening one from a result is a normal entry point, but moving between docs and scripts
+ * should not pay for a full page load each time.
+ */
+export const docsHref = (slug: string) => `#/docs/${slug}`;
 
-export const scriptsHref = () => import.meta.env.DEV ? "#/scripts" : "scripts/";
+export const scriptsHref = () => "#/scripts";
 
-export const homeHref = () => import.meta.env.DEV ? "#/" : "./";
+export const homeHref = () => "#/";
