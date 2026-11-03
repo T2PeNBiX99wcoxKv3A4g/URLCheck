@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.11.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.10.0..v1.11.0) - 2026-11-03
+
+### ⛰️  Features
+
+- *(lua)* Add base64, json, http and javascript helpers - ([69bfcd4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/69bfcd4416bba2bea53d09edeb94d3837367c0f0))
+- *(lua)* Unwrap more redirect intermediaries - ([340cdd8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/340cdd8891b16b5646df77a3879a4e22301e9a85))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([337efe9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/337efe99d3db31f94b03efeed27db056647438a8))
+
+
 ## [1.10.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.9.2..v1.10.0) - 2026-11-03
 
 ### ⛰️  Features
