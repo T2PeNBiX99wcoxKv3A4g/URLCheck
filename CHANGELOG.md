@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.10.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.9.2..v1.10.0) - 2026-11-03
+
+### ⛰️  Features
+
+- *(scripts)* Add update checks through scriptUrl and scriptVersion - ([e97bd5e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/e97bd5ed8df15c4279aa23c541fc5e3b9d5df490))
+- *(site)* Make docs and scripts pages indexable - ([b2eede8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b2eede808b46c7cfb025768b828adc77bcd39e1a))
+- *(site)* Add social preview metadata - ([a0fc0ec](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a0fc0ecc0d053ce908cd5a3235ede634f304fbbc))
+- *(ui)* Replace the script editor with codemirror - ([43d948f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/43d948ffa7a4629bc43c0b22956560e03e6de2c1))
+
+### 🐛 Bug Fixes
+
+- *(lua)* Handle urls that arrive without a scheme - ([df00b03](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/df00b03b341d380a77f62f3185ac5d7254ca0b6c))
+
+### 🚜 Refactor
+
+- *(site)* Keep every language in the SPA - ([db1c66a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/db1c66aafb683dc0d44f45b4ae47cecf6f42b213))
+- *(site)* Keep docs navigation in the SPA - ([88a9257](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/88a925743abd11fd1f00bd7294464a5cd0781011))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(site)* Add Google Search Console verification - ([50b9843](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/50b984333c05e3893e734d777005a7cc5cd78add))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([645eef0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/645eef0bc1b504c42840c8243037e4a86c90a1f9))
+
+
 ## [1.9.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.9.1..v1.9.2) - 2026-11-02
 
 ### 📚 Documentation
