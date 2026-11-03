@@ -22,6 +22,8 @@ export interface AppSettings {
     hideOnLaunch: boolean;
     /** Watch the clipboard and float a button over the pointer whenever a copied text is an http(s) URL. */
     showUrlButton: boolean;
+    /** Let Lua scripts make HTTP requests; a script must also set scriptNetwork = true. */
+    allowScriptNetwork: boolean;
     /** Accept pairing requests and forwarded URLs: opens the listener and answers discovery queries. */
     forwardingEnabled: boolean;
     /** Display name this device advertises to peers. */

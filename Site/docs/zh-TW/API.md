@@ -11,6 +11,7 @@ URLCheck 執行的是 **Lua 5.2**。本節說明沙箱提供的每一個函式�
 | [math](math)           | `math.floor`、`math.random`、三角函式、…                         |
 | [coroutine](coroutine) | `coroutine.create`、`coroutine.wrap`、…                          |
 | [bit32](bit32)         | 32 位元位元運算（Lua 5.2 沒有位元運算子）。                      |
+| [Lua 腳本](Lua-Scripts) | 額外函式庫：`base64`、`json`、`http`、`js`。                    |
 
 參考頁面 [Lua 腳本](Lua-Scripts) 說明腳本的結構、`u` 表包含什麼，以及 URL 編碼如何運作。
 [Lua 腳本範例](Lua-Script-Examples) 則有可直接複製的完整腳本。
@@ -36,5 +37,5 @@ URLCheck 執行的是 **Lua 5.2**。本節說明沙箱提供的每一個函式�
 - 字串有少許擴充：`s[i]` 會讀取一個字元，`s + t` 也能像 `..` 一樣串接。
   請見 [string](string)。
 
-所有程式都在 [Lua 腳本](Lua-Scripts) 所述的沙箱中執行：沒有檔案或網路存取，
-且每個腳本對每個 URL 有兩秒鐘的時間。
+所有程式都在 [Lua 腳本](Lua-Scripts) 所述的沙箱中執行：沒有直接的檔案存取；
+只有在腳本宣告 `scriptNetwork` 且設定開啟時才能連網；每個腳本對每個 URL 有 8 秒。

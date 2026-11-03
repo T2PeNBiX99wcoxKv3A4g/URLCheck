@@ -89,5 +89,5 @@ print(coroutine.resume(co))       -- true   first
 print(coroutine.resume(co, "second")) -- true   second
 ```
 
-スクリプトには依然として URL ごとに 2 秒の制限があることを忘れないでください。コルーチンによって
+スクリプトには依然として URL ごとに 8 秒の制限があることを忘れないでください。コルーチンによって
 それが延びることはありません。

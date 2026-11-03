@@ -60,6 +60,9 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                                                -- scriptUrl = "https://example.com/my-script.lua"
                                                -- scriptVersion = "1.0.0"
                                                --
+                                               -- To use http.get/request, set scriptNetwork = true here and enable
+                                               -- script network access in the settings.
+                                               --
                                                -- Everything arrives URL-decoded; the URL is encoded again on the way out.
                                                -- Return u (or a URL string) to accept the changes, nil to leave the URL alone.
 
@@ -73,7 +76,7 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                                                """;
 
     /// <summary>How long one script may run before it is cancelled; it only handles a URL.</summary>
-    private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(8);
 
     /// <summary>How long one regular expression may run; a URL script has to stay quick.</summary>
     private static readonly TimeSpan RegexTimeout = TimeSpan.FromSeconds(1);
@@ -700,6 +703,8 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
             Instance.Write("info", script, string.Join("\t", parts));
             return new(0);
         });
+
+        LuaCapabilities.Register(state);
 
         return state;
     }

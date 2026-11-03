@@ -213,13 +213,75 @@ end
 
 ## 沙箱與限制
 
-腳本在只能處理文字與數字的沙箱中執行，別無其他：
+腳本在處理文字與數字的沙箱中執行：
 
 - **可用：** 基礎函式庫（[_G](_G)）、[string](string)、[table](table)、[math](math)、
-  [bit32](bit32) 與 [coroutine](coroutine)。
+  [bit32](bit32)、[coroutine](coroutine)，以及 `base64`、`json`、`http`、`js`（見下）。
 - **無法使用：** `io`、`os`、`debug`、`package`、`require`、`dofile` 與 `loadfile`。
-  腳本無法讀取檔案、連上網路或啟動程式。
-- 每個腳本對每個 URL 有 **2 秒鐘**。執行超過時間的腳本會被中止並視為錯誤。
+  腳本無法讀取檔案或啟動程式。
+- 每個腳本對每個 URL 有 **8 秒**（包含網路請求）。執行超過時間的腳本會被中止並視為錯誤。
+
+## 額外函式庫
+
+### `base64`
+
+```lua
+base64.encode("hello")        -- "aGVsbG8="
+base64.decode("aGVsbG8=")     -- "hello"；也接受 URL-safe 與缺少填充的輸入
+```
+
+`decode` 遇到非法輸入時傳回 `nil`。
+
+### `json`
+
+```lua
+local value = json.parse('{"a":[1,2]}')  -- { a = { 1, 2 } }
+local text = json.stringify(value)       -- '{"a":[1,2]}'
+```
+
+`parse` 遇到非法 JSON 時傳回 `nil, message`。
+
+### `http`
+
+網路預設關閉。要使用它，請在 **設定 → 腳本網路存取** 中開啟，並在腳本開頭設定
+`scriptNetwork = true`：
+
+```lua
+scriptNetwork = true
+
+return function(u)
+    local response = http.get("https://example.com/api?url=" .. u.url)
+    if not response then
+        return u
+    end
+
+    print(response.status, response.headers["content-type"])
+    local data = json.parse(response.body)
+    ...
+end
+```
+
+`http.get(url [, options])` 與 `http.request(url [, options])` 傳回
+`{ status, body, headers, url }`，失敗時傳回 `nil, message`。只接受 `http`/`https` 與
+`GET`/`POST`/`HEAD`；正文上限 512 KB，請求共用 8 秒預算。`options` 可包含 `method`、`body`、
+`headers` 與 `timeout`（1–7 秒）。
+
+允許連網的腳本可以把看到的網址傳送到任何地方。只對你信任的腳本開啟；下載來的腳本也可以自行
+宣告 `scriptNetwork`。
+
+### `js`
+
+`js.eval(source [, bindings])` 執行一個裸 JavaScript 引擎：
+
+```lua
+local target = js.eval([[
+    decodeURIComponent(new URL(input).searchParams.get("next"))
+]], { input = u.url })
+```
+
+沒有 DOM、`setTimeout`、`fetch` 或頁面環境，所以頁面自身的腳本無法執行。它適合表達式與小片段
+（解碼、正規表示式、字串處理）；要取得文字請先用 `http.get`。傳回字串、數字、布林值或 `nil`；
+發生錯誤會拋出例外。
 
 ## 錯誤
 

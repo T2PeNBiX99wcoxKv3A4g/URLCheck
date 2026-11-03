@@ -1490,6 +1490,18 @@ export const SettingsPage: React.FC = () => {
                                 onChange={(e) => update({showUrlButton: e.target.checked})}
                             />
                         </SettingRow>
+
+                        <SettingRow>
+                            <SettingInfo>
+                                <SettingLabel>{t("settings.scriptNetwork")}</SettingLabel>
+                                <SettingDescription>{t("settings.scriptNetworkDescription")}</SettingDescription>
+                            </SettingInfo>
+                            <Checkbox
+                                disabled={busy}
+                                checked={settings.allowScriptNetwork ?? false}
+                                onChange={(e) => update({allowScriptNetwork: e.target.checked})}
+                            />
+                        </SettingRow>
                     </Section>
 
                     <Section id={anchorId("settings.userAgent")}>

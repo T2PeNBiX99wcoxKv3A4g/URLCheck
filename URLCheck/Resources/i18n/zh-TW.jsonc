@@ -113,6 +113,8 @@
   "settings.autoStripTrackingDescription": "彈窗開啟時自動移除已知的追蹤參數（utm_*、fbclid 等）。關閉後請改用彈窗中的「跟蹤」按鈕手動清理。",
   "settings.showUrlButton": "複製連結時的懸浮按鈕",
   "settings.showUrlButtonDescription": "監看剪貼簿，當複製的內容是 http(s) 連結時，在滑鼠指標旁顯示一個小按鈕，不必切換程式就能檢查該連結。",
+  "settings.scriptNetwork": "腳本網路存取",
+  "settings.scriptNetworkDescription": "允許 Lua 腳本發出 HTTP 請求。腳本還必須設定 scriptNetwork = true。開啟後，已安裝的腳本可以把看到的網址傳送到任意伺服器。除非你信任所有腳本，否則請保持關閉。",
   "settings.forwarding": "裝置互傳",
   "settings.forwardingDescription": "把彈窗中的網址傳給區域網路內另一台 URLCheck，並在對方的檢查彈窗中開啟。裝置會自動互相搜尋，並用一次性驗證碼配對；資料不會離開你的網路。",
   "settings.forwardingEnabled": "啟用裝置互傳",

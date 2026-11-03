@@ -11,6 +11,7 @@ library, so you can look things up the same way you would in the Lua manual.
 | [math](math)           | `math.floor`, `math.random`, trigonometry, …                     |
 | [coroutine](coroutine) | `coroutine.create`, `coroutine.wrap`, …                          |
 | [bit32](bit32)         | 32-bit bitwise operations (Lua 5.2 has no bitwise operators).    |
+| [Lua scripts](Lua-Scripts) | Extra libraries: `base64`, `json`, `http`, `js`.              |
 
 The reference page [Lua scripts](Lua-Scripts) explains how a script is structured, what the `u`
 table contains and how URL encoding works. [Lua script examples](Lua-Script-Examples) has complete
@@ -38,5 +39,6 @@ Because the interpreter is Lua 5.2, a few newer things do not exist:
 - Strings are extended a little: `s[i]` reads one character and `s + t` concatenates as well as
   `..`. See [string](string).
 
-Everything runs in the sandbox described on [Lua scripts](Lua-Scripts): no file or network access,
-and each script has two seconds per URL.
+Everything runs in the sandbox described on [Lua scripts](Lua-Scripts): no direct file access, no
+network unless the script declares `scriptNetwork` and the setting is on, and each script has eight
+seconds per URL.

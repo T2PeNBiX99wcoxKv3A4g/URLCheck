@@ -222,14 +222,76 @@ The log keeps the last 200 lines; the **Clear** button empties it.
 
 ## Sandbox and limits
 
-Scripts run in a sandbox that can work on text and numbers, and nothing else:
+Scripts run in a sandbox that can work on text and numbers:
 
 - **Available:** the base library ([_G](_G)), [string](string), [table](table), [math](math),
-  [bit32](bit32) and [coroutine](coroutine).
+  [bit32](bit32), [coroutine](coroutine), plus `base64`, `json`, `http` and `js` (see below).
 - **Not available:** `io`, `os`, `debug`, `package`, `require`, `dofile` and `loadfile`. A script
-  cannot read files, reach the network or start programs.
-- Each script gets **2 seconds** per URL. A script that runs longer is stopped and treated as an
-  error.
+  cannot read files or start programs.
+- Each script gets **8 seconds** per URL, including any network request. A script that runs longer is
+  stopped and treated as an error.
+
+## Extra libraries
+
+### `base64`
+
+```lua
+base64.encode("hello")        -- "aGVsbG8="
+base64.decode("aGVsbG8=")     -- "hello"; URL-safe input and missing padding are accepted
+```
+
+`decode` returns `nil` when the input is not base64.
+
+### `json`
+
+```lua
+local value = json.parse('{"a":[1,2]}')  -- { a = { 1, 2 } }
+local text = json.stringify(value)       -- '{"a":[1,2]}'
+```
+
+`parse` returns `nil, message` when the text is not valid JSON.
+
+### `http`
+
+Network access is off by default. To use it, enable **Settings → Script network access**, and set
+`scriptNetwork = true` at the top of the script:
+
+```lua
+scriptNetwork = true
+
+return function(u)
+    local response = http.get("https://example.com/api?url=" .. u.url)
+    if not response then
+        return u
+    end
+
+    print(response.status, response.headers["content-type"])
+    local data = json.parse(response.body)
+    ...
+end
+```
+
+`http.get(url [, options])` and `http.request(url [, options])` return
+`{ status, body, headers, url }`, or `nil, message`. Only `http`/`https`, `GET`, `POST` and `HEAD`
+are accepted; the body is capped at 512 KB and the request shares the 8-second script budget.
+`options` can contain `method`, `body`, `headers` and `timeout` (1–7 seconds).
+
+A script with network access can send every URL it sees anywhere. Only enable this for scripts you
+trust; a downloaded script can also declare `scriptNetwork` itself.
+
+### `js`
+
+`js.eval(source [, bindings])` runs a bare JavaScript engine:
+
+```lua
+local target = js.eval([[
+    decodeURIComponent(new URL(input).searchParams.get("next"))
+]], { input = u.url })
+```
+
+There is no DOM, no `setTimeout`, no `fetch` and no page environment, so a page's own scripts will
+not run. It is for small expressions and snippets (decoding, regex, string work); fetch the text
+with `http.get` first. Returns a string, number, boolean or `nil`; errors throw.
 
 ## Errors
 

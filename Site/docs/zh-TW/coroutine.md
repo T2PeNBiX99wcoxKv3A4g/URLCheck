@@ -89,4 +89,4 @@ print(coroutine.resume(co))       -- true   first
 print(coroutine.resume(co, "second")) -- true   second
 ```
 
-請記住，腳本對每個 URL 仍只有兩秒鐘；協程並不會延長這個限制。
+請記住，腳本對每個 URL 仍只有 8 秒；協程並不會延長這個限制。

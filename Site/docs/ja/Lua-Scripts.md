@@ -224,14 +224,77 @@ end
 
 ## サンドボックスと制限
 
-スクリプトは、テキストと数値だけを扱えるサンドボックス内で実行されます。
+スクリプトはテキストと数値を扱うサンドボックス内で実行されます。
 
 - **利用可能:** 基本ライブラリ（[_G](_G)）、[string](string)、[table](table)、[math](math)、
-  [bit32](bit32)、[coroutine](coroutine)。
+  [bit32](bit32)、[coroutine](coroutine)。さらに `base64`、`json`、`http`、`js`（下記）。
 - **利用不可:** `io`、`os`、`debug`、`package`、`require`、`dofile`、`loadfile`。スクリプトは
-  ファイルを読んだり、ネットワークにアクセスしたり、プログラムを起動したりできません。
-- 各スクリプトには URL ごとに **2 秒** が与えられます。それより長く実行されるスクリプトは停止され、
-  エラーとして扱われます。
+  ファイルを読んだり、プログラムを起動したりできません。
+- 各スクリプトには URL ごとに **8 秒** が与えられます（ネットワーク通信を含む）。それより長く
+  実行されるスクリプトは停止され、エラーとして扱われます。
+
+## 追加ライブラリ
+
+### `base64`
+
+```lua
+base64.encode("hello")        -- "aGVsbG8="
+base64.decode("aGVsbG8=")     -- "hello"; URL-safe 入力とパディングなしも可
+```
+
+`decode` は base64 でない入力に対して `nil` を返します。
+
+### `json`
+
+```lua
+local value = json.parse('{"a":[1,2]}')  -- { a = { 1, 2 } }
+local text = json.stringify(value)       -- '{"a":[1,2]}'
+```
+
+`parse` は不正な JSON に対して `nil, message` を返します。
+
+### `http`
+
+ネットワークは既定で無効です。**設定 → スクリプトのネットワーク アクセス** を有効にし、
+スクリプトの先頭で `scriptNetwork = true` を設定してください。
+
+```lua
+scriptNetwork = true
+
+return function(u)
+    local response = http.get("https://example.com/api?url=" .. u.url)
+    if not response then
+        return u
+    end
+
+    print(response.status, response.headers["content-type"])
+    local data = json.parse(response.body)
+    ...
+end
+```
+
+`http.get(url [, options])` と `http.request(url [, options])` は
+`{ status, body, headers, url }`、失敗時は `nil, message` を返します。`http`/`https` と
+`GET`/`POST`/`HEAD` のみ、本文は 512 KB まで、リクエストは 8 秒の予算を共有します。
+`options` には `method`、`body`、`headers`、`timeout`（1〜7 秒）を指定できます。
+
+ネットワークを許可したスクリプトは、処理した URL をどこへでも送信できます。信頼できる
+スクリプトだけに許可してください。ダウンロードしたスクリプト自身が `scriptNetwork` を
+宣言することもできます。
+
+### `js`
+
+`js.eval(source [, bindings])` は素の JavaScript エンジンで式や小さなスニペットを実行します。
+
+```lua
+local target = js.eval([[
+    decodeURIComponent(new URL(input).searchParams.get("next"))
+]], { input = u.url })
+```
+
+DOM、`setTimeout`、`fetch`、ページ環境はありません。ページ自身のスクリプトは実行できません。
+デコード、正規表現、文字列処理向けで、取得は `http.get` を使ってください。文字列、数値、
+真偽値、`nil` を返し、エラーは例外になります。
 
 ## エラー
 

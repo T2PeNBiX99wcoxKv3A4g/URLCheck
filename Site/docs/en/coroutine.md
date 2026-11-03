@@ -90,4 +90,4 @@ print(coroutine.resume(co))       -- true   first
 print(coroutine.resume(co, "second")) -- true   second
 ```
 
-Remember that a script still has two seconds per URL; a coroutine does not extend that.
+Remember that a script still has eight seconds per URL; a coroutine does not extend that.

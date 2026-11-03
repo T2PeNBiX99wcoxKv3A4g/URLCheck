@@ -113,6 +113,8 @@
   "settings.autoStripTrackingDescription": "弹窗打开时自动移除已知的跟踪参数（utm_*、fbclid 等）。关闭后请改用弹窗中的“跟踪”按钮手动清理。",
   "settings.showUrlButton": "复制链接时的悬浮按钮",
   "settings.showUrlButtonDescription": "监视剪贴板，当复制的内容是 http(s) 链接时，在鼠标指针旁显示一个小按钮，无需切换程序即可检查该链接。",
+  "settings.scriptNetwork": "脚本网络访问",
+  "settings.scriptNetworkDescription": "允许 Lua 脚本发起 HTTP 请求。脚本还必须设置 scriptNetwork = true。开启后，已安装的脚本可以把看到的网址发送到任意服务器。除非你信任所有脚本，否则请保持关闭。",
   "settings.forwarding": "设备互传",
   "settings.forwardingDescription": "把弹窗中的网址传给局域网内另一台 URLCheck，并在对方的检查弹窗中打开。设备会自动互相搜索，并用一次性验证码配对；数据不会离开你的网络。",
   "settings.forwardingEnabled": "启用设备互传",

@@ -113,6 +113,8 @@
   "settings.autoStripTrackingDescription": "ポップアップを開いた時点で既知のトラッキング パラメーター（utm_*、fbclid など）を削除します。オフのときはポップアップの「トラッキング」ボタンで手動で削除します。",
   "settings.showUrlButton": "コピーしたリンクのフローティング ボタン",
   "settings.showUrlButtonDescription": "クリップボードを監視し、コピーしたテキストが http(s) URL のときはポインターの横に小さなボタンを表示します。アプリを切り替えずに検査できます。",
+  "settings.scriptNetwork": "スクリプトのネットワーク アクセス",
+  "settings.scriptNetworkDescription": "Lua スクリプトに HTTP リクエストを許可します。スクリプト側でも scriptNetwork = true が必要です。オンにすると、インストールしたスクリプトが処理した URL を任意のサーバーへ送信できます。すべてのスクリプトを信頼できる場合を除き、オフのままにしてください。",
   "settings.forwarding": "デバイス転送",
   "settings.forwardingDescription": "ポップアップの URL を同じローカル ネットワーク上の別の URLCheck に送り、そのデバイスの検査ポップアップで開きます。デバイスは自動で見つかり、一度きりのコードでペアリングします。データはネットワーク外に出ません。",
   "settings.forwardingEnabled": "デバイス転送を有効にする",

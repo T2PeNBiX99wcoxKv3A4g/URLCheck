@@ -70,6 +70,12 @@ internal sealed class AppSettings
     /// </summary>
     public bool ShowUrlButton { get; set; } = true;
 
+    /// <summary>
+    ///     Let Lua scripts make HTTP requests. A script must also set <c>scriptNetwork = true</c>; both
+    ///     are needed, because a script that can fetch can also send the URLs it sees somewhere else.
+    /// </summary>
+    public bool AllowScriptNetwork { get; set; }
+
     /// <summary>Display name this device advertises to peers.</summary>
     public string DeviceName { get; set; } = "";
 

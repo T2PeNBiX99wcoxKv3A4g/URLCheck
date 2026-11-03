@@ -89,4 +89,4 @@ print(coroutine.resume(co))       -- true   first
 print(coroutine.resume(co, "second")) -- true   second
 ```
 
-请记住，脚本处理一个 URL 仍只有两秒；协程并不会延长这个限制。
+请记住，脚本处理一个 URL 仍只有 8 秒；协程并不会延长这个限制。
