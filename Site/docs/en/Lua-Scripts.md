@@ -41,6 +41,25 @@ Clicking it downloads the script into the folder and opens the Scripts page. URL
 `checkurl://` scheme together with `http`/`https` when you press **Register http/https** in
 **Settings → System integration**; if the link does nothing, press it once.
 
+## Updates
+
+A script can publish where it came from and which version it is:
+
+```lua
+scriptUrl = "https://example.com/my-script.lua"
+scriptVersion = "1.2.0"
+```
+
+Both are plain globals set while the file loads. URLCheck reads them once; the Scripts page can then
+check `scriptUrl` and offer to replace the file when the version there is newer. Versions are dotted
+numbers (`1.2.3`): bump `scriptVersion` whenever you change the script, or the update is never
+offered. Leaving either global out simply makes the script not updatable.
+
+A check only reads the published text; code that is not installed yet is never executed. Updates run
+one script at a time or all at once, and always on your command. When the versions match but the
+content differs, URLCheck asks before overwriting the local copy. A replacement keeps the installed
+file name, and a file that does not compile is never written over a working one.
+
 ## The shape of a script
 
 A script file is executed once when it is loaded and must **return a function**. That function is

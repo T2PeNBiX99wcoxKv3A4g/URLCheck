@@ -45,6 +45,10 @@ local function isTracking(name)
     return false
 end
 
+-- The update check compares this version with the one published at scriptUrl.
+scriptUrl = "https://raw.githubusercontent.com/T2PeNBiX99wcoxKv3A4g/URLCheck/master/Lua/strip-tracking-params.lua"
+scriptVersion = "1.0.0"
+
 return function(u)
     for name in pairs(u.query) do
         if isTracking(name) then

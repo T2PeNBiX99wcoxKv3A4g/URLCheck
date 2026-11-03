@@ -11,7 +11,8 @@ using PhotinoNetUtils.Utils;
 namespace URLCheck.Scripting;
 
 /// <summary>One script as the interface lists it.</summary>
-internal sealed record ScriptInfo(string Name, long Size, DateTime Modified, string? Error);
+internal sealed record ScriptInfo(string Name, long Size, DateTime Modified, string? Error, string? Version,
+    string? UpdateUrl);
 
 /// <summary>What the scripts made of one URL, and the first failure to show in the popup.</summary>
 internal sealed record ScriptOutcome(string Url, string? Error);
@@ -53,6 +54,11 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                                                --
                                                -- A URL without a scheme, such as "google.com", has no host or path:
                                                -- check u.host and u.path before using them.
+                                               --
+                                               -- To let URLCheck check for updates, set these two globals. Both must be
+                                               -- literal strings, and the version is bumped on every change:
+                                               -- scriptUrl = "https://example.com/my-script.lua"
+                                               -- scriptVersion = "1.0.0"
                                                --
                                                -- Everything arrives URL-decoded; the URL is encoded again on the way out.
                                                -- Return u (or a URL string) to accept the changes, nil to leave the URL alone.
@@ -171,7 +177,11 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                 if (state is null || function is null)
                     return new(url, error ?? "error.scriptNoFunction");
 
-                script = new(name, state, function, new(PathFor(name)));
+                script = new(name, state, function, new(PathFor(name)))
+                {
+                    Version = Metadata(state, "scriptVersion"),
+                    UpdateUrl = UpdateUrl(state)
+                };
             }
 
             var (next, problem) = await RunAsync(script, url, appVersion);
@@ -589,8 +599,29 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
         if (error is not null)
             Serilog.Log.Warning("Lua script {Script} could not be loaded: {Error}", name, error);
 
-        return new(name, state, function, info, error);
+        return new(name, state, function, info, error)
+        {
+            Version = Metadata(state, "scriptVersion"),
+            UpdateUrl = UpdateUrl(state)
+        };
     }
+
+    /// <summary>
+    ///     A string the script posted as a global while it loaded, for the update check. The value is
+    ///     only read; scripts still cannot reach the network or the file system.
+    /// </summary>
+    private static string? Metadata(LuaState? state, string name) =>
+        state is not null && state.Environment[name].TryRead<string>(out var value) && value.Trim() is { Length: > 0 } text
+            ? text
+            : null;
+
+    /// <summary>The <c>scriptUrl</c> global, when it is an http(s) URL the update check can fetch.</summary>
+    private static string? UpdateUrl(LuaState? state) =>
+        Metadata(state, "scriptUrl") is { } url &&
+        Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
+        uri.Scheme is "http" or "https"
+            ? url
+            : null;
 
     /// <summary>
     ///     Compiles a source into the function it returns. The caller owns the state and must dispose
@@ -986,8 +1017,12 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
 
     private sealed record Script(string Name, LuaState? State, LuaFunction? Function, FileInfo File, string? Error = null)
     {
+        public string? Version { get; init; }
+
+        public string? UpdateUrl { get; init; }
+
         public ScriptInfo Info =>
             new(Name, File.Exists ? File.Length : 0, File.Exists ? File.LastWriteTime : default,
-                Error ?? (Function is null ? "error.scriptNoFunction" : null));
+                Error ?? (Function is null ? "error.scriptNoFunction" : null), Version, UpdateUrl);
     }
 }

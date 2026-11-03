@@ -27,6 +27,10 @@ local function destination(u, params)
     return nil
 end
 
+-- The update check compares this version with the one published at scriptUrl.
+scriptUrl = "https://raw.githubusercontent.com/T2PeNBiX99wcoxKv3A4g/URLCheck/master/Lua/skip-redirects.lua"
+scriptVersion = "1.0.0"
+
 return function(u)
     -- A bare host such as "google.com" arrives without scheme, host or path, so both are checked.
     for _, rule in ipairs(rules) do

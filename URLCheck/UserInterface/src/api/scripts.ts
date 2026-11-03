@@ -8,6 +8,10 @@ export interface ScriptEntry {
     modified: string;
     /** Compile/load error the backend found, or null. */
     error: string | null;
+    /** The `scriptVersion` global, or null when the script does not publish one. */
+    version: string | null;
+    /** The `scriptUrl` global, or null when the script is not updatable. */
+    updateUrl: string | null;
 }
 
 export interface ScriptList {
@@ -37,7 +41,16 @@ async function result(type: string, payload?: unknown): Promise<string | null> {
 export async function listScripts(): Promise<ScriptList> {
     if (!Native.available) return {scripts: [], directory: ""};
 
-    return await Native.request<ScriptList>("scripts.list");
+    const answer = await Native.request<ScriptList>("scripts.list");
+
+    return {
+        ...answer,
+        scripts: answer.scripts.map((script) => ({
+            ...script,
+            version: script.version ?? null,
+            updateUrl: script.updateUrl ?? null,
+        })),
+    };
 }
 
 /** The source of one script. */
@@ -110,4 +123,64 @@ export async function scriptLogs(): Promise<ScriptLogEntry[]> {
 
 export async function clearScriptLogs(): Promise<void> {
     await result("scripts.clearLogs");
+}
+
+/** One script the update check inspected. */
+export interface ScriptUpdateEntry {
+    name: string;
+    /** The local `scriptVersion`, or null. */
+    installed: string | null;
+    /** The version published at `scriptUrl`, or null when it could not be read. */
+    latest: string | null;
+    /** The published version is newer than the local one. */
+    available: boolean;
+    /** Same version but different content: the local copy may have been edited. */
+    changed: boolean;
+    /** Why the check failed, or null. */
+    error: string | null;
+}
+
+/** Asks every script that publishes `scriptUrl` and `scriptVersion` for its current version. */
+export async function checkScriptUpdates(): Promise<ScriptUpdateEntry[]> {
+    if (!Native.available) return [];
+
+    const answer = await Native.request<{ updates: ScriptUpdateEntry[] }>("scripts.checkUpdates");
+
+    return (answer.updates ?? []).map((entry) => ({
+        ...entry,
+        installed: entry.installed ?? null,
+        latest: entry.latest ?? null,
+        available: entry.available ?? false,
+        changed: entry.changed ?? false,
+        error: entry.error ?? null,
+    }));
+}
+
+/**
+ * Replaces one script with the copy at its `scriptUrl`. `force` is only for the case where the
+ * versions match but the content differs and the user agreed to overwrite the local copy.
+ */
+export async function updateScript(name: string, force = false): Promise<string | null> {
+    return await result("scripts.update", {name, force});
+}
+
+export interface ScriptUpdateAllResult {
+    ok: boolean;
+    updated: number;
+    failed: number;
+    error: string | null;
+}
+
+/** Updates every script whose published version is newer. */
+export async function updateAllScripts(): Promise<ScriptUpdateAllResult> {
+    if (!Native.available) return {ok: true, updated: 0, failed: 0, error: null};
+
+    const answer = await Native.request<Partial<ScriptUpdateAllResult>>("scripts.updateAll");
+
+    return {
+        ok: answer.ok ?? false,
+        updated: answer.updated ?? 0,
+        failed: answer.failed ?? 0,
+        error: answer.error ?? null,
+    };
 }

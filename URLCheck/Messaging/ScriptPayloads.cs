@@ -7,7 +7,8 @@ namespace URLCheck.Messaging;
 internal sealed record ScriptNameRequest(string? Name);
 
 /// <summary>One script in the list.</summary>
-internal sealed record ScriptEntryPayload(string Name, long Size, DateTime Modified, string? Error);
+internal sealed record ScriptEntryPayload(string Name, long Size, DateTime Modified, string? Error, string? Version,
+    string? UpdateUrl);
 
 /// <summary>Body for <c>scripts.list</c>: the scripts and the folder they live in.</summary>
 internal sealed record ScriptListPayload(IReadOnlyList<ScriptEntryPayload> Scripts, string Directory);
@@ -32,6 +33,23 @@ internal sealed record ScriptTestPayload(string Url, string? Error);
 
 /// <summary>Body for the messages that only report whether they worked.</summary>
 internal sealed record ScriptResultPayload(bool Ok, string? Error);
+
+/// <summary>Payload for <c>scripts.update</c>; <c>Force</c> replaces a same-version local change.</summary>
+internal sealed record ScriptUpdateRequest(string? Name, bool Force = false);
+
+/// <summary>
+///     One script the update check inspected. <c>Available</c> means the remote version is newer;
+///     <c>Changed</c> means the versions match but the content differs, so the local copy may have
+///     been edited.
+/// </summary>
+internal sealed record ScriptUpdateEntryPayload(string Name, string? Installed, string? Latest, bool Available,
+    bool Changed, string? Error);
+
+/// <summary>Body for <c>scripts.checkUpdates</c>.</summary>
+internal sealed record ScriptUpdatesPayload(IReadOnlyList<ScriptUpdateEntryPayload> Updates);
+
+/// <summary>Body for <c>scripts.updateAll</c>.</summary>
+internal sealed record ScriptUpdateAllPayload(bool Ok, int Updated, int Failed, string? Error);
 
 /// <summary>One line of script output, as the scripts page shows it.</summary>
 internal sealed record ScriptLogPayload(string Time, string Level, string Script, string Message);

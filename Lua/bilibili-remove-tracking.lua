@@ -6,6 +6,10 @@ local tracking = {
     "share_plat", "share_session_id", "share_tag", "timestamp", "unique_k"
 }
 
+-- The update check compares this version with the one published at scriptUrl.
+scriptUrl = "https://raw.githubusercontent.com/T2PeNBiX99wcoxKv3A4g/URLCheck/master/Lua/bilibili-remove-tracking.lua"
+scriptVersion = "1.0.0"
+
 return function(u)
     if u.host and u.host:regexMatch(hosts) then
         for _, name in ipairs(tracking) do

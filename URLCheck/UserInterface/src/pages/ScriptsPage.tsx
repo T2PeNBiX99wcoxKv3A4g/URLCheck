@@ -14,6 +14,7 @@ import {
 } from "../components/Icons";
 import {
     clearScriptLogs,
+    checkScriptUpdates,
     createScript,
     deleteScript,
     downloadScript,
@@ -27,7 +28,10 @@ import {
     type ScriptLogEntry,
     scriptLogs,
     type ScriptTestResult,
+    type ScriptUpdateEntry,
     testScript,
+    updateAllScripts,
+    updateScript,
 } from "../api/scripts";
 
 type Mode = "idle" | "new" | "download";
@@ -57,6 +61,10 @@ export const ScriptsPage: React.FC = () => {
     const [testing, setTesting] = useState(false);
     const [renaming, setRenaming] = useState(false);
     const [renameDraft, setRenameDraft] = useState("");
+    const [updates, setUpdates] = useState<Record<string, ScriptUpdateEntry>>({});
+    const [checkingUpdates, setCheckingUpdates] = useState(false);
+    const [updating, setUpdating] = useState<string | null>(null);
+    const [armedUpdate, setArmedUpdate] = useState<string | null>(null);
     const logBody = useRef<HTMLDivElement | null>(null);
     const saveRef = useRef<() => Promise<void>>(async () => undefined);
     /** The open script and its dirty flag, for the callbacks registered once. */
@@ -64,6 +72,10 @@ export const ScriptsPage: React.FC = () => {
 
     const dirty = content !== saved;
     const gone = selected !== null && !scripts.some((script) => script.name === selected);
+    const availableUpdates = Object.values(updates).filter((entry) => entry.available);
+    const selectedUpdate = selected === null ? undefined : updates[selected];
+    const canUpdate = selectedUpdate !== undefined && (selectedUpdate.available || selectedUpdate.changed);
+    const selectedScript = selected === null ? undefined : scripts.find((script) => script.name === selected);
 
     useEffect(() => {
         openRef.current = {name: selected, dirty};
@@ -74,6 +86,7 @@ export const ScriptsPage: React.FC = () => {
         setContent("");
         setSaved("");
         setArmed(false);
+        setArmedUpdate(null);
         setTest(null);
         setRenaming(false);
     };
@@ -81,6 +94,7 @@ export const ScriptsPage: React.FC = () => {
     const select = async (name: string) => {
         setError(null);
         setArmed(false);
+        setArmedUpdate(null);
         setTest(null);
         setRenaming(false);
 
@@ -125,8 +139,76 @@ export const ScriptsPage: React.FC = () => {
         close();
     };
 
+    /** Reads every script's published version; the page calls it on open and on demand. */
+    const checkUpdates = async (silent = false) => {
+        setCheckingUpdates(true);
+
+        try {
+            const list = await checkScriptUpdates();
+            setUpdates(Object.fromEntries(list.map((entry) => [entry.name, entry])));
+        } catch (problem) {
+            if (!silent) setError(problem instanceof Error ? problem.message : String(problem));
+        } finally {
+            setCheckingUpdates(false);
+        }
+    };
+
+    /**
+     * Replaces one script. A changed same-version copy, or an open buffer with unsaved edits, asks
+     * for a second click first: both would throw work away.
+     */
+    const applyUpdate = async (entry: ScriptUpdateEntry) => {
+        const confirm = entry.changed || (openRef.current.name === entry.name && openRef.current.dirty);
+
+        if (confirm && armedUpdate !== entry.name) {
+            setArmedUpdate(entry.name);
+            return;
+        }
+
+        setUpdating(entry.name);
+        setError(null);
+
+        const problem = await updateScript(entry.name, entry.changed);
+        setUpdating(null);
+        setArmedUpdate(null);
+
+        if (problem) {
+            setError(problem);
+            return;
+        }
+
+        await refresh(entry.name);
+
+        // refresh keeps an open buffer on purpose, so read the replaced file again here.
+        if (openRef.current.name === entry.name) await select(entry.name);
+
+        await checkUpdates(true);
+    };
+
+    const applyAllUpdates = async () => {
+        if (dirty && armedUpdate !== "all") {
+            setArmedUpdate("all");
+            return;
+        }
+
+        const open = openRef.current.name;
+        setUpdating("all");
+        setError(null);
+
+        const result = await updateAllScripts();
+        setUpdating(null);
+        setArmedUpdate(null);
+
+        if (result.failed > 0) setError(t("scripts.updateAllFailed", {failed: result.failed}));
+
+        await refresh();
+        if (open) await select(open);
+        await checkUpdates(true);
+    };
+
     useEffect(() => {
         void refresh();
+        void checkUpdates(true);
         void scriptLogs().then(setLogs).catch(() => setLogs([]));
 
         return Native.on((message) => {
@@ -346,7 +428,14 @@ export const ScriptsPage: React.FC = () => {
                                 title={script.name}
                                 type="button"
                             >
-                                <span>{script.name}</span>
+                                <NameText>{script.name}</NameText>
+                                {script.version && <Version>v{script.version}</Version>}
+                                {updates[script.name]?.available && (
+                                    <UpdateDot title={t("scripts.updateAvailable")}/>
+                                )}
+                                {updates[script.name]?.changed && (
+                                    <UpdateDot $changed title={t("scripts.updateChanged")}/>
+                                )}
                                 {script.error && (
                                     <Problem title={t(script.error)}>
                                         <AlertTriangleIcon size={14}/>
@@ -387,6 +476,26 @@ export const ScriptsPage: React.FC = () => {
                                     >
                                         {t("scripts.download")}
                                     </DockGhostButton>
+                                </DockRow>
+                                <DockRow>
+                                    <DockGhostButton
+                                        disabled={busy || checkingUpdates}
+                                        onClick={() => void checkUpdates()}
+                                        type="button"
+                                    >
+                                        {checkingUpdates ? t("scripts.checkingUpdates") : t("scripts.checkUpdates")}
+                                    </DockGhostButton>
+                                    {availableUpdates.length > 0 && (
+                                        <DockGhostButton
+                                            disabled={busy || updating !== null}
+                                            onClick={() => void applyAllUpdates()}
+                                            type="button"
+                                        >
+                                            {armedUpdate === "all"
+                                                ? t("scripts.updateOverwrite")
+                                                : t("scripts.updateAllCount", {count: availableUpdates.length})}
+                                        </DockGhostButton>
+                                    )}
                                 </DockRow>
                             </DockStack>
                         ) : (
@@ -439,6 +548,7 @@ export const ScriptsPage: React.FC = () => {
                                     ) : (
                                         <Name>{selected}</Name>
                                     )}
+                                    {selectedScript?.version && <Version>v{selectedScript.version}</Version>}
                                     {gone && (
                                         <Gone title={t("scripts.fileGone")}>
                                             <AlertTriangleIcon size={14}/>
@@ -461,6 +571,20 @@ export const ScriptsPage: React.FC = () => {
                                     >
                                         <ExternalLinkIcon size={15}/>
                                     </GhostButton>
+                                    {canUpdate && selectedUpdate && (
+                                        <GhostButton
+                                            disabled={busy || updating !== null}
+                                            onClick={() => void applyUpdate(selectedUpdate)}
+                                            title={selectedUpdate.changed
+                                                ? t("scripts.updateChanged")
+                                                : t("scripts.updateAvailable")}
+                                            type="button"
+                                        >
+                                            {armedUpdate === selected
+                                                ? t("scripts.updateOverwrite")
+                                                : t("scripts.update")}
+                                        </GhostButton>
+                                    )}
                                     <GhostButton
                                         disabled={!dirty || busy}
                                         onClick={() => void save()}
@@ -666,6 +790,30 @@ const Problem = styled.span`
     place-items: center;
     color: #fbbf24;
     flex-shrink: 0;
+`;
+
+/** The script name takes the room the version and the icon do not need. */
+const NameText = styled.span`
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+`;
+
+const Version = styled.span`
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: #6b7280;
+`;
+
+const UpdateDot = styled.span<{ $changed?: boolean }>`
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: ${(props) => (props.$changed ? "#fbbf24" : "#34d399")};
 `;
 
 const Dock = styled.div`

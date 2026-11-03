@@ -30,6 +30,9 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
     {
         NativeBridge.MessageReceived += HandleMessageAsync;
 
+        // Registers the scripts.checkUpdates / scripts.update handlers.
+        _ = ScriptUpdates.Instance;
+
         // Every line a script writes is pushed to the interface as it happens, so the page does not
         // have to poll for it.
         ScriptEngine.Instance.Logged += entry => WindowManager.Instance.BroadcastEventIfReady("scripts.log",
@@ -117,7 +120,7 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
         };
 
     private static ScriptEntryPayload Entry(ScriptInfo script) =>
-        new(script.Name, script.Size, script.Modified, script.Error);
+        new(script.Name, script.Size, script.Modified, script.Error, script.Version, script.UpdateUrl);
 
     private static async Task<NativeResponse?> ListAsync(NativeContext context)
     {

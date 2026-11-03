@@ -36,6 +36,23 @@ checkurl://script?url=https%3A%2F%2Fraw.githubusercontent.com%2FT2PeNBiX99wcoxKv
 点击它会把脚本下载到该文件夹并打开脚本页面。当你在 **设置 → 系统集成** 中按下 **注册 http/https** 时，
 URLCheck 会连同 `http`/`https` 一起注册 `checkurl://` 协议；如果链接没有反应，请再按一次。
 
+## 更新
+
+脚本可以用全局变量声明来源和版本：
+
+```lua
+scriptUrl = "https://example.com/my-script.lua"
+scriptVersion = "1.2.0"
+```
+
+两者都是脚本加载时设置的普通全局变量。URLCheck 只读取一次，之后脚本页可以检查 `scriptUrl`，
+并在那边的版本更新时提示替换。版本号是点分数字（`1.2.3`）：改动脚本后必须递增
+`scriptVersion`，否则不会提示更新。缺少其中任何一个，脚本就不参与更新检查。
+
+检查时只读取发布端的文本，不会执行尚未安装的代码。更新由你逐个或一次全部确认执行。如果版本相同
+但内容不同，URLCheck 会先确认是否覆盖本地副本。替换时保留已安装的文件名；无法编译的文件不会
+覆盖正在工作的脚本。
+
 ## 脚本的结构
 
 脚本文件在加载时执行一次，并且必须**返回一个函数**。随后该函数会为每个 URL 调用一次：
