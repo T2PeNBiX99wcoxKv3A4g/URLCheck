@@ -76,6 +76,15 @@ end
 | `u.query`       | table           | 解码后的查询参数，例如 `{ q = "hello world", page = "2" }`。即使 URL 没有查询，也总是表。                                      |
 | `u.app_version` | string          | 正在运行的 URLCheck 版本。                                                                                                     |
 
+当输入不是绝对 URL 时（例如在弹窗里只输入 `google.com`），`u.scheme`、`u.host` 和 `u.path` 不存在。
+使用前请先检查：
+
+```lua
+if u.host and u.host == "example.com" then
+    u.query["ref"] = nil
+end
+```
+
 对于这样的 URL
 
 ```

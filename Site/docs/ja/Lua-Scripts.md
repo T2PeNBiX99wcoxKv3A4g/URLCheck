@@ -84,6 +84,15 @@ end
 | `u.query`       | table           | デコードされたクエリ パラメーター。たとえば `{ q = "hello world", page = "2" }`。URL にクエリがなくても常にテーブルです。        |
 | `u.app_version` | string          | 実行中の URLCheck のバージョン。                                                                                                |
 
+入力が絶対 URL ではない場合（ポップアップに `google.com` だけを入力した場合など）、`u.scheme`、
+`u.host`、`u.path` は存在しません。使う前に確認してください。
+
+```lua
+if u.host and u.host == "example.com" then
+    u.query["ref"] = nil
+end
+```
+
 次のような URL の場合、
 
 ```

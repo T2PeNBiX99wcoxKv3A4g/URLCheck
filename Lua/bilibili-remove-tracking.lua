@@ -7,7 +7,7 @@ local tracking = {
 }
 
 return function(u)
-    if u.host:regexMatch(hosts) then
+    if u.host and u.host:regexMatch(hosts) then
         for _, name in ipairs(tracking) do
             u.query[name] = nil
         end

@@ -77,6 +77,15 @@ end
 | `u.query`       | table           | 已解碼的查詢參數，例如 `{ q = "hello world", page = "2" }`。一律是 table，即使 URL 沒有查詢字串。                              |
 | `u.app_version` | string          | 執行中的 URLCheck 版本。                                                                                                       |
 
+當輸入不是絕對 URL 時（例如在彈窗裡只輸入 `google.com`），`u.scheme`、`u.host` 與 `u.path` 不存在。
+使用前請先檢查：
+
+```lua
+if u.host and u.host == "example.com" then
+    u.query["ref"] = nil
+end
+```
+
 對於像這樣的 URL
 
 ```

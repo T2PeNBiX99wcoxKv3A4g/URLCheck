@@ -2,7 +2,7 @@
 local reddit = [[^(?:www\.)?reddit\.com$]]
 
 return function(u)
-    if u.host:regexMatch(reddit) then
+    if u.host and u.host:regexMatch(reddit) then
         u.host = "old.reddit.com"
     end
 

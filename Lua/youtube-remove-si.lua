@@ -2,7 +2,7 @@
 local youtube = [[^(?:(?:.+\.)?youtube\.com|youtu\.be)$]]
 
 return function(u)
-    if u.host:regexMatch(youtube) then
+    if u.host and u.host:regexMatch(youtube) then
         u.query["si"] = nil
         u.query["feature"] = nil
         u.query["pp"] = nil

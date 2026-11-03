@@ -82,6 +82,15 @@ work with plain text and never have to unescape anything themselves.
 | `u.query`       | table           | The decoded query parameters, for example `{ q = "hello world", page = "2" }`. Always a table, even when the URL has no query. |
 | `u.app_version` | string          | The running URLCheck version.                                                                                                  |
 
+`u.scheme`, `u.host` and `u.path` do not exist when the input is not an absolute URL, for example a
+bare `google.com` typed into the popup. Check them before using them:
+
+```lua
+if u.host and u.host == "example.com" then
+    u.query["ref"] = nil
+end
+```
+
 For a URL like
 
 ```

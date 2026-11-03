@@ -51,6 +51,9 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
                                                -- u.query        decoded query parameters as a table; set one to nil to drop it
                                                -- u.app_version  the running version
                                                --
+                                               -- A URL without a scheme, such as "google.com", has no host or path:
+                                               -- check u.host and u.path before using them.
+                                               --
                                                -- Everything arrives URL-decoded; the URL is encoded again on the way out.
                                                -- Return u (or a URL string) to accept the changes, nil to leave the URL alone.
 

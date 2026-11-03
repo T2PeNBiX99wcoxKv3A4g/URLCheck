@@ -12,7 +12,7 @@
 local quiet = [[^(?:.+\.)?(?:x|twitter)\.com$]]
 
 return function(u)
-    if u.host:regexMatch(quiet) then
+    if u.host and u.host:regexMatch(quiet) then
         u.query = nil
     end
 

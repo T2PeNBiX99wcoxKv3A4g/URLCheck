@@ -3,7 +3,7 @@ local amazon = [[(?:^|\.)amazon\.]]
 local noise = [[^(?:pf_rd_|ref|utm_)]]
 
 return function(u)
-    if not u.host:regexMatch(amazon) then
+    if not u.host or not u.host:regexMatch(amazon) then
         return u
     end
 

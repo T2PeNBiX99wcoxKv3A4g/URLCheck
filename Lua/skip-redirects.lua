@@ -28,8 +28,9 @@ local function destination(u, params)
 end
 
 return function(u)
+    -- A bare host such as "google.com" arrives without scheme, host or path, so both are checked.
     for _, rule in ipairs(rules) do
-        if u.host:regexMatch(rule.host) and u.path:regexMatch(rule.path) then
+        if u.host and u.path and u.host:regexMatch(rule.host) and u.path:regexMatch(rule.path) then
             local target = destination(u, rule.params)
             if target then
                 return target
