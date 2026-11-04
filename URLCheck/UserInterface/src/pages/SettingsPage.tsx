@@ -111,12 +111,21 @@ const StyledRange = styled.div`
     }
 `;
 
+/**
+ * The form actions stay pinned to the bottom of the viewport while the settings scroll, so Save
+ * and Reset are always one click away instead of being carried off-screen with the content.
+ */
 const ActionRow = styled.div`
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
     display: flex;
     align-items: center;
     gap: 12px;
     /* On a narrow window (or a high display scale) the buttons wrap instead of being clipped. */
     flex-wrap: wrap;
+    padding: 12px 0;
+    background: linear-gradient(to top, #0b0f19 68%, rgba(11, 15, 25, 0));
 `;
 
 const BaseButton = styled.button`
@@ -1445,12 +1454,15 @@ export const SettingsPage: React.FC = () => {
                             </SettingInfo>
                             <Dropdown
                                 variant="form"
-                                disabled={busy || locales.length === 0}
+                                disabled={busy}
                                 value={settings.language}
-                                options={locales.map((locale) => ({
-                                    value: locale,
-                                    label: LOCALE_NAMES[locale] ?? locale
-                                }))}
+                                options={[
+                                    {value: "system", label: t("settings.systemDefault")},
+                                    ...locales.map((locale) => ({
+                                        value: locale,
+                                        label: LOCALE_NAMES[locale] ?? locale
+                                    }))
+                                ]}
                                 onChange={handleLanguageChange}
                             />
                         </SettingRow>
@@ -2099,6 +2111,15 @@ export const SettingsPage: React.FC = () => {
                 </SettingsNav>
             </SettingsBody>
 
+            <FileInfo>
+                <span>{t("settings.fileInfo")}</span>
+                <code>{settingsFilePath || "..."}</code>
+            </FileInfo>
+
+            <AttributionLink type="button" onClick={() => setAttributionOpen(true)}>
+                {t("attribution.title")}
+            </AttributionLink>
+
             <ActionRow>
                 <SaveButton onClick={handleSave} disabled={busy}>
                     {loading ? t("settings.loading") : saving ? t("settings.saving") : t("settings.save")}
@@ -2116,15 +2137,6 @@ export const SettingsPage: React.FC = () => {
                     </Toast>
                 )}
             </ActionRow>
-
-            <FileInfo>
-                <span>{t("settings.fileInfo")}</span>
-                <code>{settingsFilePath || "..."}</code>
-            </FileInfo>
-
-            <AttributionLink type="button" onClick={() => setAttributionOpen(true)}>
-                {t("attribution.title")}
-            </AttributionLink>
 
             {attributionOpen && (
                 <React.Suspense fallback={null}>

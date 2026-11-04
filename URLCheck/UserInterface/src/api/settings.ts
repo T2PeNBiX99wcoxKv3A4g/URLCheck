@@ -5,7 +5,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     requestTimeoutMs: 5000,
     userAgents: [],
     browsers: [],
-    language: "en",
+    language: "system",
     borderlessPopup: true,
     autoStripTrackingParams: true,
     autoRedirectHosts: [],

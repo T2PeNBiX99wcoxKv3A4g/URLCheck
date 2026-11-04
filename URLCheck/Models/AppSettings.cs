@@ -12,7 +12,8 @@ internal sealed class AppSettings
 {
     public const int TimeoutMinMs = 1_000;
     public const int TimeoutMaxMs = 15_000;
-    public const string DefaultLanguage = "en";
+    /// <summary>The stored value that makes the app follow the operating system's UI language.</summary>
+    public const string DefaultLanguage = "system";
 
     /// <summary>Port the device-forwarding listener uses unless the user picks another one.</summary>
     public const int DefaultForwardPort = 45_454;
@@ -32,7 +33,7 @@ internal sealed class AppSettings
     /// <summary>Id of the <see cref="UserAgents" /> entry used for outbound requests. The first entry is the fallback.</summary>
     public string SelectedUserAgentId { get; set; } = "";
 
-    /// <summary>UI language, e.g. <c>en</c>, <c>zh-TW</c>.</summary>
+    /// <summary>UI language: <c>system</c>, <c>en</c>, <c>ja</c>, <c>zh-CN</c> or <c>zh-TW</c>.</summary>
     public string Language { get; set; } = DefaultLanguage;
 
     /// <summary>Browsers offered in the popup. The first entry is used as the default.</summary>

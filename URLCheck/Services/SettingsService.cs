@@ -1,7 +1,6 @@
 using System.Text.Json;
 using JetBrains.Annotations;
 using PhotinoNetUtils.Extensions;
-using PhotinoNetUtils.Localization;
 using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Utils;
 using URLCheck.Messaging;
@@ -159,8 +158,7 @@ internal sealed class SettingsService : Singleton<SettingsService>
         if (!File.Exists(SettingsFilePath))
             return new()
             {
-                Browsers = [.. _browserLocator.Detect()],
-                Language = Localization.ResolveSystemLocale()
+                Browsers = [.. _browserLocator.Detect()]
             };
 
         return (await Try.Run(async () =>

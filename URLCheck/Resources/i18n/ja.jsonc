@@ -57,6 +57,7 @@
   "settings.unregister": "登録解除",
   "settings.protocolStatus": "既定のブラウザ: {isDefault} · checkurl:// 登録済み: {scheme}",
   "settings.pathMismatch": "登録されているハンドラーは別の URLCheck を指しています: {path}。http/https を登録し直して、こちらを指すようにしてください。",
+  "settings.systemDefault": "システム既定",
   "settings.language": "言語",
   "settings.languageDescription": "インターフェースとデスクトップ バックエンドで共通の言語。",
   "settings.borderlessPopup": "枠なしポップアップ",

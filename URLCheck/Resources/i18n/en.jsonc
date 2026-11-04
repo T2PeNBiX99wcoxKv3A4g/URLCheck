@@ -62,6 +62,7 @@
   "settings.unregister": "Unregister",
   "settings.protocolStatus": "Default browser: {isDefault} · checkurl:// registered: {scheme}",
   "settings.pathMismatch": "The registered handler points at a different copy of URLCheck: {path}. Register http/https again to point it at this one.",
+  "settings.systemDefault": "System default",
   "settings.language": "Language",
   "settings.languageDescription": "Language used by both the interface and the desktop backend.",
   "settings.borderlessPopup": "Borderless popup",
