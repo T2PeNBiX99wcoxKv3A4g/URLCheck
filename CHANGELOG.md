@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.12.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.11.1..v1.12.0) - 2026-11-04
+
+### ⛰️  Features
+
+- *(settings)* Add system language and pin the action bar - ([09fc032](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/09fc0320b4771baf50b282c8307d8008049f81c9))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([adcd900](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/adcd9004b1eb2f9642b4c6d14e0eb225fc50b658))
+
+
 ## [1.11.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.11.0..v1.11.1) - 2026-11-03
 
 ### ⚙️ Miscellaneous Tasks
