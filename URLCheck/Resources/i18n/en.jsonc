@@ -282,6 +282,7 @@
   // ------------------------------------------------------------------ tray
   "tray.open": "Open URLCheck",
   "tray.settings": "Settings",
+  "tray.reload": "Reload interface",
   "tray.exit": "Exit",
   // ---------------------------------------------------------------- errors
   "error.missingUrl": "Missing URL.",

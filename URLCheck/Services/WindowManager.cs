@@ -81,6 +81,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
     private bool _hideWhenRendered;
 
     private PhotinoWindow? _mainWindow;
+    private PhotinoNetUtils.Services.WebViewRecovery? _webViewRecovery;
 
     /// <summary>Whether the host window's interface has reported in; before that, messages crash.</summary>
     private bool _mainWindowReady;
@@ -271,6 +272,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
         ApplyIcon(window);
         _platform.ConfigureMainWindow(window);
 
+        _webViewRecovery = PhotinoNetUtils.Services.WebViewRecovery.Attach(window, AppUrl);
         window.Load(AppUrl);
         _mainWindow = window;
 
@@ -808,9 +810,13 @@ internal sealed class WindowManager : Singleton<WindowManager>
     public void Exit()
     {
         _allowClose = true;
+        _webViewRecovery?.Dispose();
         _clipboard.Stop();
         CloseWindow(_mainWindow);
     }
+
+    /// <summary>Reloads the main UI from the tray's recovery action.</summary>
+    public void ReloadWebView() => _webViewRecovery?.Reload();
 
     /// <summary>Gives the window the app icon, when one was extracted.</summary>
     private void ApplyIcon(PhotinoWindow window)

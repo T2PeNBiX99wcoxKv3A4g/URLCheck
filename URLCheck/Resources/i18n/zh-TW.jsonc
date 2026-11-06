@@ -273,6 +273,7 @@
   "error.unknown": "出了點問題。",
   "tray.open": "開啟 URLCheck",
   "tray.settings": "設定",
+  "tray.reload": "重新載入介面",
   "tray.exit": "結束",
   "error.missingUrl": "缺少網址。",
   "error.noBrowser": "尚未設定瀏覽器。請在設定中新增。",
