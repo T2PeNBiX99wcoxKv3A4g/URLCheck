@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.13.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.13.0..v1.13.1) - 2026-11-06
+
+### ⚙️ Miscellaneous Tasks
+
+- Update shared PhotinoNETUtils to 0.12.1 - ([1ae5f31](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1ae5f313ca24b960ef42dc6eaa9ea31529960c2e))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([b975df1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b975df17d6ee7ac7e74c916684cc6a6fe60fbe32))
+
+
 ## [1.13.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.12.0..v1.13.0) - 2026-11-06
 
 ### ⛰️  Features
