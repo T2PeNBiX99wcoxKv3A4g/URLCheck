@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.13.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.12.0..v1.13.0) - 2026-11-06
+
+### ⛰️  Features
+
+- Recover blank WebView and add tray reload - ([b967aed](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b967aed15b4844288fe61fb9b9197890793df740))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update PhotinoNETUtils library - ([03c0860](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/03c086081646a45d616e05292e092c7d9ef54c2e))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([9a660bf](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/9a660bf1fe6840bd27b362d0046a869c72ebba08))
+
+
 ## [1.12.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.11.1..v1.12.0) - 2026-11-04
 
 ### ⛰️  Features
