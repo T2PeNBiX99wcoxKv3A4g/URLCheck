@@ -5,7 +5,7 @@
 
 -- The update check compares this version with the one published at scriptUrl.
 scriptUrl = "https://raw.githubusercontent.com/T2PeNBiX99wcoxKv3A4g/URLCheck/master/Lua/skip-redirects.lua"
-scriptVersion = "1.1.0"
+scriptVersion = "1.1.1"
 
 local rules = {
     { host = [[^(?:.+\.)?youtube\.com$]], path = [[^/redirect]], params = { "q" } },
@@ -13,7 +13,7 @@ local rules = {
     { host = [[^(?:[a-z]+\.)?facebook\.com$]], path = [[^/l\.php$]], params = { "u" } },
     { host = [[^l\.instagram\.com$]], path = [[^/$]], params = { "u" } },
     { host = [[^out\.reddit\.com$]], path = [[^/]], params = { "url" } },
-    { host = [[^steamcommunity\.com$]], path = [[^/linkfilter]], params = { "url" } },
+    { host = [[^steamcommunity\.com$]], path = [[^/linkfilter]], params = { "u", "url" } },
     { host = [[^(?:www\.)?duckduckgo\.com$]], path = [[^/l/]], params = { "uddg" } },
     { host = [[^away\.vk\.com$]], path = [[^/away]], params = { "to" } },
     { host = [[^link\.zhihu\.com$]], path = [[^/$]], params = { "target" } },
