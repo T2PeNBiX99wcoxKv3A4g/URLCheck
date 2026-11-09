@@ -271,7 +271,7 @@
   "error.scriptUpdateTooLarge": "已發布的腳本過大。",
   "error.scriptUpdateOlder": "已發布的版本比本機舊。",
   "error.unknown": "出了點問題。",
-  "tray.open": "開啟 URLCheck",
+  "tray.open": "開啟",
   "tray.settings": "設定",
   "tray.reload": "重新載入介面",
   "tray.exit": "結束",

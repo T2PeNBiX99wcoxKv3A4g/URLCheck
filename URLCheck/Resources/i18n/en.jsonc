@@ -280,7 +280,7 @@
   "error.scriptUpdateOlder": "The published version is older than the local one.",
   "error.unknown": "Something went wrong.",
   // ------------------------------------------------------------------ tray
-  "tray.open": "Open URLCheck",
+  "tray.open": "Open",
   "tray.settings": "Settings",
   "tray.reload": "Reload interface",
   "tray.exit": "Exit",
