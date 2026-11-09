@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.13.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.13.2..v1.13.3) - 2026-11-09
+
+### ⚙️ Miscellaneous Tasks
+
+- *(i18n)* Shorten the tray open label - ([8d22500](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8d225003f81055cf51b20b6ad5e122522c823ef0))
+
+
+## [1.13.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.13.1..v1.13.2) - 2026-11-09
+
+### 🐛 Bug Fixes
+
+- *(lua)* Handle the Steam linkfilter u parameter - ([8190400](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/81904004e1e9f97349e06ad5fb4dca185c1a5e81))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update shared PhotinoNETUtils to 0.13.0 - ([714f0b9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/714f0b9e3cff0cd0a75a9c70f27a2a2f8148d790))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([ae86382](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ae86382716446ef50b88055cc96769e8f9846776))
+
+
 ## [1.13.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.13.0..v1.13.1) - 2026-11-06
 
 ### ⚙️ Miscellaneous Tasks
