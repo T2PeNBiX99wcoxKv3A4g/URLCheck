@@ -36,6 +36,9 @@
     "vite": "^8.3.7",
     "vite-plugin-svgr": "^5.2.0"
   },
+  "overrides": {
+    "@babel/plugin-transform-runtime": "^7.29.0"
+  },
   "allowScripts": {
     "@parcel/watcher": true
   }
