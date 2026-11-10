@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.14.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.14.0..v1.14.1) - 2026-11-10
+
+### 🐛 Bug Fixes
+
+- Match the FileProviders package to PhotinoNETUtils - ([02f89a1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/02f89a1d5e04caa4fc090b27fa3a977e6ed9b137))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update Microsoft.Data.Sqlite to v11.0.0 - ([8ae579c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8ae579c2fa4543edece45258e1ee450ba1fee7e5))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([6ae3e37](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6ae3e375b949710e93bcb533be6c93a1ea71d2a6))
+
+
 ## [1.14.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.13.4..v1.14.0) - 2026-11-10
 
 ### ⛰️  Features
