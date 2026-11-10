@@ -52,6 +52,13 @@ internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWin
     {
         window.SetSize(width, height);
 
+        // Wayland gives a client no way to change its own size: the request above is only a hint, and
+        // Hyprland ignores it for a floating window, which then keeps the size it was mapped with. The
+        // compositor is the one that can, and Hyprland takes the size over its command socket — it
+        // centres the window again as well, since a compositor-side resize grows from the top left.
+        if (LinuxHyprland.Resize(window.Title, width, height))
+            return;
+
         // Keep it centered on every fit.
         window.Center();
     }
