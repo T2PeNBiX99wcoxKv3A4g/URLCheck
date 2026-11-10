@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.14.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.13.4..v1.14.0) - 2026-11-10
+
+### ⛰️  Features
+
+- Fit the popup through Hyprland's command socket - ([59b72d1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/59b72d1d99ef7734828e79a716b844b380612d69))
+
+### 🐛 Bug Fixes
+
+- *(ui)* Resolve the npm peer dependency conflict - ([60fdc42](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/60fdc42870337dc6896985ffbe8f1bd6ca9e4531))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update @photino-net-utils/bridge to v0.15.1 and refresh associated libraries - ([b361e71](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b361e71b385da0f768c107ee6fea1a1dc58abc1e))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([08767c2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/08767c27cea472d7b59e2bcfad9216862f54c730))
+
+
 ## [1.13.4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.13.3..v1.13.4) - 2026-11-10
 
 ### ⚙️ Miscellaneous Tasks
