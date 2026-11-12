@@ -63,7 +63,7 @@ URLCheck 會將自己註冊為連結處理程式，因此點擊 `http`/`https` �
 
 ## 技術組成
 
-- **C# on .NET 10** — 所有邏輯：攔截連結、系統匣、解析與清理 URL、
+- **C# on .NET 11** — 所有邏輯：攔截連結、系統匣、解析與清理 URL、
   啟動瀏覽器，以及歷史紀錄。
 - **React 19 + TypeScript**，由 **Vite** 打包並以 **styled-components** 設計樣式 — 介面部分。
   它僅負責呈現：與 C# 端交換 JSON 訊息，本身不做任何運算。
@@ -137,7 +137,7 @@ AppIndicator 函式庫僅供系統匣圖示使用：沒有它應用程式仍可�
 
 ## 建置
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [.NET 11 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/) 20 或更新版本，用於建置介面
 - `URLCheck/Libs` 中共用的 DLL 與前端橋接套件，需以 `build-and-copy.ps1` 從獨立的
   [PhotinoNETUtils](../PhotinoNETUtils) 專案複製過來
@@ -175,7 +175,7 @@ cd URLCheck/UserInterface && npm run build
 cd ../.. && ./URLCheck/publish.sh          # publish.bat on Windows
 ```
 
-這會為每個平台在 `URLCheck/bin/Release/net10.0/<rid>/publish/` 下產生單一自包含執行檔。
+這會為每個平台在 `URLCheck/bin/Release/net11.0/<rid>/publish/` 下產生單一自包含執行檔。
 
 ## 資料存放位置
 

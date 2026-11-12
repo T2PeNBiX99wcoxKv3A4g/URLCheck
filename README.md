@@ -68,7 +68,7 @@ desktop version.
 
 ## Built with
 
-- **C# on .NET 10** — all of the logic: intercepting links, the tray, parsing and cleaning the URL,
+- **C# on .NET 11** — all of the logic: intercepting links, the tray, parsing and cleaning the URL,
   launching the browser, and the history.
 - **React 19 + TypeScript**, bundled by **Vite** and styled with **styled-components** — the
   interface. It is presentation only: it exchanges JSON messages with the C# side and does no work
@@ -143,7 +143,7 @@ has no tray and keeps its main window visible instead.
 
 ## Building
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [.NET 11 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/) 20 or newer, to build the interface
 - The shared DLL and front-end bridge package in `URLCheck/Libs`, copied from the separate
   [PhotinoNETUtils](../PhotinoNETUtils) project with its `build-and-copy.ps1`
@@ -182,7 +182,7 @@ cd ../.. && ./URLCheck/publish.sh          # publish.bat on Windows
 ```
 
 That produces a single self-contained executable per platform under
-`URLCheck/bin/Release/net10.0/<rid>/publish/`.
+`URLCheck/bin/Release/net11.0/<rid>/publish/`.
 
 ## Where things are stored
 

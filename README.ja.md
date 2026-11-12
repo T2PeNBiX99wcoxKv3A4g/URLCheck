@@ -69,7 +69,7 @@ URL を確認せずにリンクを開くのは危険です。このソフトウ�
 
 ## 使用技術
 
-- **.NET 10 上の C#** — リンクのインターセプト、トレイ、URL の解析とクリーンアップ、
+- **.NET 11 上の C#** — リンクのインターセプト、トレイ、URL の解析とクリーンアップ、
   ブラウザの起動、履歴といったすべてのロジック。
 - **React 19 + TypeScript**、 **Vite** でバンドルし、 **styled-components** でスタイルを適用 —
   インターフェース部分。表示専用で、C# 側と JSON メッセージをやり取りするだけで、それ自体では
@@ -147,7 +147,7 @@ AppIndicator ライブラリはトレイ アイコンにのみ必要です。こ
 
 ## ビルド
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [.NET 11 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/) 20 以降（インターフェースのビルド用）
 - `URLCheck/Libs` にある共有 DLL とフロントエンド ブリッジ パッケージ。別プロジェクトの
   [PhotinoNETUtils](../PhotinoNETUtils) から、その `build-and-copy.ps1` でコピーしたものです。
@@ -185,7 +185,7 @@ cd URLCheck/UserInterface && npm run build
 cd ../.. && ./URLCheck/publish.sh          # publish.bat on Windows
 ```
 
-これにより、`URLCheck/bin/Release/net10.0/<rid>/publish/` の下に、プラットフォームごとの
+これにより、`URLCheck/bin/Release/net11.0/<rid>/publish/` の下に、プラットフォームごとの
 自己完結型の単一実行ファイルが生成されます。
 
 ## データの保存場所

@@ -56,7 +56,7 @@ URLCheck 会把自身注册为链接处理器，因此点击 `http`/`https` 链�
 
 ## 技术构成
 
-- **.NET 10 上的 C#** —— 全部逻辑：拦截链接、托盘、URL 的解析与清理、启动浏览器以及历史记录。
+- **.NET 11 上的 C#** —— 全部逻辑：拦截链接、托盘、URL 的解析与清理、启动浏览器以及历史记录。
 - **React 19 + TypeScript**，由 **Vite** 打包，使用 **styled-components** 设置样式 —— 即界面部分。它只负责呈现：
   与 C# 端交换 JSON 消息，自身不做任何实际工作。
 - **Photino.NET** —— 桌面外壳。它使用操作系统自带的 Web 视图显示界面，因此 Web 视图是运行时依赖：
@@ -123,7 +123,7 @@ AppIndicator 库仅用于托盘图标：没有它应用仍能运行，只是没�
 
 ## 构建
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [.NET 11 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/) 20 或更高版本，用于构建界面
 - `URLCheck/Libs` 中的共享 DLL 和前端桥接包，从独立的
   [PhotinoNETUtils](../PhotinoNETUtils) 项目用其 `build-and-copy.ps1` 复制而来
@@ -160,7 +160,7 @@ cd URLCheck/UserInterface && npm run build
 cd ../.. && ./URLCheck/publish.sh          # publish.bat on Windows
 ```
 
-这会在 `URLCheck/bin/Release/net10.0/<rid>/publish/` 下为每个平台生成单个自包含可执行文件。
+这会在 `URLCheck/bin/Release/net11.0/<rid>/publish/` 下为每个平台生成单个自包含可执行文件。
 
 ## 文件存放位置
 
