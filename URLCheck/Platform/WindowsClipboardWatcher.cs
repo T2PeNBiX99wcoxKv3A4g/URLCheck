@@ -16,7 +16,7 @@ internal sealed class WindowsClipboardWatcher : Singleton<WindowsClipboardWatche
     private const int ReadAttempts = 6;
     private const int ReadRetryMs = 20;
 
-    private readonly string _className = $"URLCheck.Clipboard.{Guid.NewGuid():N}";
+    private readonly string _className = $"URLCheck.Clipboard.{Guid.CreateVersion7():N}";
     private readonly ManualResetEventSlim _ready = new();
     private IntPtr _hwnd = IntPtr.Zero;
     private string? _lastText;

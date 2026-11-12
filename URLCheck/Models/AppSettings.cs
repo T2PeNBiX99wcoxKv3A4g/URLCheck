@@ -153,7 +153,7 @@ internal sealed class AppSettings
         foreach (var agent in UserAgents)
         {
             if (string.IsNullOrWhiteSpace(agent.Id))
-                agent.Id = Guid.NewGuid().ToString("N");
+                agent.Id = Guid.CreateVersion7().ToString("N");
 
             if (string.IsNullOrWhiteSpace(agent.Name))
                 agent.Name = "Custom";
@@ -169,7 +169,7 @@ internal sealed class AppSettings
         foreach (var browser in Browsers)
         {
             if (string.IsNullOrWhiteSpace(browser.Id))
-                browser.Id = Guid.NewGuid().ToString("N");
+                browser.Id = Guid.CreateVersion7().ToString("N");
 
             if (string.IsNullOrWhiteSpace(browser.Name))
                 browser.Name = Path.GetFileNameWithoutExtension(browser.ExecutablePath);
@@ -178,7 +178,7 @@ internal sealed class AppSettings
         // A device needs an identity before it can be reached, even when the user never opens the
         // forwarding settings.
         if (string.IsNullOrWhiteSpace(DeviceId))
-            DeviceId = Guid.NewGuid().ToString("N");
+            DeviceId = Guid.CreateVersion7().ToString("N");
 
         if (string.IsNullOrWhiteSpace(DeviceName))
             DeviceName = Environment.MachineName;
@@ -205,7 +205,7 @@ internal sealed class AppSettings
         foreach (var device in Devices)
         {
             if (string.IsNullOrWhiteSpace(device.Id))
-                device.Id = Guid.NewGuid().ToString("N");
+                device.Id = Guid.CreateVersion7().ToString("N");
 
             if (string.IsNullOrWhiteSpace(device.Name))
                 device.Name = device.Host;

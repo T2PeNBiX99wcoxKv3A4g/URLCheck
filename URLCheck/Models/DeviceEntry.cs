@@ -6,7 +6,7 @@ namespace URLCheck.Models;
 /// </summary>
 internal sealed class DeviceEntry
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    public string Id { get; set; } = Guid.CreateVersion7().ToString("N");
 
     public string Name { get; set; } = string.Empty;
 

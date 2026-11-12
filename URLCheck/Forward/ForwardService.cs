@@ -407,7 +407,7 @@ internal sealed class ForwardService : Singleton<ForwardService>
         var transcript = ForwardCrypto.Transcript("URLCheck.Pair.v1",
             peerKey, Utf8(request.DeviceId), _identity.PublicKey, Utf8(settings.DeviceId), nonce);
 
-        var requestId = Guid.NewGuid().ToString("N");
+        var requestId = Guid.CreateVersion7().ToString("N");
         var incoming = new IncomingPairing(requestId, request.DeviceId, request.DeviceName,
             ForwardCrypto.PairingCode(transcript),
             new(TaskCreationOptions.RunContinuationsAsynchronously));

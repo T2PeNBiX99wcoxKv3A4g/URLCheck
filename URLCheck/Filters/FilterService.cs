@@ -98,7 +98,7 @@ internal sealed class FilterService : Singleton<FilterService>
             var lists = await LoadListsAsync();
             var entry = new FilterListEntry
             {
-                Id = Guid.NewGuid().ToString("N"),
+                Id = Guid.CreateVersion7().ToString("N"),
                 Name = request.Name.Trim(),
                 Url = url
             };
