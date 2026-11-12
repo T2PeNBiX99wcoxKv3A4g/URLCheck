@@ -2,8 +2,8 @@ import {useEffect, useRef} from "react";
 import styled from "styled-components";
 import {EditorState} from "@codemirror/state";
 import {
-    EditorView,
     drawSelection,
+    EditorView,
     highlightActiveLine,
     highlightActiveLineGutter,
     highlightSpecialChars,
@@ -14,11 +14,11 @@ import {
 import {defaultKeymap, history, historyKeymap, indentWithTab} from "@codemirror/commands";
 import {highlightSelectionMatches, search, searchKeymap} from "@codemirror/search";
 import {
-    HighlightStyle,
-    StreamLanguage,
     bracketMatching,
     foldGutter,
+    HighlightStyle,
     indentOnInput,
+    StreamLanguage,
     syntaxHighlighting,
 } from "@codemirror/language";
 import {lua} from "@codemirror/legacy-modes/mode/lua";

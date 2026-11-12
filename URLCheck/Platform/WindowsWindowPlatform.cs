@@ -4,7 +4,6 @@ using System.Runtime.Versioning;
 using Photino.NET;
 using PhotinoNetUtils.Interop;
 using PhotinoNetUtils.Platform;
-using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Platform;
 

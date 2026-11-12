@@ -5,13 +5,16 @@ using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Lua;
 using Lua.Standard;
-using PhotinoNetUtils.Extensions;
-using PhotinoNetUtils.Utils;
 
 namespace URLCheck.Scripting;
 
 /// <summary>One script as the interface lists it.</summary>
-internal sealed record ScriptInfo(string Name, long Size, DateTime Modified, string? Error, string? Version,
+internal sealed record ScriptInfo(
+    string Name,
+    long Size,
+    DateTime Modified,
+    string? Error,
+    string? Version,
     string? UpdateUrl);
 
 /// <summary>What the scripts made of one URL, and the first failure to show in the popup.</summary>
@@ -614,7 +617,8 @@ internal sealed class ScriptEngine : Singleton<ScriptEngine>
     ///     only read; scripts still cannot reach the network or the file system.
     /// </summary>
     private static string? Metadata(LuaState? state, string name) =>
-        state is not null && state.Environment[name].TryRead<string>(out var value) && value.Trim() is { Length: > 0 } text
+        state is not null && state.Environment[name].TryRead<string>(out var value) &&
+        value.Trim() is { Length: > 0 } text
             ? text
             : null;
 

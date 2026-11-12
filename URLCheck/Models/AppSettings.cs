@@ -12,6 +12,7 @@ internal sealed class AppSettings
 {
     public const int TimeoutMinMs = 1_000;
     public const int TimeoutMaxMs = 15_000;
+
     /// <summary>The stored value that makes the app follow the operating system's UI language.</summary>
     public const string DefaultLanguage = "system";
 

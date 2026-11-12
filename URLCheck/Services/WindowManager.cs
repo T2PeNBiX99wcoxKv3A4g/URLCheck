@@ -1,10 +1,9 @@
 using System.Drawing;
 using JetBrains.Annotations;
 using Photino.NET;
-using PhotinoNetUtils.Extensions;
 using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Platform;
-using PhotinoNetUtils.Utils;
+using PhotinoNetUtils.Services;
 using URLCheck.Inspect;
 using URLCheck.Messaging;
 using URLCheck.Models;
@@ -81,7 +80,6 @@ internal sealed class WindowManager : Singleton<WindowManager>
     private bool _hideWhenRendered;
 
     private PhotinoWindow? _mainWindow;
-    private PhotinoNetUtils.Services.WebViewRecovery? _webViewRecovery;
 
     /// <summary>Whether the host window's interface has reported in; before that, messages crash.</summary>
     private bool _mainWindowReady;
@@ -102,6 +100,8 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
     /// <summary>Whether the button's page is listening for <c>selection.show</c> yet.</summary>
     private bool _selectionReady;
+
+    private WebViewRecovery? _webViewRecovery;
 
     public WindowManager()
     {
@@ -272,7 +272,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
         ApplyIcon(window);
         _platform.ConfigureMainWindow(window);
 
-        _webViewRecovery = PhotinoNetUtils.Services.WebViewRecovery.Attach(window, AppUrl);
+        _webViewRecovery = WebViewRecovery.Attach(window, AppUrl);
         window.Load(AppUrl);
         _mainWindow = window;
 

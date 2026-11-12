@@ -1,7 +1,5 @@
 using System.Runtime.Versioning;
 using Microsoft.Win32;
-using PhotinoNetUtils.Extensions;
-using PhotinoNetUtils.Utils;
 using URLCheck.Models;
 
 namespace URLCheck.Platform;

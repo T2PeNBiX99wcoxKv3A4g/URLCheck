@@ -99,7 +99,7 @@ internal static class LuaCapabilities
 
             using (var writer = new Utf8JsonWriter(stream))
                 WriteJson(writer, context.HasArgument(0) ? context.GetArgument(0) : LuaValue.Nil,
-                    new HashSet<LuaTable>(ReferenceEqualityComparer.Instance));
+                    new(ReferenceEqualityComparer.Instance));
 
             return new(context.Return(Encoding.UTF8.GetString(stream.ToArray())));
         }
@@ -224,7 +224,7 @@ internal static class LuaCapabilities
 
         try
         {
-            using var request = new HttpRequestMessage(new HttpMethod(method), uri);
+            using var request = new HttpRequestMessage(new(method), uri);
 
             if (!forceGet && Option(options, "body") is { } body)
                 request.Content = new StringContent(body, Encoding.UTF8);
@@ -297,7 +297,6 @@ internal static class LuaCapabilities
                 .LimitMemory(16_000_000));
 
             if (Table(context, 1) is { } bindings)
-            {
                 foreach (var (key, value) in bindings)
                 {
                     if (!key.TryRead<string>(out var name))
@@ -310,7 +309,6 @@ internal static class LuaCapabilities
                     else if (value.TryRead<bool>(out var flag))
                         engine.SetValue(name, flag);
                 }
-            }
 
             var result = engine.Evaluate(Text(context, 0));
 

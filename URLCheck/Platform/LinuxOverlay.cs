@@ -1,7 +1,5 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using PhotinoNetUtils.Extensions;
-using PhotinoNetUtils.Utils;
 using Serilog;
 
 namespace URLCheck.Platform;

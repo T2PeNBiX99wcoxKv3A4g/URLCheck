@@ -7,7 +7,12 @@ namespace URLCheck.Messaging;
 internal sealed record ScriptNameRequest(string? Name);
 
 /// <summary>One script in the list.</summary>
-internal sealed record ScriptEntryPayload(string Name, long Size, DateTime Modified, string? Error, string? Version,
+internal sealed record ScriptEntryPayload(
+    string Name,
+    long Size,
+    DateTime Modified,
+    string? Error,
+    string? Version,
     string? UpdateUrl);
 
 /// <summary>Body for <c>scripts.list</c>: the scripts and the folder they live in.</summary>
@@ -42,8 +47,13 @@ internal sealed record ScriptUpdateRequest(string? Name, bool Force = false);
 ///     <c>Changed</c> means the versions match but the content differs, so the local copy may have
 ///     been edited.
 /// </summary>
-internal sealed record ScriptUpdateEntryPayload(string Name, string? Installed, string? Latest, bool Available,
-    bool Changed, string? Error);
+internal sealed record ScriptUpdateEntryPayload(
+    string Name,
+    string? Installed,
+    string? Latest,
+    bool Available,
+    bool Changed,
+    string? Error);
 
 /// <summary>Body for <c>scripts.checkUpdates</c>.</summary>
 internal sealed record ScriptUpdatesPayload(IReadOnlyList<ScriptUpdateEntryPayload> Updates);

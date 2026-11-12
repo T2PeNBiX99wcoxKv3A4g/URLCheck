@@ -13,8 +13,8 @@ import {
     TrashIcon
 } from "../components/Icons";
 import {
-    clearScriptLogs,
     checkScriptUpdates,
+    clearScriptLogs,
     createScript,
     deleteScript,
     downloadScript,
