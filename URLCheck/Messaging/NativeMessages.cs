@@ -38,9 +38,6 @@ internal sealed record ForwardAddressRequest(string DeviceId, string Address);
 /// </summary>
 internal sealed record InspectRequest(string Url, string? UserAgentId = null);
 
-/// <summary>Payload for <c>app.setStartup</c>: whether the startup shortcut should exist.</summary>
-internal sealed record StartupRequest(bool Enabled);
-
 /// <summary>Payload for <c>filters.add</c>: a display name and a direct rule-file URL.</summary>
 internal sealed record FilterAddRequest(string Name, string Url);
 

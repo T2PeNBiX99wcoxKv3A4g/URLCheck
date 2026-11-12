@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JetBrains.Annotations;
+using PhotinoNetUtils.Localization;
 using PhotinoNetUtils.Messaging;
 using URLCheck.Messaging;
 using URLCheck.Models;
@@ -12,7 +13,8 @@ namespace URLCheck.Services;
 ///     (<c>%APPDATA%\URLCheck</c> on Windows, <c>~/.config/URLCheck</c> on Linux).
 ///     The first read seeds the browser list so the popup works out of the box.
 /// </summary>
-internal sealed class SettingsService : Singleton<SettingsService>
+[Singleton]
+internal partial class SettingsService
 {
     private static readonly JsonSerializerOptions SettingsFileOptions = new(JsonSerializerDefaults.Web)
     {
@@ -23,7 +25,7 @@ internal sealed class SettingsService : Singleton<SettingsService>
     private readonly IBrowserLocator _browserLocator = PlatformServices.BrowserLocator;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
-    public SettingsService()
+    private SettingsService()
     {
         SettingsFilePath = Path.Combine(Constants.SettingsDirectory, "settings.json");
         NativeBridge.MessageReceived += HandleMessageAsync;
@@ -99,6 +101,7 @@ internal sealed class SettingsService : Singleton<SettingsService>
 
             Current = await ReadAsync();
             Current.Normalize();
+            Current.Language = Localization.Normalize(Current.Language);
             return Current;
         }
         finally
@@ -111,6 +114,7 @@ internal sealed class SettingsService : Singleton<SettingsService>
     public async Task<AppSettings> SaveAsync(AppSettings settings)
     {
         settings.Normalize();
+        settings.Language = Localization.Normalize(settings.Language);
 
         await _gate.WaitAsync();
         try

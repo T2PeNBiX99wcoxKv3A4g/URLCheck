@@ -16,7 +16,8 @@ namespace URLCheck.Services;
 ///     Owns the Photino windows: a hidden "host" window that keeps the message loop alive while the
 ///     app sits in the tray, and an on-demand borderless popup used to inspect a URL.
 /// </summary>
-internal sealed class WindowManager : Singleton<WindowManager>
+[Singleton]
+internal partial class WindowManager
 {
     /// <summary>
     ///     Side of the floating button's square window, in physical pixels. It is a little larger than
@@ -103,7 +104,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
     private WebViewRecovery? _webViewRecovery;
 
-    public WindowManager()
+    private WindowManager()
     {
         _clipboard.TextCopied += OnTextCopied;
         _pointerTimer = new(_ => PollPointer(), null, Timeout.Infinite, Timeout.Infinite);
@@ -323,13 +324,13 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
         Try.Run(() =>
         {
-            if (File.Exists(marker) && File.ReadAllText(marker) != AppInfoService.BuildToken)
+            if (File.Exists(marker) && File.ReadAllText(marker) != AppIdentity.BuildToken)
             {
                 Log.Information("This is a different build; clearing the web view's cache");
                 Directory.Delete(WebViewDataPath, true);
             }
 
-            File.WriteAllText(marker, AppInfoService.BuildToken);
+            File.WriteAllText(marker, AppIdentity.BuildToken);
         }).OnFailure(ex => Log.Warning(ex, "Failed to prepare the web view's data folder"));
     }
 
@@ -606,7 +607,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
 
         // The scripts only see the URL the popup will really open: after the redirects are followed.
         var resolved = await ResolveAutoRedirectAsync(url);
-        var outcome = await ScriptEngine.Instance.ProcessAsync(resolved, AppInfoService.Version);
+        var outcome = await ScriptEngine.Instance.ProcessAsync(resolved, AppIdentity.Version);
 
         ShowPopup(outcome.Url, outcome.Error);
     }

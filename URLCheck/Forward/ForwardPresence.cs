@@ -14,7 +14,8 @@ namespace URLCheck.Forward;
 ///     The check repeats in the background while at least one device is paired, and windows are only
 ///     told when the answer changes, so a steady state costs no messages.
 /// </remarks>
-internal sealed class ForwardPresence : Singleton<ForwardPresence>
+[Singleton]
+internal partial class ForwardPresence
 {
     /// <summary>How often every paired device is rechecked while any of them exist.</summary>
     private static readonly TimeSpan Interval = TimeSpan.FromSeconds(10);

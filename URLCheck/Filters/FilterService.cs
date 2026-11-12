@@ -17,7 +17,8 @@ namespace URLCheck.Filters;
 ///     rules are handed to the popup so it can clean a URL without another round-trip.
 /// </summary>
 [PublicAPI]
-internal sealed class FilterService : Singleton<FilterService>
+[Singleton]
+internal partial class FilterService
 {
     private static readonly JsonSerializerOptions ManifestOptions = new(JsonSerializerDefaults.Web)
     {
@@ -46,7 +47,7 @@ internal sealed class FilterService : Singleton<FilterService>
     private List<RemoveParamRule>? _effectiveRules;
     private List<FilterListEntry>? _lists;
 
-    public FilterService()
+    private FilterService()
     {
         _directory = Path.Combine(Constants.SettingsDirectory, "filters");
         Directory.CreateDirectory(_directory);

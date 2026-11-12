@@ -7,7 +7,8 @@ namespace URLCheck.Platform;
 
 /// <summary>GTK implementation of the platform window operations.</summary>
 [SupportedOSPlatform("linux")]
-internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWindowPlatform
+[Singleton]
+internal partial class LinuxWindowPlatform  : IWindowPlatform
 {
     /// <summary>
     ///     GTK windows get no frame at all without decorations, so the corners and the border are the

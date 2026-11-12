@@ -7,12 +7,13 @@ namespace URLCheck.Forward;
 ///     when they pair, and every handshake is signed with the private key. The private key lives in its
 ///     own file so it never travels with the settings.
 /// </summary>
-internal sealed class DeviceIdentity : Singleton<DeviceIdentity>
+[Singleton]
+internal partial class DeviceIdentity
 {
     private const string FileName = "device.key";
 
     /// <summary>Reads the key from the settings folder, generating one on first use.</summary>
-    public DeviceIdentity()
+    private DeviceIdentity()
     {
         var path = Path.Combine(Constants.SettingsDirectory, FileName);
 

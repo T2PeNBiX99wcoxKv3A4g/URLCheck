@@ -6,7 +6,8 @@ using URLCheck.Services;
 namespace URLCheck.Inspect;
 
 /// <summary>Answers the <c>inspect.*</c> messages: the HTTP status of a URL, redirects included.</summary>
-internal sealed class InspectService : Singleton<InspectService>
+[Singleton]
+internal partial class InspectService
 {
     /// <summary>
     ///     Never follows redirects, so the response keeps its own status: a redirect comes back as the
@@ -20,7 +21,7 @@ internal sealed class InspectService : Singleton<InspectService>
 
     private readonly SettingsService _settings = SettingsService.Instance;
 
-    public InspectService() => NativeBridge.MessageReceived += HandleMessageAsync;
+    private InspectService() => NativeBridge.MessageReceived += HandleMessageAsync;
 
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch
     {

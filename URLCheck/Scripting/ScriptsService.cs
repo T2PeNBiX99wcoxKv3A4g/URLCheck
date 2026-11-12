@@ -9,7 +9,8 @@ namespace URLCheck.Scripting;
 ///     Answers the <c>scripts.*</c> messages: what is installed, reading and saving the source, and the
 ///     lines the scripts printed or failed with.
 /// </summary>
-internal sealed class ScriptsService : Singleton<ScriptsService>
+[Singleton]
+internal partial class ScriptsService
 {
     private static readonly HttpClient Client = new()
     {
@@ -25,7 +26,7 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
     /// </summary>
     private static FileSystemWatcher? _watcher;
 
-    public ScriptsService()
+    private ScriptsService()
     {
         NativeBridge.MessageReceived += HandleMessageAsync;
 
@@ -238,7 +239,7 @@ internal sealed class ScriptsService : Singleton<ScriptsService>
         if (payload?.Name is not { Length: > 0 } name || payload.Url is not { Length: > 0 } url)
             return context.Fail("scripts.test.result", "error.invalidScript");
 
-        var result = await ScriptEngine.Instance.TestAsync(name, url, AppInfoService.Version, payload.Content);
+        var result = await ScriptEngine.Instance.TestAsync(name, url, AppIdentity.Version, payload.Content);
 
         return context.Reply("scripts.test.result", new ScriptTestPayload(result.Url, result.Error));
     }

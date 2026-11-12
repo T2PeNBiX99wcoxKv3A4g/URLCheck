@@ -9,7 +9,8 @@ namespace URLCheck.Services;
 ///     Exposes the platform protocol registrar (<see cref="IProtocolRegistrar" />) over the native
 ///     message bridge.
 /// </summary>
-internal sealed class ProtocolRegistrationService : Singleton<ProtocolRegistrationService>
+[Singleton]
+internal partial class ProtocolRegistrationService
 {
     private static readonly TimeSpan StatusLifetime = TimeSpan.FromSeconds(2);
 
@@ -17,7 +18,7 @@ internal sealed class ProtocolRegistrationService : Singleton<ProtocolRegistrati
     private ProtocolStatusPayload? _status;
     private DateTime _statusReadAt;
 
-    public ProtocolRegistrationService() => NativeBridge.MessageReceived += HandleMessageAsync;
+    private ProtocolRegistrationService() => NativeBridge.MessageReceived += HandleMessageAsync;
 
     [PublicAPI] public string ExecutablePath => _registrar.ExecutablePath;
 

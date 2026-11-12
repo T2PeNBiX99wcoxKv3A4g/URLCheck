@@ -12,7 +12,8 @@ namespace URLCheck.Platform;
 ///     asynchronous request.
 /// </summary>
 [SupportedOSPlatform("linux")]
-internal sealed class LinuxClipboardWatcher : Singleton<LinuxClipboardWatcher>, IClipboardWatcher
+[Singleton]
+internal partial class LinuxClipboardWatcher  : IClipboardWatcher
 {
     /// <summary>Opens each value in the child's output. A control byte can never appear in a URL.</summary>
     private const byte Separator = 0x01;

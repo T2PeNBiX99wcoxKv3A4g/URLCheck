@@ -6,7 +6,8 @@ namespace URLCheck.Platform;
 
 /// <summary>Reads installed browsers from the Windows "StartMenuInternet" client registry.</summary>
 [SupportedOSPlatform("windows")]
-internal sealed class WindowsBrowserLocator : Singleton<WindowsBrowserLocator>, IBrowserLocator
+[Singleton]
+internal partial class WindowsBrowserLocator  : IBrowserLocator
 {
     private const string OwnClientName = "URLCheck";
 

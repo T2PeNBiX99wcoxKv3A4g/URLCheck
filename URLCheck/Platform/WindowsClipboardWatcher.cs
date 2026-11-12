@@ -10,7 +10,8 @@ namespace URLCheck.Platform;
 ///     retried a couple of times and then skipped, so the clipboard is never blocked for anyone else.
 /// </summary>
 [SupportedOSPlatform("windows")]
-internal sealed class WindowsClipboardWatcher : Singleton<WindowsClipboardWatcher>, IClipboardWatcher
+[Singleton]
+internal partial class WindowsClipboardWatcher  : IClipboardWatcher
 {
     private const uint WmDestroy = 0x0002;
     private const int ReadAttempts = 6;

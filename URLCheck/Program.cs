@@ -76,7 +76,7 @@ internal static class Program
             // without racing for the default 8000. The content root is a folder we own, which keeps
             // the web root out of the executable's directory.
             using var staticServer = StaticServer.Start(Constants.DataDirectory);
-            var appUrl = $"{staticServer.BaseUrl}/index.html?v={AppInfoService.BuildToken}";
+            var appUrl = $"{staticServer.BaseUrl}/index.html?v={AppIdentity.BuildToken}";
 #else
             const string appUrl = "http://127.0.0.1:3000";
 #endif
@@ -96,10 +96,8 @@ internal static class Program
 
             _ = HistoryService.Instance;
             var iconPath = AppIcon.EnsureExtracted(typeof(Program).Assembly, Constants.Name);
-            _ = AppInfoService.Instance;
             _ = BrowserService.Instance;
             _ = ProtocolRegistrationService.Instance;
-            _ = StartupService.Instance;
             _ = InspectService.Instance;
             _ = FilterService.Instance;
             _ = ScriptsService.Instance;
@@ -115,11 +113,24 @@ internal static class Program
             manager.ShowMainWindowOnStartup = showMainWindow;
             manager.IconPath = iconPath;
 
+            using var appInfo = new AppInfoService(new AppInfoOptions(
+                typeof(Program).Assembly,
+                Constants.LogDirectory,
+                Constants.IsDebugMode,
+                () => PlatformServices.Window.DrawsWindowCorners));
+
+            using var startup = new StartupService(new StartupRegistration(
+                typeof(Program).Assembly,
+                Constants.Name,
+                "web-browser",
+                $"{Constants.WindowTitle} URL intermediary",
+                OperatingSystem.IsLinux() ? LinuxProtocolRegistrar.ProcessName : null));
+
             using var updates = new UpdateService(new UpdateOptions(
                 Owner: "T2PeNBiX99wcoxKv3A4g",
                 Repository: "URLCheck",
                 AppName: Constants.Name,
-                CurrentVersion: AppInfoService.Version,
+                CurrentVersion: AppIdentity.Version,
                 AssetPattern: "URLCheck-{version}-win-x64.msi",
                 ReleasePageUrl: "https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/releases/latest",
                 LogDirectory: Constants.LogDirectory,

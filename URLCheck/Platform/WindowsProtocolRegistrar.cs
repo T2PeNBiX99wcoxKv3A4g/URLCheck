@@ -15,7 +15,8 @@ namespace URLCheck.Platform;
 ///     deep-links them to that page.
 /// </remarks>
 [SupportedOSPlatform("windows")]
-internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegistrar>, IProtocolRegistrar
+[Singleton]
+internal partial class WindowsProtocolRegistrar  : IProtocolRegistrar
 {
     private const string AppKeyName = "URLCheck";
 
@@ -33,7 +34,7 @@ internal sealed class WindowsProtocolRegistrar : Singleton<WindowsProtocolRegist
 
     private readonly string _command;
 
-    public WindowsProtocolRegistrar()
+    private WindowsProtocolRegistrar()
     {
         ExecutablePath = Environment.ProcessPath
                          ?? Process.GetCurrentProcess().MainModule?.FileName

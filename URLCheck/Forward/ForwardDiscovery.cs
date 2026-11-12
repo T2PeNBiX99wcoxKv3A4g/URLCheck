@@ -15,7 +15,8 @@ namespace URLCheck.Forward;
 ///     with its name, port and public key. Discovery is only a hint: the keys are pinned for real when
 ///     the user pairs.
 /// </summary>
-internal sealed class ForwardDiscovery : Singleton<ForwardDiscovery>
+[Singleton]
+internal partial class ForwardDiscovery
 {
     /// <summary>A fixed link-local multicast group, so IPv6-only networks work as well as IPv4 ones.</summary>
     private static readonly IPAddress Group = IPAddress.Parse("ff02::5552:4c48");
@@ -41,7 +42,7 @@ internal sealed class ForwardDiscovery : Singleton<ForwardDiscovery>
     private UdpClient? _v4;
     private UdpClient? _v6;
 
-    public ForwardDiscovery() =>
+    private ForwardDiscovery() =>
         _onDiscovered = devices => WindowManager.Instance.RunOnMainWindow(() =>
             WindowManager.Instance.BroadcastEvent("forward.discovered", new ForwardDiscoveredPayload(devices)));
 

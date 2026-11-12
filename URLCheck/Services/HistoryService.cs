@@ -11,7 +11,8 @@ namespace URLCheck.Services;
 ///     building generates code and is therefore not usable from a Native AOT build.
 /// </summary>
 [PublicAPI]
-internal sealed class HistoryService : Singleton<HistoryService>
+[Singleton]
+internal partial class HistoryService
 {
     private const string CreateSchema =
         """
@@ -27,7 +28,7 @@ internal sealed class HistoryService : Singleton<HistoryService>
 
     private readonly SemaphoreSlim _gate = new(1, 1);
 
-    public HistoryService()
+    private HistoryService()
     {
         DatabasePath = Path.Combine(Constants.SettingsDirectory, "history.db");
         _connectionString = new SqliteConnectionStringBuilder

@@ -15,7 +15,8 @@ namespace URLCheck.Forward;
 ///     accepts pairing requests and forwarded URLs. A URL that arrives opens in the inspection popup,
 ///     so the receiving side still checks it first.
 /// </summary>
-internal sealed class ForwardService : Singleton<ForwardService>
+[Singleton]
+internal partial class ForwardService
 {
     private readonly ForwardDiscovery _discovery = ForwardDiscovery.Instance;
     private readonly SemaphoreSlim _gate = new(1, 1);
@@ -34,7 +35,7 @@ internal sealed class ForwardService : Singleton<ForwardService>
     /// <summary>The port the running listener was built for, so it only restarts on a real change.</summary>
     private string _signature = "";
 
-    public ForwardService()
+    private ForwardService()
     {
         NativeBridge.MessageReceived += HandleMessageAsync;
         SettingsService.Changed += payload => _ = ApplyAsync(payload.Settings);

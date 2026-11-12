@@ -9,7 +9,8 @@ namespace URLCheck.Platform;
 ///     file plus <c>xdg-mime default</c>. Unlike Windows, the default handler can be set directly.
 /// </summary>
 [SupportedOSPlatform("linux")]
-internal sealed class LinuxProtocolRegistrar : Singleton<LinuxProtocolRegistrar>, IProtocolRegistrar
+[Singleton]
+internal partial class LinuxProtocolRegistrar  : IProtocolRegistrar
 {
     private const string DesktopFileName = "urlcheck.desktop";
     private const string CustomSchemeMime = "x-scheme-handler/checkurl";

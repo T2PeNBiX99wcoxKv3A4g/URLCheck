@@ -9,7 +9,8 @@ namespace URLCheck.Platform;
 
 /// <summary>Win32 implementation of the platform window operations.</summary>
 [SupportedOSPlatform("windows")]
-internal sealed class WindowsWindowPlatform : Singleton<WindowsWindowPlatform>, IWindowPlatform
+[Singleton]
+internal partial class WindowsWindowPlatform  : IWindowPlatform
 {
     /// <summary>The native frame rounds the window and draws its border, so the interface does not.</summary>
     public bool DrawsWindowCorners => false;

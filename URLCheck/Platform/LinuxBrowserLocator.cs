@@ -8,7 +8,8 @@ namespace URLCheck.Platform;
 ///     themselves as <c>x-scheme-handler/http</c> or <c>https</c> handlers.
 /// </summary>
 [SupportedOSPlatform("linux")]
-internal sealed class LinuxBrowserLocator : Singleton<LinuxBrowserLocator>, IBrowserLocator
+[Singleton]
+internal partial class LinuxBrowserLocator  : IBrowserLocator
 {
     private const string OwnDesktopFile = "urlcheck.desktop";
 

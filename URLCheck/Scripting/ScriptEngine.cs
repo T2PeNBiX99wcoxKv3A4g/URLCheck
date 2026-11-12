@@ -37,7 +37,8 @@ internal sealed record ScriptLogEntry(DateTime Time, string Level, string Script
 ///     <c>package</c>, and no <c>dofile</c>/<c>loadfile</c>, so a script can neither read files nor
 ///     reach the machine.
 /// </remarks>
-internal sealed class ScriptEngine : Singleton<ScriptEngine>
+[Singleton]
+internal partial class ScriptEngine
 {
     /// <summary>How many log lines are kept for the scripts page.</summary>
     private const int MaxLogEntries = 200;

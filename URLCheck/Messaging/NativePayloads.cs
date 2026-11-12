@@ -34,21 +34,6 @@ internal sealed record ProtocolStatusPayload(
 /// <summary>Body for <c>browsers.detect</c>.</summary>
 internal sealed record BrowsersPayload(IReadOnlyList<BrowserEntry> Browsers);
 
-/// <summary>Body for <c>app.info</c>: the build version, the platform id and where the logs live.</summary>
-internal sealed record AppInfoPayload(string Version, string Platform, string LogDirectory, bool Rounded);
-
-/// <summary>
-///     Body for the <c>app.startup</c> messages. The state lives in the Startup folder, so it is
-///     reported rather than stored, and platforms without one report <c>Supported: false</c>.
-/// </summary>
-internal sealed record StartupPayload(bool Supported, bool Enabled);
-
-/// <summary>Body for the <c>window.state</c> event: whether the window is maximized.</summary>
-internal sealed record WindowStatePayload(bool Maximized);
-
-/// <summary>Payload for <c>window.resize</c>: the edge the interface's grip was dragged from.</summary>
-internal sealed record WindowResizeRequest(string Direction);
-
 /// <summary>Body for <c>history.list</c>.</summary>
 internal sealed record HistoryListPayload(IReadOnlyList<HistoryItemPayload> Entries);
 

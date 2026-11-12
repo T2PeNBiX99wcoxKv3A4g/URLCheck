@@ -9,7 +9,8 @@ namespace URLCheck.Scripting;
 ///     setting two globals while it loads; the app reads them once and never executes the remote copy
 ///     during a check.
 /// </summary>
-internal sealed class ScriptUpdates : Singleton<ScriptUpdates>
+[Singleton]
+internal partial class ScriptUpdates
 {
     /// <summary>A URL script is small; anything larger is not one.</summary>
     private const int MaxBytes = 512 * 1024;
@@ -29,7 +30,7 @@ internal sealed class ScriptUpdates : Singleton<ScriptUpdates>
         @"(?m)^[ \t]*scriptVersion[ \t]*=[ \t]*(?:""(?<value>[^""]*)""|'(?<value>[^']*)')",
         RegexOptions.Compiled);
 
-    public ScriptUpdates() => NativeBridge.MessageReceived += HandleMessageAsync;
+    private ScriptUpdates() => NativeBridge.MessageReceived += HandleMessageAsync;
 
     private static Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch
     {

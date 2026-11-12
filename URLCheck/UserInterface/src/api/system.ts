@@ -95,6 +95,8 @@ export interface AppInfo {
     logDirectory: string;
     /** True when the interface has to paint the window's rounded corners itself (Linux). */
     rounded: boolean;
+    /** True when the shared AppInfoService is running a debug build. */
+    debug?: boolean;
 }
 
 /** Reads the app version declared in the csproj, plus the host platform id and where logs live. */
