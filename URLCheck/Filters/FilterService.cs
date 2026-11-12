@@ -390,7 +390,7 @@ internal sealed class FilterService : Singleton<FilterService>
         var lists = (await Try.Run(async () =>
         {
             var json = await File.ReadAllTextAsync(_manifestPath);
-            return JsonSerializer.Deserialize(json, ManifestOptions.GetTypeInfo(typeof(List<FilterListEntry>)))
+            return JsonSerializer.Deserialize(json, ManifestOptions.GetTypeInfo<List<FilterListEntry>>())
                 as List<FilterListEntry> ?? [];
         })).GetOrElse(ex =>
         {
@@ -406,7 +406,7 @@ internal sealed class FilterService : Singleton<FilterService>
     {
         _lists = lists;
         await File.WriteAllTextAsync(_manifestPath,
-            JsonSerializer.Serialize(lists, ManifestOptions.GetTypeInfo(typeof(List<FilterListEntry>))));
+            JsonSerializer.Serialize(lists, ManifestOptions.GetTypeInfo<List<FilterListEntry>>()));
     }
 
     private string RuleFilePath(string id) => Path.Combine(_directory, $"{id}.txt");

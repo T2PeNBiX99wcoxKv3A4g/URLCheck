@@ -1,7 +1,6 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using URLCheck.Messaging;
 using URLCheck.Models;
 
@@ -230,7 +229,7 @@ internal static class ForwardClient
     private static async Task WriteAsync<T>(NetworkStream stream, T message, CancellationToken token)
         where T : class
     {
-        var typeInfo = (JsonTypeInfo<T>)NativeJson.TypeInfo(typeof(T));
+        var typeInfo = NativeJson.TypeInfo<T>();
         var frame = JsonSerializer.SerializeToUtf8Bytes(message, typeInfo);
         await ForwardProtocol.WriteFrameAsync(stream, frame, token);
     }
@@ -252,5 +251,5 @@ internal static class ForwardClient
     }
 
     private static T? Deserialize<T>(byte[]? frame) where T : class =>
-        frame is null ? null : JsonSerializer.Deserialize(frame, (JsonTypeInfo<T>)NativeJson.TypeInfo(typeof(T)));
+        frame is null ? null : JsonSerializer.Deserialize(frame, NativeJson.TypeInfo<T>());
 }

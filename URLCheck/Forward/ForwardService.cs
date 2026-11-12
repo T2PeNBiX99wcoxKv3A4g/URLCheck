@@ -3,7 +3,6 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using PhotinoNetUtils.Messaging;
 using URLCheck.Messaging;
 using URLCheck.Models;
@@ -586,7 +585,7 @@ internal sealed class ForwardService : Singleton<ForwardService>
     private static async Task WriteMessageAsync<T>(NetworkStream stream, T message, CancellationToken token)
         where T : class
     {
-        var frame = JsonSerializer.SerializeToUtf8Bytes(message, (JsonTypeInfo<T>)NativeJson.TypeInfo(typeof(T)));
+        var frame = JsonSerializer.SerializeToUtf8Bytes(message, NativeJson.TypeInfo<T>());
         await ForwardProtocol.WriteFrameAsync(stream, frame, token);
     }
 
@@ -594,7 +593,7 @@ internal sealed class ForwardService : Singleton<ForwardService>
         WriteMessageAsync(stream, new StatusMessage(ForwardProtocol.Status, ok, error), token);
 
     private static T? Deserialize<T>(byte[] frame) where T : class =>
-        JsonSerializer.Deserialize(frame, (JsonTypeInfo<T>)NativeJson.TypeInfo(typeof(T)));
+        JsonSerializer.Deserialize(frame, NativeJson.TypeInfo<T>());
 
     private static string HostOf(TcpClient client)
     {

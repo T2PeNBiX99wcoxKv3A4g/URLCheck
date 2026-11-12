@@ -116,7 +116,7 @@ internal sealed class SettingsService : Singleton<SettingsService>
         try
         {
             await File.WriteAllTextAsync(SettingsFilePath,
-                JsonSerializer.Serialize(settings, SettingsFileOptions.GetTypeInfo(typeof(AppSettings))));
+                JsonSerializer.Serialize(settings, SettingsFileOptions.GetTypeInfo<AppSettings>()));
             Current = settings;
             return settings;
         }
@@ -162,7 +162,7 @@ internal sealed class SettingsService : Singleton<SettingsService>
         return (await Try.Run(async () =>
         {
             var json = await File.ReadAllTextAsync(SettingsFilePath);
-            return JsonSerializer.Deserialize(json, SettingsFileOptions.GetTypeInfo(typeof(AppSettings)))
+            return JsonSerializer.Deserialize(json, SettingsFileOptions.GetTypeInfo<AppSettings>())
                 as AppSettings ?? new AppSettings();
         })).GetOrElse(ex =>
         {
