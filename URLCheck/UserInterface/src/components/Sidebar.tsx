@@ -2,8 +2,7 @@ import React, {useEffect, useState} from "react";
 import styled, {keyframes} from "styled-components";
 import {Native, useTranslation} from "@photino-net-utils/bridge";
 import {TABS, type TabType} from "../tabs";
-import {getAppInfo, getUpdateStatus, RELEASES_URL, type UpdateCheck} from "../api/system";
-import {openWithDefaultHandler} from "../api/browsers";
+import {getAppInfo, getUpdateStatus, openReleasePage, type UpdateCheck} from "../api/system";
 
 interface SidebarProps {
     currentTab: TabType;
@@ -120,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
         /* A check started from the settings page reports its result here too. */
         return Native.on((message) => {
             const event = message as { type?: string; data?: UpdateCheck };
-            if (event.type === "app.update" && event.data)
+            if (event.type === "update.checked" && event.data)
                 setUpdate(event.data);
         });
     }, []);
@@ -149,7 +148,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
                     <UpdateDot
                         type="button"
                         title={t("app.updateAvailable", {version: update.latest})}
-                        onClick={() => void openWithDefaultHandler(RELEASES_URL).catch(() => undefined)}
+                        onClick={() => void openReleasePage().catch(() => undefined)}
                     />
                 )}
             </FooterSection>

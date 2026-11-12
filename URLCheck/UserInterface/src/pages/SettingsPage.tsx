@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import styled, {css} from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
@@ -6,7 +6,7 @@ import {Dropdown} from "../components/Dropdown";
 import {loadStrings, Native, useLocale, useTranslation} from "@photino-net-utils/bridge";
 import {AppSettings, BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
-import {detectBrowsers, openWithDefaultHandler} from "../api/browsers";
+import {detectBrowsers} from "../api/browsers";
 import {
     addDeviceAddress,
     type DevicePresence,
@@ -34,20 +34,25 @@ import {
 } from "../api/filters";
 import {FILTER_CATALOG} from "../data/filterCatalog";
 import {
+    cancelUpdateDownload,
     checkForUpdates,
+    downloadUpdate,
     getAppInfo,
     getUpdateStatus,
+    installUpdate,
     openDefaultAppsSettings,
     openLogsFolder,
+    openReleasePage,
     protocolStatus,
     type ProtocolStatus,
     registerProtocols,
-    RELEASES_URL,
     setStartup,
     startupStatus,
     type StartupStatus,
     unregisterProtocols,
-    type UpdateCheck
+    type UpdateChangelog,
+    type UpdateCheck,
+    type UpdateProgress
 } from "../api/system";
 
 /* Loaded on demand: the licence texts are far too large to sit in the main bundle. */
@@ -759,6 +764,63 @@ const DialogTitle = styled.h3`
     color: #f9fafb;
 `;
 
+/** The update download/installation window; wider than the other dialogs for the changelog. */
+const UpdateDialog = styled(Dialog)`
+    max-width: 680px;
+    max-height: min(760px, calc(100vh - 48px));
+`;
+
+const UpdateStatus = styled.p<{ $error: boolean }>`
+    margin: 0;
+    color: ${(props) => (props.$error ? "#f87171" : "#cbd5e1")};
+    font-size: 0.85rem;
+    line-height: 1.5;
+`;
+
+const UpdateProgressTrack = styled.div`
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+`;
+
+const UpdateProgressFill = styled.div<{ $percent: number; $error: boolean }>`
+    width: ${(props) => `${Math.max(0, Math.min(100, props.$percent))}%`};
+    height: 100%;
+    border-radius: inherit;
+    background: ${(props) => (props.$error
+            ? "linear-gradient(90deg, #b91c1c, #ef4444)"
+            : "linear-gradient(90deg, #2563eb, #6366f1, #8b5cf6)")};
+    transition: width 180ms ease;
+`;
+
+const ChangelogTitle = styled.h4`
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #e5e7eb;
+`;
+
+const Changelog = styled.pre`
+    flex: 1;
+    min-height: 120px;
+    max-height: 42vh;
+    overflow: auto;
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.55);
+    color: #cbd5e1;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+`;
+
 const Tabs = styled.div`
     display: flex;
     gap: 6px;
@@ -851,6 +913,38 @@ const DialogInput = styled(ListInput)`
     width: 100%;
 `;
 
+/** The status line shown in the update window. */
+function updateStatusLabel(
+    phase: string,
+    error: string | null | undefined,
+    t: (key: string) => string
+): string {
+    switch (phase) {
+        case "ready":
+        case "installing":
+            return t("settings.updateInstalling");
+        case "cancelled":
+            return t("settings.updateCancelled");
+        case "error":
+            return error || t("settings.updateDownloadFailed");
+        case "downloading":
+            return t("settings.updateDownloading");
+        default:
+            return t("settings.updatePreparing");
+    }
+}
+
+/** Human-readable download sizes for the update progress window. */
+function formatBytes(bytes: number): string {
+    if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
+
+    const units = ["B", "KB", "MB", "GB"];
+    const exponent = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+    const value = bytes / 1024 ** exponent;
+
+    return `${value.toFixed(exponent === 0 ? 0 : 1)} ${units[exponent]}`;
+}
+
 /** Language names are always shown in their own language. */
 const LOCALE_NAMES: Record<string, string> = {
     en: "English",
@@ -897,12 +991,21 @@ export const SettingsPage: React.FC = () => {
     } | null>(null);
     const [protocols, setProtocols] = useState<ProtocolStatus | null>(null);
     const [platform, setPlatform] = useState("windows");
+    /** Downloading and installing a release is only implemented on Windows. */
+    const [isWindows, setIsWindows] = useState(false);
     /** The running build's version and the folder it writes logs to. */
     const [appVersion, setAppVersion] = useState("");
     const [logDirectory, setLogDirectory] = useState("");
     /** Result of the last update check, and whether one is running. */
     const [updateResult, setUpdateResult] = useState<UpdateCheck | null>(null);
     const [updateBusy, setUpdateBusy] = useState(false);
+    /** The download/install window, its progress, and the changelog it shows. */
+    const [updateProgress, setUpdateProgress] = useState<UpdateProgress | null>(null);
+    const [updateChangelogText, setUpdateChangelogText] = useState("");
+    const [updateInstalling, setUpdateInstalling] = useState(false);
+    const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
+    /** True between "download and install" and the ready event, so the installer starts only once. */
+    const autoInstallUpdate = useRef(false);
     const [filterLists, setFilterLists] = useState<FilterListEntry[]>([]);
     const [builtinRuleCount, setBuiltinRuleCount] = useState(0);
     const [filtersBusy, setFiltersBusy] = useState(false);
@@ -1006,6 +1109,7 @@ export const SettingsPage: React.FC = () => {
         getAppInfo()
             .then((info) => {
                 setPlatform(info.platform);
+                setIsWindows(info.platform === "windows");
                 setAppVersion(info.version);
                 setLogDirectory(info.logDirectory);
             })
@@ -1013,6 +1117,59 @@ export const SettingsPage: React.FC = () => {
 
         /* The sidebar already ran the automatic check, so this normally answers from the cache. */
         getUpdateStatus().then(setUpdateResult).catch(() => undefined);
+    }, []);
+
+    /* Progress, changelog and the final "ready" event all come from the shared update service. */
+    useEffect(() => {
+        return Native.on((message) => {
+            const event = message as { type?: string; data?: unknown };
+
+            if (event.type === "update.changelog") {
+                setUpdateChangelogText((event.data as UpdateChangelog | undefined)?.text ?? "");
+                return;
+            }
+
+            if (event.type === "update.checked") {
+                const check = event.data as UpdateCheck | undefined;
+                if (check) setUpdateResult(check);
+                return;
+            }
+
+            if (event.type !== "update.progress") return;
+
+            const progress = event.data as UpdateProgress | undefined;
+            if (!progress) return;
+
+            setUpdateProgress(progress);
+
+            if (progress.phase !== "ready" || !autoInstallUpdate.current) return;
+
+            // The download is complete; start the MSI now. The service closes the app afterwards.
+            autoInstallUpdate.current = false;
+            setUpdateInstalling(true);
+
+            void installUpdate().then((ack) => {
+                if (ack.ok) return;
+
+                setUpdateInstalling(false);
+                setUpdateProgress({
+                    phase: "error",
+                    downloaded: 0,
+                    total: 0,
+                    percent: 0,
+                    error: ack.error ?? null
+                });
+            }, (problem) => {
+                setUpdateInstalling(false);
+                setUpdateProgress({
+                    phase: "error",
+                    downloaded: 0,
+                    total: 0,
+                    percent: 0,
+                    error: problem instanceof Error ? problem.message : String(problem)
+                });
+            });
+        });
     }, []);
 
     useEffect(() => {
@@ -1293,12 +1450,63 @@ export const SettingsPage: React.FC = () => {
         }
     };
 
-    /** Hands the release page to the system's default handler, which may be this app itself. */
+    /** Opens the newest release page through the shared update service. */
     const handleOpenRelease = async () => {
         try {
-            await openWithDefaultHandler(RELEASES_URL);
+            await openReleasePage();
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
+        }
+    };
+
+    /** Starts the MSI download; the shared service sends its progress and changelog as events. */
+    const handleStartUpdate = async () => {
+        setError(null);
+        setUpdateChangelogText("");
+        setUpdateInstalling(false);
+        setUpdateProgress({phase: "changelog", downloaded: 0, total: 0, percent: 0});
+        setUpdateDialogOpen(true);
+        autoInstallUpdate.current = true;
+
+        try {
+            const ack = await downloadUpdate();
+            if (ack.ok) return;
+
+            autoInstallUpdate.current = false;
+            setUpdateProgress({
+                phase: "error",
+                downloaded: 0,
+                total: 0,
+                percent: 0,
+                error: ack.error ?? t("settings.updateDownloadFailed")
+            });
+        } catch (err) {
+            autoInstallUpdate.current = false;
+            setUpdateProgress({
+                phase: "error",
+                downloaded: 0,
+                total: 0,
+                percent: 0,
+                error: err instanceof Error ? err.message : String(err)
+            });
+        }
+    };
+
+    const closeUpdateDialog = () => {
+        autoInstallUpdate.current = false;
+        setUpdateDialogOpen(false);
+        setUpdateProgress(null);
+        setUpdateChangelogText("");
+        setUpdateInstalling(false);
+    };
+
+    const handleCancelUpdate = async () => {
+        closeUpdateDialog();
+
+        try {
+            await cancelUpdateDownload();
+        } catch {
+            // The download may already have finished; closing the window is still correct.
         }
     };
 
@@ -1408,6 +1616,26 @@ export const SettingsPage: React.FC = () => {
 
     /** A short, readable fingerprint of this device's public key. */
     const fingerprint = (key: string) => (key ? `${key.slice(0, 16)}…` : "—");
+
+    const updatePhase = updateInstalling ? "installing" : updateProgress?.phase ?? "changelog";
+    const updatePercent = updatePhase === "ready" || updatePhase === "installing"
+        ? 100
+        : Math.max(0, updateProgress?.percent ?? 0);
+
+    const updateStatusText = (() => {
+        if (updatePhase === "downloading") {
+            const downloaded = updateProgress?.downloaded ?? 0;
+            const total = updateProgress?.total ?? 0;
+            const amount = total > 0
+                ? `${Math.max(0, updateProgress?.percent ?? 0)}% ` +
+                    `(${formatBytes(downloaded)} / ${formatBytes(total)})`
+                : formatBytes(downloaded);
+
+            return `${t("settings.updateDownloading")} ${amount}`;
+        }
+
+        return updateStatusLabel(updatePhase, updateProgress?.error, t);
+    })();
 
     return (
         <PageContainer $maxWidth={964}>
@@ -2073,6 +2301,11 @@ export const SettingsPage: React.FC = () => {
                                     {t("settings.openRelease")}
                                 </GhostButton>
                             )}
+                            {updateResult?.available && isWindows && (
+                                <GhostButton type="button" onClick={handleStartUpdate}>
+                                    {t("settings.updateDownloadInstall")}
+                                </GhostButton>
+                            )}
                             <GhostButton type="button" onClick={handleOpenLogs}>
                                 {t("settings.openLogs")}
                             </GhostButton>
@@ -2142,6 +2375,50 @@ export const SettingsPage: React.FC = () => {
                 <React.Suspense fallback={null}>
                     <AttributionPage onClose={() => setAttributionOpen(false)}/>
                 </React.Suspense>
+            )}
+
+            {updateDialogOpen && updateProgress && (
+                <Overlay>
+                    <UpdateDialog
+                        aria-modal="true"
+                        onClick={(event) => event.stopPropagation()}
+                        role="dialog"
+                    >
+                        <DialogTitle>{t("settings.updateDownloadTitle")}</DialogTitle>
+                        <UpdateStatus $error={updatePhase === "error"}>{updateStatusText}</UpdateStatus>
+
+                        <UpdateProgressTrack>
+                            <UpdateProgressFill
+                                $error={updatePhase === "error"}
+                                $percent={updatePercent}
+                            />
+                        </UpdateProgressTrack>
+
+                        <ChangelogTitle>{t("settings.updateChangelog")}</ChangelogTitle>
+                        {updateChangelogText
+                            ? <Changelog>{updateChangelogText}</Changelog>
+                            : (
+                                <InfoText>
+                                    {updatePhase === "changelog"
+                                        ? t("settings.updateChangelogLoading")
+                                        : t("settings.updateChangelogUnavailable")}
+                                </InfoText>
+                            )}
+
+                        <ButtonRow>
+                            {(updatePhase === "error" || updatePhase === "cancelled") && (
+                                <GhostButton type="button" onClick={closeUpdateDialog}>
+                                    {t("settings.updateClose")}
+                                </GhostButton>
+                            )}
+                            {(updatePhase === "changelog" || updatePhase === "downloading") && (
+                                <GhostButton type="button" onClick={handleCancelUpdate}>
+                                    {t("settings.updateCancel")}
+                                </GhostButton>
+                            )}
+                        </ButtonRow>
+                    </UpdateDialog>
+                </Overlay>
             )}
 
             {addOpen && (

@@ -38,12 +38,6 @@ internal sealed record BrowsersPayload(IReadOnlyList<BrowserEntry> Browsers);
 internal sealed record AppInfoPayload(string Version, string Platform, string LogDirectory, bool Rounded);
 
 /// <summary>
-///     Body for <c>app.checkUpdate</c>: the running version, the published one, and whether the
-///     published one is actually newer.
-/// </summary>
-internal sealed record UpdateCheckPayload(string Current, string Latest, bool Available);
-
-/// <summary>
 ///     Body for the <c>app.startup</c> messages. The state lives in the Startup folder, so it is
 ///     reported rather than stored, and platforms without one report <c>Supported: false</c>.
 /// </summary>

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using PhotinoNetUtils.Localization;
 using PhotinoNetUtils.Messaging;
+using PhotinoNetUtils.Updates;
 using URLCheck.Filters;
 using URLCheck.Forward;
 using URLCheck.Models;
@@ -41,6 +42,9 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(BrowsersPayload))]
 [JsonSerializable(typeof(AppInfoPayload))]
 [JsonSerializable(typeof(UpdateCheckPayload))]
+[JsonSerializable(typeof(UpdateAckPayload))]
+[JsonSerializable(typeof(UpdateProgressPayload))]
+[JsonSerializable(typeof(UpdateChangelogPayload))]
 [JsonSerializable(typeof(StartupPayload))]
 [JsonSerializable(typeof(WindowStatePayload))]
 [JsonSerializable(typeof(WindowResizeRequest))]

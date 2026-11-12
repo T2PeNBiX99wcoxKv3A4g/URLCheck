@@ -5,6 +5,7 @@ using PhotinoNetUtils.Localization;
 using PhotinoNetUtils.Messaging;
 using PhotinoNetUtils.Platform;
 using PhotinoNetUtils.Services;
+using PhotinoNetUtils.Updates;
 using Serilog;
 using URLCheck.Filters;
 using URLCheck.Forward;
@@ -96,7 +97,6 @@ internal static class Program
             _ = HistoryService.Instance;
             var iconPath = AppIcon.EnsureExtracted(typeof(Program).Assembly, Constants.Name);
             _ = AppInfoService.Instance;
-            _ = UpdateService.Instance;
             _ = BrowserService.Instance;
             _ = ProtocolRegistrationService.Instance;
             _ = StartupService.Instance;
@@ -114,6 +114,17 @@ internal static class Program
             manager.AppUrl = appUrl;
             manager.ShowMainWindowOnStartup = showMainWindow;
             manager.IconPath = iconPath;
+
+            using var updates = new UpdateService(new UpdateOptions(
+                Owner: "T2PeNBiX99wcoxKv3A4g",
+                Repository: "URLCheck",
+                AppName: Constants.Name,
+                CurrentVersion: AppInfoService.Version,
+                AssetPattern: "URLCheck-{version}-win-x64.msi",
+                ReleasePageUrl: "https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/releases/latest",
+                LogDirectory: Constants.LogDirectory,
+                Shutdown: manager.Exit,
+                Notify: manager.NotifyMainWindow));
 
             using var tray = CreateTray(iconPath);
 
