@@ -158,11 +158,17 @@ internal sealed class LinuxWindowPlatform : Singleton<LinuxWindowPlatform>, IWin
     ///     Wayland ignores a client's requested position, so <c>MoveTo</c> is best-effort there and the
     ///     compositor places the button instead; the requested place is reported back either way.
     /// </summary>
-    public Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size)
+    public Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size, int offset)
     {
         window.SetSize(size, size);
         window.MoveTo(x, y);
         LinuxGtk.ShowOnTop(window.Title);
+
+        // Wayland hides the pointer from clients as well, so the compositor is the only one that can
+        // put the button next to it. It is asked after the window is shown, since a hidden window has
+        // no surface for it to move yet; the call after the show settles covers that race.
+        LinuxHyprland.MoveNextToCursor(window.Title, offset, size);
+
         return new(x, y);
     }
 

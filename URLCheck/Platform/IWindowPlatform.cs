@@ -59,7 +59,12 @@ internal interface IWindowPlatform
     ///     <paramref name="size" />-pixel square, without stealing focus when possible, and returns the
     ///     place it was really put.
     /// </summary>
-    Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size);
+    /// <remarks>
+    ///     <paramref name="offset" /> is the gap the interface wants between the pointer and the button.
+    ///     It only matters where the platform has to place the button itself, because the pointer is not
+    ///     something the client can see.
+    /// </remarks>
+    Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size, int offset);
 
     /// <summary>
     ///     Whether the window's native counterpart still exists. A window that something else destroyed

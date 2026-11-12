@@ -115,7 +115,7 @@ internal sealed class WindowsWindowPlatform : Singleton<WindowsWindowPlatform>, 
         });
     }
 
-    public Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size)
+    public Point ShowSelectionButton(PhotinoWindow window, int x, int y, int size, int offset)
     {
         var placed = ClampToMonitor(x, y, size);
 

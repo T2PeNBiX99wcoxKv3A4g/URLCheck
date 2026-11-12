@@ -428,7 +428,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
             else if (!created)
                 _pendingSelectionUrl = url;
 
-            _buttonAt = _platform.ShowSelectionButton(button, x, y, ButtonSize);
+            _buttonAt = _platform.ShowSelectionButton(button, x, y, ButtonSize, ButtonOffset);
 
             // Wayland hides the pointer from clients, so the compositor is the only one that can put
             // the button next to it.
@@ -453,7 +453,7 @@ internal sealed class WindowManager : Singleton<WindowManager>
         RunOnMainWindow(() =>
         {
             if (_buttonAt is not null && ReferenceEquals(_buttonWindow, button))
-                _platform.ShowSelectionButton(button, x, y, ButtonSize);
+                _platform.ShowSelectionButton(button, x, y, ButtonSize, ButtonOffset);
         });
     }
 
