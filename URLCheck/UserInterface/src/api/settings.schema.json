@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AppSettings",
+  "type": "object",
+  "properties": {
+    "requestTimeoutMs": {
+      "type": "integer",
+      "description": "Maximum milliseconds to wait for a single URL response."
+    },
+    "userAgents": {
+      "type": "array",
+      "items": {},
+      "description": "User-Agent headers offered in the popup and the settings."
+    },
+    "selectedUserAgentId": {
+      "type": "string",
+      "description": "User-Agent used for outbound requests."
+    },
+    "language": {
+      "type": "string",
+      "description": "Interface and backend language: system, en, ja, zh-CN or zh-TW."
+    },
+    "browsers": {
+      "type": "array",
+      "items": {},
+      "description": "Browsers offered in the popup."
+    },
+    "borderlessPopup": {
+      "type": "boolean",
+      "description": "Draw the inspection popup without a window frame."
+    },
+    "autoStripTrackingParams": {
+      "type": "boolean",
+      "description": "Strip known tracking parameters as soon as the popup opens."
+    },
+    "autoRedirectHosts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Hosts whose links are followed through their redirects."
+    },
+    "hideOnLaunch": {
+      "type": "boolean",
+      "description": "Start with the management window hidden."
+    },
+    "showUrlButton": {
+      "type": "boolean",
+      "description": "Show a floating button for copied URLs."
+    },
+    "allowScriptNetwork": {
+      "type": "boolean",
+      "description": "Allow Lua scripts to make HTTP requests."
+    },
+    "deviceName": {
+      "type": "string",
+      "description": "Name this device advertises to peers."
+    },
+    "deviceId": {
+      "type": "string",
+      "description": "Stable identifier for this device."
+    },
+    "forwardingEnabled": {
+      "type": "boolean",
+      "description": "Accept pairing requests and forwarded URLs."
+    },
+    "forwardPort": {
+      "type": "integer",
+      "description": "Port for pairing and forwarded URLs."
+    },
+    "filterAutoUpdate": {
+      "type": "boolean",
+      "description": "Refresh installed filter lists automatically."
+    },
+    "filterAutoUpdateMinutes": {
+      "type": "integer",
+      "description": "Minutes between filter refreshes; -1 disables the timer."
+    },
+    "devices": {
+      "type": "array",
+      "items": {},
+      "description": "Devices this one can forward URLs to."
+    }
+  },
+  "additionalProperties": false
+}

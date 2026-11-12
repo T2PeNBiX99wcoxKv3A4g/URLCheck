@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using PhotinoNetUtils.Settings;
 
 namespace URLCheck.Models;
 
@@ -8,6 +9,7 @@ namespace URLCheck.Models;
 ///     TypeScript <c>AppSettings</c> interface.
 /// </summary>
 [SuppressMessage("ReSharper", "PropertyCanBeMadeInitOnly.Global")]
+[SettingsModel]
 internal sealed class AppSettings
 {
     public const int TimeoutMinMs = 1_000;
@@ -26,18 +28,23 @@ internal sealed class AppSettings
     public const int FilterAutoUpdateMaxMinutes = 10_080;
 
     /// <summary>Maximum milliseconds to wait for a single URL response.</summary>
+    [Setting(Comment = "Maximum milliseconds to wait for a single URL response.")]
     public int RequestTimeoutMs { get; set; } = 5_000;
 
     /// <summary>User-Agent headers offered in the popup and the settings.</summary>
+    [Setting(Comment = "User-Agent headers offered in the popup and the settings.")]
     public List<UserAgentEntry> UserAgents { get; set; } = [];
 
     /// <summary>Id of the <see cref="UserAgents" /> entry used for outbound requests. The first entry is the fallback.</summary>
+    [Setting(Comment = "User-Agent used for outbound requests.")]
     public string SelectedUserAgentId { get; set; } = "";
 
     /// <summary>UI language: <c>system</c>, <c>en</c>, <c>ja</c>, <c>zh-CN</c> or <c>zh-TW</c>.</summary>
+    [Setting(Comment = "Interface and backend language: system, en, ja, zh-CN or zh-TW.")]
     public string Language { get; set; } = DefaultLanguage;
 
     /// <summary>Browsers offered in the popup. The first entry is used as the default.</summary>
+    [Setting(Comment = "Browsers offered in the popup.")]
     public List<BrowserEntry> Browsers { get; set; } = [];
 
     /// <summary>
@@ -45,18 +52,21 @@ internal sealed class AppSettings
     ///     frame. On Linux the window is also made transparent so those corners are not filled in; when
     ///     this is off the window keeps its normal frame and the UI draws no border of its own.
     /// </summary>
+    [Setting(Comment = "Draw the inspection popup without a window frame.")]
     public bool BorderlessPopup { get; set; } = true;
 
     /// <summary>
     ///     Strip known tracking parameters from a URL as soon as the popup opens. When off, the URL
     ///     is left alone until the popup's tracking button is pressed.
     /// </summary>
+    [Setting(Comment = "Strip known tracking parameters as soon as the popup opens.")]
     public bool AutoStripTrackingParams { get; set; } = true;
 
     /// <summary>
     ///     Hosts whose links are followed through their redirects before the popup opens, so a short
     ///     link reveals (and is stored as) its real destination. Matching is by host, subdomains included.
     /// </summary>
+    [Setting(Comment = "Hosts whose links are followed through their redirects.")]
     public List<string> AutoRedirectHosts { get; set; } = [];
 
     /// <summary>
@@ -64,48 +74,58 @@ internal sealed class AppSettings
     ///     of its own, so it still appears. Ignored when there is no tray icon to restore the window
     ///     from.
     /// </summary>
+    [Setting(Comment = "Start with the management window hidden.")]
     public bool HideOnLaunch { get; set; }
 
     /// <summary>
     ///     Watch the system clipboard and show a floating button next to the pointer whenever the
     ///     copied text is an http(s) URL, so it can be inspected without switching applications.
     /// </summary>
+    [Setting(Comment = "Show a floating button for copied URLs.")]
     public bool ShowUrlButton { get; set; } = true;
 
     /// <summary>
     ///     Let Lua scripts make HTTP requests. A script must also set <c>scriptNetwork = true</c>; both
     ///     are needed, because a script that can fetch can also send the URLs it sees somewhere else.
     /// </summary>
+    [Setting(Comment = "Allow Lua scripts to make HTTP requests.")]
     public bool AllowScriptNetwork { get; set; }
 
     /// <summary>Display name this device advertises to peers.</summary>
+    [Setting(Comment = "Name this device advertises to peers.")]
     public string DeviceName { get; set; } = "";
 
     /// <summary>Stable identifier for this device, generated on first use.</summary>
+    [Setting(Comment = "Stable identifier for this device.")]
     public string DeviceId { get; set; } = "";
 
     /// <summary>
     ///     Accept pairing requests and forwarded URLs: opens the listener and answers discovery queries.
     ///     Off by default, so nothing is reachable until the user turns it on.
     /// </summary>
+    [Setting(Comment = "Accept pairing requests and forwarded URLs.")]
     public bool ForwardingEnabled { get; set; }
 
     /// <summary>Port this device listens on for pairing and incoming forwarded URLs.</summary>
+    [Setting(Comment = "Port for pairing and forwarded URLs.")]
     public int ForwardPort { get; set; } = DefaultForwardPort;
 
     /// <summary>
     ///     Check the installed filter lists when URLCheck starts, and keep refreshing them while it runs.
     ///     The timer part is controlled by <see cref="FilterAutoUpdateMinutes" />.
     /// </summary>
+    [Setting(Comment = "Refresh installed filter lists automatically.")]
     public bool FilterAutoUpdate { get; set; }
 
     /// <summary>
     ///     Minutes between automatic filter list refreshes. <c>-1</c> turns the timer off, so the lists are
     ///     only checked when the app starts; the startup check still follows <see cref="FilterAutoUpdate" />.
     /// </summary>
+    [Setting(Comment = "Minutes between filter refreshes; -1 disables the timer.")]
     public int FilterAutoUpdateMinutes { get; set; } = DefaultFilterAutoUpdateMinutes;
 
     /// <summary>Paired devices URLs can be forwarded to; the popup hides its button while this is empty.</summary>
+    [Setting(Comment = "Devices this one can forward URLs to.")]
     public List<DeviceEntry> Devices { get; set; } = [];
 
     public AppSettings Clone() => (AppSettings)MemberwiseClone();
