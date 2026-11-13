@@ -11,7 +11,7 @@
         <!-- Generate embedded file manifest when using the Photino.NET StaticFileServer -->
         <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
         <RootNamespace>URLCheck</RootNamespace>
-        <Version>1.14.1</Version>
+        <Version>1.1.1</Version>
         <!-- Explorer/taskbar icon; also embedded (Resources\**) so the tray can load it at runtime. -->
         <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
     </PropertyGroup>
@@ -54,8 +54,9 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <!-- The generator is native AOT: one executable, no .dll/.deps.json/.runtimeconfig.json. -->
-        <SettingsCodeGenPath>$(MSBuildProjectDirectory)\Libs\CodeGen\PhotinoNETUtils.CodeGen</SettingsCodeGenPath>
+        <!-- One executable per platform under Libs/CodeGen/<rid>; the host RID picks the right one.
+             Framework-dependent single-file: a Windows machine can cross-publish the Linux build. -->
+        <SettingsCodeGenPath>$(MSBuildProjectDirectory)\Libs\CodeGen\$(NETCoreSdkRuntimeIdentifier)\PhotinoNETUtils.CodeGen</SettingsCodeGenPath>
         <SettingsCodeGenPath Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(SettingsCodeGenPath).exe</SettingsCodeGenPath>
     </PropertyGroup>
 
