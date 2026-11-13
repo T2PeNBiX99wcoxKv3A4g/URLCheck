@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from "react";
 import styled, {keyframes} from "styled-components";
-import {Native} from "@photino-net-utils/bridge";
+import {Native, useTranslation} from "@photino-net-utils/bridge";
 import {TABS, type TabType} from "../tabs";
-import {useTranslation} from "../api/i18n";
 import {getAppInfo, getUpdateStatus, openReleasesPage, RELEASES_URL, type UpdateCheck} from "../api/system";
 
 interface SidebarProps {

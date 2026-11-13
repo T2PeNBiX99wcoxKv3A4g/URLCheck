@@ -3,9 +3,7 @@ import styled, {css, keyframes} from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
 import {Dropdown} from "../components/Dropdown";
-import {Native} from "@photino-net-utils/bridge";
-import {loadStrings, type Translate, useLocale, useTranslation} from "../api/i18n";
-import type {LocalizationKey} from "../api/i18n.generated";
+import {type LocalizationKey, loadStrings, Native, type Translate, useLocale, useTranslation} from "@photino-net-utils/bridge";
 import {AppSettings, BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
@@ -1655,7 +1653,7 @@ export const SettingsPage: React.FC = () => {
             const total = updateProgress?.total ?? 0;
             const amount = total > 0
                 ? `${Math.max(0, updateProgress?.percent ?? 0)}% ` +
-                    `(${formatBytes(downloaded)} / ${formatBytes(total)})`
+                `(${formatBytes(downloaded)} / ${formatBytes(total)})`
                 : formatBytes(downloaded);
 
             return `${t("settings.updateDownloading")} ${amount}`;

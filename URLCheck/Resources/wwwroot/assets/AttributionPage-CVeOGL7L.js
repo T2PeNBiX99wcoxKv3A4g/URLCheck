@@ -1,4 +1,4 @@
-import{a as e,i as t,n,r,t as i}from"./index-DTNJmuRg.js";var a=e(t(),1),o=[{name:`@codemirror/commands`,version:`6.11.1`,license:`MIT`,text:`MIT License
+import{a as e,i as t,n,r,t as i}from"./index-BUvNu_te.js";var a=e(t(),1),o=[{name:`@codemirror/commands`,version:`6.11.1`,license:`MIT`,text:`MIT License
 
 Copyright (C) 2018-2021 by Marijn Haverbeke <marijn@haverbeke.berlin> and others
 

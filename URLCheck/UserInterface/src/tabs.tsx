@@ -1,5 +1,5 @@
 import type React from "react";
-import type {LocalizationKey} from "./api/i18n.generated";
+import type {LocalizationKey} from "@photino-net-utils/bridge";
 import type {IconProps} from "./components/Icons";
 import {CodeIcon, HistoryIcon, HomeIcon, SettingsIcon} from "./components/Icons";
 import {HistoryPage} from "./pages/HistoryPage";

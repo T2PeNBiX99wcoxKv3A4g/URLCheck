@@ -1,8 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import styled from "styled-components";
-import {Native} from "@photino-net-utils/bridge";
-import type {LocalizationKey} from "../api/i18n.generated";
-import {useTranslation} from "../api/i18n";
+import {type LocalizationKey, Native, useTranslation} from "@photino-net-utils/bridge";
 import {PageContainer} from "../components/Layout";
 import {CodeEditor} from "../components/CodeEditor";
 import {

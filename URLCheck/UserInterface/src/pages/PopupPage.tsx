@@ -8,9 +8,7 @@ import {checkStatus, type StatusResult} from "../api/inspect";
 import {closePopup, resizePopup} from "../api/system";
 import {loadFilterRules} from "../api/filters";
 import {type CompiledRules, compileRules, stripTrackingParams, trackingParamKeys} from "../data/filterRules";
-import {Native} from "@photino-net-utils/bridge";
-import type {LocalizationKey} from "../api/i18n.generated";
-import {useTranslation} from "../api/i18n";
+import {type LocalizationKey, Native, useTranslation} from "@photino-net-utils/bridge";
 import {
     AlertTriangleIcon,
     CheckCircleIcon,

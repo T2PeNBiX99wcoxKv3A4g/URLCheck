@@ -23,7 +23,7 @@ import {
 } from "@codemirror/language";
 import {lua} from "@codemirror/legacy-modes/mode/lua";
 import {tags} from "@lezer/highlight";
-import {useLocale} from "../api/i18n";
+import {useLocale} from "@photino-net-utils/bridge";
 
 interface CodeEditorProps {
     value: string;
