@@ -12,7 +12,7 @@ namespace URLCheck.Services;
 ///     Owns the TOML settings file and its standard bridge messages. The shared base handles
 ///     loading, saving, JSON-to-TOML migration and the change notification.
 /// </summary>
-internal sealed class SettingsService : SettingsServiceBase<AppSettings, SettingsPayload>
+internal sealed class SettingsService : SettingsServiceBase<SettingsService, AppSettings, SettingsPayload>
 {
     private const string Header =
         "# URLCheck settings. Rewritten when settings are saved; comments are not preserved.";
@@ -24,11 +24,9 @@ internal sealed class SettingsService : SettingsServiceBase<AppSettings, Setting
         Path.Combine(Constants.DataDirectory, "settings.json")
     }.FirstOrDefault(File.Exists);
 
-    public static readonly SettingsService Instance = new();
-
     private readonly IBrowserLocator _browserLocator = PlatformServices.BrowserLocator;
 
-    private SettingsService() : base(
+    public SettingsService() : base(
         new TomlSettingsStore<AppSettings>(
             Path.Combine(Constants.SettingsDirectory, "settings.toml"),
             new AppSettings { Browsers = [.. PlatformServices.BrowserLocator.Detect()] },
