@@ -75,6 +75,20 @@ const VersionLabel = styled.span`
     font-family: var(--font-mono);
 `;
 
+/** Marks a debug build next to the version, so it is not mistaken for a release binary. */
+const DebugBadge = styled.span`
+    padding: 1px 5px;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    border-radius: 4px;
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+`;
+
 /** Draws attention to the update dot without moving anything around it. */
 const pulse = keyframes`
     0%, 100% {
@@ -105,11 +119,18 @@ const UpdateDot = styled.button`
 export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
     const t = useTranslation();
     const [version, setVersion] = useState<string | null>(null);
+    const [debug, setDebug] = useState(false);
     /** The automatically checked update state; null until it is known. */
     const [update, setUpdate] = useState<UpdateCheck | null>(null);
 
     useEffect(() => {
-        getAppInfo().then((info) => setVersion(info.version)).catch(() => setVersion(null));
+        getAppInfo().then((info) => {
+            setVersion(info.version);
+            setDebug(info.debug === true);
+        }).catch(() => {
+            setVersion(null);
+            setDebug(false);
+        });
     }, []);
 
     /* The first ask runs the check; the backend answers from its cache after that. */
@@ -144,6 +165,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
 
             <FooterSection>
                 <VersionLabel>{version ? `v${version}` : "…"}</VersionLabel>
+                {debug && <DebugBadge title="Debug build">DEBUG</DebugBadge>}
                 {update?.available && (
                     <UpdateDot
                         type="button"
