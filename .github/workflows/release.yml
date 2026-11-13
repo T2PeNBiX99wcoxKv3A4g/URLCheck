@@ -28,6 +28,7 @@ jobs:
     with:
       project_path: './URLCheck/URLCheck.csproj'
       filename: 'URLCheck'
+      dotnet_version: '11.0.x'
       runtimes: '["win-x64", "linux-x64"]'
       version_file_path: './URLCheck/URLCheck.csproj'
       msi_script: 'installer/windows/build-msi.ps1'
