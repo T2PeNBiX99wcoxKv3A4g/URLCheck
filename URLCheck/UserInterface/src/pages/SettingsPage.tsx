@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import styled, {css} from "styled-components";
+import styled, {css, keyframes} from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
 import {Dropdown} from "../components/Dropdown";
@@ -777,23 +777,43 @@ const UpdateStatus = styled.p<{ $error: boolean }>`
     line-height: 1.5;
 `;
 
-const UpdateProgressTrack = styled.div`
-    width: 100%;
-    height: 8px;
-    overflow: hidden;
-    border-radius: 999px;
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+const updateIndeterminate = keyframes`
+    from {
+        transform: translateX(-110%);
+    }
+    to {
+        transform: translateX(310%);
+    }
 `;
 
-const UpdateProgressFill = styled.div<{ $percent: number; $error: boolean }>`
-    width: ${(props) => `${Math.max(0, Math.min(100, props.$percent))}%`};
+const UpdateProgressTrack = styled.div`
+    width: 100%;
+    height: 10px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(2, 6, 23, 0.9);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55);
+`;
+
+const UpdateProgressFill = styled.div<{ $percent: number; $error: boolean; $indeterminate: boolean }>`
     height: 100%;
     border-radius: inherit;
     background: ${(props) => (props.$error
             ? "linear-gradient(90deg, #b91c1c, #ef4444)"
-            : "linear-gradient(90deg, #2563eb, #6366f1, #8b5cf6)")};
-    transition: width 180ms ease;
+            : "linear-gradient(90deg, #3b82f6, #6366f1, #a78bfa)")};
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.45);
+
+    ${(props) => props.$indeterminate
+            ? css`
+                width: 30%;
+                animation: ${updateIndeterminate} 1.1s ease-in-out infinite;
+            `
+            : css`
+                width: ${Math.max(0, Math.min(100, props.$percent))}%;
+                transition: width 180ms ease;
+            `}
 `;
 
 const ChangelogTitle = styled.h4`
@@ -1618,9 +1638,13 @@ export const SettingsPage: React.FC = () => {
     const fingerprint = (key: string) => (key ? `${key.slice(0, 16)}…` : "—");
 
     const updatePhase = updateInstalling ? "installing" : updateProgress?.phase ?? "changelog";
-    const updatePercent = updatePhase === "ready" || updatePhase === "installing"
+    const updatePercent = updatePhase === "ready" || updatePhase === "installing" || updatePhase === "error"
         ? 100
         : Math.max(0, updateProgress?.percent ?? 0);
+    /** Before the first measurable percent (or while reading the changelog), show motion instead of an empty bar. */
+    const updateBarIndeterminate =
+        updatePhase === "changelog" ||
+        updatePhase === "downloading" && (updateProgress?.percent ?? 0) <= 0;
 
     const updateStatusText = (() => {
         if (updatePhase === "downloading") {
@@ -2390,6 +2414,7 @@ export const SettingsPage: React.FC = () => {
                         <UpdateProgressTrack>
                             <UpdateProgressFill
                                 $error={updatePhase === "error"}
+                                $indeterminate={updateBarIndeterminate}
                                 $percent={updatePercent}
                             />
                         </UpdateProgressTrack>
