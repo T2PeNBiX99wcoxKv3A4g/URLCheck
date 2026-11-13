@@ -21,6 +21,7 @@ export {
     onUpdateProgress,
     openLogsFolder,
     openReleasesPage,
+    openUrl,
     setStartup,
     startUpdateDownload,
     startupStatus,

@@ -3,7 +3,7 @@ import styled, {css, keyframes} from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
 import {Dropdown} from "../components/Dropdown";
-import {type LocalizationKey, loadStrings, Native, type Translate, useLocale, useTranslation} from "@photino-net-utils/bridge";
+import {type LocalizationKey, loadStrings, Markdown, Native, type Translate, useLocale, useTranslation} from "@photino-net-utils/bridge";
 import {AppSettings, BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
@@ -42,6 +42,7 @@ import {
     openDefaultAppsSettings,
     openLogsFolder,
     openReleasesPage,
+    openUrl,
     protocolStatus,
     type ProtocolStatus,
     registerProtocols,
@@ -824,7 +825,8 @@ const ChangelogTitle = styled.h4`
     color: var(--text-primary);
 `;
 
-const Changelog = styled.pre`
+/** The release notes, rendered from Markdown into the update dialog. */
+const Changelog = styled.div`
     flex: 1;
     min-height: 120px;
     max-height: 42vh;
@@ -835,11 +837,114 @@ const Changelog = styled.pre`
     border-radius: 10px;
     background: var(--surface-dim);
     color: var(--text-soft);
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
+    font-size: 0.8rem;
     line-height: 1.65;
-    white-space: pre-wrap;
     overflow-wrap: anywhere;
+
+    > :first-child {
+        margin-top: 0;
+    }
+
+    > :last-child {
+        margin-bottom: 0;
+    }
+
+    h1, h2, h3, h4 {
+        margin: 14px 0 8px;
+        color: var(--text-primary);
+        line-height: 1.35;
+    }
+
+    h1 {
+        font-size: 1.05rem;
+    }
+
+    h2 {
+        font-size: 0.95rem;
+    }
+
+    h3, h4 {
+        font-size: 0.87rem;
+    }
+
+    p {
+        margin: 0 0 8px;
+    }
+
+    ul, ol {
+        margin: 0 0 10px;
+        padding-left: 20px;
+    }
+
+    li {
+        margin: 2px 0;
+    }
+
+    a {
+        color: var(--link);
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    code {
+        padding: 1px 4px;
+        border-radius: 4px;
+        background: var(--border-faint);
+        font-family: var(--font-mono);
+        font-size: 0.78em;
+    }
+
+    pre {
+        margin: 0 0 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: var(--surface-deep);
+        overflow-x: auto;
+
+        code {
+            padding: 0;
+            background: transparent;
+        }
+    }
+
+    blockquote {
+        margin: 0 0 10px;
+        padding-left: 12px;
+        border-left: 2px solid var(--border-strong);
+        color: var(--text-muted);
+    }
+
+    hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 12px 0;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    table {
+        width: 100%;
+        margin: 0 0 10px;
+        border-collapse: collapse;
+        font-size: 0.75rem;
+    }
+
+    th, td {
+        padding: 5px 8px;
+        border: 1px solid var(--border);
+        text-align: left;
+    }
+
+    th {
+        background: var(--border-faint);
+        color: var(--text-primary);
+    }
 `;
 
 const Tabs = styled.div`
@@ -1555,6 +1660,16 @@ export const SettingsPage: React.FC = () => {
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
         }
+    };
+
+    /** A link in the release notes opens in the browser, never inside the app's web view. */
+    const handleChangelogClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        const link = (event.target as HTMLElement).closest("a");
+        if (!link) return;
+
+        event.preventDefault();
+        const href = link.getAttribute("href");
+        if (href && /^https?:\/\//i.test(href)) void openUrl(href).catch(() => undefined);
     };
 
     /** Runs a filter-list action and reports failure through the shared error banner. */
@@ -2458,7 +2573,11 @@ export const SettingsPage: React.FC = () => {
 
                         <ChangelogTitle>{t("settings.update_changelog")}</ChangelogTitle>
                         {updateChangelogText
-                            ? <Changelog>{updateChangelogText}</Changelog>
+                            ? (
+                                <Changelog onClick={handleChangelogClick}>
+                                    <Markdown source={updateChangelogText}/>
+                                </Changelog>
+                            )
                             : (
                                 <InfoText>
                                     {updatePhase === "changelog"
