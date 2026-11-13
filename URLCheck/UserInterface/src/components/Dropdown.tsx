@@ -254,12 +254,15 @@ export const Dropdown: React.FC<DropdownProps> = ({
         const onKeyDown = (event: KeyboardEvent) => {
             if (event.key === "Escape") setOpen(false);
         };
+        const close = () => setOpen(false);
 
         document.addEventListener("mousedown", onPointerDown);
         document.addEventListener("keydown", onKeyDown);
+        window.addEventListener("blur", close);
         return () => {
             document.removeEventListener("mousedown", onPointerDown);
             document.removeEventListener("keydown", onKeyDown);
+            window.removeEventListener("blur", close);
         };
     }, [open]);
 

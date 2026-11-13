@@ -701,6 +701,36 @@ export const PopupPage: React.FC = () => {
     const browserMenuStyle = useMenuFit(browserMenuOpen, true, browserAnchor);
     const forwardMenuStyle = useMenuFit(forwardMenuOpen, true, forwardAnchor);
 
+    /* Clicking anywhere outside an open menu (or leaving the window) closes it, like a native menu. */
+    useEffect(() => {
+        if (!historyMenuOpen && !browserMenuOpen && !forwardMenuOpen) return;
+
+        const closeAll = () => {
+            setHistoryMenuOpen(false);
+            setBrowserMenuOpen(false);
+            setForwardMenuOpen(false);
+        };
+        const onPointerDown = (event: MouseEvent) => {
+            const target = event.target as Node;
+
+            if (historyMenuOpen && !historyAnchor.current?.contains(target)) setHistoryMenuOpen(false);
+            if (browserMenuOpen && !browserAnchor.current?.contains(target)) setBrowserMenuOpen(false);
+            if (forwardMenuOpen && !forwardAnchor.current?.contains(target)) setForwardMenuOpen(false);
+        };
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") closeAll();
+        };
+
+        document.addEventListener("mousedown", onPointerDown);
+        document.addEventListener("keydown", onKeyDown);
+        window.addEventListener("blur", closeAll);
+        return () => {
+            document.removeEventListener("mousedown", onPointerDown);
+            document.removeEventListener("keydown", onKeyDown);
+            window.removeEventListener("blur", closeAll);
+        };
+    }, [historyMenuOpen, browserMenuOpen, forwardMenuOpen]);
+
     const parsed = useMemo(() => {
         try {
             return new URL(url);
