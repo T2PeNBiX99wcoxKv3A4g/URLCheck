@@ -1,4 +1,5 @@
 import type React from "react";
+import type {LocalizationKey} from "./api/i18n.generated";
 import type {IconProps} from "./components/Icons";
 import {CodeIcon, HistoryIcon, HomeIcon, SettingsIcon} from "./components/Icons";
 import {HistoryPage} from "./pages/HistoryPage";
@@ -10,9 +11,9 @@ import {ScriptsPage} from "./pages/ScriptsPage";
 export interface TabDefinition {
     id: string;
     /** Translation keys, resolved by the sidebar and header. */
-    labelKey: string;
-    titleKey: string;
-    subtitleKey: string;
+    labelKey: LocalizationKey;
+    titleKey: LocalizationKey;
+    subtitleKey: LocalizationKey;
     icon: React.FC<IconProps>;
     page: React.FC;
 }

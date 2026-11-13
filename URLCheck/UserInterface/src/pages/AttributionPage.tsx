@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {ATTRIBUTIONS} from "../data/attributions";
-import {useTranslation} from "@photino-net-utils/bridge";
+import {useTranslation} from "../api/i18n";
 
 /**
  * The open-source notices, shown as a floating panel from the settings: the projects are listed on

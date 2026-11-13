@@ -1,6 +1,8 @@
 import React, {useEffect, useRef, useState} from "react";
 import styled from "styled-components";
-import {Native, useTranslation} from "@photino-net-utils/bridge";
+import {Native} from "@photino-net-utils/bridge";
+import type {LocalizationKey} from "../api/i18n.generated";
+import {useTranslation} from "../api/i18n";
 import {PageContainer} from "../components/Layout";
 import {CodeEditor} from "../components/CodeEditor";
 import {
@@ -404,7 +406,7 @@ export const ScriptsPage: React.FC = () => {
             {error && (
                 <Banner>
                     <AlertTriangleIcon size={16}/>
-                    <span>{t(error)}</span>
+                    <span>{t(error as LocalizationKey)}</span>
                 </Banner>
             )}
 
@@ -437,7 +439,7 @@ export const ScriptsPage: React.FC = () => {
                                     <UpdateDot $changed title={t("scripts.updateChanged")}/>
                                 )}
                                 {script.error && (
-                                    <Problem title={t(script.error)}>
+                                    <Problem title={t(script.error as LocalizationKey)}>
                                         <AlertTriangleIcon size={14}/>
                                     </Problem>
                                 )}

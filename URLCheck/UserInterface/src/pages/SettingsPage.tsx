@@ -3,7 +3,9 @@ import styled, {css, keyframes} from "styled-components";
 import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
 import {Dropdown} from "../components/Dropdown";
-import {loadStrings, Native, useLocale, useTranslation} from "@photino-net-utils/bridge";
+import {Native} from "@photino-net-utils/bridge";
+import {loadStrings, type Translate, useLocale, useTranslation} from "../api/i18n";
+import type {LocalizationKey} from "../api/i18n.generated";
 import {AppSettings, BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
 import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
@@ -36,17 +38,18 @@ import {FILTER_CATALOG} from "../data/filterCatalog";
 import {
     cancelUpdateDownload,
     checkForUpdates,
-    downloadUpdate,
     getAppInfo,
     getUpdateStatus,
     installUpdate,
     openDefaultAppsSettings,
     openLogsFolder,
-    openReleasePage,
+    openReleasesPage,
     protocolStatus,
     type ProtocolStatus,
     registerProtocols,
+    RELEASES_URL,
     setStartup,
+    startUpdateDownload,
     startupStatus,
     type StartupStatus,
     unregisterProtocols,
@@ -937,7 +940,7 @@ const DialogInput = styled(ListInput)`
 function updateStatusLabel(
     phase: string,
     error: string | null | undefined,
-    t: (key: string) => string
+    t: Translate
 ): string {
     switch (phase) {
         case "ready":
@@ -985,15 +988,15 @@ const SECTIONS = [
     "settings.filterLists",
     "settings.startup",
     "settings.about",
-];
+] as const satisfies readonly LocalizationKey[];
 
 /** Anchor id of a section; every card carries the matching one. */
-const anchorId = (key: string) => key.replace(".", "-");
+const anchorId = (key: LocalizationKey): LocalizationKey => key.replace(".", "-") as LocalizationKey;
 
 export const SettingsPage: React.FC = () => {
     const t = useTranslation();
     const locale = useLocale();
-    const [activeSection, setActiveSection] = useState(SECTIONS[0]);
+    const [activeSection, setActiveSection] = useState<LocalizationKey>(SECTIONS[0]);
     const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
     /** Last persisted snapshot; the form is "dirty" while it differs from this. */
     const [baseline, setBaseline] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -1006,7 +1009,7 @@ export const SettingsPage: React.FC = () => {
     const [detecting, setDetecting] = useState(false);
     const [integrationBusy, setIntegrationBusy] = useState(false);
     const [integrationMessage, setIntegrationMessage] = useState<{
-        key: string;
+        key: LocalizationKey;
         params?: Record<string, string>
     } | null>(null);
     const [protocols, setProtocols] = useState<ProtocolStatus | null>(null);
@@ -1067,7 +1070,7 @@ export const SettingsPage: React.FC = () => {
                 const top = entries
                     .filter((entry) => entry.isIntersecting)
                     .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-                if (top) setActiveSection(top.target.id);
+                if (top) setActiveSection(top.target.id as LocalizationKey);
             },
             {rootMargin: "-8% 0px -70% 0px"}
         );
@@ -1076,7 +1079,7 @@ export const SettingsPage: React.FC = () => {
         return () => observer.disconnect();
     }, []);
 
-    const jumpTo = (id: string) => {
+    const jumpTo = (id: LocalizationKey) => {
         setActiveSection(id);
         document.getElementById(id)?.scrollIntoView({behavior: "smooth", block: "start"});
     };
@@ -1177,7 +1180,7 @@ export const SettingsPage: React.FC = () => {
                     downloaded: 0,
                     total: 0,
                     percent: 0,
-                    error: ack.error ?? null
+                    error: ack.error ?? undefined
                 });
             }, (problem) => {
                 setUpdateInstalling(false);
@@ -1473,7 +1476,7 @@ export const SettingsPage: React.FC = () => {
     /** Opens the newest release page through the shared update service. */
     const handleOpenRelease = async () => {
         try {
-            await openReleasePage();
+            await openReleasesPage(RELEASES_URL);
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
         }
@@ -1489,7 +1492,7 @@ export const SettingsPage: React.FC = () => {
         autoInstallUpdate.current = true;
 
         try {
-            const ack = await downloadUpdate();
+            const ack = await startUpdateDownload();
             if (ack.ok) return;
 
             autoInstallUpdate.current = false;
@@ -1673,7 +1676,7 @@ export const SettingsPage: React.FC = () => {
                     {error && (
                         <ErrorBanner>
                             <AlertTriangleIcon size={16}/>
-                            <span>{t(error)}</span>
+                            <span>{t(error as LocalizationKey)}</span>
                         </ErrorBanner>
                     )}
 
@@ -2233,7 +2236,7 @@ export const SettingsPage: React.FC = () => {
                                             {list.error && (
                                                 <FilterError>
                                                     <AlertTriangleIcon size={13}/>
-                                                    <span>{t(list.error)}</span>
+                                                    <span>{t(list.error as LocalizationKey)}</span>
                                                 </FilterError>
                                             )}
                                         </FilterBody>
@@ -2568,7 +2571,7 @@ export const SettingsPage: React.FC = () => {
                         {pairing.error ? (
                             <ErrorBanner>
                                 <AlertTriangleIcon size={16}/>
-                                <span>{t(pairing.error)}</span>
+                                <span>{t(pairing.error as LocalizationKey)}</span>
                             </ErrorBanner>
                         ) : pairing.code ? (
                             <>

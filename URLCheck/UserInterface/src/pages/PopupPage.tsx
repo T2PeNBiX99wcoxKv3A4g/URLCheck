@@ -8,7 +8,9 @@ import {checkStatus, type StatusResult} from "../api/inspect";
 import {closePopup, resizePopup} from "../api/system";
 import {loadFilterRules} from "../api/filters";
 import {type CompiledRules, compileRules, stripTrackingParams, trackingParamKeys} from "../data/filterRules";
-import {Native, useTranslation} from "@photino-net-utils/bridge";
+import {Native} from "@photino-net-utils/bridge";
+import type {LocalizationKey} from "../api/i18n.generated";
+import {useTranslation} from "../api/i18n";
 import {
     AlertTriangleIcon,
     CheckCircleIcon,
@@ -1265,7 +1267,7 @@ export const PopupPage: React.FC = () => {
                 {error && (
                     <Message $tone="error">
                         <AlertTriangleIcon size={13}/>
-                        <span>{t(error)}</span>
+                        <span>{t(error as LocalizationKey)}</span>
                     </Message>
                 )}
 

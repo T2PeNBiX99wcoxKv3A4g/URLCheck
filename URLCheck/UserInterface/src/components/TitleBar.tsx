@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import {useTranslation, useWindowControls, useWindowDrag} from "@photino-net-utils/bridge";
+import {useWindowControls, useWindowDrag} from "@photino-net-utils/bridge";
+import {useTranslation} from "../api/i18n";
 import {LogoIcon} from "./Icons";
 
 /**

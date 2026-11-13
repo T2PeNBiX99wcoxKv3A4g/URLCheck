@@ -1,5 +1,34 @@
 import {Native} from "@photino-net-utils/bridge";
 
+/**
+ * The app-side system messages the shared bridge does not know about. App info, startup and update
+ * calls come straight from `@photino-net-utils/bridge`.
+ */
+export {
+    type AppInfo,
+    type StartupStatus,
+    type UpdateAck,
+    type UpdateChangelog,
+    type UpdateCheck,
+    type UpdatePhase,
+    type UpdateProgress,
+    cancelUpdateDownload,
+    checkForUpdates,
+    getAppInfo,
+    getUpdateStatus,
+    installUpdate,
+    onUpdateChangelog,
+    onUpdateProgress,
+    openLogsFolder,
+    openReleasesPage,
+    setStartup,
+    startUpdateDownload,
+    startupStatus,
+} from "@photino-net-utils/bridge";
+
+/** Fallback only for the browser preview; the desktop host owns the real release URL. */
+export const RELEASES_URL = "https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/releases/latest";
+
 /** Simulates a link click: asks the backend to open (or navigate) the inspection popup. */
 export async function showPopup(url: string): Promise<void> {
     if (!Native.available) {
@@ -61,24 +90,6 @@ export async function protocolStatus(): Promise<ProtocolStatus> {
     return await Native.request<ProtocolStatus>("app.protocolStatus");
 }
 
-export interface StartupStatus {
-    /** False on platforms with no per-user Startup folder (Linux). */
-    supported: boolean;
-    enabled: boolean;
-}
-
-/** Reports whether URLCheck starts with the user's session. */
-export async function startupStatus(): Promise<StartupStatus> {
-    if (!Native.available) return {supported: false, enabled: false};
-
-    return await Native.request<StartupStatus>("app.startup");
-}
-
-/** Adds or removes the per-user startup shortcut. */
-export async function setStartup(enabled: boolean): Promise<StartupStatus> {
-    return await Native.request<StartupStatus>("app.setStartup", {enabled});
-}
-
 /** Opens the Windows "Default apps" settings page. */
 export async function openDefaultAppsSettings(): Promise<void> {
     await Native.request("app.openDefaultApps");
@@ -87,114 +98,6 @@ export async function openDefaultAppsSettings(): Promise<void> {
 /** Asks the backend to resize the popup window so it fits its content. */
 export function resizePopup(height: number): void {
     Native.send({type: "popup.resize", payload: {height: Math.round(height)}});
-}
-
-export interface AppInfo {
-    version: string;
-    platform: string;
-    logDirectory: string;
-    /** True when the interface has to paint the window's rounded corners itself (Linux). */
-    rounded: boolean;
-    /** True when the shared AppInfoService is running a debug build. */
-    debug?: boolean;
-}
-
-/** Reads the app version declared in the csproj, plus the host platform id and where logs live. */
-export async function getAppInfo(): Promise<AppInfo> {
-    if (!Native.available) return {version: "dev", platform: "windows", logDirectory: "", rounded: false};
-
-    return await Native.request<AppInfo>("app.info");
-}
-
-/** Opens the folder the app writes its log files to, in the desktop's file manager. */
-export async function openLogsFolder(): Promise<void> {
-    if (!Native.available) return;
-
-    await Native.request("update.openLogs");
-}
-
-/** Body of `update.check`: the running version, the published one, and whether it is newer. */
-export interface UpdateCheck {
-    current: string;
-    latest: string;
-    available: boolean;
-}
-
-/** Reply to an update action that only reports whether it started. */
-export interface UpdateAck {
-    ok: boolean;
-    error?: string | null;
-}
-
-/** One `update.progress` event. */
-export interface UpdateProgress {
-    phase: "changelog" | "downloading" | "ready" | "cancelled" | "error";
-    downloaded: number;
-    total: number;
-    percent: number;
-    error?: string | null;
-}
-
-/** One `update.changelog` event. */
-export interface UpdateChangelog {
-    text: string;
-}
-
-/** Where the newest release can be downloaded from. */
-export const RELEASES_URL = "https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/releases/latest";
-
-/**
- * The update state, checked automatically on first use and then cached by the shared update service.
- * Null while it is unknown, which is also what a failed check reports: nobody asked for it, so
- * nothing is shown.
- */
-export async function getUpdateStatus(): Promise<UpdateCheck | null> {
-    if (!Native.available) return null;
-
-    return (await Native.request<UpdateCheck | null>("update.status")) ?? null;
-}
-
-/**
- * Compares this build with the version file the release workflow publishes, ignoring the cache. The
- * shared update service reads the file directly, so checking never runs into the GitHub API rate
- * limit.
- */
-export async function checkForUpdates(): Promise<UpdateCheck> {
-    if (!Native.available) return {current: "dev", latest: "dev", available: false};
-
-    return await Native.request<UpdateCheck>("update.check");
-}
-
-/** Starts downloading the release asset; progress and the changelog arrive as events. */
-export async function downloadUpdate(): Promise<UpdateAck> {
-    if (!Native.available) return {ok: false, error: "Only the desktop app can install updates."};
-
-    return await Native.request<UpdateAck>("update.download");
-}
-
-/** Stops an in-flight download. */
-export async function cancelUpdateDownload(): Promise<void> {
-    if (!Native.available) return;
-
-    await Native.request("update.cancel");
-}
-
-/** Starts the downloaded MSI; the shared service closes the app once the reply has been sent. */
-export async function installUpdate(): Promise<UpdateAck> {
-    if (!Native.available) return {ok: false, error: "Only the desktop app can install updates."};
-
-    return await Native.request<UpdateAck>("update.install");
-}
-
-/** Opens the latest release page in the user's browser. */
-export async function openReleasePage(): Promise<void> {
-    if (!Native.available) {
-        window.open(RELEASES_URL, "_blank", "noopener,noreferrer");
-        return;
-    }
-
-    const ack = await Native.request<UpdateAck>("update.openRelease");
-    if (!ack.ok) throw new Error(ack.error ?? "Could not open the release page.");
 }
 
 /**

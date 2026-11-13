@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import styled from "styled-components";
 import {addAutoRedirect} from "../api/settings";
 import {readClipboard} from "../api/system";
-import {useTranslation} from "@photino-net-utils/bridge";
+import {useTranslation} from "../api/i18n";
 
 /** Inputs where pasting text makes no sense. */
 const NON_TEXT_INPUTS = new Set([

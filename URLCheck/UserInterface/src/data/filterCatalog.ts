@@ -7,11 +7,13 @@
  * lists, ClearURLs' JSON catalog and Firefox's query-stripping records. The format is detected from
  * the downloaded content.
  */
+import type {LocalizationKey} from "../api/i18n.generated";
+
 export interface CatalogEntry {
     name: string;
     url: string;
     /** Translation key for the one-line description. */
-    descriptionKey: string;
+    descriptionKey: LocalizationKey;
 }
 
 export const FILTER_CATALOG: CatalogEntry[] = [

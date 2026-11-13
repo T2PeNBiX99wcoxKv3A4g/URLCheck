@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import styled, {keyframes} from "styled-components";
 import {hideSelectionButton, showPopup} from "../api/system";
-import {Native, useTranslation} from "@photino-net-utils/bridge";
+import {Native} from "@photino-net-utils/bridge";
+import {useTranslation} from "../api/i18n";
 import {LogoIcon} from "../components/Icons";
 
 const popIn = keyframes`

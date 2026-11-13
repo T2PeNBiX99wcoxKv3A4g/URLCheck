@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from "react";
 import styled, {keyframes} from "styled-components";
-import {Native, useTranslation} from "@photino-net-utils/bridge";
+import {Native} from "@photino-net-utils/bridge";
 import {TABS, type TabType} from "../tabs";
-import {getAppInfo, getUpdateStatus, openReleasePage, type UpdateCheck} from "../api/system";
+import {useTranslation} from "../api/i18n";
+import {getAppInfo, getUpdateStatus, openReleasesPage, RELEASES_URL, type UpdateCheck} from "../api/system";
 
 interface SidebarProps {
     currentTab: TabType;
@@ -170,7 +171,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
                     <UpdateDot
                         type="button"
                         title={t("app.updateAvailable", {version: update.latest})}
-                        onClick={() => void openReleasePage().catch(() => undefined)}
+                        onClick={() => void openReleasesPage(RELEASES_URL).catch(() => undefined)}
                     />
                 )}
             </FooterSection>

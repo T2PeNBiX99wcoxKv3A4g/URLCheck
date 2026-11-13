@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import {useTranslation} from "@photino-net-utils/bridge";
+import {useTranslation} from "../api/i18n";
 import {AlertTriangleIcon} from "./Icons";
 
 const Fallback = styled.div`

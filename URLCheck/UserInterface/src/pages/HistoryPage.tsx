@@ -3,7 +3,9 @@ import styled from "styled-components";
 import {HistoryItem} from "../types";
 import {AlertTriangleIcon, SearchIcon, TrashIcon} from "../components/Icons";
 import {Card, PageContainer} from "../components/Layout";
-import {Native, useLocale, useTranslation} from "@photino-net-utils/bridge";
+import {Native} from "@photino-net-utils/bridge";
+import type {LocalizationKey} from "../api/i18n.generated";
+import {useLocale, useTranslation} from "../api/i18n";
 import {clearHistory, listHistory} from "../api/history";
 import {showPopup} from "../api/system";
 
@@ -251,7 +253,7 @@ export const HistoryPage: React.FC = () => {
             {error && (
                 <ErrorBanner>
                     <AlertTriangleIcon size={16}/>
-                    <span>{t(error)}</span>
+                    <span>{t(error as LocalizationKey)}</span>
                 </ErrorBanner>
             )}
 
