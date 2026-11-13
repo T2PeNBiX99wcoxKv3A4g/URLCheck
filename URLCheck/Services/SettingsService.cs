@@ -12,7 +12,18 @@ namespace URLCheck.Services;
 ///     Owns the TOML settings file and its standard bridge messages. The shared base handles
 ///     loading, saving, JSON-to-TOML migration and the change notification.
 /// </summary>
-internal sealed class SettingsService : SettingsServiceBase<SettingsService, AppSettings, SettingsPayload>
+internal sealed class SettingsService() : SettingsServiceBase<SettingsService, AppSettings, SettingsPayload>(
+    new TomlSettingsStore<AppSettings>(
+        Path.Combine(Constants.SettingsDirectory, "settings.toml"),
+        new()
+        {
+            Browsers = [.. PlatformServices.BrowserLocator.Detect()]
+        },
+        AppTomlContext.Default.AppSettings,
+        json => JsonSerializer.Deserialize(json, AppJsonContext.Default.AppSettings),
+        LegacySettingsPath,
+        Header),
+    (type, data) => WindowManager.Instance.BroadcastEventIfReady(type, data))
 {
     private const string Header =
         "# URLCheck settings. Rewritten when settings are saved; comments are not preserved.";
@@ -20,23 +31,10 @@ internal sealed class SettingsService : SettingsServiceBase<SettingsService, App
     /// <summary>The old JSON file, read once when the TOML file does not exist yet.</summary>
     private static readonly string? LegacySettingsPath = new[]
     {
-        Path.Combine(Constants.SettingsDirectory, "settings.json"),
-        Path.Combine(Constants.DataDirectory, "settings.json")
+        Path.Combine(Constants.SettingsDirectory, "settings.json"), Path.Combine(Constants.DataDirectory, "settings.json")
     }.FirstOrDefault(File.Exists);
 
     private readonly IBrowserLocator _browserLocator = PlatformServices.BrowserLocator;
-
-    public SettingsService() : base(
-        new TomlSettingsStore<AppSettings>(
-            Path.Combine(Constants.SettingsDirectory, "settings.toml"),
-            new AppSettings { Browsers = [.. PlatformServices.BrowserLocator.Detect()] },
-            AppTomlContext.Default.AppSettings,
-            json => JsonSerializer.Deserialize(json, AppJsonContext.Default.AppSettings),
-            LegacySettingsPath,
-            Header),
-        (type, data) => WindowManager.Instance.BroadcastEventIfReady(type, data))
-    {
-    }
 
     /// <summary>The language from the loaded settings.</summary>
     public string Language => Current.Language;
