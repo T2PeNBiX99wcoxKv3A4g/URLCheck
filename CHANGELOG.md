@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.16.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.16.0..v1.16.1) - 2026-11-13
+
+### ⚙️ Miscellaneous Tasks
+
+- Update @photino-net-utils/bridge to v0.26.1 and refresh associated libraries - ([3f7eab2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/3f7eab26d5aaaf940ff382d062faf570d438a92f))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([40c27f9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/40c27f916ae92280b8b884e9e3d812f033043917))
+
+
 ## [1.16.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.15.2..v1.16.0) - 2026-11-13
 
 ### ⛰️  Features
