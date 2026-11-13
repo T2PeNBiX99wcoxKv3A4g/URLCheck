@@ -14,6 +14,7 @@ import "@fontsource/jetbrains-mono/latin-700.css";
 import App from "./App";
 import {ContextMenu} from "./components/ContextMenu";
 import {LocalizationProvider} from "@photino-net-utils/bridge";
+import {ThemeRoot} from "./components/ThemeRoot";
 import {PopupPage} from "./pages/PopupPage";
 import {SelectionButtonPage} from "./pages/SelectionButtonPage";
 
@@ -31,8 +32,10 @@ if (rootElement) {
     createRoot(rootElement).render(
         <StrictMode>
             <LocalizationProvider>
-                {page}
-                <ContextMenu/>
+                <ThemeRoot>
+                    {page}
+                    <ContextMenu/>
+                </ThemeRoot>
             </LocalizationProvider>
         </StrictMode>
     );

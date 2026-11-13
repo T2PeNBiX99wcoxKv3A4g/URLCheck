@@ -6,6 +6,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     userAgents: [],
     browsers: [],
     language: "system",
+    theme: "system",
     borderlessPopup: true,
     autoStripTrackingParams: true,
     autoRedirectHosts: [],
@@ -58,6 +59,7 @@ function normalize(settings: AppSettings): AppSettings {
             useCount: browser.useCount ?? 0,
         })),
         language: settings.language || DEFAULT_SETTINGS.language,
+        theme: settings.theme === "light" || settings.theme === "dark" ? settings.theme : DEFAULT_SETTINGS.theme,
         borderlessPopup: settings.borderlessPopup ?? DEFAULT_SETTINGS.borderlessPopup,
         autoStripTrackingParams:
             settings.autoStripTrackingParams ?? DEFAULT_SETTINGS.autoStripTrackingParams,

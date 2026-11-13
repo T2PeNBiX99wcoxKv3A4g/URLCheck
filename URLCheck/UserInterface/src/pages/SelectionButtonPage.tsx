@@ -41,11 +41,11 @@ const Button = styled.button`
     align-items: center;
     justify-content: center;
     padding: 0;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid var(--border-hover);
     border-radius: 50%;
     background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
     cursor: pointer;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 5px var(--shadow);
     animation: ${popIn} 0.16s cubic-bezier(0.22, 1, 0.36, 1);
     transition: filter 0.15s ease;
 

@@ -123,11 +123,11 @@ const fadeIn = keyframes`
 
 const Root = styled.div<{ $borderless: boolean }>`
     min-height: 100vh;
-    background-color: #0b0f19;
+    background-color: var(--bg-primary);
     background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 70%);
-    color: #f9fafb;
+    color: var(--text-primary);
     border-radius: ${(p) => (p.$borderless ? "8px" : "0")};
-    box-shadow: ${(p) => (p.$borderless ? "inset 0 0 0 1px rgba(255, 255, 255, 0.12)" : "none")};
+    box-shadow: ${(p) => (p.$borderless ? "inset 0 0 0 1px var(--border-strong)" : "none")};
     overflow: hidden;
     animation: ${fadeIn} 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 `;
@@ -146,7 +146,7 @@ const CloseButton = styled.button`
     border-radius: 6px;
     border: none;
     background: transparent;
-    color: #6b7280;
+    color: var(--text-muted);
     cursor: pointer;
     font-size: 0.85rem;
     line-height: 1;
@@ -154,7 +154,7 @@ const CloseButton = styled.button`
 
     &:hover {
         background: rgba(239, 68, 68, 0.15);
-        color: #f87171;
+        color: var(--danger);
     }
 `;
 
@@ -170,16 +170,16 @@ const UrlInput = styled.input<{ $warn?: boolean }>`
     height: 34px;
     padding: 0 11px;
     border-radius: 8px;
-    border: 1px solid ${(p) => (p.$warn ? "rgba(245, 158, 11, 0.6)" : "rgba(255, 255, 255, 0.12)")};
-    background: ${(p) => (p.$warn ? "rgba(245, 158, 11, 0.1)" : "rgba(15, 23, 42, 0.8)")};
-    color: #f9fafb;
+    border: 1px solid ${(p) => (p.$warn ? "rgba(245, 158, 11, 0.6)" : "var(--border-strong)")};
+    background: ${(p) => (p.$warn ? "rgba(245, 158, 11, 0.1)" : "var(--surface-soft)")};
+    color: var(--text-primary);
     font-family: var(--font-mono);
     font-size: 0.8rem;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 
     &:focus {
-        border-color: ${(p) => (p.$warn ? "#f59e0b" : "#3b82f6")};
+        border-color: ${(p) => (p.$warn ? "var(--warning-strong)" : "#3b82f6")};
         box-shadow: 0 0 0 3px ${(p) => (p.$warn ? "rgba(245, 158, 11, 0.25)" : "rgba(59, 130, 246, 0.25)")};
     }
 `;
@@ -189,7 +189,7 @@ const HttpWarning = styled.div`
     align-items: center;
     gap: 6px;
     margin-top: -4px;
-    color: #fbbf24;
+    color: var(--warning);
     font-size: 0.74rem;
     animation: ${fadeIn} 0.15s ease;
 `;
@@ -203,7 +203,7 @@ const ScriptProblem = styled.div`
     border-radius: 8px;
     border: 1px solid rgba(239, 68, 68, 0.35);
     background: rgba(239, 68, 68, 0.12);
-    color: #fca5a5;
+    color: var(--danger);
     font-size: 0.74rem;
     line-height: 1.35;
     animation: ${fadeIn} 0.15s ease;
@@ -236,16 +236,16 @@ const SmallButton = styled.button`
     height: 24px;
     padding: 0 6px;
     border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: #cbd5e1;
+    border: 1px solid var(--border-soft);
+    background: var(--border-faint);
+    color: var(--text-soft);
     font-size: 0.72rem;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 
     &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.12);
-        color: #f9fafb;
+        background: var(--border-strong);
+        color: var(--text-primary);
         transform: translateY(-1px);
     }
 
@@ -290,7 +290,7 @@ const StatusPill = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
                             ? "rgba(59, 130, 246, 0.3)"
                             : p.$tone === "error"
                                     ? "rgba(239, 68, 68, 0.3)"
-                                    : "rgba(255, 255, 255, 0.1)"};
+                                    : "var(--border-soft)"};
     background: ${(p) =>
             p.$tone === "ok"
                     ? "rgba(16, 185, 129, 0.12)"
@@ -298,15 +298,15 @@ const StatusPill = styled.button<{ $tone: "idle" | "ok" | "info" | "error" }>`
                             ? "rgba(59, 130, 246, 0.12)"
                             : p.$tone === "error"
                                     ? "rgba(239, 68, 68, 0.12)"
-                                    : "rgba(255, 255, 255, 0.04)"};
+                                    : "var(--border-faint)"};
     color: ${(p) =>
             p.$tone === "ok"
-                    ? "#34d399"
+                    ? "var(--success)"
                     : p.$tone === "info"
-                            ? "#60a5fa"
+                            ? "var(--link)"
                             : p.$tone === "error"
-                                    ? "#f87171"
-                                    : "#9ca3af"};
+                                    ? "var(--danger)"
+                                    : "var(--text-secondary)"};
 `;
 
 const Actions = styled.div`
@@ -327,9 +327,9 @@ const ActionButton = styled.button<{ $accent?: boolean }>`
     box-sizing: border-box;
     padding: 0 11px;
     border-radius: 7px;
-    border: 1px solid ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.4)" : "rgba(255, 255, 255, 0.1)")};
-    background: ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.14)" : "rgba(255, 255, 255, 0.05)")};
-    color: ${(p) => (p.$accent ? "#fbbf24" : "#d1d5db")};
+    border: 1px solid ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.4)" : "var(--border-soft)")};
+    background: ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.14)" : "var(--border-faint)")};
+    color: ${(p) => (p.$accent ? "var(--warning)" : "var(--text-soft)")};
     font-size: 0.76rem;
     font-weight: 500;
     line-height: 1;
@@ -337,8 +337,8 @@ const ActionButton = styled.button<{ $accent?: boolean }>`
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 
     &:hover:not(:disabled) {
-        background: ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.26)" : "rgba(255, 255, 255, 0.12)")};
-        color: #f9fafb;
+        background: ${(p) => (p.$accent ? "rgba(245, 158, 11, 0.26)" : "var(--border-strong)")};
+        color: var(--text-primary);
         transform: translateY(-1px);
     }
 
@@ -353,10 +353,10 @@ const ActionButton = styled.button<{ $accent?: boolean }>`
 `;
 
 const Section = styled.div`
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
-    background: rgba(15, 23, 42, 0.5);
+    background: var(--surface-dim);
 `;
 
 const SectionHeader = styled.div`
@@ -375,7 +375,7 @@ const SectionToggle = styled.button`
     padding: 2px 0;
     border: none;
     background: transparent;
-    color: #9ca3af;
+    color: var(--text-secondary);
     font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
@@ -383,7 +383,7 @@ const SectionToggle = styled.button`
     transition: color 0.15s ease;
 
     &:hover {
-        color: #f9fafb;
+        color: var(--text-primary);
     }
 `;
 
@@ -395,13 +395,13 @@ const HeaderAction = styled.button`
     border: none;
     border-radius: 5px;
     background: none;
-    color: #6b7280;
+    color: var(--text-muted);
     cursor: pointer;
     transition: color 0.15s ease, background 0.15s ease;
 
     &:hover:not(:disabled) {
-        color: #60a5fa;
-        background: rgba(255, 255, 255, 0.08);
+        color: var(--link);
+        background: var(--border);
     }
 
     &:disabled {
@@ -412,7 +412,7 @@ const HeaderAction = styled.button`
 
 const ClearAction = styled(HeaderAction)`
     &:hover:not(:disabled) {
-        color: #f87171;
+        color: var(--danger);
         background: rgba(239, 68, 68, 0.12);
     }
 `;
@@ -425,8 +425,8 @@ const Chevron = styled.span<{ $open: boolean }>`
 `;
 
 const CountBadge = styled.span`
-    background: rgba(255, 255, 255, 0.08);
-    color: #cbd5e1;
+    background: var(--border);
+    color: var(--text-soft);
     border-radius: 9999px;
     padding: 0 7px;
     font-size: 0.68rem;
@@ -436,7 +436,7 @@ const CountBadge = styled.span`
 
 const EmptyHint = styled.span`
     padding: 6px 2px;
-    color: #6b7280;
+    color: var(--text-muted);
     font-size: 0.76rem;
 `;
 
@@ -451,13 +451,13 @@ const Row = styled.div`
     display: flex;
     gap: 10px;
     padding: 4px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-faint);
     font-family: var(--font-mono);
     font-size: 0.75rem;
 `;
 
 const RowKey = styled.span`
-    color: #60a5fa;
+    color: var(--link);
     flex-shrink: 0;
     min-width: 78px;
     overflow: hidden;
@@ -466,7 +466,7 @@ const RowKey = styled.span`
 `;
 
 const RowValue = styled.span`
-    color: #cbd5e1;
+    color: var(--text-soft);
     flex: 1;
     word-break: break-all;
 `;
@@ -476,7 +476,7 @@ const HostLink = styled.button`
     border: none;
     padding: 0;
     font: inherit;
-    color: #60a5fa;
+    color: var(--link);
     text-decoration: underline;
     text-underline-offset: 2px;
     cursor: pointer;
@@ -484,7 +484,7 @@ const HostLink = styled.button`
     transition: color 0.15s ease;
 
     &:hover {
-        color: #93c5fd;
+        color: var(--accent-soft);
     }
 `;
 
@@ -499,38 +499,38 @@ const ParamInput = styled.input`
     transition: background 0.15s ease, border-color 0.15s ease;
 
     &.key {
-        color: #60a5fa;
+        color: var(--link);
         flex: 0 0 40%;
         min-width: 0;
     }
 
     &.value {
-        color: #cbd5e1;
+        color: var(--text-soft);
         flex: 1;
         min-width: 0;
     }
 
     &:hover {
-        border-color: rgba(255, 255, 255, 0.12);
+        border-color: var(--border-strong);
     }
 
     &:focus {
         border-color: #3b82f6;
-        background: rgba(15, 23, 42, 0.9);
+        background: var(--surface);
     }
 `;
 
 const RemoveParam = styled.button`
     background: none;
     border: none;
-    color: #6b7280;
+    color: var(--text-muted);
     cursor: pointer;
     padding: 0 2px;
     flex-shrink: 0;
     transition: color 0.15s ease, background 0.15s ease;
 
     &:hover {
-        color: #f87171;
+        color: var(--danger);
     }
 `;
 
@@ -591,7 +591,7 @@ const OpenButton = styled.button`
 const ArrowButton = styled.button`
     width: 30px;
     border: none;
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-left: 1px solid var(--border-hover);
     border-radius: 0 8px 8px 0;
     background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     color: #ffffff;
@@ -610,17 +610,17 @@ const ArrowButton = styled.button`
 
 const GhostButton = styled(ActionButton)<{ $active?: boolean }>`
     height: 32px;
-    border-color: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.5)" : "rgba(255, 255, 255, 0.1)")};
-    background: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.22)" : "rgba(255, 255, 255, 0.05)")};
-    color: ${(p) => (p.$active ? "#c7d2fe" : "#d1d5db")};
+    border-color: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.5)" : "var(--border-soft)")};
+    background: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.22)" : "var(--border-faint)")};
+    color: ${(p) => (p.$active ? "var(--accent-soft)" : "var(--text-soft)")};
 
     /* ActionButton's hover rule knows nothing about $active, so it would flatten the active
        background back to the plain white wash. Keep the two states distinguishable. */
 
     &:hover:not(:disabled) {
-        border-color: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.7)" : "rgba(255, 255, 255, 0.1)")};
-        background: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.34)" : "rgba(255, 255, 255, 0.12)")};
-        color: ${(p) => (p.$active ? "#e0e7ff" : "#f9fafb")};
+        border-color: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.7)" : "var(--border-soft)")};
+        background: ${(p) => (p.$active ? "rgba(99, 102, 241, 0.34)" : "var(--border-strong)")};
+        color: ${(p) => (p.$active ? "var(--accent-soft)" : "var(--text-primary)")};
     }
 `;
 
@@ -633,7 +633,7 @@ const Message = styled.div<{ $tone: "error" | "ok" }>`
     font-size: 0.76rem;
     background: ${(p) => (p.$tone === "error" ? "rgba(239, 68, 68, 0.12)" : "rgba(16, 185, 129, 0.12)")};
     border: 1px solid ${(p) => (p.$tone === "error" ? "rgba(239, 68, 68, 0.3)" : "rgba(16, 185, 129, 0.3)")};
-    color: ${(p) => (p.$tone === "error" ? "#f87171" : "#34d399")};
+    color: ${(p) => (p.$tone === "error" ? "var(--danger)" : "var(--success)")};
 `;
 
 /* ---------------------------------------------------------------- component */

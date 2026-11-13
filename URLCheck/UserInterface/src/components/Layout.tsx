@@ -26,17 +26,17 @@ export const PageContainer = styled.div<{ $maxWidth?: number }>`
 
 /** Shared card surface. Hover only lifts the border and shadow, never the layout. */
 export const Card = styled.div`
-    background: rgba(17, 24, 39, 0.75);
+    background: var(--panel);
     backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 12px var(--shadow);
     transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 
     &:hover {
-        border-color: rgba(255, 255, 255, 0.14);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        border-color: var(--border-hover);
+        box-shadow: 0 8px 24px var(--shadow);
     }
 `;
 
@@ -51,8 +51,8 @@ export const StackCard = styled(Card)`
 export const SectionTitle = styled.h3`
     font-size: 1.05rem;
     font-weight: 700;
-    color: #f9fafb;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
     padding-bottom: 12px;
     margin-bottom: 4px;
 `;

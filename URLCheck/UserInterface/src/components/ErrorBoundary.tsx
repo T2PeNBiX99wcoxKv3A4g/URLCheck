@@ -13,7 +13,7 @@ const Fallback = styled.div`
     border: 1px solid rgba(239, 68, 68, 0.25);
     border-radius: 12px;
     background: rgba(239, 68, 68, 0.08);
-    color: #f87171;
+    color: var(--danger);
     font-size: 0.9rem;
 `;
 

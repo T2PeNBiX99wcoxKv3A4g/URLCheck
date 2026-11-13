@@ -82,12 +82,12 @@ const SettingInfo = styled.div`
 const SettingLabel = styled.span`
     font-size: 0.925rem;
     font-weight: 600;
-    color: #f9fafb;
+    color: var(--text-primary);
 `;
 
 const SettingDescription = styled.span`
     font-size: 0.8rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
 `;
 
 const StyledRange = styled.div`
@@ -110,7 +110,7 @@ const StyledRange = styled.div`
     span {
         font-size: 0.85rem;
         font-weight: 600;
-        color: #60a5fa;
+        color: var(--link);
         min-width: 50px;
         text-align: right;
         font-family: var(--font-mono);
@@ -131,7 +131,7 @@ const ActionRow = styled.div`
     /* On a narrow window (or a high display scale) the buttons wrap instead of being clipped. */
     flex-wrap: wrap;
     padding: 12px 0;
-    background: linear-gradient(to top, #0b0f19 68%, rgba(11, 15, 25, 0));
+    background: linear-gradient(to top, var(--bg-primary) 68%, transparent);
 `;
 
 const BaseButton = styled.button`
@@ -174,12 +174,12 @@ const SaveButton = styled(BaseButton)`
 /** Shared red treatment for the destructive actions (discard edits, reset to defaults). */
 const dangerStyles = css`
     background: rgba(239, 68, 68, 0.12);
-    color: #f87171;
+    color: var(--danger);
     border: 1px solid rgba(239, 68, 68, 0.35);
 
     &:hover:not(:disabled) {
         background: rgba(239, 68, 68, 0.24);
-        color: #fca5a5;
+        color: var(--danger);
         border-color: rgba(239, 68, 68, 0.5);
     }
 `;
@@ -219,7 +219,7 @@ const Toast = styled.div`
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #34d399;
+    color: var(--success);
     font-size: 0.85rem;
     font-weight: 500;
 `;
@@ -232,7 +232,7 @@ const ErrorBanner = styled.div`
     border-radius: 8px;
     background: rgba(239, 68, 68, 0.12);
     border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #f87171;
+    color: var(--danger);
     font-size: 0.85rem;
 `;
 
@@ -251,10 +251,10 @@ const UnsavedBanner = styled.div<{ $visible: boolean }>`
     overflow: hidden;
     border-radius: 10px;
     border: solid rgba(251, 191, 36, 0.35);
-    background: rgba(30, 27, 17, 0.92);
+    background: var(--warning-surface);
     backdrop-filter: blur(16px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-    color: #fbbf24;
+    box-shadow: 0 8px 24px var(--shadow);
+    color: var(--warning);
     font-size: 0.85rem;
     font-weight: 600;
     transform-origin: top;
@@ -312,7 +312,7 @@ const NavItem = styled.button<{ $active: boolean }>`
     border: 0;
     border-radius: 7px;
     background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.16)" : "transparent")};
-    color: ${(props) => (props.$active ? "#93c5fd" : "#9ca3af")};
+    color: ${(props) => (props.$active ? "var(--accent-soft)" : "var(--text-secondary)")};
     font: inherit;
     font-size: 0.76rem;
     font-weight: ${(props) => (props.$active ? "600" : "500")};
@@ -322,8 +322,8 @@ const NavItem = styled.button<{ $active: boolean }>`
     transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
-        background: rgba(255, 255, 255, 0.06);
-        color: #f9fafb;
+        background: var(--border-faint);
+        color: var(--text-primary);
     }
 `;
 
@@ -336,7 +336,7 @@ const PulseDot = styled.span`
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #fbbf24;
+    background: var(--warning);
     flex-shrink: 0;
     animation: unsavedPulse 1.8s ease-out infinite;
 
@@ -358,10 +358,10 @@ const FileInfo = styled.div`
     flex-direction: column;
     gap: 4px;
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-muted);
 
     code {
-        color: #9ca3af;
+        color: var(--text-secondary);
         font-family: var(--font-mono);
         word-break: break-all;
     }
@@ -373,7 +373,7 @@ const AttributionLink = styled.button`
     padding: 0;
     border: none;
     background: none;
-    color: #6b7280;
+    color: var(--text-muted);
     font-size: 0.78rem;
     cursor: pointer;
     text-decoration: underline;
@@ -381,7 +381,7 @@ const AttributionLink = styled.button`
     transition: color 0.15s ease;
 
     &:hover {
-        color: #9ca3af;
+        color: var(--text-secondary);
     }
 `;
 
@@ -401,16 +401,16 @@ const ListRow = styled.div`
 const ListInput = styled.input`
     padding: 8px 10px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(15, 23, 42, 0.75);
-    color: #f9fafb;
+    border: 1px solid var(--border-strong);
+    background: var(--input);
+    color: var(--text-primary);
     font-size: 0.82rem;
     outline: none;
     transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 
     &:focus {
         border-color: #3b82f6;
-        background: rgba(15, 23, 42, 0.95);
+        background: var(--input-focus);
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
     }
 
@@ -441,9 +441,9 @@ const ListInput = styled.input`
 const GhostButton = styled.button`
     padding: 8px 14px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.06);
-    color: #d1d5db;
+    border: 1px solid var(--border-strong);
+    background: var(--border-faint);
+    color: var(--text-soft);
     font-weight: 500;
     font-size: 0.82rem;
     cursor: pointer;
@@ -453,8 +453,8 @@ const GhostButton = styled.button`
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
     &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.12);
-        color: #f9fafb;
+        background: var(--border-strong);
+        color: var(--text-primary);
     }
 
     &:disabled {
@@ -466,11 +466,11 @@ const GhostButton = styled.button`
 const DangerGhostButton = styled(GhostButton)`
     border-color: rgba(239, 68, 68, 0.35);
     background: rgba(239, 68, 68, 0.12);
-    color: #f87171;
+    color: var(--danger);
 
     &:hover:not(:disabled) {
         background: rgba(239, 68, 68, 0.24);
-        color: #fca5a5;
+        color: var(--danger);
     }
 `;
 
@@ -478,7 +478,7 @@ const IconOnlyButton = styled.button`
     background: none;
     border: none;
     cursor: pointer;
-    color: #6b7280;
+    color: var(--text-muted);
     display: flex;
     align-items: center;
     padding: 6px;
@@ -487,7 +487,7 @@ const IconOnlyButton = styled.button`
     transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 
     &:hover {
-        color: #f87171;
+        color: var(--danger);
         background: rgba(239, 68, 68, 0.12);
         transform: scale(1.08);
     }
@@ -506,7 +506,7 @@ const ButtonRow = styled.div`
 
 const InfoText = styled.span`
     font-size: 0.78rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
 `;
 
 const WarnText = styled.div`
@@ -515,7 +515,7 @@ const WarnText = styled.div`
     gap: 6px;
     font-size: 0.78rem;
     line-height: 1.4;
-    color: #fbbf24;
+    color: var(--warning);
 `;
 
 /** The short verification code both devices show while pairing. */
@@ -525,7 +525,7 @@ const PairCode = styled.div`
     border-radius: 10px;
     border: 1px solid rgba(99, 102, 241, 0.35);
     background: rgba(99, 102, 241, 0.12);
-    color: #c7d2fe;
+    color: var(--accent-soft);
     font-family: var(--font-mono);
     font-size: 1.5rem;
     font-weight: 700;
@@ -562,14 +562,14 @@ const FilterRow = styled.div`
     align-items: flex-start;
     gap: 12px;
     padding: 12px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
     border-radius: 10px;
-    background: rgba(15, 23, 42, 0.5);
+    background: var(--surface-dim);
     transition: border-color 0.2s ease, background 0.2s ease;
 
     &:hover {
-        border-color: rgba(255, 255, 255, 0.16);
-        background: rgba(15, 23, 42, 0.72);
+        border-color: var(--border-hover);
+        background: var(--surface-soft);
     }
 `;
 
@@ -584,7 +584,7 @@ const FilterBody = styled.div`
 const FilterName = styled.span`
     font-size: 0.9rem;
     font-weight: 600;
-    color: #f9fafb;
+    color: var(--text-primary);
     word-break: break-word;
 `;
 
@@ -601,13 +601,13 @@ const StatusDot = styled.span<{ $online: boolean }>`
     height: 8px;
     flex-shrink: 0;
     border-radius: 50%;
-    background: ${(props) => (props.$online ? "#22c55e" : "#374151")};
+    background: ${(props) => (props.$online ? "var(--success)" : "var(--text-muted)")};
     box-shadow: ${(props) => (props.$online ? "0 0 6px rgba(34, 197, 94, 0.7)" : "none")};
 `;
 
 const FilterUrl = styled.span`
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-muted);
     font-family: var(--font-mono);
     word-break: break-all;
 `;
@@ -618,7 +618,7 @@ const AddressRow = styled.div`
     align-items: center;
     gap: 4px;
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
     font-family: var(--font-mono);
     word-break: break-all;
 
@@ -641,7 +641,7 @@ const FilterMeta = styled.span`
     flex-wrap: wrap;
     gap: 12px;
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
 `;
 
 const FilterError = styled.span`
@@ -649,7 +649,7 @@ const FilterError = styled.span`
     align-items: center;
     gap: 6px;
     font-size: 0.75rem;
-    color: #f87171;
+    color: var(--danger);
     word-break: break-word;
 `;
 
@@ -668,7 +668,7 @@ const AddedMark = styled.span`
     flex-shrink: 0;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #34d399;
+    color: var(--success);
 `;
 
 /**
@@ -682,8 +682,8 @@ const Toggle = styled.button<{ $on: boolean }>`
     padding: 0;
     flex-shrink: 0;
     border-radius: 999px;
-    border: 1px solid ${(props) => (props.$on ? "#6366f1" : "rgba(255, 255, 255, 0.15)")};
-    background: ${(props) => (props.$on ? "#6366f1" : "rgba(255, 255, 255, 0.06)")};
+    border: 1px solid ${(props) => (props.$on ? "#6366f1" : "var(--border-hover)")};
+    background: ${(props) => (props.$on ? "#6366f1" : "var(--border-faint)")};
     cursor: pointer;
     transition: background 0.2s ease, border-color 0.2s ease;
 
@@ -695,13 +695,13 @@ const Toggle = styled.button<{ $on: boolean }>`
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        background: ${(props) => (props.$on ? "#ffffff" : "#9ca3af")};
+        background: ${(props) => (props.$on ? "#ffffff" : "var(--text-secondary)")};
         transition: left 0.2s ease, background 0.2s ease;
     }
 
     &:hover:not(:disabled) {
-        background: ${(props) => (props.$on ? "#4f46e5" : "rgba(255, 255, 255, 0.12)")};
-        border-color: ${(props) => (props.$on ? "#4f46e5" : "rgba(255, 255, 255, 0.24)")};
+        background: ${(props) => (props.$on ? "#4f46e5" : "var(--border-strong)")};
+        border-color: ${(props) => (props.$on ? "#4f46e5" : "var(--border-hover)")};
     }
 
     &:disabled {
@@ -718,7 +718,7 @@ const Overlay = styled.div`
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: rgba(3, 7, 18, 0.72);
+    background: var(--overlay);
     backdrop-filter: blur(4px);
     animation: overlayIn 0.2s ease;
 
@@ -742,9 +742,9 @@ const Dialog = styled.div`
     overflow-y: auto;
     padding: 22px;
     border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: #111827;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--border-soft);
+    background: var(--bg-secondary);
+    box-shadow: 0 24px 64px var(--shadow);
     animation: dialogIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 
     @keyframes dialogIn {
@@ -762,7 +762,7 @@ const Dialog = styled.div`
 const DialogTitle = styled.h3`
     font-size: 1.05rem;
     font-weight: 700;
-    color: #f9fafb;
+    color: var(--text-primary);
 `;
 
 /** The update download/installation window; wider than the other dialogs for the changelog. */
@@ -773,7 +773,7 @@ const UpdateDialog = styled(Dialog)`
 
 const UpdateStatus = styled.p<{ $error: boolean }>`
     margin: 0;
-    color: ${(props) => (props.$error ? "#f87171" : "#cbd5e1")};
+    color: ${(props) => (props.$error ? "var(--danger)" : "var(--text-soft)")};
     font-size: 0.85rem;
     line-height: 1.5;
 `;
@@ -793,16 +793,16 @@ const UpdateProgressTrack = styled.div`
     flex-shrink: 0;
     overflow: hidden;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(2, 6, 23, 0.9);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55);
+    border: 1px solid var(--border-soft);
+    background: var(--surface-deep);
+    box-shadow: inset 0 1px 3px var(--shadow);
 `;
 
 const UpdateProgressFill = styled.div<{ $percent: number; $error: boolean; $indeterminate: boolean }>`
     height: 100%;
     border-radius: inherit;
     background: ${(props) => (props.$error
-            ? "linear-gradient(90deg, #b91c1c, #ef4444)"
+            ? "linear-gradient(90deg, var(--danger-strong), var(--danger-strong))"
             : "linear-gradient(90deg, #3b82f6, #6366f1, #a78bfa)")};
     box-shadow: 0 0 12px rgba(99, 102, 241, 0.45);
 
@@ -821,7 +821,7 @@ const ChangelogTitle = styled.h4`
     margin: 0;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #e5e7eb;
+    color: var(--text-primary);
 `;
 
 const Changelog = styled.pre`
@@ -831,10 +831,10 @@ const Changelog = styled.pre`
     overflow: auto;
     margin: 0;
     padding: 12px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
     border-radius: 10px;
-    background: rgba(15, 23, 42, 0.55);
-    color: #cbd5e1;
+    background: var(--surface-dim);
+    color: var(--text-soft);
     font-family: var(--font-mono);
     font-size: 0.74rem;
     line-height: 1.65;
@@ -846,7 +846,7 @@ const Tabs = styled.div`
     display: flex;
     gap: 6px;
     padding-bottom: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
 `;
 
 const Tab = styled.button<{ $active: boolean }>`
@@ -854,15 +854,15 @@ const Tab = styled.button<{ $active: boolean }>`
     border: none;
     border-radius: 8px;
     background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.18)" : "transparent")};
-    color: ${(props) => (props.$active ? "#93c5fd" : "#9ca3af")};
+    color: ${(props) => (props.$active ? "var(--accent-soft)" : "var(--text-secondary)")};
     font-weight: 600;
     font-size: 0.85rem;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
-        background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.24)" : "rgba(255, 255, 255, 0.06)")};
-        color: #f9fafb;
+        background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.24)" : "var(--border-faint)")};
+        color: var(--text-primary);
     }
 `;
 
@@ -881,8 +881,8 @@ const CatalogItem = styled.div`
     gap: 6px;
     padding: 12px;
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border);
+    background: var(--surface-dim);
 `;
 
 const CatalogItemHead = styled.div`
@@ -895,13 +895,13 @@ const CatalogItemHead = styled.div`
 const CatalogName = styled.span`
     font-size: 0.875rem;
     font-weight: 600;
-    color: #f9fafb;
+    color: var(--text-primary);
 `;
 
 const CatalogDescription = styled.span`
     font-size: 0.78rem;
     line-height: 1.5;
-    color: #9ca3af;
+    color: var(--text-secondary);
 `;
 
 const FormatNote = styled.div`
@@ -914,11 +914,11 @@ const FormatNote = styled.div`
     background: rgba(59, 130, 246, 0.08);
     font-size: 0.78rem;
     line-height: 1.55;
-    color: #cbd5e1;
+    color: var(--text-soft);
 
     strong {
         font-weight: 600;
-        color: #93c5fd;
+        color: var(--accent-soft);
     }
 `;
 
@@ -927,7 +927,7 @@ const FieldLabel = styled.label`
     flex-direction: column;
     gap: 6px;
     font-size: 0.8rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
 `;
 
 const DialogInput = styled(ListInput)`
@@ -976,6 +976,7 @@ const LOCALE_NAMES: Record<string, string> = {
 
 /** The settings sections, in page order; the quick-jump list is built from this. */
 const SECTIONS = [
+    "settings.appearance",
     "settings.network",
     "settings.userAgent",
     "settings.browsers",
@@ -1543,6 +1544,19 @@ export const SettingsPage: React.FC = () => {
         }
     };
 
+    /* The theme is applied immediately, like the language, because the whole window repaints. */
+    const handleThemeChange = async (theme: string) => {
+        const next = {...settings, theme};
+        setSettings(next);
+        setError(null);
+        try {
+            const payload = await saveSettings(next);
+            applyPayload(payload);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : String(err));
+        }
+    };
+
     /** Runs a filter-list action and reports failure through the shared error banner. */
     const runFilterAction = async (
         action: () => Promise<FilterListsPayload>,
@@ -1677,6 +1691,28 @@ export const SettingsPage: React.FC = () => {
                             <span>{t(error as LocalizationKey)}</span>
                         </ErrorBanner>
                     )}
+
+                    <Section id={anchorId("settings.appearance")}>
+                        <SectionTitle>{t("settings.appearance")}</SectionTitle>
+
+                        <SettingRow>
+                            <SettingInfo>
+                                <SettingLabel>{t("settings.theme")}</SettingLabel>
+                                <SettingDescription>{t("settings.themeDescription")}</SettingDescription>
+                            </SettingInfo>
+                            <Dropdown
+                                variant="form"
+                                disabled={busy}
+                                value={settings.theme}
+                                options={[
+                                    {value: "system", label: t("settings.themeSystem")},
+                                    {value: "light", label: t("settings.themeLight")},
+                                    {value: "dark", label: t("settings.themeDark")},
+                                ]}
+                                onChange={handleThemeChange}
+                            />
+                        </SettingRow>
+                    </Section>
 
                     <Section id={anchorId("settings.network")}>
                         <SectionTitle>{t("settings.network")}</SectionTitle>

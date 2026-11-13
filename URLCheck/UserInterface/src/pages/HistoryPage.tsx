@@ -25,37 +25,37 @@ const SearchWrapper = styled.div`
     svg {
         position: absolute;
         left: 14px;
-        stroke: #9ca3af;
+        stroke: var(--text-secondary);
     }
 `;
 
 const SearchInput = styled.input`
     width: 100%;
     padding: 10px 14px 10px 42px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--border-strong);
     border-radius: 8px;
-    background: rgba(15, 23, 42, 0.75);
-    color: #f9fafb;
+    background: var(--input);
+    color: var(--text-primary);
     font-size: 0.9rem;
     outline: none;
     font-family: inherit;
     transition: all 0.2s ease;
 
     &:focus {
-        background: rgba(15, 23, 42, 0.95);
+        background: var(--input-focus);
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
     }
 
     &::placeholder {
-        color: #6b7280;
+        color: var(--text-muted);
     }
 `;
 
 const DangerButton = styled.button`
     padding: 10px 16px;
     background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
+    color: var(--danger);
     border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: 8px;
     font-weight: 500;
@@ -68,7 +68,7 @@ const DangerButton = styled.button`
 
     &:hover:not(:disabled) {
         background: rgba(239, 68, 68, 0.25);
-        color: #fca5a5;
+        color: var(--danger);
         border-color: rgba(239, 68, 68, 0.5);
     }
 
@@ -91,19 +91,19 @@ const Table = styled.table`
     th {
         text-align: left;
         padding: 12px 18px;
-        background: rgba(15, 23, 42, 0.7);
-        color: #9ca3af;
+        background: var(--surface-soft);
+        color: var(--text-secondary);
         font-weight: 600;
         font-size: 0.8rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid var(--border);
         text-transform: uppercase;
         letter-spacing: 0.03em;
     }
 
     td {
         padding: 14px 18px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        color: #e2e8f0;
+        border-bottom: 1px solid var(--border-faint);
+        color: var(--text-strong);
         transition: background 0.2s ease, box-shadow 0.2s ease;
     }
 
@@ -122,7 +122,7 @@ const Table = styled.table`
     }
 
     tr:hover td:first-child {
-        box-shadow: inset 3px 0 0 0 #60a5fa;
+        box-shadow: inset 3px 0 0 0 var(--link);
     }
 `;
 
@@ -136,7 +136,7 @@ const UrlLink = styled.button`
     padding: 0;
     font: inherit;
     font-family: var(--font-mono);
-    color: #60a5fa;
+    color: var(--link);
     text-align: left;
     word-break: break-all;
     cursor: pointer;
@@ -145,7 +145,7 @@ const UrlLink = styled.button`
     transition: color 0.15s ease;
 
     &:hover {
-        color: #93c5fd;
+        color: var(--accent-soft);
     }
 `;
 
@@ -157,7 +157,7 @@ const ErrorBanner = styled.div`
     border-radius: 8px;
     background: rgba(239, 68, 68, 0.12);
     border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #f87171;
+    color: var(--danger);
     font-size: 0.85rem;
 `;
 
@@ -284,7 +284,7 @@ export const HistoryPage: React.FC = () => {
                     {filteredHistory.length > 0 ? (
                         filteredHistory.map((item) => (
                             <tr key={item.id} data-history-url={item.url}>
-                                <td style={{color: "#9ca3af", fontSize: "0.85rem"}}>
+                                <td style={{color: "var(--text-secondary)", fontSize: "0.85rem"}}>
                                     {formatTimestamp(item.timestamp, locale)}
                                 </td>
                                 <UrlCell>
@@ -299,7 +299,7 @@ export const HistoryPage: React.FC = () => {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={2} style={{textAlign: "center", padding: "36px", color: "#6b7280"}}>
+                            <td colSpan={2} style={{textAlign: "center", padding: "36px", color: "var(--text-muted)"}}>
                                 {loading ? t("history.loading") : t("history.empty")}
                             </td>
                         </tr>

@@ -1,4 +1,4 @@
-import{a as e,i as t,n,r,t as i}from"./index-BUvNu_te.js";var a=e(t(),1),o=[{name:`@codemirror/commands`,version:`6.11.1`,license:`MIT`,text:`MIT License
+import{a as e,i as t,n,r,t as i}from"./index-CSEWgon0.js";var a=e(t(),1),o=[{name:`@codemirror/commands`,version:`6.11.1`,license:`MIT`,text:`MIT License
 
 Copyright (C) 2018-2021 by Marijn Haverbeke <marijn@haverbeke.berlin> and others
 
@@ -5006,7 +5006,7 @@ SOFTWARE.`}],s=n(),c=r.div`
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: rgba(2, 6, 23, 0.65);
+    background: var(--surface-deep);
     backdrop-filter: blur(3px);
     animation: attributionFade 0.16s ease;
 
@@ -5023,10 +5023,10 @@ SOFTWARE.`}],s=n(),c=r.div`
     flex-direction: column;
     width: min(920px, 100%);
     max-height: min(680px, 100%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-soft);
     border-radius: 14px;
-    background: #0f172a;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    background: var(--surface-deep);
+    box-shadow: 0 30px 80px var(--shadow);
     overflow: hidden;
     animation: attributionIn 0.18s ease;
 
@@ -5047,25 +5047,25 @@ SOFTWARE.`}],s=n(),c=r.div`
     gap: 16px;
     flex-shrink: 0;
     padding: 18px 22px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
 `,d=r.h2`
     margin: 0;
     font-size: 1.05rem;
     font-weight: 700;
-    color: #f9fafb;
+    color: var(--text-primary);
 `,f=r.p`
     margin: 6px 0 0;
     max-width: 620px;
     font-size: 0.8rem;
     line-height: 1.5;
-    color: #9ca3af;
+    color: var(--text-secondary);
 `,p=r.button`
     width: 30px;
     height: 30px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.06);
-    color: #d1d5db;
+    border: 1px solid var(--border-strong);
+    background: var(--border-faint);
+    color: var(--text-soft);
     font-size: 0.85rem;
     cursor: pointer;
     flex-shrink: 0;
@@ -5074,7 +5074,7 @@ SOFTWARE.`}],s=n(),c=r.div`
     &:hover {
         background: rgba(239, 68, 68, 0.15);
         border-color: rgba(239, 68, 68, 0.35);
-        color: #f87171;
+        color: var(--danger);
     }
 `,m=r.div`
     display: flex;
@@ -5091,14 +5091,14 @@ SOFTWARE.`}],s=n(),c=r.div`
     width: 260px;
     flex-shrink: 0;
     padding: 10px;
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid var(--border);
     overflow-y: auto;
 
     @media (max-width: 700px) {
         width: 100%;
         max-height: 150px;
         border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid var(--border);
     }
 `,g=r.button`
     display: flex;
@@ -5109,15 +5109,15 @@ SOFTWARE.`}],s=n(),c=r.div`
     border: none;
     border-radius: 8px;
     background: ${e=>e.$active?`rgba(59, 130, 246, 0.16)`:`transparent`};
-    color: ${e=>e.$active?`#f9fafb`:`#cbd5e1`};
+    color: ${e=>e.$active?`var(--text-primary)`:`var(--text-soft)`};
     font: inherit;
     text-align: left;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
-        background: ${e=>e.$active?`rgba(59, 130, 246, 0.2)`:`rgba(255, 255, 255, 0.05)`};
-        color: #f9fafb;
+        background: ${e=>e.$active?`rgba(59, 130, 246, 0.2)`:`var(--border-faint)`};
+        color: var(--text-primary);
     }
 `,_=r.span`
     font-size: 0.85rem;
@@ -5126,7 +5126,7 @@ SOFTWARE.`}],s=n(),c=r.div`
 `,v=r.span`
     font-family: var(--font-mono);
     font-size: 0.7rem;
-    color: #6b7280;
+    color: var(--text-muted);
 `,y=r.article`
     flex: 1;
     min-width: 0;
@@ -5142,13 +5142,13 @@ SOFTWARE.`}],s=n(),c=r.div`
     margin: 0;
     font-size: 0.95rem;
     font-weight: 600;
-    color: #f9fafb;
+    color: var(--text-primary);
 `,S=r.pre`
     margin: 0;
     font-family: var(--font-mono);
     font-size: 0.72rem;
     line-height: 1.6;
-    color: #9ca3af;
+    color: var(--text-secondary);
     white-space: pre-wrap;
     word-break: break-word;
 `,C=e=>[e.version,e.license].filter(Boolean).join(` · `),w=({onClose:e})=>{let t=i(),[n,r]=(0,a.useState)(0),w=o[n]??o[0];return(0,a.useEffect)(()=>{let t=t=>{t.key===`Escape`&&e()};return window.addEventListener(`keydown`,t),()=>window.removeEventListener(`keydown`,t)},[e]),(0,s.jsx)(c,{onClick:e,children:(0,s.jsxs)(l,{onClick:e=>e.stopPropagation(),children:[(0,s.jsxs)(u,{children:[(0,s.jsxs)(`div`,{children:[(0,s.jsx)(d,{children:t(`attribution.title`)}),(0,s.jsx)(f,{children:t(`attribution.description`,{count:o.length})})]}),(0,s.jsx)(p,{type:`button`,onClick:e,title:t(`attribution.close`),children:`✕`})]}),(0,s.jsxs)(m,{children:[(0,s.jsx)(h,{children:o.map((e,t)=>(0,s.jsxs)(g,{$active:t===n,onClick:()=>r(t),type:`button`,children:[(0,s.jsx)(_,{children:e.name}),(0,s.jsx)(v,{children:C(e)})]},`${e.name}@${e.version}`))}),(0,s.jsxs)(y,{children:[(0,s.jsxs)(b,{children:[(0,s.jsx)(x,{children:w.name}),(0,s.jsx)(v,{children:C(w)})]}),(0,s.jsx)(S,{children:w.text})]})]})]})})};export{w as AttributionPage};

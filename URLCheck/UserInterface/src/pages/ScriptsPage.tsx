@@ -686,9 +686,9 @@ const ListPane = styled.section`
     flex-direction: column;
     width: 280px;
     flex-shrink: 0;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
     border-radius: 12px;
-    background: rgba(17, 24, 39, 0.75);
+    background: var(--panel);
     overflow: hidden;
 `;
 
@@ -697,21 +697,21 @@ const ListHeader = styled.div`
     align-items: center;
     gap: 8px;
     padding: 12px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: #9ca3af;
+    color: var(--text-secondary);
     flex-shrink: 0;
 `;
 
 const Count = styled.span`
     padding: 1px 7px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--border);
     font-size: 0.7rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
 `;
 
 const Spacer = styled.div`
@@ -724,7 +724,7 @@ const Folder = styled.span`
     font-weight: 400;
     text-transform: none;
     letter-spacing: 0;
-    color: #6b7280;
+    color: var(--text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -741,19 +741,19 @@ const List = styled.div`
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+    scrollbar-color: var(--scrollbar-hover) transparent;
 
     &::-webkit-scrollbar {
         width: 8px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.28);
+        background: var(--scrollbar-hover);
         border-radius: 4px;
     }
 
     &::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.45);
+        background: var(--scrollbar-hover);
     }
 `;
 
@@ -766,7 +766,7 @@ const ListItem = styled.button<{ $active: boolean }>`
     border: 1px solid ${(props) => (props.$active ? "rgba(99, 102, 241, 0.35)" : "transparent")};
     border-radius: 8px;
     background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.15)" : "transparent")};
-    color: ${(props) => (props.$active ? "#93c5fd" : "#9ca3af")};
+    color: ${(props) => (props.$active ? "var(--accent-soft)" : "var(--text-secondary)")};
     font: inherit;
     font-size: 0.85rem;
     text-align: left;
@@ -780,15 +780,15 @@ const ListItem = styled.button<{ $active: boolean }>`
     }
 
     &:hover {
-        background: rgba(255, 255, 255, 0.06);
-        color: #f9fafb;
+        background: var(--border-faint);
+        color: var(--text-primary);
     }
 `;
 
 const Problem = styled.span`
     display: grid;
     place-items: center;
-    color: #fbbf24;
+    color: var(--warning);
     flex-shrink: 0;
 `;
 
@@ -805,7 +805,7 @@ const Version = styled.span`
     flex-shrink: 0;
     font-family: var(--font-mono);
     font-size: 0.66rem;
-    color: #6b7280;
+    color: var(--text-muted);
 `;
 
 const UpdateDot = styled.span<{ $changed?: boolean }>`
@@ -813,7 +813,7 @@ const UpdateDot = styled.span<{ $changed?: boolean }>`
     height: 7px;
     border-radius: 50%;
     flex-shrink: 0;
-    background: ${(props) => (props.$changed ? "#fbbf24" : "#34d399")};
+    background: ${(props) => (props.$changed ? "var(--warning)" : "var(--success)")};
 `;
 
 const Dock = styled.div`
@@ -822,11 +822,11 @@ const Dock = styled.div`
     right: 10px;
     bottom: 10px;
     padding: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--border-strong);
     border-radius: 12px;
-    background: rgba(17, 24, 39, 0.94);
+    background: var(--panel-strong);
     backdrop-filter: blur(14px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 28px var(--shadow);
 `;
 
 const DockStack = styled.div`
@@ -854,9 +854,9 @@ const EditorCard = styled.section`
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
     border-radius: 12px;
-    background: rgba(17, 24, 39, 0.75);
+    background: var(--panel);
     overflow: hidden;
 `;
 
@@ -865,15 +865,15 @@ const EditorHeader = styled.div`
     align-items: center;
     gap: 10px;
     padding: 10px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    color: #9ca3af;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
     flex-shrink: 0;
 `;
 
 const Name = styled.strong`
     flex: 1;
     font-size: 0.85rem;
-    color: #f9fafb;
+    color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -885,8 +885,8 @@ const RenameInput = styled.input`
     padding: 4px 8px;
     border-radius: 6px;
     border: 1px solid rgba(99, 102, 241, 0.6);
-    background: rgba(15, 23, 42, 0.9);
-    color: #f9fafb;
+    background: var(--surface);
+    color: var(--text-primary);
     font-family: var(--font-mono);
     font-size: 0.82rem;
 
@@ -900,7 +900,7 @@ const RenameInput = styled.input`
 const Gone = styled.span`
     display: grid;
     place-items: center;
-    color: #fbbf24;
+    color: var(--warning);
     flex-shrink: 0;
 `;
 
@@ -908,7 +908,7 @@ const Dirty = styled.span`
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #fbbf24;
+    background: var(--warning);
     flex-shrink: 0;
 `;
 
@@ -916,7 +916,7 @@ const TestBar = styled.div`
     display: flex;
     gap: 8px;
     padding: 10px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
 `;
 
@@ -925,9 +925,9 @@ const TestInput = styled.input`
     min-width: 0;
     padding: 7px 10px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(15, 23, 42, 0.9);
-    color: #f9fafb;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-primary);
     font-family: var(--font-mono);
     font-size: 0.78rem;
 
@@ -937,7 +937,7 @@ const TestInput = styled.input`
     }
 
     &::placeholder {
-        color: #6b7280;
+        color: var(--text-muted);
     }
 `;
 
@@ -949,8 +949,8 @@ const TestOutput = styled.div<{ $error: boolean }>`
     max-height: 120px;
     overflow-y: auto;
     flex-shrink: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    background: ${(props) => (props.$error ? "rgba(239, 68, 68, 0.1)" : "rgba(15, 23, 42, 0.55)")};
+    border-bottom: 1px solid var(--border);
+    background: ${(props) => (props.$error ? "rgba(239, 68, 68, 0.1)" : "var(--surface-dim)")};
     font-family: var(--font-mono);
     font-size: 0.75rem;
 `;
@@ -962,12 +962,12 @@ const ResultRow = styled.div`
 `;
 
 const ResultLabel = styled.span`
-    color: #6b7280;
+    color: var(--text-muted);
     flex-shrink: 0;
 `;
 
 const ResultUrl = styled.span<{ $error?: boolean }>`
-    color: ${(props) => (props.$error ? "#f87171" : "#93c5fd")};
+    color: ${(props) => (props.$error ? "var(--danger)" : "var(--accent-soft)")};
     overflow-wrap: anywhere;
 `;
 
@@ -979,7 +979,7 @@ const Placeholder = styled.div`
     gap: 12px;
     flex: 1;
     padding: 32px;
-    color: #6b7280;
+    color: var(--text-muted);
     font-size: 0.85rem;
     text-align: center;
 `;
@@ -992,7 +992,7 @@ const Banner = styled.div`
     border-radius: 8px;
     background: rgba(239, 68, 68, 0.12);
     border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #f87171;
+    color: var(--danger);
     font-size: 0.85rem;
     flex-shrink: 0;
 `;
@@ -1001,9 +1001,9 @@ const DraftInput = styled.input`
     width: 100%;
     padding: 8px 10px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(15, 23, 42, 0.9);
-    color: #f9fafb;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-primary);
     font-family: var(--font-mono);
     font-size: 0.8rem;
 
@@ -1013,7 +1013,7 @@ const DraftInput = styled.input`
     }
 
     &::placeholder {
-        color: #6b7280;
+        color: var(--text-muted);
     }
 `;
 
@@ -1021,9 +1021,9 @@ const Logs = styled.section`
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
     border-radius: 12px;
-    background: rgba(17, 24, 39, 0.75);
+    background: var(--panel);
     overflow: hidden;
 `;
 
@@ -1032,10 +1032,10 @@ const LogHeader = styled.div`
     align-items: center;
     justify-content: space-between;
     padding: 8px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
     font-size: 0.8rem;
     font-weight: 600;
-    color: #f9fafb;
+    color: var(--text-primary);
 `;
 
 const LogBody = styled.div`
@@ -1055,15 +1055,15 @@ const LogLine = styled.div<{ $error: boolean }>`
     display: flex;
     gap: 10px;
     padding: 2px 14px;
-    color: ${(props) => (props.$error ? "#f87171" : "#9ca3af")};
+    color: ${(props) => (props.$error ? "var(--danger)" : "var(--text-secondary)")};
 
     time {
-        color: #6b7280;
+        color: var(--text-muted);
         flex-shrink: 0;
     }
 
     ${ScriptName} {
-        color: #93c5fd;
+        color: var(--accent-soft);
         flex-shrink: 0;
     }
 
@@ -1074,7 +1074,7 @@ const LogLine = styled.div<{ $error: boolean }>`
 
 const Empty = styled.p`
     padding: 16px;
-    color: #6b7280;
+    color: var(--text-muted);
     font-size: 0.82rem;
 `;
 
@@ -1087,7 +1087,7 @@ const PrimaryButton = styled.button`
     border-radius: 8px;
     border: 1px solid rgba(99, 102, 241, 0.45);
     background: rgba(59, 130, 246, 0.18);
-    color: #bfdbfe;
+    color: var(--accent-soft);
     font: inherit;
     font-size: 0.85rem;
     font-weight: 600;
@@ -1110,16 +1110,16 @@ const GhostButton = styled.button`
     justify-content: center;
     padding: 7px 12px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--border-strong);
     background: transparent;
-    color: #9ca3af;
+    color: var(--text-secondary);
     font: inherit;
     font-size: 0.8rem;
     cursor: pointer;
 
     &:hover:not(:disabled) {
-        color: #f9fafb;
-        border-color: rgba(255, 255, 255, 0.25);
+        color: var(--text-primary);
+        border-color: var(--border-hover);
     }
 
     &:disabled {
@@ -1137,7 +1137,7 @@ const DangerButton = styled(GhostButton)<{ $armed: boolean }>`
     display: grid;
     place-items: center;
     min-width: 34px;
-    color: ${(props) => (props.$armed ? "#fecaca" : "#9ca3af")};
-    border-color: ${(props) => (props.$armed ? "rgba(239, 68, 68, 0.6)" : "rgba(255, 255, 255, 0.12)")};
+    color: ${(props) => (props.$armed ? "var(--danger)" : "var(--text-secondary)")};
+    border-color: ${(props) => (props.$armed ? "rgba(239, 68, 68, 0.6)" : "var(--border-strong)")};
     background: ${(props) => (props.$armed ? "rgba(239, 68, 68, 0.18)" : "transparent")};
 `;

@@ -11,12 +11,115 @@
 // Chromium picks the CJK fallback from the element's language, and a generic family would swallow
 // anything listed after it.
 html {
+  color-scheme: dark;
+
+  // Design tokens. The dark values are the interface's original colours; the light set below is the
+  // only other theme, and every surface, text and border colour reads from these.
+  --bg-primary: #0b0f19;
+  --bg-secondary: #111827;
+  --panel: rgba(17, 24, 39, 0.75);
+  --panel-strong: rgba(17, 24, 39, 0.85);
+  --input: rgba(15, 23, 42, 0.75);
+  --input-focus: rgba(15, 23, 42, 0.95);
+  --surface: rgba(15, 23, 42, 0.9);
+  --surface-soft: rgba(15, 23, 42, 0.7);
+  --surface-dim: rgba(15, 23, 42, 0.5);
+  --surface-deep: rgba(2, 6, 23, 0.9);
+  --overlay: rgba(3, 7, 18, 0.72);
+  --hover: rgba(31, 41, 55, 0.85);
+
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-soft: #cbd5e1;
+  --text-strong: #e2e8f0;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-soft: rgba(255, 255, 255, 0.1);
+  --border-faint: rgba(255, 255, 255, 0.05);
+  --border-hover: rgba(255, 255, 255, 0.24);
+  --shadow: rgba(0, 0, 0, 0.5);
+  --scrollbar: rgba(255, 255, 255, 0.15);
+  --scrollbar-hover: rgba(255, 255, 255, 0.28);
+
+  --accent: #3b82f6;
+  --accent-strong: #2563eb;
+  --accent-soft: #93c5fd;
+  --link: #60a5fa;
+  --success: #34d399;
+  --danger: #f87171;
+  --danger-strong: #ef4444;
+  --warning: #fbbf24;
+  --warning-strong: #f59e0b;
+  --warning-surface: rgba(30, 27, 17, 0.92);
+  --success-surface: rgba(6, 78, 59, 0.95);
+  --syntax-comment: #6b7280;
+  --syntax-keyword: #c792ea;
+  --syntax-string: #a5d6a7;
+  --syntax-number: #f9a825;
+  --syntax-operator: #89ddff;
+  --syntax-function: #82aaff;
+  --syntax-property: #93c5fd;
+
   --font-cjk: sans-serif;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial;
   --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, "SFMono-Regular", Menlo,
   var(--font-cjk);
 
   font-family: var(--font-sans), var(--font-cjk);
+}
+
+// The light theme rewrites the same tokens; nothing in the components knows which one is active.
+html[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-primary: #f4f6fa;
+  --bg-secondary: #ffffff;
+  --panel: rgba(255, 255, 255, 0.88);
+  --panel-strong: rgba(255, 255, 255, 0.96);
+  --input: rgba(255, 255, 255, 0.92);
+  --input-focus: #ffffff;
+  --surface: rgba(241, 245, 249, 0.96);
+  --surface-soft: rgba(241, 245, 249, 0.82);
+  --surface-dim: rgba(241, 245, 249, 0.65);
+  --surface-deep: #e8edf5;
+  --overlay: rgba(15, 23, 42, 0.42);
+  --hover: rgba(226, 232, 240, 0.9);
+
+  --text-primary: #111827;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-soft: #334155;
+  --text-strong: #1e293b;
+
+  --border: rgba(15, 23, 42, 0.1);
+  --border-strong: rgba(15, 23, 42, 0.16);
+  --border-soft: rgba(15, 23, 42, 0.12);
+  --border-faint: rgba(15, 23, 42, 0.06);
+  --border-hover: rgba(15, 23, 42, 0.3);
+  --shadow: rgba(15, 23, 42, 0.16);
+  --scrollbar: rgba(15, 23, 42, 0.2);
+  --scrollbar-hover: rgba(15, 23, 42, 0.35);
+
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --accent-soft: #1d4ed8;
+  --link: #1d4ed8;
+  --success: #047857;
+  --danger: #b91c1c;
+  --danger-strong: #dc2626;
+  --warning: #b45309;
+  --warning-strong: #c2410c;
+  --warning-surface: rgba(254, 243, 199, 0.95);
+  --success-surface: rgba(209, 250, 229, 0.95);
+  --syntax-comment: #64748b;
+  --syntax-keyword: #7c3aed;
+  --syntax-string: #047857;
+  --syntax-number: #b45309;
+  --syntax-operator: #0369a1;
+  --syntax-function: #1d4ed8;
+  --syntax-property: #1e40af;
 }
 
 // Without a language of its own, Japanese text gets drawn with a Chinese face (and the other way
@@ -34,26 +137,9 @@ html:lang(ja) {
   --font-cjk: "Noto Sans JP", "Yu Gothic UI", "Hiragino Kaku Gothic ProN";
 }
 
-$bg-primary: #0b0f19;
-$bg-secondary: #111827;
-$bg-card: rgba(17, 24, 39, 0.75);
-$bg-card-hover: rgba(31, 41, 55, 0.85);
-$bg-input: rgba(15, 23, 42, 0.75);
-$bg-input-focus: rgba(15, 23, 42, 0.95);
-
-$text-primary: #f9fafb;
-$text-secondary: #9ca3af;
-$text-muted: #6b7280;
-
-$border-color: rgba(255, 255, 255, 0.08);
-$border-color-hover: rgba(99, 102, 241, 0.4);
-$border-color-focus: #3b82f6;
-
-$accent-primary: #3b82f6;
-$accent-secondary: #6366f1;
-$accent-gradient: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
-$accent-gradient-hover: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
-$accent-glow: 0 0 24px rgba(99, 102, 241, 0.35);
+// Legacy SCSS names kept next to the tokens so the base styles read naturally.
+$bg-primary: var(--bg-primary);
+$text-primary: var(--text-primary);
 
 // Reset & Base Layout
 *, *::before, *::after {
@@ -126,10 +212,10 @@ html.window-rounded body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--scrollbar);
   border-radius: 4px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.28);
+    background: var(--scrollbar-hover);
   }
 }

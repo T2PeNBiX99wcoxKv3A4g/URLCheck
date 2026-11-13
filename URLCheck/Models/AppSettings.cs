@@ -43,6 +43,10 @@ internal sealed class AppSettings
     [Setting(Comment = "Interface and backend language: system, en, ja, zh-CN or zh-TW.")]
     public string Language { get; set; } = DefaultLanguage;
 
+    /// <summary>Interface theme: <c>system</c> follows the operating system, <c>light</c> and <c>dark</c> pin one.</summary>
+    [Setting(Comment = "Interface theme: system, light or dark.")]
+    public string Theme { get; set; } = "system";
+
     /// <summary>Browsers offered in the popup. The first entry is used as the default.</summary>
     [Setting(Comment = "Browsers offered in the popup.")]
     public List<BrowserEntry> Browsers { get; set; } = [];
@@ -166,6 +170,9 @@ internal sealed class AppSettings
 
         if (string.IsNullOrWhiteSpace(Language))
             Language = DefaultLanguage;
+
+        if (Theme is not ("light" or "dark"))
+            Theme = "system";
 
         if (UserAgents.Count == 0)
             UserAgents = DefaultUserAgents();

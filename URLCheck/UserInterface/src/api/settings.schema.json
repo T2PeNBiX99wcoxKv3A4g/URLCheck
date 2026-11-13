@@ -20,6 +20,10 @@
       "type": "string",
       "description": "Interface and backend language: system, en, ja, zh-CN or zh-TW."
     },
+    "theme": {
+      "type": "string",
+      "description": "Interface theme: system, light or dark."
+    },
     "browsers": {
       "type": "array",
       "items": {},

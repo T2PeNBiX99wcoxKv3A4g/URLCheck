@@ -15,7 +15,7 @@ const Backdrop = styled.div`
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: rgba(2, 6, 23, 0.65);
+    background: var(--surface-deep);
     backdrop-filter: blur(3px);
     animation: attributionFade 0.16s ease;
 
@@ -34,10 +34,10 @@ const Panel = styled.div`
     flex-direction: column;
     width: min(920px, 100%);
     max-height: min(680px, 100%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-soft);
     border-radius: 14px;
-    background: #0f172a;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    background: var(--surface-deep);
+    box-shadow: 0 30px 80px var(--shadow);
     overflow: hidden;
     animation: attributionIn 0.18s ease;
 
@@ -60,14 +60,14 @@ const Header = styled.header`
     gap: 16px;
     flex-shrink: 0;
     padding: 18px 22px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
 `;
 
 const Title = styled.h2`
     margin: 0;
     font-size: 1.05rem;
     font-weight: 700;
-    color: #f9fafb;
+    color: var(--text-primary);
 `;
 
 const Intro = styled.p`
@@ -75,16 +75,16 @@ const Intro = styled.p`
     max-width: 620px;
     font-size: 0.8rem;
     line-height: 1.5;
-    color: #9ca3af;
+    color: var(--text-secondary);
 `;
 
 const CloseButton = styled.button`
     width: 30px;
     height: 30px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.06);
-    color: #d1d5db;
+    border: 1px solid var(--border-strong);
+    background: var(--border-faint);
+    color: var(--text-soft);
     font-size: 0.85rem;
     cursor: pointer;
     flex-shrink: 0;
@@ -93,7 +93,7 @@ const CloseButton = styled.button`
     &:hover {
         background: rgba(239, 68, 68, 0.15);
         border-color: rgba(239, 68, 68, 0.35);
-        color: #f87171;
+        color: var(--danger);
     }
 `;
 
@@ -114,14 +114,14 @@ const Sidebar = styled.nav`
     width: 260px;
     flex-shrink: 0;
     padding: 10px;
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid var(--border);
     overflow-y: auto;
 
     @media (max-width: 700px) {
         width: 100%;
         max-height: 150px;
         border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid var(--border);
     }
 `;
 
@@ -134,15 +134,15 @@ const Item = styled.button<{ $active: boolean }>`
     border: none;
     border-radius: 8px;
     background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.16)" : "transparent")};
-    color: ${(props) => (props.$active ? "#f9fafb" : "#cbd5e1")};
+    color: ${(props) => (props.$active ? "var(--text-primary)" : "var(--text-soft)")};
     font: inherit;
     text-align: left;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
-        background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.2)" : "rgba(255, 255, 255, 0.05)")};
-        color: #f9fafb;
+        background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.2)" : "var(--border-faint)")};
+        color: var(--text-primary);
     }
 `;
 
@@ -155,7 +155,7 @@ const ItemName = styled.span`
 const Meta = styled.span`
     font-family: var(--font-mono);
     font-size: 0.7rem;
-    color: #6b7280;
+    color: var(--text-muted);
 `;
 
 const Article = styled.article`
@@ -177,7 +177,7 @@ const ArticleName = styled.h3`
     margin: 0;
     font-size: 0.95rem;
     font-weight: 600;
-    color: #f9fafb;
+    color: var(--text-primary);
 `;
 
 const Licence = styled.pre`
@@ -185,7 +185,7 @@ const Licence = styled.pre`
     font-family: var(--font-mono);
     font-size: 0.72rem;
     line-height: 1.6;
-    color: #9ca3af;
+    color: var(--text-secondary);
     white-space: pre-wrap;
     word-break: break-word;
 `;

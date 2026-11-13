@@ -9,7 +9,7 @@ import {useNavigate} from "../navigation";
 const Title = styled.h3`
     font-size: 1.05rem;
     font-weight: 700;
-    color: #f9fafb;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -17,7 +17,7 @@ const Title = styled.h3`
 
 const Description = styled.p`
     font-size: 0.85rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
     line-height: 1.6;
 `;
 
@@ -35,7 +35,7 @@ const InputWrapper = styled.div`
     svg {
         position: absolute;
         left: 16px;
-        stroke: #9ca3af;
+        stroke: var(--text-secondary);
     }
 `;
 
@@ -43,22 +43,22 @@ const StyledInput = styled.input`
     width: 100%;
     padding: 14px 16px 14px 48px;
     font-size: 0.95rem;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--border-strong);
     border-radius: 8px;
-    background: rgba(15, 23, 42, 0.75);
-    color: #f9fafb;
+    background: var(--input);
+    color: var(--text-primary);
     outline: none;
     font-family: inherit;
     transition: all 0.2s ease;
 
     &:focus {
-        background: rgba(15, 23, 42, 0.95);
+        background: var(--input-focus);
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
     }
 
     &::placeholder {
-        color: #6b7280;
+        color: var(--text-muted);
     }
 `;
 
@@ -107,23 +107,23 @@ const Presets = styled.div`
 
 const PresetLabel = styled.span`
     font-size: 0.8rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
     font-weight: 500;
 `;
 
 const PresetChip = styled.button`
-    background: rgba(15, 23, 42, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 4px 10px;
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.15s ease;
 
     &:hover {
-        background: rgba(31, 41, 55, 0.85);
-        color: #f9fafb;
+        background: var(--hover);
+        color: var(--text-primary);
         border-color: rgba(99, 102, 241, 0.35);
     }
 `;
@@ -137,7 +137,7 @@ const Banner = styled.div`
     border-radius: 12px;
     border: 1px solid rgba(245, 158, 11, 0.35);
     background: rgba(245, 158, 11, 0.12);
-    color: #fbbf24;
+    color: var(--warning);
     transition: border-color 0.25s ease, background 0.25s ease;
 
     &:hover {
@@ -167,7 +167,7 @@ const BannerTitle = styled.span`
 
 const BannerBody = styled.span`
     font-size: 0.82rem;
-    color: #d1d5db;
+    color: var(--text-soft);
     line-height: 1.55;
 `;
 
@@ -176,7 +176,7 @@ const BannerButton = styled.button`
     padding: 10px 18px;
     border-radius: 8px;
     border: none;
-    background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    background: linear-gradient(135deg, #f59e0b 0%, #f59e0b 100%);
     color: #1f2937;
     font-weight: 700;
     font-size: 0.85rem;

@@ -23,9 +23,9 @@ const Menu = styled.div`
     min-width: 200px;
     padding: 4px;
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(15, 23, 42, 0.98);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--border-strong);
+    background: var(--input-focus);
+    box-shadow: 0 16px 40px var(--shadow);
     backdrop-filter: blur(12px);
 `;
 
@@ -36,7 +36,7 @@ const Item = styled.button`
     border: none;
     border-radius: 7px;
     background: none;
-    color: #e2e8f0;
+    color: var(--text-strong);
     font-size: 0.85rem;
     text-align: left;
     cursor: pointer;
@@ -44,7 +44,7 @@ const Item = styled.button`
 
     &:hover {
         background: rgba(59, 130, 246, 0.18);
-        color: #f9fafb;
+        color: var(--text-primary);
     }
 `;
 
@@ -57,8 +57,8 @@ const Toast = styled.div`
     padding: 8px 14px;
     border-radius: 999px;
     border: 1px solid rgba(16, 185, 129, 0.3);
-    background: rgba(6, 78, 59, 0.95);
-    color: #6ee7b7;
+    background: var(--success-surface);
+    color: var(--success);
     font-size: 0.8rem;
     pointer-events: none;
 `;

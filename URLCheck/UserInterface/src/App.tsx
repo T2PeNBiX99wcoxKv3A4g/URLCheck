@@ -14,14 +14,14 @@ const AppContainer = styled.div<{ $rounded: boolean }>`
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background-color: #0b0f19;
+    background-color: var(--bg-primary);
     background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 70%);
-    color: #f9fafb;
+    color: var(--text-primary);
 
     /* GTK gives an undecorated window no frame at all, so the corners and the border are drawn
        here; the window itself is transparent behind them. */
     border-radius: ${(props) => (props.$rounded ? "10px" : "0")};
-    box-shadow: ${(props) => (props.$rounded ? "inset 0 0 0 1px rgba(255, 255, 255, 0.1)" : "none")};
+    box-shadow: ${(props) => (props.$rounded ? "inset 0 0 0 1px var(--border-soft)" : "none")};
 `;
 
 const Body = styled.div`

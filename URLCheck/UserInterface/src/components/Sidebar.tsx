@@ -11,9 +11,9 @@ interface SidebarProps {
 
 const SidebarContainer = styled.aside`
     width: 260px;
-    background: rgba(17, 24, 39, 0.85);
+    background: var(--panel-strong);
     backdrop-filter: blur(16px);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -38,7 +38,7 @@ const NavItem = styled.button<{ $active: boolean }>`
     border-radius: 8px;
     border: 1px solid ${(props) => (props.$active ? "rgba(99, 102, 241, 0.35)" : "transparent")};
     background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.15)" : "transparent")};
-    color: ${(props) => (props.$active ? "#60a5fa" : "#9ca3af")};
+    color: ${(props) => (props.$active ? "var(--link)" : "var(--text-secondary)")};
     font-weight: ${(props) => (props.$active ? "600" : "500")};
     font-size: 0.925rem;
     cursor: pointer;
@@ -46,24 +46,24 @@ const NavItem = styled.button<{ $active: boolean }>`
     text-align: left;
 
     &:hover {
-        background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.2)" : "rgba(255, 255, 255, 0.05)")};
-        color: ${(props) => (props.$active ? "#93c5fd" : "#f9fafb")};
-        border-color: ${(props) => (props.$active ? "rgba(99, 102, 241, 0.5)" : "rgba(255, 255, 255, 0.05)")};
+        background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.2)" : "var(--border-faint)")};
+        color: ${(props) => (props.$active ? "var(--accent-soft)" : "var(--text-primary)")};
+        border-color: ${(props) => (props.$active ? "rgba(99, 102, 241, 0.5)" : "var(--border-faint)")};
     }
 
     svg {
-        stroke: ${(props) => (props.$active ? "#60a5fa" : "#9ca3af")};
+        stroke: ${(props) => (props.$active ? "var(--link)" : "var(--text-secondary)")};
         transition: stroke 0.2s ease;
     }
 
     &:hover svg {
-        stroke: ${(props) => (props.$active ? "#93c5fd" : "#f9fafb")};
+        stroke: ${(props) => (props.$active ? "var(--accent-soft)" : "var(--text-primary)")};
     }
 `;
 
 const FooterSection = styled.div`
     padding: 16px 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--border-faint);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -71,7 +71,7 @@ const FooterSection = styled.div`
 
 const VersionLabel = styled.span`
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-muted);
     font-family: var(--font-mono);
 `;
 
@@ -81,7 +81,7 @@ const DebugBadge = styled.span`
     border: 1px solid rgba(251, 191, 36, 0.45);
     border-radius: 4px;
     background: rgba(251, 191, 36, 0.12);
-    color: #fbbf24;
+    color: var(--warning);
     font-family: var(--font-mono);
     font-size: 0.6rem;
     font-weight: 700;
@@ -106,13 +106,13 @@ const UpdateDot = styled.button`
     padding: 0;
     border: none;
     border-radius: 50%;
-    background: #fbbf24;
+    background: var(--warning);
     cursor: pointer;
     animation: ${pulse} 2s ease-in-out infinite;
     transition: background 0.15s ease;
 
     &:hover {
-        background: #fcd34d;
+        background: var(--warning);
     }
 `;
 

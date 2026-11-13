@@ -42,9 +42,9 @@ export const DropdownMenu = styled.div<{ $up?: boolean; $stretch?: boolean }>`
     overflow-y: auto;
     padding: 5px;
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: #111827;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-secondary);
+    box-shadow: 0 12px 32px var(--shadow);
     z-index: 30;
     transform-origin: ${(props) => (props.$up ? "bottom" : "top")};
     animation: ${(props) => (props.$up ? menuUp : menuDown)} 0.16s cubic-bezier(0.22, 1, 0.36, 1);
@@ -58,7 +58,7 @@ export const DropdownItem = styled.button<{ $active?: boolean; $mono?: boolean }
     border: none;
     border-radius: 6px;
     background: ${(props) => (props.$active ? "rgba(59, 130, 246, 0.2)" : "transparent")};
-    color: ${(props) => (props.$active ? "#ffffff" : "#e2e8f0")};
+    color: ${(props) => (props.$active ? "#ffffff" : "var(--text-strong)")};
     font-size: ${(props) => (props.$mono ? "0.72rem" : "0.8rem")};
     font-family: ${(props) => (props.$mono ? "var(--font-mono)" : "inherit")};
     cursor: pointer;
@@ -131,9 +131,9 @@ const Trigger = styled.button<{ $variant: "compact" | "form" }>`
         max-width: 170px;
         padding: 0 8px;
         border-radius: 7px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.05);
-        color: #d1d5db;
+        border: 1px solid var(--border-soft);
+        background: var(--border-faint);
+        color: var(--text-soft);
         font-size: 0.76rem;
         line-height: 1;
     `
@@ -141,16 +141,16 @@ const Trigger = styled.button<{ $variant: "compact" | "form" }>`
         min-width: 200px;
         padding: 8px 12px;
         border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(15, 23, 42, 0.75);
-        color: #f9fafb;
+        border: 1px solid var(--border-strong);
+        background: var(--input);
+        color: var(--text-primary);
         font-size: 0.875rem;
     `}
     &:hover:not(:disabled) {
         ${(props) =>
                 props.$variant === "compact"
-                        ? "background: rgba(255, 255, 255, 0.12); color: #f9fafb;"
-                        : "border-color: rgba(255, 255, 255, 0.24);"}
+                        ? "background: var(--border-strong); color: var(--text-primary);"
+                        : "border-color: var(--border-hover);"}
     }
 
     &:focus-visible {

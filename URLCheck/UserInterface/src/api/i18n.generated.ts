@@ -145,6 +145,7 @@ declare module "@photino-net-utils/bridge"
         "settings.addBrowser": true;
         "settings.addFilterList": true;
         "settings.addUserAgent": true;
+        "settings.appearance": true;
         "settings.autoRedirect": true;
         "settings.autoRedirectDescription": true;
         "settings.autoRedirectEmpty": true;
@@ -268,6 +269,11 @@ declare module "@photino-net-utils/bridge"
         "settings.systemIntegration": true;
         "settings.systemIntegrationDescription": true;
         "settings.systemIntegrationDescriptionLinux": true;
+        "settings.theme": true;
+        "settings.themeDark": true;
+        "settings.themeDescription": true;
+        "settings.themeLight": true;
+        "settings.themeSystem": true;
         "settings.unregister": true;
         "settings.unregistered": true;
         "settings.unsaved": true;

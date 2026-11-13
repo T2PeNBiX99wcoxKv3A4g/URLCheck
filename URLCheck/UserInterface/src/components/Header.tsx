@@ -9,9 +9,9 @@ interface HeaderProps {
 
 const HeaderContainer = styled.header`
     height: 64px;
-    background: rgba(17, 24, 39, 0.75);
+    background: var(--panel);
     backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -39,13 +39,13 @@ const PageTitleGroup = styled.div`
 const PageTitle = styled.h1`
     font-size: 1.25rem;
     font-weight: 700;
-    color: #f9fafb;
+    color: var(--text-primary);
     letter-spacing: -0.01em;
 `;
 
 const PageSubtitle = styled.span`
     font-size: 0.8rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
 `;
 
 export const Header: React.FC<HeaderProps> = ({currentTab}) => {

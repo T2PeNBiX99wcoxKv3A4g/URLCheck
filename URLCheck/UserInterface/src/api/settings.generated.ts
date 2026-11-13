@@ -10,6 +10,8 @@ export interface AppSettingsGenerated {
     selectedUserAgentId: string;
     /** Interface and backend language: system, en, ja, zh-CN or zh-TW. */
     language: string;
+    /** Interface theme: system, light or dark. */
+    theme: string;
     /** Browsers offered in the popup. */
     browsers: unknown[];
     /** Draw the inspection popup without a window frame. */

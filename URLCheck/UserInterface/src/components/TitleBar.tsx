@@ -61,9 +61,9 @@ const Bar = styled.header`
     align-items: stretch;
     height: 40px;
     flex-shrink: 0;
-    background: rgba(17, 24, 39, 0.85);
+    background: var(--panel-strong);
     backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
     user-select: none;
     -webkit-user-select: none;
 `;
@@ -91,12 +91,12 @@ const Name = styled.strong`
     font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: -0.01em;
-    color: #f9fafb;
+    color: var(--text-primary);
 `;
 
 const Tagline = styled.span`
     font-size: 0.7rem;
-    color: #6b7280;
+    color: var(--text-muted);
 
     /* The first thing to go when the window gets narrow. */
     @media (max-width: 640px) {
@@ -121,7 +121,7 @@ const ControlButton = styled.button`
     height: 100%;
     border: 0;
     background: transparent;
-    color: #9ca3af;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: background 120ms ease, color 120ms ease;
 
@@ -134,8 +134,8 @@ const ControlButton = styled.button`
     }
 
     &:hover {
-        background: rgba(255, 255, 255, 0.08);
-        color: #f9fafb;
+        background: var(--border);
+        color: var(--text-primary);
     }
 
     &:focus-visible {
