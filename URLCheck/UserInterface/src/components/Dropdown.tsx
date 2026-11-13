@@ -1,4 +1,5 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
+import {createPortal} from "react-dom";
 import styled, {keyframes} from "styled-components";
 
 export interface DropdownOption {
@@ -202,14 +203,53 @@ export const Dropdown: React.FC<DropdownProps> = ({
                                                   }) => {
     const [open, setOpen] = useState(false);
     const root = useRef<HTMLDivElement>(null);
-    const menuStyle = useMenuFit(open, up, root);
+    const menu = useRef<HTMLDivElement>(null);
+    const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
+
+    /*
+     * The menu is portalled to the body. A settings card paints its own backdrop blur, which makes
+     * it a stacking context, so an absolutely positioned menu inside it can never rise above the
+     * next card; rendering it at the document root also lets it escape scrolling containers.
+     */
+    useLayoutEffect(() => {
+        if (!open) return;
+
+        const measure = () => {
+            const anchor = root.current?.getBoundingClientRect();
+            if (!anchor) return;
+
+            const margin = 8;
+            const width = menu.current?.offsetWidth ?? Math.max(200, anchor.width);
+            const left = Math.max(margin, Math.min(anchor.left, window.innerWidth - width - margin));
+            const space = up ? anchor.top - margin : window.innerHeight - anchor.bottom - margin;
+
+            setMenuStyle({
+                position: "fixed",
+                left,
+                zIndex: 50,
+                maxHeight: Math.max(120, Math.floor(space - 5)),
+                ...(up
+                    ? {bottom: window.innerHeight - anchor.top + 5}
+                    : {top: anchor.bottom + 5}),
+            });
+        };
+
+        measure();
+        window.addEventListener("resize", measure);
+        window.addEventListener("scroll", measure, true);
+        return () => {
+            window.removeEventListener("resize", measure);
+            window.removeEventListener("scroll", measure, true);
+        };
+    }, [open, up]);
 
     /* Close on a click elsewhere or on Escape, the way a native select does. */
     useEffect(() => {
         if (!open) return;
 
         const onPointerDown = (event: MouseEvent) => {
-            if (!root.current?.contains(event.target as Node)) setOpen(false);
+            const target = event.target as Node;
+            if (!root.current?.contains(target) && !menu.current?.contains(target)) setOpen(false);
         };
         const onKeyDown = (event: KeyboardEvent) => {
             if (event.key === "Escape") setOpen(false);
@@ -240,8 +280,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
                 <Caret $open={open}>▾</Caret>
             </Trigger>
 
-            {open && (
-                <DropdownMenu $up={up} role="listbox" style={menuStyle}>
+            {open && createPortal(
+                <DropdownMenu $up={up} role="listbox" ref={menu} style={menuStyle}>
                     {options.map((option) => (
                         <DropdownItem
                             key={option.value}
@@ -257,7 +297,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
                             {option.label}
                         </DropdownItem>
                     ))}
-                </DropdownMenu>
+                </DropdownMenu>,
+                document.body
             )}
         </Root>
     );
