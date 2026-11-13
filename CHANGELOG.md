@@ -1,5 +1,60 @@
 # Changelog
 
+## [1.15.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.14.1..v1.15.0) - 2026-11-13
+
+### ⛰️  Features
+
+- *(settings)* Move settings to the shared TOML store - ([6871440](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/68714400567fede514ac0c13f5fe8e87db1d9a64))
+- *(ui)* Add system, light and dark themes - ([a04e21e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a04e21e6a21194a64df60ebeef16fbb53269682d))
+- *(ui)* Mark debug builds beside the version - ([dc33923](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/dc33923b994b67887f76e4750be48fecabb8dc48))
+- *(update)* Use the shared service and install MSI on Windows - ([31dd377](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/31dd3773446a27d79ed620705b00fae121ca6bf4))
+- Generate settings types and localization keys - ([6c190ff](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6c190ff71feabbf11b9bcafefa1fc4e9768fa2e6))
+- Put the selection button next to the pointer on Hyprland - ([a1645d1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a1645d137d34d48dc8ddefde6219da1cbc19a66c))
+
+### 🐛 Bug Fixes
+
+- *(ui)* Make the update progress bar visible - ([f0f46ea](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f0f46eac60d32463f1bef732774f16547fd5f502))
+
+### 🚜 Refactor
+
+- *(settings)* Use the generated service instance - ([15b65c1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/15b65c12bc60d4b4407348584c305f7d06d71863))
+- *(ui)* Use the bridge's augmented localization keys - ([0a64e42](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0a64e42a32d1c5728ce9a0fe28b5d929ee5b7eca))
+- *(ui)* Use the shared i18n and system bridge - ([9f2dc21](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/9f2dc219a195b7473a5559108bb8c87efcbb7e04))
+- Use primary constructor for SettingsService - ([4224998](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/42249982d4b9257710f8cd8fe50a15423c84c967))
+- Adopt the generated singletons and shared services - ([7dc8b2c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/7dc8b2c3a23dd26a04ff71f8f22e3eb0b1c3a377))
+- Use generic JSON type info helpers - ([7eca073](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/7eca07395c25831136656055454d7becadca8191))
+- Use version 7 GUIDs for generated IDs - ([a5f6a1b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a5f6a1b8283f16f7616caed21edd81c38162a120))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update @photino-net-utils/bridge to v0.23.0 and refresh associated libraries - ([99d2346](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/99d2346e29eff1f78b1a9fe6b30474e94b8a4575))
+- Update @photino-net-utils/bridge to v0.22.0 and refresh associated libraries - ([1f47839](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1f4783992060e3a26ba9767690ec0b5e2948013a))
+- Update @photino-net-utils/bridge to v0.21.0 and refresh associated libraries - ([5eecf62](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5eecf62cbe9c49c0c2e61e829a86b0363ee7ae0f))
+- Update PhotinoNetUtils bridge to version 0.20.2 - ([bdbfb5a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/bdbfb5a0bb623ad48d80da10f839f3e79800fcf1))
+- Bump version to 1.14.1 - ([3c8c628](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/3c8c6280425d57f50fa664c6c0ecd5c87647fe62))
+- Use runtime-specific settings codegen path - ([0b393a7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0b393a73acd8d545efc71455e17db7946a14f4d8))
+- Update @photino-net-utils/bridge to v0.20.0 and refresh associated libraries - ([df0a49d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/df0a49dd96103241b6bc9384dc52d956e05a307c))
+- Update @photino-net-utils/bridge to v0.19.0 and refresh associated libraries - ([f1709df](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f1709df5480061203199aa5e6742c73e9a34613f))
+- Update the shared generator - ([8111ffe](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8111ffe63689ff6a1e2fbd25450c74ad79d7d8e6))
+- Update the shared generator - ([608466d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/608466d6a15572fbcddfef81e320ecbe823b5636))
+- Update the shared generator - ([919558e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/919558e5d412660580f5bb5bc37a3749fafd3acf))
+- Update the shared generator - ([b189651](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b189651ffe9632653490de3b12e9c7dd2fbb9c4c))
+- Update the shared generator - ([f81a7b5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f81a7b5a9548a9d7c08d4f9a50e5987191a14ca5))
+- Update the shared generator - ([bd3b355](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/bd3b355d2fe24b9daf8914daa2efed40b38ed855))
+- Update the shared generator - ([8f9b518](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8f9b518889d88cac7c1c04ddc99d5fba8e702de8))
+- Update the shared generator - ([89a6409](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/89a64096cee6393dd9b117a450059d8be6fc1bb5))
+- Update the shared generator - ([b549315](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b549315c8aa035574233e0dc3c6d5377ee41f195))
+- Validate every translation file - ([6d75bb5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6d75bb5448e3e2a1223a179b4fe264adc43b32eb))
+- Adopt the shared analyzers - ([d42e641](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d42e641c5e6a3e0f8beb4741f482157bcfdbe8cc))
+- Add the shared source generator - ([92e5b25](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/92e5b25f2107585bdedeb461866fc9b460f90f31))
+- Update PhotinoNETUtils library and clean up import statements - ([6d1af93](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6d1af937b44f7e7d3c63c5618f8400b0ef2fcff2))
+- Target .NET 11 - ([bc0b472](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/bc0b472089dff8feace92fd7c2c4aa471e87192f))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([2af85a7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2af85a706e67e6cba6b2272ddf831fa4c30229ed))
+
+
 ## [1.14.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.14.0..v1.14.1) - 2026-11-10
 
 ### 🐛 Bug Fixes
