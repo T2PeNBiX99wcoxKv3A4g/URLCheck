@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.15.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.15.0..v1.15.1) - 2026-11-13
+
+### 🐛 Bug Fixes
+
+- *(build)* Generate the settings types from the compiled model - ([03d5aa0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/03d5aa05b58deb47fead546f22cc35715ac65e87))
+
+### 🚜 Refactor
+
+- *(i18n)* Use path-shaped keys - ([953965f](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/953965fe355131290ae1f4a4898e2f067b4a18af))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update @photino-net-utils/bridge to v0.25.0 and refresh associated libraries - ([2d7a77b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2d7a77bd283606d4800a289c7c3d2eeed0adbf14))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([f83f812](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f83f812dde13a5f9c91795ee0831c3d4c4924b86))
+
+
 ## [1.15.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.14.1..v1.15.0) - 2026-11-13
 
 ### ⛰️  Features
