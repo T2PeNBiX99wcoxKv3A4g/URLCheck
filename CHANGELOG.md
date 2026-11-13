@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.16.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.15.2..v1.16.0) - 2026-11-13
+
+### ⛰️  Features
+
+- *(ui)* Render the update changelog as markdown - ([1f83860](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1f8386060acb10331a2440137c4980ee6265f1d1))
+
+### 🐛 Bug Fixes
+
+- *(ui)* Close dropdown menus when clicking elsewhere - ([01f36df](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/01f36df1200e53e4c85a3fadfff2c49fa70a3f99))
+- *(ui)* Draw dropdown menus above the following cards - ([3481d22](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/3481d22aa56152b3c59b26b4e678d50e4b1d0182))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update @photino-net-utils/bridge to v0.26.0 and refresh associated libraries - ([8e8a46b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8e8a46b1f3ece1958f08a1251a1a5f1c2fd8706d))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([38c33fa](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/38c33fad4ae62939bf6f11a2024f25c2266b016c))
+
+
 ## [1.15.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.15.1..v1.15.2) - 2026-11-13
 
 ### ⚙️ Miscellaneous Tasks
