@@ -199,7 +199,7 @@ export const ScriptsPage: React.FC = () => {
         setUpdating(null);
         setArmedUpdate(null);
 
-        if (result.failed > 0) setError(t("scripts.updateAllFailed", {failed: result.failed}));
+        if (result.failed > 0) setError(t("scripts.update_all_failed", {failed: result.failed}));
 
         await refresh();
         if (open) await select(open);
@@ -431,10 +431,10 @@ export const ScriptsPage: React.FC = () => {
                                 <NameText>{script.name}</NameText>
                                 {script.version && <Version>v{script.version}</Version>}
                                 {updates[script.name]?.available && (
-                                    <UpdateDot title={t("scripts.updateAvailable")}/>
+                                    <UpdateDot title={t("scripts.update_available")}/>
                                 )}
                                 {updates[script.name]?.changed && (
-                                    <UpdateDot $changed title={t("scripts.updateChanged")}/>
+                                    <UpdateDot $changed title={t("scripts.update_changed")}/>
                                 )}
                                 {script.error && (
                                     <Problem title={t(script.error as LocalizationKey)}>
@@ -483,7 +483,7 @@ export const ScriptsPage: React.FC = () => {
                                         onClick={() => void checkUpdates()}
                                         type="button"
                                     >
-                                        {checkingUpdates ? t("scripts.checkingUpdates") : t("scripts.checkUpdates")}
+                                        {checkingUpdates ? t("scripts.checking_updates") : t("scripts.check_updates")}
                                     </DockGhostButton>
                                     {availableUpdates.length > 0 && (
                                         <DockGhostButton
@@ -492,8 +492,8 @@ export const ScriptsPage: React.FC = () => {
                                             type="button"
                                         >
                                             {armedUpdate === "all"
-                                                ? t("scripts.updateOverwrite")
-                                                : t("scripts.updateAllCount", {count: availableUpdates.length})}
+                                                ? t("scripts.update_overwrite")
+                                                : t("scripts.update_all_count", {count: availableUpdates.length})}
                                         </DockGhostButton>
                                     )}
                                 </DockRow>
@@ -507,7 +507,7 @@ export const ScriptsPage: React.FC = () => {
                                         if (event.key === "Enter") submit();
                                         if (event.key === "Escape") setMode("idle");
                                     }}
-                                    placeholder={mode === "new" ? t("scripts.namePlaceholder") : t("scripts.downloadPlaceholder")}
+                                    placeholder={mode === "new" ? t("scripts.name_placeholder") : t("scripts.download_placeholder")}
                                     value={draft}
                                 />
                                 <DockRow>
@@ -550,7 +550,7 @@ export const ScriptsPage: React.FC = () => {
                                     )}
                                     {selectedScript?.version && <Version>v{selectedScript.version}</Version>}
                                     {gone && (
-                                        <Gone title={t("scripts.fileGone")}>
+                                        <Gone title={t("scripts.file_gone")}>
                                             <AlertTriangleIcon size={14}/>
                                         </Gone>
                                     )}
@@ -566,7 +566,7 @@ export const ScriptsPage: React.FC = () => {
                                     <GhostButton
                                         disabled={busy}
                                         onClick={() => void open()}
-                                        title={t("scripts.openExternal")}
+                                        title={t("scripts.open_external")}
                                         type="button"
                                     >
                                         <ExternalLinkIcon size={15}/>
@@ -576,12 +576,12 @@ export const ScriptsPage: React.FC = () => {
                                             disabled={busy || updating !== null}
                                             onClick={() => void applyUpdate(selectedUpdate)}
                                             title={selectedUpdate.changed
-                                                ? t("scripts.updateChanged")
-                                                : t("scripts.updateAvailable")}
+                                                ? t("scripts.update_changed")
+                                                : t("scripts.update_available")}
                                             type="button"
                                         >
                                             {armedUpdate === selected
-                                                ? t("scripts.updateOverwrite")
+                                                ? t("scripts.update_overwrite")
                                                 : t("scripts.update")}
                                         </GhostButton>
                                     )}
@@ -595,7 +595,7 @@ export const ScriptsPage: React.FC = () => {
                                     </GhostButton>
                                     <DangerButton $armed={armed} disabled={busy} onClick={() => void remove()}
                                                   type="button">
-                                        {armed ? t("scripts.deleteConfirm") : <TrashIcon size={15}/>}
+                                        {armed ? t("scripts.delete_confirm") : <TrashIcon size={15}/>}
                                     </DangerButton>
                                 </EditorHeader>
 
@@ -605,7 +605,7 @@ export const ScriptsPage: React.FC = () => {
                                         onKeyDown={(event) => {
                                             if (event.key === "Enter") void runTest();
                                         }}
-                                        placeholder={t("scripts.testPlaceholder")}
+                                        placeholder={t("scripts.test_placeholder")}
                                         spellCheck={false}
                                         value={testUrl}
                                     />
@@ -623,7 +623,7 @@ export const ScriptsPage: React.FC = () => {
                                     <TestOutput $error={test.error !== null}>
                                         {test.error === null ? (
                                             <ResultRow>
-                                                <ResultLabel>{t("scripts.testFinalUrl")}</ResultLabel>
+                                                <ResultLabel>{t("scripts.test_final_url")}</ResultLabel>
                                                 <ResultUrl>{test.url}</ResultUrl>
                                             </ResultRow>
                                         ) : (
@@ -637,7 +637,7 @@ export const ScriptsPage: React.FC = () => {
                         ) : (
                             <Placeholder>
                                 <CodeIcon size={30}/>
-                                <span>{t("scripts.noScript")}</span>
+                                <span>{t("scripts.no_script")}</span>
                             </Placeholder>
                         )}
                     </EditorCard>
@@ -646,12 +646,12 @@ export const ScriptsPage: React.FC = () => {
                         <LogHeader>
                             <span>{t("scripts.logs")}</span>
                             <GhostButton onClick={() => void clearScriptLogs().then(() => setLogs([]))} type="button">
-                                {t("scripts.clearLogs")}
+                                {t("scripts.clear_logs")}
                             </GhostButton>
                         </LogHeader>
 
                         <LogBody ref={logBody}>
-                            {logs.length === 0 && <Empty>{t("scripts.logsEmpty")}</Empty>}
+                            {logs.length === 0 && <Empty>{t("scripts.logs_empty")}</Empty>}
                             {logs.map((entry, index) => (
                                 <LogLine $error={entry.level === "error"} key={`${entry.time}-${index}`}>
                                     <time>{entry.time}</time>

@@ -233,23 +233,23 @@ export const HomePage: React.FC = () => {
                     <BannerText>
                         <BannerTitle>
                             <AlertTriangleIcon size={16}/>
-                            <span>{t("home.bannerTitle")}</span>
+                            <span>{t("home.banner_title")}</span>
                         </BannerTitle>
                         <BannerBody>
-                            {t("home.bannerBody")}
+                            {t("home.banner_body")}
                         </BannerBody>
                     </BannerText>
-                    <BannerButton onClick={() => navigate("settings")}>{t("home.openSettings")}</BannerButton>
+                    <BannerButton onClick={() => navigate("settings")}>{t("home.open_settings")}</BannerButton>
                 </Banner>
             )}
 
             <StackCard>
                 <Title>
                     <LinkIcon size={18}/>
-                    <span>{t("home.openTitle")}</span>
+                    <span>{t("home.open_title")}</span>
                 </Title>
                 <Description>
-                    {t("home.openDescription")}
+                    {t("home.open_description")}
                 </Description>
 
                 <InputForm onSubmit={handleSubmit}>

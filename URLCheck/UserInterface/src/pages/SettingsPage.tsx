@@ -943,15 +943,15 @@ function updateStatusLabel(
     switch (phase) {
         case "ready":
         case "installing":
-            return t("settings.updateInstalling");
+            return t("settings.update_installing");
         case "cancelled":
-            return t("settings.updateCancelled");
+            return t("settings.update_cancelled");
         case "error":
-            return error || t("settings.updateDownloadFailed");
+            return error || t("settings.update_download_failed");
         case "downloading":
-            return t("settings.updateDownloading");
+            return t("settings.update_downloading");
         default:
-            return t("settings.updatePreparing");
+            return t("settings.update_preparing");
     }
 }
 
@@ -978,13 +978,13 @@ const LOCALE_NAMES: Record<string, string> = {
 const SECTIONS = [
     "settings.appearance",
     "settings.network",
-    "settings.userAgent",
+    "settings.user_agent",
     "settings.browsers",
     "settings.forwarding",
-    "settings.forwardDevices",
-    "settings.systemIntegration",
-    "settings.autoRedirect",
-    "settings.filterLists",
+    "settings.forward_devices",
+    "settings.system_integration",
+    "settings.auto_redirect",
+    "settings.filter_lists",
     "settings.startup",
     "settings.about",
 ] as const satisfies readonly LocalizationKey[];
@@ -1114,7 +1114,7 @@ export const SettingsPage: React.FC = () => {
                     setPairing((previous) => ({
                         name: previous?.name ?? "",
                         code: null,
-                        error: state.error ?? "error.forwardFailed"
+                        error: state.error ?? "error.forward_failed"
                     }));
                 }
                 return;
@@ -1401,7 +1401,7 @@ export const SettingsPage: React.FC = () => {
                 const additions = detected.filter((browser) => !existing.has(browser.executablePath.toLowerCase()));
                 return {...prev, browsers: [...prev.browsers, ...additions]};
             });
-            if (detected.length === 0) setIntegrationMessage({key: "settings.noBrowsersDetected"});
+            if (detected.length === 0) setIntegrationMessage({key: "settings.no_browsers_detected"});
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
         } finally {
@@ -1414,7 +1414,7 @@ export const SettingsPage: React.FC = () => {
         setIntegrationMessage(null);
         try {
             const result = await registerProtocols();
-            setIntegrationMessage({key: "settings.registeredHttp", params: {path: result.executablePath}});
+            setIntegrationMessage({key: "settings.registered_http", params: {path: result.executablePath}});
             setProtocols(await protocolStatus());
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
@@ -1441,7 +1441,7 @@ export const SettingsPage: React.FC = () => {
         setIntegrationBusy(true);
         try {
             await openDefaultAppsSettings();
-            setIntegrationMessage({key: "settings.openedDefaultApps"});
+            setIntegrationMessage({key: "settings.opened_default_apps"});
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
         } finally {
@@ -1500,7 +1500,7 @@ export const SettingsPage: React.FC = () => {
                 downloaded: 0,
                 total: 0,
                 percent: 0,
-                error: ack.error ?? t("settings.updateDownloadFailed")
+                error: ack.error ?? t("settings.update_download_failed")
             });
         } catch (err) {
             autoInstallUpdate.current = false;
@@ -1670,7 +1670,7 @@ export const SettingsPage: React.FC = () => {
                 `(${formatBytes(downloaded)} / ${formatBytes(total)})`
                 : formatBytes(downloaded);
 
-            return `${t("settings.updateDownloading")} ${amount}`;
+            return `${t("settings.update_downloading")} ${amount}`;
         }
 
         return updateStatusLabel(updatePhase, updateProgress?.error, t);
@@ -1698,16 +1698,16 @@ export const SettingsPage: React.FC = () => {
                         <SettingRow>
                             <SettingInfo>
                                 <SettingLabel>{t("settings.theme")}</SettingLabel>
-                                <SettingDescription>{t("settings.themeDescription")}</SettingDescription>
+                                <SettingDescription>{t("settings.theme_description")}</SettingDescription>
                             </SettingInfo>
                             <Dropdown
                                 variant="form"
                                 disabled={busy}
                                 value={settings.theme}
                                 options={[
-                                    {value: "system", label: t("settings.themeSystem")},
-                                    {value: "light", label: t("settings.themeLight")},
-                                    {value: "dark", label: t("settings.themeDark")},
+                                    {value: "system", label: t("settings.theme_system")},
+                                    {value: "light", label: t("settings.theme_light")},
+                                    {value: "dark", label: t("settings.theme_dark")},
                                 ]}
                                 onChange={handleThemeChange}
                             />
@@ -1719,8 +1719,8 @@ export const SettingsPage: React.FC = () => {
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.requestTimeout")}</SettingLabel>
-                                <SettingDescription>{t("settings.requestTimeoutDescription")}</SettingDescription>
+                                <SettingLabel>{t("settings.request_timeout")}</SettingLabel>
+                                <SettingDescription>{t("settings.request_timeout_description")}</SettingDescription>
                             </SettingInfo>
                             <StyledRange>
                                 <input
@@ -1739,14 +1739,14 @@ export const SettingsPage: React.FC = () => {
                         <SettingRow>
                             <SettingInfo>
                                 <SettingLabel>{t("settings.language")}</SettingLabel>
-                                <SettingDescription>{t("settings.languageDescription")}</SettingDescription>
+                                <SettingDescription>{t("settings.language_description")}</SettingDescription>
                             </SettingInfo>
                             <Dropdown
                                 variant="form"
                                 disabled={busy}
                                 value={settings.language}
                                 options={[
-                                    {value: "system", label: t("settings.systemDefault")},
+                                    {value: "system", label: t("settings.system_default")},
                                     ...locales.map((locale) => ({
                                         value: locale,
                                         label: LOCALE_NAMES[locale] ?? locale
@@ -1758,8 +1758,8 @@ export const SettingsPage: React.FC = () => {
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.borderlessPopup")}</SettingLabel>
-                                <SettingDescription>{t("settings.borderlessPopupDescription")}</SettingDescription>
+                                <SettingLabel>{t("settings.borderless_popup")}</SettingLabel>
+                                <SettingDescription>{t("settings.borderless_popup_description")}</SettingDescription>
                             </SettingInfo>
                             <Checkbox
                                 disabled={busy}
@@ -1770,8 +1770,8 @@ export const SettingsPage: React.FC = () => {
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.autoStripTracking")}</SettingLabel>
-                                <SettingDescription>{t("settings.autoStripTrackingDescription")}</SettingDescription>
+                                <SettingLabel>{t("settings.auto_strip_tracking")}</SettingLabel>
+                                <SettingDescription>{t("settings.auto_strip_tracking_description")}</SettingDescription>
                             </SettingInfo>
                             <Checkbox
                                 disabled={busy}
@@ -1782,8 +1782,8 @@ export const SettingsPage: React.FC = () => {
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.showUrlButton")}</SettingLabel>
-                                <SettingDescription>{t("settings.showUrlButtonDescription")}</SettingDescription>
+                                <SettingLabel>{t("settings.show_url_button")}</SettingLabel>
+                                <SettingDescription>{t("settings.show_url_button_description")}</SettingDescription>
                             </SettingInfo>
                             <Checkbox
                                 disabled={busy}
@@ -1794,8 +1794,8 @@ export const SettingsPage: React.FC = () => {
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.scriptNetwork")}</SettingLabel>
-                                <SettingDescription>{t("settings.scriptNetworkDescription")}</SettingDescription>
+                                <SettingLabel>{t("settings.script_network")}</SettingLabel>
+                                <SettingDescription>{t("settings.script_network_description")}</SettingDescription>
                             </SettingInfo>
                             <Checkbox
                                 disabled={busy}
@@ -1805,18 +1805,18 @@ export const SettingsPage: React.FC = () => {
                         </SettingRow>
                     </Section>
 
-                    <Section id={anchorId("settings.userAgent")}>
-                        <SectionTitle>{t("settings.userAgent")}</SectionTitle>
+                    <Section id={anchorId("settings.user_agent")}>
+                        <SectionTitle>{t("settings.user_agent")}</SectionTitle>
 
                         <SettingInfo>
                             <SettingDescription>
-                                {t("settings.userAgentDescription")}
+                                {t("settings.user_agent_description")}
                             </SettingDescription>
                         </SettingInfo>
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.userAgentDefault")}</SettingLabel>
+                                <SettingLabel>{t("settings.user_agent_default")}</SettingLabel>
                             </SettingInfo>
                             <Dropdown
                                 variant="form"
@@ -1832,21 +1832,21 @@ export const SettingsPage: React.FC = () => {
                                 <ListRow key={agent.id}>
                                     <ListInput
                                         className="name"
-                                        placeholder={t("settings.browserNamePlaceholder")}
+                                        placeholder={t("settings.browser_name_placeholder")}
                                         disabled={busy}
                                         value={agent.name}
                                         onChange={(e) => updateUserAgent(agent.id, {name: e.target.value})}
                                     />
                                     <ListInput
                                         className="path"
-                                        placeholder={t("settings.userAgentValuePlaceholder")}
+                                        placeholder={t("settings.user_agent_value_placeholder")}
                                         disabled={busy}
                                         value={agent.value}
                                         onChange={(e) => updateUserAgent(agent.id, {value: e.target.value})}
                                     />
                                     <IconOnlyButton
                                         type="button"
-                                        title={t("settings.removeUserAgent")}
+                                        title={t("settings.remove_user_agent")}
                                         onClick={() => removeUserAgent(agent.id)}
                                     >
                                         <TrashIcon size={16}/>
@@ -1857,7 +1857,7 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" onClick={addUserAgent} disabled={busy}>
-                                {t("settings.addUserAgent")}
+                                {t("settings.add_user_agent")}
                             </GhostButton>
                         </ButtonRow>
                     </Section>
@@ -1867,7 +1867,7 @@ export const SettingsPage: React.FC = () => {
 
                         <SettingInfo>
                             <SettingDescription>
-                                {t("settings.browsersDescription")}
+                                {t("settings.browsers_description")}
                             </SettingDescription>
                         </SettingInfo>
 
@@ -1876,29 +1876,29 @@ export const SettingsPage: React.FC = () => {
                                 <ListRow key={browser.id}>
                                     <ListInput
                                         className="name"
-                                        placeholder={t("settings.browserNamePlaceholder")}
+                                        placeholder={t("settings.browser_name_placeholder")}
                                         disabled={busy}
                                         value={browser.name}
                                         onChange={(e) => updateBrowser(browser.id, {name: e.target.value})}
                                     />
                                     <ListInput
                                         className="path"
-                                        placeholder={t("settings.browserPathPlaceholder")}
+                                        placeholder={t("settings.browser_path_placeholder")}
                                         disabled={busy}
                                         value={browser.executablePath}
                                         onChange={(e) => updateBrowser(browser.id, {executablePath: e.target.value})}
                                     />
                                     <ListInput
                                         className="args"
-                                        placeholder={t("settings.browserArgsPlaceholder")}
-                                        title={t("settings.browserArgsTitle")}
+                                        placeholder={t("settings.browser_args_placeholder")}
+                                        title={t("settings.browser_args_title")}
                                         disabled={busy}
                                         value={browser.arguments}
                                         onChange={(e) => updateBrowser(browser.id, {arguments: e.target.value})}
                                     />
                                     <IconOnlyButton
                                         type="button"
-                                        title={t("settings.removeBrowser")}
+                                        title={t("settings.remove_browser")}
                                         onClick={() => removeBrowser(browser.id)}
                                     >
                                         <TrashIcon size={16}/>
@@ -1909,10 +1909,10 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" onClick={addBrowser} disabled={busy}>
-                                {t("settings.addBrowser")}
+                                {t("settings.add_browser")}
                             </GhostButton>
                             <GhostButton type="button" onClick={handleDetectBrowsers} disabled={busy || detecting}>
-                                {detecting ? t("settings.detecting") : t("settings.detectInstalled")}
+                                {detecting ? t("settings.detecting") : t("settings.detect_installed")}
                             </GhostButton>
                         </ButtonRow>
                     </Section>
@@ -1921,13 +1921,13 @@ export const SettingsPage: React.FC = () => {
                         <SectionTitle>{t("settings.forwarding")}</SectionTitle>
 
                         <SettingInfo>
-                            <SettingDescription>{t("settings.forwardingDescription")}</SettingDescription>
+                            <SettingDescription>{t("settings.forwarding_description")}</SettingDescription>
                         </SettingInfo>
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.forwardingEnabled")}</SettingLabel>
-                                <SettingDescription>{t("settings.forwardingEnabledDescription")}</SettingDescription>
+                                <SettingLabel>{t("settings.forwarding_enabled")}</SettingLabel>
+                                <SettingDescription>{t("settings.forwarding_enabled_description")}</SettingDescription>
                             </SettingInfo>
                             <Checkbox
                                 disabled={busy}
@@ -1940,8 +1940,8 @@ export const SettingsPage: React.FC = () => {
                             <>
                                 <SettingRow>
                                     <SettingInfo>
-                                        <SettingLabel>{t("settings.deviceName")}</SettingLabel>
-                                        <SettingDescription>{t("settings.deviceNameDescription")}</SettingDescription>
+                                        <SettingLabel>{t("settings.device_name")}</SettingLabel>
+                                        <SettingDescription>{t("settings.device_name_description")}</SettingDescription>
                                     </SettingInfo>
                                     <ListInput
                                         className="name"
@@ -1953,8 +1953,8 @@ export const SettingsPage: React.FC = () => {
 
                                 <SettingRow>
                                     <SettingInfo>
-                                        <SettingLabel>{t("settings.forwardPort")}</SettingLabel>
-                                        <SettingDescription>{t("settings.forwardPortDescription")}</SettingDescription>
+                                        <SettingLabel>{t("settings.forward_port")}</SettingLabel>
+                                        <SettingDescription>{t("settings.forward_port_description")}</SettingDescription>
                                     </SettingInfo>
                                     <ListInput
                                         className="port"
@@ -1967,7 +1967,7 @@ export const SettingsPage: React.FC = () => {
 
                                 {forwardInfo && forwardInfo.addresses.length > 0 && (
                                     <InfoText>
-                                        {t("settings.forwardAddresses", {
+                                        {t("settings.forward_addresses", {
                                             port: settings.forwardPort,
                                             addresses: forwardInfo.addresses.join(", "),
                                         })}
@@ -1975,33 +1975,33 @@ export const SettingsPage: React.FC = () => {
                                 )}
 
                                 {forwardInfo && (
-                                    <InfoText>{t("settings.forwardKey", {key: fingerprint(forwardInfo.publicKey)})}</InfoText>
+                                    <InfoText>{t("settings.forward_key", {key: fingerprint(forwardInfo.publicKey)})}</InfoText>
                                 )}
 
                                 {forwardInfo?.enabled && !forwardInfo.listening && (
                                     <WarnText>
                                         <AlertTriangleIcon size={14}/>
-                                        <span>{t("settings.forwardNotListening")}</span>
+                                        <span>{t("settings.forward_not_listening")}</span>
                                     </WarnText>
                                 )}
                             </>
                         )}
 
                         {settings.forwardingEnabled !== forwardingActive && (
-                            <InfoText>{t("settings.forwardSaveFirst")}</InfoText>
+                            <InfoText>{t("settings.forward_save_first")}</InfoText>
                         )}
                     </Section>
 
-                    <Section id={anchorId("settings.forwardDevices")}>
-                        <SectionTitle>{t("settings.forwardDevices")}</SectionTitle>
+                    <Section id={anchorId("settings.forward_devices")}>
+                        <SectionTitle>{t("settings.forward_devices")}</SectionTitle>
 
                         <SettingInfo>
-                            <SettingDescription>{t("settings.forwardDevicesDescription")}</SettingDescription>
-                            <SettingDescription>{t("settings.forwardAddressesHint")}</SettingDescription>
+                            <SettingDescription>{t("settings.forward_devices_description")}</SettingDescription>
+                            <SettingDescription>{t("settings.forward_addresses_hint")}</SettingDescription>
                         </SettingInfo>
 
                         {settings.devices.length === 0 ? (
-                            <InfoText>{t("settings.forwardDevicesEmpty")}</InfoText>
+                            <InfoText>{t("settings.forward_devices_empty")}</InfoText>
                         ) : (
                             <FilterList>
                                 {settings.devices.map((device) => (
@@ -2010,7 +2010,7 @@ export const SettingsPage: React.FC = () => {
                                             <DeviceNameRow>
                                                 <StatusDot
                                                     $online={onlineDevices.has(device.id)}
-                                                    title={t(onlineDevices.has(device.id) ? "settings.deviceOnline" : "settings.deviceOffline")}
+                                                    title={t(onlineDevices.has(device.id) ? "settings.device_online" : "settings.device_offline")}
                                                 />
                                                 <FilterName>{device.name || device.host}</FilterName>
                                             </DeviceNameRow>
@@ -2021,7 +2021,7 @@ export const SettingsPage: React.FC = () => {
                                                     <span>+ {address}:{device.port}</span>
                                                     <IconOnlyButton
                                                         type="button"
-                                                        title={t("settings.removeAddress")}
+                                                        title={t("settings.remove_address")}
                                                         onClick={() => removeDeviceAddress(device.id, address)}
                                                     >
                                                         <TrashIcon size={14}/>
@@ -2032,7 +2032,7 @@ export const SettingsPage: React.FC = () => {
                                             <AddressAddRow>
                                                 <ListInput
                                                     className="path"
-                                                    placeholder={t("settings.deviceAddressPlaceholder")}
+                                                    placeholder={t("settings.device_address_placeholder")}
                                                     disabled={!forwardingActive}
                                                     value={addressInputs[device.id] ?? ""}
                                                     onChange={(event) => setAddressInputs((previous) => ({
@@ -2045,14 +2045,14 @@ export const SettingsPage: React.FC = () => {
                                                     disabled={!forwardingActive || !(addressInputs[device.id] ?? "").trim()}
                                                     onClick={handleAddAddress(device.id)}
                                                 >
-                                                    {t("settings.addAddress")}
+                                                    {t("settings.add_address")}
                                                 </GhostButton>
                                             </AddressAddRow>
                                         </FilterBody>
                                         <FilterActions>
                                             <IconOnlyButton
                                                 type="button"
-                                                title={t("settings.removeDevice")}
+                                                title={t("settings.remove_device")}
                                                 onClick={() => removeDevice(device.id)}
                                             >
                                                 <TrashIcon size={16}/>
@@ -2065,19 +2065,19 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" disabled={!forwardingActive} onClick={handleSearchOpen}>
-                                {t("settings.forwardSearch")}
+                                {t("settings.forward_search")}
                             </GhostButton>
                         </ButtonRow>
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.forwardManual")}</SettingLabel>
-                                <SettingDescription>{t("settings.forwardManualDescription")}</SettingDescription>
+                                <SettingLabel>{t("settings.forward_manual")}</SettingLabel>
+                                <SettingDescription>{t("settings.forward_manual_description")}</SettingDescription>
                             </SettingInfo>
                             <ButtonRow>
                                 <ListInput
                                     className="path"
-                                    placeholder={t("settings.deviceHostPlaceholder")}
+                                    placeholder={t("settings.device_host_placeholder")}
                                     disabled={!forwardingActive}
                                     value={manualHost}
                                     onChange={(event) => setManualHost(event.target.value)}
@@ -2094,30 +2094,30 @@ export const SettingsPage: React.FC = () => {
                                     disabled={!forwardingActive || !manualHost.trim()}
                                     onClick={handleManualPair}
                                 >
-                                    {t("settings.forwardPair")}
+                                    {t("settings.forward_pair")}
                                 </GhostButton>
                             </ButtonRow>
                         </SettingRow>
                     </Section>
 
-                    <Section id={anchorId("settings.systemIntegration")}>
-                        <SectionTitle>{t("settings.systemIntegration")}</SectionTitle>
+                    <Section id={anchorId("settings.system_integration")}>
+                        <SectionTitle>{t("settings.system_integration")}</SectionTitle>
                         <SettingInfo>
                             <SettingDescription>
                                 {t(platform === "windows"
-                                    ? "settings.systemIntegrationDescription"
-                                    : "settings.systemIntegrationDescriptionLinux")}
+                                    ? "settings.system_integration_description"
+                                    : "settings.system_integration_description_linux")}
                             </SettingDescription>
                         </SettingInfo>
 
                         <ButtonRow>
                             <GhostButton type="button" onClick={handleRegisterProtocols} disabled={integrationBusy}>
                                 <LinkIcon size={15}/>
-                                {t("settings.registerHttp")}
+                                {t("settings.register_http")}
                             </GhostButton>
                             {platform === "windows" && (
                                 <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
-                                    {t("settings.openDefaultApps")}
+                                    {t("settings.open_default_apps")}
                                 </GhostButton>
                             )}
                             <DangerGhostButton type="button" onClick={handleUnregisterProtocols}
@@ -2129,7 +2129,7 @@ export const SettingsPage: React.FC = () => {
 
                         {protocols && (
                             <InfoText>
-                                {t("settings.protocolStatus", {
+                                {t("settings.protocol_status", {
                                     isDefault: protocols.isDefault && protocols.pathMatches ? t("settings.yes") : t("settings.no"),
                                     scheme: protocols.customSchemeRegistered ? t("settings.yes") : t("settings.no"),
                                 })}
@@ -2139,7 +2139,7 @@ export const SettingsPage: React.FC = () => {
                         {protocols?.isDefault && !protocols.pathMatches && (
                             <WarnText>
                                 <AlertTriangleIcon size={14}/>
-                                <span>{t("settings.pathMismatch", {path: protocols.registeredPath ?? "?"})}</span>
+                                <span>{t("settings.path_mismatch", {path: protocols.registeredPath ?? "?"})}</span>
                             </WarnText>
                         )}
 
@@ -2147,15 +2147,15 @@ export const SettingsPage: React.FC = () => {
                             <InfoText>{t(integrationMessage.key, integrationMessage.params)}</InfoText>}
                     </Section>
 
-                    <Section id={anchorId("settings.autoRedirect")}>
-                        <SectionTitle>{t("settings.autoRedirect")}</SectionTitle>
+                    <Section id={anchorId("settings.auto_redirect")}>
+                        <SectionTitle>{t("settings.auto_redirect")}</SectionTitle>
 
                         <SettingInfo>
-                            <SettingDescription>{t("settings.autoRedirectDescription")}</SettingDescription>
+                            <SettingDescription>{t("settings.auto_redirect_description")}</SettingDescription>
                         </SettingInfo>
 
                         {settings.autoRedirectHosts.length === 0 ? (
-                            <InfoText>{t("settings.autoRedirectEmpty")}</InfoText>
+                            <InfoText>{t("settings.auto_redirect_empty")}</InfoText>
                         ) : (
                             <FilterList>
                                 {settings.autoRedirectHosts.map((host) => (
@@ -2167,7 +2167,7 @@ export const SettingsPage: React.FC = () => {
                                             <IconOnlyButton
                                                 type="button"
                                                 disabled={busy}
-                                                title={t("settings.removeAutoRedirect")}
+                                                title={t("settings.remove_auto_redirect")}
                                                 onClick={() => removeAutoRedirectHost(host)}
                                             >
                                                 <TrashIcon size={16}/>
@@ -2182,7 +2182,7 @@ export const SettingsPage: React.FC = () => {
                             <ListInput
                                 className="name"
                                 disabled={busy}
-                                placeholder={t("settings.autoRedirectPlaceholder")}
+                                placeholder={t("settings.auto_redirect_placeholder")}
                                 value={newAutoRedirectHost}
                                 onChange={(event) => setNewAutoRedirectHost(event.target.value)}
                                 onKeyDown={(event) => {
@@ -2194,24 +2194,24 @@ export const SettingsPage: React.FC = () => {
                             />
                             <GhostButton type="button" disabled={busy || newAutoRedirectHost.trim().length === 0}
                                          onClick={addAutoRedirectHost}>
-                                {t("settings.addAutoRedirect")}
+                                {t("settings.add_auto_redirect")}
                             </GhostButton>
                         </ButtonRow>
                     </Section>
 
-                    <Section id={anchorId("settings.filterLists")}>
-                        <SectionTitle>{t("settings.filterLists")}</SectionTitle>
+                    <Section id={anchorId("settings.filter_lists")}>
+                        <SectionTitle>{t("settings.filter_lists")}</SectionTitle>
 
                         <SettingInfo>
                             <SettingDescription>
-                                {t("settings.filterListsDescription", {count: builtinRuleCount})}
+                                {t("settings.filter_lists_description", {count: builtinRuleCount})}
                             </SettingDescription>
                         </SettingInfo>
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.filterAutoUpdate")}</SettingLabel>
-                                <SettingDescription>{t("settings.filterAutoUpdateDescription")}</SettingDescription>
+                                <SettingLabel>{t("settings.filter_auto_update")}</SettingLabel>
+                                <SettingDescription>{t("settings.filter_auto_update_description")}</SettingDescription>
                             </SettingInfo>
                             <Checkbox
                                 disabled={busy}
@@ -2222,9 +2222,9 @@ export const SettingsPage: React.FC = () => {
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.filterAutoUpdateInterval")}</SettingLabel>
+                                <SettingLabel>{t("settings.filter_auto_update_interval")}</SettingLabel>
                                 <SettingDescription>
-                                    {t("settings.filterAutoUpdateIntervalDescription")}
+                                    {t("settings.filter_auto_update_interval_description")}
                                 </SettingDescription>
                             </SettingInfo>
                             <ListInput
@@ -2247,11 +2247,11 @@ export const SettingsPage: React.FC = () => {
                         </SettingRow>
 
                         {settings.filterAutoUpdate && settings.filterAutoUpdateMinutes === -1 && (
-                            <InfoText>{t("settings.filterAutoUpdateTimerOff")}</InfoText>
+                            <InfoText>{t("settings.filter_auto_update_timer_off")}</InfoText>
                         )}
 
                         {filterLists.length === 0 ? (
-                            <InfoText>{t("settings.filterListsEmpty")}</InfoText>
+                            <InfoText>{t("settings.filter_lists_empty")}</InfoText>
                         ) : (
                             <FilterList>
                                 {filterLists.map((list) => (
@@ -2260,11 +2260,11 @@ export const SettingsPage: React.FC = () => {
                                             <FilterName>{list.name}</FilterName>
                                             <FilterUrl>{list.url}</FilterUrl>
                                             <FilterMeta>
-                                                <span>{t("settings.filterRules", {count: list.ruleCount})}</span>
+                                                <span>{t("settings.filter_rules", {count: list.ruleCount})}</span>
                                                 <span>
                                 {list.lastUpdated
-                                    ? t("settings.filterUpdated", {date: new Date(list.lastUpdated).toLocaleString(locale)})
-                                    : t("settings.filterNeverUpdated")}
+                                    ? t("settings.filter_updated", {date: new Date(list.lastUpdated).toLocaleString(locale)})
+                                    : t("settings.filter_never_updated")}
                               </span>
                                             </FilterMeta>
                                             {list.error && (
@@ -2281,13 +2281,13 @@ export const SettingsPage: React.FC = () => {
                                                 $on={list.enabled}
                                                 disabled={filtersBusy}
                                                 aria-pressed={list.enabled}
-                                                title={t(list.enabled ? "settings.filterDisable" : "settings.filterEnable")}
+                                                title={t(list.enabled ? "settings.filter_disable" : "settings.filter_enable")}
                                                 onClick={() => handleToggleFilterList(list.id, !list.enabled)}
                                             />
                                             <IconOnlyButton
                                                 type="button"
                                                 disabled={filtersBusy}
-                                                title={t("settings.removeFilterList")}
+                                                title={t("settings.remove_filter_list")}
                                                 onClick={() => handleRemoveFilterList(list.id)}
                                             >
                                                 <TrashIcon size={16}/>
@@ -2300,11 +2300,11 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" disabled={filtersBusy} onClick={() => setAddOpen(true)}>
-                                {t("settings.addFilterList")}
+                                {t("settings.add_filter_list")}
                             </GhostButton>
                             <GhostButton type="button" disabled={filtersBusy || filterLists.length === 0}
                                          onClick={handleCheckFilterUpdates}>
-                                {filtersBusy ? t("settings.filterUpdating") : t("settings.checkFilterUpdates")}
+                                {filtersBusy ? t("settings.filter_updating") : t("settings.check_filter_updates")}
                             </GhostButton>
                         </ButtonRow>
                     </Section>
@@ -2313,15 +2313,15 @@ export const SettingsPage: React.FC = () => {
                         <SectionTitle>{t("settings.startup")}</SectionTitle>
 
                         <SettingInfo>
-                            <SettingDescription>{t("settings.startupDescription")}</SettingDescription>
+                            <SettingDescription>{t("settings.startup_description")}</SettingDescription>
                         </SettingInfo>
 
                         {/* Only Windows has a per-user Startup folder, so the row is absent elsewhere. */}
                         {startup?.supported && (
                             <SettingRow>
                                 <SettingInfo>
-                                    <SettingLabel>{t("settings.startWithSession")}</SettingLabel>
-                                    <SettingDescription>{t("settings.startWithSessionDescription")}</SettingDescription>
+                                    <SettingLabel>{t("settings.start_with_session")}</SettingLabel>
+                                    <SettingDescription>{t("settings.start_with_session_description")}</SettingDescription>
                                 </SettingInfo>
                                 <Checkbox
                                     disabled={startupBusy}
@@ -2333,8 +2333,8 @@ export const SettingsPage: React.FC = () => {
 
                         <SettingRow>
                             <SettingInfo>
-                                <SettingLabel>{t("settings.hideOnLaunch")}</SettingLabel>
-                                <SettingDescription>{t("settings.hideOnLaunchDescription")}</SettingDescription>
+                                <SettingLabel>{t("settings.hide_on_launch")}</SettingLabel>
+                                <SettingDescription>{t("settings.hide_on_launch_description")}</SettingDescription>
                             </SettingInfo>
                             <Checkbox
                                 disabled={busy}
@@ -2349,26 +2349,26 @@ export const SettingsPage: React.FC = () => {
 
                         <SettingInfo>
                             <SettingDescription>
-                                {t("settings.aboutDescription", {version: appVersion || "…"})}
+                                {t("settings.about_description", {version: appVersion || "…"})}
                             </SettingDescription>
                         </SettingInfo>
 
                         <ButtonRow>
                             <GhostButton type="button" disabled={updateBusy} onClick={handleCheckUpdate}>
-                                {updateBusy ? t("settings.updateChecking") : t("settings.checkUpdates")}
+                                {updateBusy ? t("settings.update_checking") : t("settings.check_updates")}
                             </GhostButton>
                             {updateResult?.available && (
                                 <GhostButton type="button" onClick={handleOpenRelease}>
-                                    {t("settings.openRelease")}
+                                    {t("settings.open_release")}
                                 </GhostButton>
                             )}
                             {updateResult?.available && isWindows && (
                                 <GhostButton type="button" onClick={handleStartUpdate}>
-                                    {t("settings.updateDownloadInstall")}
+                                    {t("settings.update_download_install")}
                                 </GhostButton>
                             )}
                             <GhostButton type="button" onClick={handleOpenLogs}>
-                                {t("settings.openLogs")}
+                                {t("settings.open_logs")}
                             </GhostButton>
                         </ButtonRow>
 
@@ -2376,15 +2376,15 @@ export const SettingsPage: React.FC = () => {
                             (updateResult.available ? (
                                 <WarnText>
                                     <AlertTriangleIcon size={14}/>
-                                    <span>{t("settings.updateAvailable", {version: updateResult.latest})}</span>
+                                    <span>{t("settings.update_available", {version: updateResult.latest})}</span>
                                 </WarnText>
                             ) : (
-                                <InfoText>{t("settings.updateCurrent", {version: updateResult.current})}</InfoText>
+                                <InfoText>{t("settings.update_current", {version: updateResult.current})}</InfoText>
                             ))}
 
                         {logDirectory && (
                             <FileInfo>
-                                <span>{t("settings.logsLocation")}</span>
+                                <span>{t("settings.logs_location")}</span>
                                 <code>{logDirectory}</code>
                             </FileInfo>
                         )}
@@ -2406,7 +2406,7 @@ export const SettingsPage: React.FC = () => {
             </SettingsBody>
 
             <FileInfo>
-                <span>{t("settings.fileInfo")}</span>
+                <span>{t("settings.file_info")}</span>
                 <code>{settingsFilePath || "..."}</code>
             </FileInfo>
 
@@ -2445,7 +2445,7 @@ export const SettingsPage: React.FC = () => {
                         onClick={(event) => event.stopPropagation()}
                         role="dialog"
                     >
-                        <DialogTitle>{t("settings.updateDownloadTitle")}</DialogTitle>
+                        <DialogTitle>{t("settings.update_download_title")}</DialogTitle>
                         <UpdateStatus $error={updatePhase === "error"}>{updateStatusText}</UpdateStatus>
 
                         <UpdateProgressTrack>
@@ -2456,26 +2456,26 @@ export const SettingsPage: React.FC = () => {
                             />
                         </UpdateProgressTrack>
 
-                        <ChangelogTitle>{t("settings.updateChangelog")}</ChangelogTitle>
+                        <ChangelogTitle>{t("settings.update_changelog")}</ChangelogTitle>
                         {updateChangelogText
                             ? <Changelog>{updateChangelogText}</Changelog>
                             : (
                                 <InfoText>
                                     {updatePhase === "changelog"
-                                        ? t("settings.updateChangelogLoading")
-                                        : t("settings.updateChangelogUnavailable")}
+                                        ? t("settings.update_changelog_loading")
+                                        : t("settings.update_changelog_unavailable")}
                                 </InfoText>
                             )}
 
                         <ButtonRow>
                             {(updatePhase === "error" || updatePhase === "cancelled") && (
                                 <GhostButton type="button" onClick={closeUpdateDialog}>
-                                    {t("settings.updateClose")}
+                                    {t("settings.update_close")}
                                 </GhostButton>
                             )}
                             {(updatePhase === "changelog" || updatePhase === "downloading") && (
                                 <GhostButton type="button" onClick={handleCancelUpdate}>
-                                    {t("settings.updateCancel")}
+                                    {t("settings.update_cancel")}
                                 </GhostButton>
                             )}
                         </ButtonRow>
@@ -2486,14 +2486,14 @@ export const SettingsPage: React.FC = () => {
             {addOpen && (
                 <Overlay onClick={() => !adding && setAddOpen(false)}>
                     <Dialog onClick={(event) => event.stopPropagation()}>
-                        <DialogTitle>{t("settings.filterAddTitle")}</DialogTitle>
+                        <DialogTitle>{t("settings.filter_add_title")}</DialogTitle>
 
                         <Tabs>
                             <Tab type="button" $active={addTab === "catalog"} onClick={() => setAddTab("catalog")}>
-                                {t("settings.filterAddFromCatalog")}
+                                {t("settings.filter_add_from_catalog")}
                             </Tab>
                             <Tab type="button" $active={addTab === "custom"} onClick={() => setAddTab("custom")}>
-                                {t("settings.filterAddCustom")}
+                                {t("settings.filter_add_custom")}
                             </Tab>
                         </Tabs>
 
@@ -2506,12 +2506,12 @@ export const SettingsPage: React.FC = () => {
                                             {isFilterAdded(entry.url) ? (
                                                 <AddedMark>
                                                     <CheckCircleIcon size={14}/>
-                                                    {t("settings.filterAdded")}
+                                                    {t("settings.filter_added")}
                                                 </AddedMark>
                                             ) : (
                                                 <GhostButton type="button" disabled={adding}
                                                              onClick={() => handleAddFilterList(entry.name, entry.url)}>
-                                                    {adding ? t("settings.filterAdding") : t("settings.filterAdd")}
+                                                    {adding ? t("settings.filter_adding") : t("settings.filter_add")}
                                                 </GhostButton>
                                             )}
                                         </CatalogItemHead>
@@ -2523,26 +2523,26 @@ export const SettingsPage: React.FC = () => {
                         ) : (
                             <>
                                 <FieldLabel>
-                                    {t("settings.filterName")}
-                                    <DialogInput value={newFilterName} placeholder={t("settings.filterNamePlaceholder")}
+                                    {t("settings.filter_name")}
+                                    <DialogInput value={newFilterName} placeholder={t("settings.filter_name_placeholder")}
                                                  onChange={(event) => setNewFilterName(event.target.value)}/>
                                 </FieldLabel>
                                 <FieldLabel>
-                                    {t("settings.filterUrl")}
-                                    <DialogInput value={newFilterUrl} placeholder={t("settings.filterUrlPlaceholder")}
+                                    {t("settings.filter_url")}
+                                    <DialogInput value={newFilterUrl} placeholder={t("settings.filter_url_placeholder")}
                                                  onChange={(event) => setNewFilterUrl(event.target.value)}/>
                                 </FieldLabel>
                                 <ButtonRow>
                                     {isFilterAdded(newFilterUrl) ? (
                                         <AddedMark>
                                             <CheckCircleIcon size={14}/>
-                                            {t("settings.filterAdded")}
+                                            {t("settings.filter_added")}
                                         </AddedMark>
                                     ) : (
                                         <GhostButton type="button"
                                                      disabled={adding || !newFilterName.trim() || !newFilterUrl.trim()}
                                                      onClick={() => handleAddFilterList(newFilterName, newFilterUrl)}>
-                                            {adding ? t("settings.filterAdding") : t("settings.filterAdd")}
+                                            {adding ? t("settings.filter_adding") : t("settings.filter_add")}
                                         </GhostButton>
                                     )}
                                 </ButtonRow>
@@ -2550,13 +2550,13 @@ export const SettingsPage: React.FC = () => {
                         )}
 
                         <FormatNote>
-                            <strong>{t("settings.filterFormatTitle")}</strong>
-                            <span>{t("settings.filterFormatBody")}</span>
+                            <strong>{t("settings.filter_format_title")}</strong>
+                            <span>{t("settings.filter_format_body")}</span>
                         </FormatNote>
 
                         <ButtonRow>
                             <GhostButton type="button" disabled={adding} onClick={() => setAddOpen(false)}>
-                                {t("settings.filterCancel")}
+                                {t("settings.filter_cancel")}
                             </GhostButton>
                         </ButtonRow>
                     </Dialog>
@@ -2566,11 +2566,11 @@ export const SettingsPage: React.FC = () => {
             {searchOpen && (
                 <Overlay onClick={handleSearchClose}>
                     <Dialog onClick={(event) => event.stopPropagation()}>
-                        <DialogTitle>{t("settings.forwardSearchTitle")}</DialogTitle>
-                        <SettingDescription>{t("settings.forwardSearchDescription")}</SettingDescription>
+                        <DialogTitle>{t("settings.forward_search_title")}</DialogTitle>
+                        <SettingDescription>{t("settings.forward_search_description")}</SettingDescription>
 
                         {discovered.length === 0 ? (
-                            <InfoText>{t("settings.forwardSearching")}</InfoText>
+                            <InfoText>{t("settings.forward_searching")}</InfoText>
                         ) : (
                             <CatalogList>
                                 {discovered.map((device) => (
@@ -2579,7 +2579,7 @@ export const SettingsPage: React.FC = () => {
                                             <CatalogName>{device.name || device.host}</CatalogName>
                                             <GhostButton type="button"
                                                          onClick={() => handlePair(device.host, device.port)}>
-                                                {t("settings.forwardPair")}
+                                                {t("settings.forward_pair")}
                                             </GhostButton>
                                         </CatalogItemHead>
                                         <FilterUrl>{device.host}:{device.port}</FilterUrl>
@@ -2590,7 +2590,7 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" onClick={handleSearchClose}>
-                                {t("settings.filterCancel")}
+                                {t("settings.filter_cancel")}
                             </GhostButton>
                         </ButtonRow>
                     </Dialog>
@@ -2600,7 +2600,7 @@ export const SettingsPage: React.FC = () => {
             {pairing && (
                 <Overlay>
                     <Dialog>
-                        <DialogTitle>{t("settings.forwardPairingTitle", {name: pairing.name})}</DialogTitle>
+                        <DialogTitle>{t("settings.forward_pairing_title", {name: pairing.name})}</DialogTitle>
 
                         {pairing.error ? (
                             <ErrorBanner>
@@ -2609,17 +2609,17 @@ export const SettingsPage: React.FC = () => {
                             </ErrorBanner>
                         ) : pairing.code ? (
                             <>
-                                <SettingDescription>{t("settings.forwardPairingCodeHint")}</SettingDescription>
+                                <SettingDescription>{t("settings.forward_pairing_code_hint")}</SettingDescription>
                                 <PairCode>{pairing.code}</PairCode>
-                                <InfoText>{t("settings.forwardPairingWaiting")}</InfoText>
+                                <InfoText>{t("settings.forward_pairing_waiting")}</InfoText>
                             </>
                         ) : (
-                            <InfoText>{t("settings.forwardPairingDone")}</InfoText>
+                            <InfoText>{t("settings.forward_pairing_done")}</InfoText>
                         )}
 
                         <ButtonRow>
                             <GhostButton type="button" onClick={() => setPairing(null)}>
-                                {t("settings.filterCancel")}
+                                {t("settings.filter_cancel")}
                             </GhostButton>
                         </ButtonRow>
                     </Dialog>
@@ -2629,19 +2629,19 @@ export const SettingsPage: React.FC = () => {
             {incoming && (
                 <Overlay>
                     <Dialog>
-                        <DialogTitle>{t("settings.forwardIncomingTitle")}</DialogTitle>
+                        <DialogTitle>{t("settings.forward_incoming_title")}</DialogTitle>
                         <SettingDescription>
-                            {t("settings.forwardIncomingDescription", {name: incoming.deviceName})}
+                            {t("settings.forward_incoming_description", {name: incoming.deviceName})}
                         </SettingDescription>
-                        <SettingDescription>{t("settings.forwardPairingCodeHint")}</SettingDescription>
+                        <SettingDescription>{t("settings.forward_pairing_code_hint")}</SettingDescription>
                         <PairCode>{incoming.code}</PairCode>
 
                         <ButtonRow>
                             <DangerGhostButton type="button" onClick={() => handlePairRespond(false)}>
-                                {t("settings.forwardReject")}
+                                {t("settings.forward_reject")}
                             </DangerGhostButton>
                             <SaveButton type="button" onClick={() => handlePairRespond(true)}>
-                                {t("settings.forwardAccept")}
+                                {t("settings.forward_accept")}
                             </SaveButton>
                         </ButtonRow>
                     </Dialog>

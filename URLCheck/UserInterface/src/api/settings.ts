@@ -130,5 +130,5 @@ export async function resetSettings(): Promise<SettingsPayload> {
 export async function addAutoRedirect(url: string): Promise<void> {
     if (!Native.available) return;
 
-    await Native.request("settings.addAutoRedirect", {url});
+    await Native.request("settings.add_auto_redirect", {url});
 }

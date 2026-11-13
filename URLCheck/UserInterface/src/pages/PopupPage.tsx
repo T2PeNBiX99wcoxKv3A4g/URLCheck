@@ -1034,7 +1034,7 @@ export const PopupPage: React.FC = () => {
         ? t("popup.checking")
         : status
             ? `${status.statusCode || "!"} ${statusDetail ?? ""}`.trim()
-            : t("popup.checkStatus");
+            : t("popup.check_status");
 
     const StatusIcon = tone === "ok" ? CheckCircleIcon : tone === "error" ? XCircleIcon : AlertTriangleIcon;
 
@@ -1049,7 +1049,7 @@ export const PopupPage: React.FC = () => {
             {scriptError && (
                 <ScriptProblem>
                     <AlertTriangleIcon size={13}/>
-                    <span>{t("popup.scriptError", {error: scriptError})}</span>
+                    <span>{t("popup.script_error", {error: scriptError})}</span>
                     <button onClick={() => setScriptError(null)} title={t("popup.close")} type="button">×</button>
                 </ScriptProblem>
             )}
@@ -1068,7 +1068,7 @@ export const PopupPage: React.FC = () => {
                 {isHttp && (
                     <HttpWarning>
                         <AlertTriangleIcon size={13}/>
-                        <span>{t("popup.httpWarning")}</span>
+                        <span>{t("popup.http_warning")}</span>
                     </HttpWarning>
                 )}
 
@@ -1118,26 +1118,26 @@ export const PopupPage: React.FC = () => {
                             disabled={statusBusy}
                             options={userAgents.map((agent) => ({value: agent.id, label: agent.name}))}
                             onChange={setUserAgentId}
-                            title={t("popup.userAgentTooltip")}
+                            title={t("popup.user_agent_tooltip")}
                         />
                     )}
 
                     <StatusPill $tone={tone} onClick={handleCheckStatus} disabled={statusBusy}
-                                title={t("popup.checkStatus")}>
+                                title={t("popup.check_status")}>
                         <StatusIcon size={13}/>
                         <span>{statusText}</span>
                     </StatusPill>
 
                     <ActionButton onClick={() => rules && commit(stripTrackingParams(url, rules))}
                                   disabled={!parsed || !rules}
-                                  title={t("popup.removeTrackingTooltip")}>
+                                  title={t("popup.remove_tracking_tooltip")}>
                         <TrashIcon size={13}/>
                         {t("popup.tracking")}{trackingCount > 0 ? ` (${trackingCount})` : ""}
                     </ActionButton>
 
                     {isHttp && (
                         <ActionButton $accent onClick={handleUseHttps}>
-                            {t("popup.useHttps")}
+                            {t("popup.use_https")}
                         </ActionButton>
                     )}
                 </Actions>
@@ -1159,7 +1159,7 @@ export const PopupPage: React.FC = () => {
                                 <RowKey>{t("popup.host")}</RowKey>
                                 <RowValue>
                                     {parsed ? (
-                                        <HostLink onClick={useOrigin} title={t("popup.hostTooltip")}>
+                                        <HostLink onClick={useOrigin} title={t("popup.host_tooltip")}>
                                             {decode(parsed.host)}
                                         </HostLink>
                                     ) : (
@@ -1191,11 +1191,11 @@ export const PopupPage: React.FC = () => {
                             <span>{t("popup.parameters")}</span>
                         </SectionToggle>
                         <CountBadge>{params.length}</CountBadge>
-                        <HeaderAction title={t("popup.addParameter")} onClick={addParam} disabled={!parsed}>
+                        <HeaderAction title={t("popup.add_parameter")} onClick={addParam} disabled={!parsed}>
                             <PlusIcon size={14}/>
                         </HeaderAction>
                         <ClearAction
-                            title={t("popup.removeAllParameters")}
+                            title={t("popup.remove_all_parameters")}
                             onClick={handleClearParams}
                             disabled={!parsed || params.length === 0}
                         >
@@ -1204,24 +1204,24 @@ export const PopupPage: React.FC = () => {
                     </SectionHeader>
                     {open.parameters && (
                         <SectionBody>
-                            {params.length === 0 && <EmptyHint>{t("popup.noParameters")}</EmptyHint>}
+                            {params.length === 0 && <EmptyHint>{t("popup.no_parameters")}</EmptyHint>}
                             {params.map((param, index) => (
                                 <Row key={index}>
                                     <ParamInput
                                         className="key"
-                                        title={t("popup.parameterName")}
+                                        title={t("popup.parameter_name")}
                                         value={param.key}
                                         onChange={(e) => updateParamAt(index, {key: e.target.value})}
                                     />
                                     <ParamInput
                                         className="value"
-                                        title={t("popup.parameterValue")}
+                                        title={t("popup.parameter_value")}
                                         placeholder={t("popup.empty")}
                                         value={param.value}
                                         onChange={(e) => updateParamAt(index, {value: e.target.value})}
                                     />
                                     <RemoveParam
-                                        title={t("popup.removeParameter")}
+                                        title={t("popup.remove_parameter")}
                                         onClick={() => handleRemoveParam(param.key, param.value)}
                                     >
                                         <TrashIcon size={12}/>
@@ -1239,7 +1239,7 @@ export const PopupPage: React.FC = () => {
                             <span>{t("popup.fragment")}</span>
                         </SectionToggle>
                         <ClearAction
-                            title={t("popup.removeFragment")}
+                            title={t("popup.remove_fragment")}
                             onClick={clearFragment}
                             disabled={!parsed || fragment.length === 0}
                         >
@@ -1252,7 +1252,7 @@ export const PopupPage: React.FC = () => {
                                 <RowKey>#</RowKey>
                                 <ParamInput
                                     className="value"
-                                    title={t("popup.fragmentTooltip")}
+                                    title={t("popup.fragment_tooltip")}
                                     placeholder={t("popup.empty")}
                                     value={fragment}
                                     onChange={(e) => updateFragment(e.target.value)}
@@ -1273,12 +1273,12 @@ export const PopupPage: React.FC = () => {
                     <SplitButton ref={browserAnchor}>
                         <OpenButton disabled={!canOpen} onClick={() => handleOpen()}>
                             <ShieldCheckIcon size={14}/>
-                            <span>{t("popup.open", {browser: defaultBrowser?.name ?? t("popup.openFallback")})}</span>
+                            <span>{t("popup.open", {browser: defaultBrowser?.name ?? t("popup.open_fallback")})}</span>
                         </OpenButton>
                         <ArrowButton
                             disabled={browsers.length === 0}
                             onClick={() => setBrowserMenuOpen((open) => !open)}
-                            title={t("popup.chooseBrowser")}
+                            title={t("popup.choose_browser")}
                         >
                             ▾
                         </ArrowButton>
@@ -1294,7 +1294,7 @@ export const PopupPage: React.FC = () => {
                     </SplitButton>
 
                     <GhostButton $active={privateMode} onClick={() => setPrivateMode((value) => !value)}
-                                 title={t("popup.privateTooltip")}>
+                                 title={t("popup.private_tooltip")}>
                         <LockIcon size={13}/>
                         {t("popup.private")}
                     </GhostButton>
@@ -1303,9 +1303,9 @@ export const PopupPage: React.FC = () => {
                         <ForwardGroup ref={forwardAnchor}>
                             <GhostButton onClick={() => setForwardMenuOpen((open) => !open)}
                                          disabled={!parsed}
-                                         title={t("popup.sendToTooltip")}>
+                                         title={t("popup.send_to_tooltip")}>
                                 <SendIcon size={13}/>
-                                {t("popup.sendTo")}
+                                {t("popup.send_to")}
                                 <Caret $open={forwardMenuOpen}>▾</Caret>
                             </GhostButton>
                             {forwardMenuOpen && (

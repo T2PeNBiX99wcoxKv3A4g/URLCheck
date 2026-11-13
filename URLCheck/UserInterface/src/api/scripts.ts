@@ -122,7 +122,7 @@ export async function scriptLogs(): Promise<ScriptLogEntry[]> {
 }
 
 export async function clearScriptLogs(): Promise<void> {
-    await result("scripts.clearLogs");
+    await result("scripts.clear_logs");
 }
 
 /** One script the update check inspected. */
@@ -144,7 +144,7 @@ export interface ScriptUpdateEntry {
 export async function checkScriptUpdates(): Promise<ScriptUpdateEntry[]> {
     if (!Native.available) return [];
 
-    const answer = await Native.request<{ updates: ScriptUpdateEntry[] }>("scripts.checkUpdates");
+    const answer = await Native.request<{ updates: ScriptUpdateEntry[] }>("scripts.check_updates");
 
     return (answer.updates ?? []).map((entry) => ({
         ...entry,

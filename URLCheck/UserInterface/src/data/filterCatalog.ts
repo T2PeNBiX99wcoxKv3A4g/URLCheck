@@ -20,17 +20,17 @@ export const FILTER_CATALOG: CatalogEntry[] = [
     {
         name: "AdGuard URL Tracking Protection",
         url: "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_17_TrackParam/filter.txt",
-        descriptionKey: "filters.catalog.adguardUrlTracking",
+        descriptionKey: "filters.catalog.adguard_url_tracking",
     },
     {
         name: "uBlock Origin – AdGuard URL Tracking Protection",
         url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt",
-        descriptionKey: "filters.catalog.uboUrlTracking",
+        descriptionKey: "filters.catalog.ubo_url_tracking",
     },
     {
         name: "ClearURLs",
         url: "https://rules1.clearurls.xyz/data.minify.json",
-        descriptionKey: "filters.catalog.clearUrls",
+        descriptionKey: "filters.catalog.clear_urls",
     },
     {
         name: "Firefox – Query Parameter Stripping",

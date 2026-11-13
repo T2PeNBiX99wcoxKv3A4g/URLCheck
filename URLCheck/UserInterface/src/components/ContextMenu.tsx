@@ -196,7 +196,7 @@ export const ContextMenu: React.FC = () => {
         setMenu(null);
         try {
             await addAutoRedirect(url);
-            flash(t("history.autoRedirectAdded"));
+            flash(t("history.auto_redirect_added"));
         } catch {
             // The settings page can still add the host by hand.
         }
@@ -213,7 +213,7 @@ export const ContextMenu: React.FC = () => {
                     )}
                     {menu.url && (
                         <Item type="button" onClick={() => copy(menu.url!)}>
-                            {t("context.copyUrl")}
+                            {t("context.copy_url")}
                         </Item>
                     )}
                     {menu.editable && (
@@ -223,7 +223,7 @@ export const ContextMenu: React.FC = () => {
                     )}
                     {menu.url && (
                         <Item type="button" onClick={() => addRedirect(menu.url!)}>
-                            {t("history.addAutoRedirect")}
+                            {t("history.add_auto_redirect")}
                         </Item>
                     )}
                 </Menu>

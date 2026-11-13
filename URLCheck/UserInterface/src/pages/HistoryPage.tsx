@@ -260,7 +260,7 @@ export const HistoryPage: React.FC = () => {
                     <SearchIcon size={18}/>
                     <SearchInput
                         type="text"
-                        placeholder={t("history.searchPlaceholder")}
+                        placeholder={t("history.search_placeholder")}
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
                     />
@@ -268,7 +268,7 @@ export const HistoryPage: React.FC = () => {
 
                 <DangerButton onClick={handleClearHistory} disabled={history.length === 0}>
                     <TrashIcon size={15}/>
-                    <span>{t("history.clearAll")}</span>
+                    <span>{t("history.clear_all")}</span>
                 </DangerButton>
             </ControlsCard>
 
@@ -290,7 +290,7 @@ export const HistoryPage: React.FC = () => {
                                 <UrlCell>
                                     <UrlLink
                                         onClick={() => handleOpen(item.url)}
-                                        title={t("history.openTooltip")}
+                                        title={t("history.open_tooltip")}
                                     >
                                         {item.url}
                                     </UrlLink>

@@ -169,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({currentTab, onSelectTab}) => {
                 {update?.available && (
                     <UpdateDot
                         type="button"
-                        title={t("app.updateAvailable", {version: update.latest})}
+                        title={t("app.update_available", {version: update.latest})}
                         onClick={() => void openReleasesPage(RELEASES_URL).catch(() => undefined)}
                     />
                 )}
