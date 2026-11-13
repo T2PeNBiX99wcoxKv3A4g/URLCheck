@@ -85,7 +85,7 @@ internal static class Program
 
             // Touching each singleton constructs it, which is what registers its message handlers.
             var settings = SettingsService.Instance;
-            _ = settings.GetAsync().GetAwaiter().GetResult(); // know the language before the tray is built
+            settings.LoadAsync().GetAwaiter().GetResult(); // know the language before the tray is built
 
             // Show the management window unless we were launched to stay in the tray or the settings
             // say to start hidden. A link launch does not hide it by itself: the setting is the only

@@ -38,7 +38,7 @@ internal partial class ForwardService
     private ForwardService()
     {
         NativeBridge.MessageReceived += HandleMessageAsync;
-        SettingsService.Changed += payload => _ = ApplyAsync(payload.Settings);
+        SettingsService.Instance.Changed += settings => _ = ApplyAsync(settings);
         _ = ApplyAsync(null);
     }
 
@@ -65,7 +65,7 @@ internal partial class ForwardService
         if (context.Payload<ForwardSendRequest>() is not { Url: { Length: > 0 } url } payload)
             return context.Fail("forward.send.result", "error.missingUrl");
 
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
         var device = settings.Devices.FirstOrDefault(candidate => candidate.Id == payload.DeviceId)
                      ?? settings.Devices.FirstOrDefault();
         if (device is null)
@@ -95,7 +95,7 @@ internal partial class ForwardService
 
     private async Task<NativeResponse?> InfoAsync(NativeContext context)
     {
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
 
         await _gate.WaitAsync();
         bool listening;
@@ -166,9 +166,9 @@ internal partial class ForwardService
     private async Task<NativeResponse?> RemoveAsync(NativeContext context)
     {
         var id = context.Payload<ForwardRemoveRequest>()?.DeviceId;
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
         if (settings.Devices.RemoveAll(device => device.Id == id) > 0)
-            await _settings.SaveAndPublishAsync(settings);
+            await _settings.SaveAsync(settings);
 
         return context.Reply("forward.remove.result", new OkPayload());
     }
@@ -181,7 +181,7 @@ internal partial class ForwardService
             Uri.CheckHostName(address) is UriHostNameType.Unknown)
             return context.Fail("forward.addAddress.result", "error.invalidAddress");
 
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
         if (settings.Devices.FirstOrDefault(device => device.Id == request.DeviceId) is not { } device)
             return context.Fail("forward.addAddress.result", "error.forwardNoDevice");
 
@@ -189,7 +189,7 @@ internal partial class ForwardService
             !device.Addresses.Contains(address, StringComparer.OrdinalIgnoreCase))
         {
             device.Addresses.Add(address);
-            await _settings.SaveAndPublishAsync(settings);
+            await _settings.SaveAsync(settings);
         }
 
         return context.Reply("forward.addAddress.result", new OkPayload());
@@ -201,10 +201,10 @@ internal partial class ForwardService
             request.Address?.Trim() is not { Length: > 0 } address)
             return context.Fail("forward.removeAddress.result", "error.invalidAddress");
 
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
         if (settings.Devices.FirstOrDefault(device => device.Id == request.DeviceId) is { } device &&
             device.Addresses.RemoveAll(candidate => candidate.Equals(address, StringComparison.OrdinalIgnoreCase)) > 0)
-            await _settings.SaveAndPublishAsync(settings);
+            await _settings.SaveAsync(settings);
 
         return context.Reply("forward.removeAddress.result", new OkPayload());
     }
@@ -223,7 +223,7 @@ internal partial class ForwardService
 
     private async Task RunPairingAsync(ForwardPairStartRequest request)
     {
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
         try
         {
             using var cts = new CancellationTokenSource(ForwardProtocol.PairTimeout + ForwardProtocol.ConnectionTimeout);
@@ -253,7 +253,7 @@ internal partial class ForwardService
     /// <summary>Brings the listener in line with the settings: it only runs while forwarding is on.</summary>
     private async Task ApplyAsync(AppSettings? settings)
     {
-        var current = settings ?? await _settings.GetAsync();
+        var current = settings ?? _settings.Current;
         _discovery.Apply(current, _identity);
         ForwardPresence.Instance.Apply(current);
 
@@ -403,7 +403,7 @@ internal partial class ForwardService
             return;
         }
 
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
         var transcript = ForwardCrypto.Transcript("URLCheck.Pair.v1",
             peerKey, Utf8(request.DeviceId), _identity.PublicKey, Utf8(settings.DeviceId), nonce);
 
@@ -478,7 +478,7 @@ internal partial class ForwardService
     /// </summary>
     private async Task HandleDiscoverAsync(NetworkStream stream, CancellationToken token)
     {
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
         await WriteMessageAsync(stream, new AnnounceMessage(ForwardProtocol.Announce, settings.DeviceId,
             settings.DeviceName, settings.ForwardPort, _identity.PublicKeyBase64), token);
     }
@@ -490,7 +490,7 @@ internal partial class ForwardService
         var nonce = ForwardCrypto.FromBase64(hello?.Nonce);
         var signature = ForwardCrypto.FromBase64(hello?.Signature);
 
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
         var device = settings.Devices.FirstOrDefault(candidate => candidate.Id == hello?.DeviceId);
         var peerKey = ForwardCrypto.FromBase64(device?.PublicKey);
 
@@ -564,7 +564,7 @@ internal partial class ForwardService
     /// <summary>Adds a newly paired device, or refreshes the address of one that was already known.</summary>
     private async Task SaveDeviceAsync(DeviceEntry peer)
     {
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
         var existing = settings.Devices.FirstOrDefault(device => device.Id == peer.Id);
 
         if (existing is null)
@@ -577,7 +577,7 @@ internal partial class ForwardService
             existing.PublicKey = peer.PublicKey;
         }
 
-        await _settings.SaveAndPublishAsync(settings);
+        await _settings.SaveAsync(settings);
     }
 
     private void Push(string type, object payload) =>

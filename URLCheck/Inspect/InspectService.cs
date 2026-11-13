@@ -34,7 +34,7 @@ internal partial class InspectService
         if (context.Payload<InspectRequest>() is not { Url: { Length: > 0 } url } payload)
             return context.Fail("inspect.status.result", "error.missingUrl");
 
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
 
         var result = await Try.Run(async () =>
         {
@@ -59,7 +59,7 @@ internal partial class InspectService
     /// </summary>
     public async Task<string?> ResolveRedirectAsync(string url)
     {
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
 
         using var cts = new CancellationTokenSource(settings.RequestTimeoutMs);
         using var request = new HttpRequestMessage(HttpMethod.Get, url);

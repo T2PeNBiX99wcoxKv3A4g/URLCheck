@@ -56,7 +56,7 @@ internal partial class FilterService
         NativeBridge.MessageReceived += HandleMessageAsync;
 
         // Saving the settings can turn the timer on, off or move its interval.
-        SettingsService.Changed += payload => ApplyAutoUpdate(payload.Settings);
+        SettingsService.Instance.Changed += ApplyAutoUpdate;
     }
 
     private Task<NativeResponse?> HandleMessageAsync(NativeContext context) => context.Request.Type switch

@@ -109,11 +109,7 @@ internal partial class WindowManager
         _clipboard.TextCopied += OnTextCopied;
         _pointerTimer = new(_ => PollPointer(), null, Timeout.Infinite, Timeout.Infinite);
 
-        SettingsService.Changed += payload =>
-        {
-            BroadcastEvent("settings.changed", payload);
-            ApplyClipboardWatching();
-        };
+        _settings.Changed += _ => ApplyClipboardWatching();
         NativeBridge.MessageReceived += HandleMessageAsync;
     }
 
@@ -156,14 +152,14 @@ internal partial class WindowManager
                 if (string.IsNullOrWhiteSpace(payload?.Url))
                     return context.Fail("popup.open.result", "error.missingUrl");
 
-                var settings = await _settings.GetAsync();
+                var settings = _settings.Current;
                 var browser = ResolveBrowser(settings, payload.BrowserId);
                 if (browser is null)
                     return context.Fail("popup.open.result", "error.noBrowser");
 
                 // Track usage so the most-used browser becomes the default entry.
                 browser.UseCount++;
-                await _settings.SaveAsync(settings);
+                await _settings.SaveSilentlyAsync(settings);
 
                 BrowserService.Launch(browser, payload.Url, payload.Private);
                 return context.Reply("popup.open.result", new BrowserOpenPayload(true, browser.Name));
@@ -344,7 +340,7 @@ internal partial class WindowManager
             return;
 
         current.BorderlessPopup = false;
-        _ = _settings.SaveAndPublishAsync(current);
+        _ = _settings.SaveAsync(current);
     }
 
     /// <summary>Runs an action on the UI thread, once the message loop is running.</summary>
@@ -629,7 +625,7 @@ internal partial class WindowManager
     /// </summary>
     private async Task<string> ResolveAutoRedirectAsync(string url)
     {
-        var settings = await _settings.GetAsync();
+        var settings = _settings.Current;
         var current = url;
 
         for (var hop = 0; hop < MaxAutoRedirects; hop++)

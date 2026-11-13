@@ -123,7 +123,7 @@ internal partial class ForwardPresence
     {
         try
         {
-            var settings = await SettingsService.Instance.GetAsync();
+            var settings = SettingsService.Instance.Current;
             var devices = settings.Devices;
 
             var results = await Task.WhenAll(devices.Select(async device =>
