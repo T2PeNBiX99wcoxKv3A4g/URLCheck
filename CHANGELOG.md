@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.15.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.15.1..v1.15.2) - 2026-11-13
+
+### ⚙️ Miscellaneous Tasks
+
+- Update @photino-net-utils/bridge to v0.25.1 and refresh associated libraries - ([bc4047e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/bc4047e27265f20f09ad2bbdf707d7afd5bb91b5))
+- Build with the .NET 11 SDK - ([2b4447c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2b4447c83a5873959851f6fa4623aa4760bc2242))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([f443ab1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f443ab11dd54bb3016601f574958012267691c06))
+
+
 ## [1.15.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.15.0..v1.15.1) - 2026-11-13
 
 ### 🐛 Bug Fixes
