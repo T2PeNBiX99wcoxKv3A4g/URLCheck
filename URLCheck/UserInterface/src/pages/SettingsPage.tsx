@@ -1,6 +1,32 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import styled, {css, keyframes} from "styled-components";
-import {AlertTriangleIcon, CheckCircleIcon, LinkIcon, TrashIcon} from "../components/Icons";
+import {
+    AlertTriangleIcon,
+    CheckCircleIcon,
+    CheckIcon,
+    DownloadIcon,
+    EditIcon,
+    ExternalLinkIcon,
+    FolderIcon,
+    GlobeIcon,
+    InfoIcon,
+    LayersIcon,
+    LinkIcon,
+    PaletteIcon,
+    PlusIcon,
+    PowerIcon,
+    RedirectIcon,
+    RefreshIcon,
+    SaveIcon,
+    SearchIcon,
+    SendIcon,
+    SettingsIcon,
+    ShieldCheckIcon,
+    TrashIcon,
+    UndoIcon,
+    UserIcon,
+    XIcon,
+} from "../components/Icons";
 import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
 import {Dropdown} from "../components/Dropdown";
 import {type LocalizationKey, loadStrings, Markdown, Native, type Translate, useLocale, useTranslation} from "@photino-net-utils/bridge";
@@ -309,6 +335,9 @@ const SettingsNav = styled.nav`
 `;
 
 const NavItem = styled.button<{ $active: boolean }>`
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
     padding: 6px 10px;
     border: 0;
     border-radius: 7px;
@@ -321,6 +350,11 @@ const NavItem = styled.button<{ $active: boolean }>`
     text-align: left;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
+
+    > svg {
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
 
     &:hover {
         background: var(--border-faint);
@@ -370,6 +404,9 @@ const FileInfo = styled.div`
 
 /** A quiet link at the very bottom of the page, opening the open-source notices. */
 const AttributionLink = styled.button`
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     align-self: flex-start;
     padding: 0;
     border: none;
@@ -955,6 +992,9 @@ const Tabs = styled.div`
 `;
 
 const Tab = styled.button<{ $active: boolean }>`
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 8px 14px;
     border: none;
     border-radius: 8px;
@@ -1093,6 +1133,21 @@ const SECTIONS = [
     "settings.startup",
     "settings.about",
 ] as const satisfies readonly LocalizationKey[];
+
+/** Icon shown before each quick-jump label. */
+const SECTION_ICONS = {
+    "settings.appearance": PaletteIcon,
+    "settings.network": GlobeIcon,
+    "settings.user_agent": UserIcon,
+    "settings.browsers": GlobeIcon,
+    "settings.forwarding": SendIcon,
+    "settings.forward_devices": LayersIcon,
+    "settings.system_integration": LinkIcon,
+    "settings.auto_redirect": RedirectIcon,
+    "settings.filter_lists": ShieldCheckIcon,
+    "settings.startup": PowerIcon,
+    "settings.about": InfoIcon,
+} satisfies Record<(typeof SECTIONS)[number], React.FC<{ size?: number }>>;
 
 /** Anchor id of a section; every card carries the matching one. */
 const anchorId = (key: LocalizationKey): LocalizationKey => key.replace(".", "-") as LocalizationKey;
@@ -1972,6 +2027,7 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" onClick={addUserAgent} disabled={busy}>
+                                <PlusIcon size={15}/>
                                 {t("settings.add_user_agent")}
                             </GhostButton>
                         </ButtonRow>
@@ -2024,9 +2080,11 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" onClick={addBrowser} disabled={busy}>
+                                <PlusIcon size={15}/>
                                 {t("settings.add_browser")}
                             </GhostButton>
                             <GhostButton type="button" onClick={handleDetectBrowsers} disabled={busy || detecting}>
+                                <SearchIcon size={15}/>
                                 {detecting ? t("settings.detecting") : t("settings.detect_installed")}
                             </GhostButton>
                         </ButtonRow>
@@ -2160,6 +2218,7 @@ export const SettingsPage: React.FC = () => {
                                                     disabled={!forwardingActive || !(addressInputs[device.id] ?? "").trim()}
                                                     onClick={handleAddAddress(device.id)}
                                                 >
+                                                    <PlusIcon size={15}/>
                                                     {t("settings.add_address")}
                                                 </GhostButton>
                                             </AddressAddRow>
@@ -2180,6 +2239,7 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" disabled={!forwardingActive} onClick={handleSearchOpen}>
+                                <SearchIcon size={15}/>
                                 {t("settings.forward_search")}
                             </GhostButton>
                         </ButtonRow>
@@ -2209,6 +2269,7 @@ export const SettingsPage: React.FC = () => {
                                     disabled={!forwardingActive || !manualHost.trim()}
                                     onClick={handleManualPair}
                                 >
+                                    <LinkIcon size={15}/>
                                     {t("settings.forward_pair")}
                                 </GhostButton>
                             </ButtonRow>
@@ -2232,6 +2293,7 @@ export const SettingsPage: React.FC = () => {
                             </GhostButton>
                             {platform === "windows" && (
                                 <GhostButton type="button" onClick={handleOpenDefaultApps} disabled={integrationBusy}>
+                                    <SettingsIcon size={15}/>
                                     {t("settings.open_default_apps")}
                                 </GhostButton>
                             )}
@@ -2309,6 +2371,7 @@ export const SettingsPage: React.FC = () => {
                             />
                             <GhostButton type="button" disabled={busy || newAutoRedirectHost.trim().length === 0}
                                          onClick={addAutoRedirectHost}>
+                                <PlusIcon size={15}/>
                                 {t("settings.add_auto_redirect")}
                             </GhostButton>
                         </ButtonRow>
@@ -2415,10 +2478,12 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" disabled={filtersBusy} onClick={() => setAddOpen(true)}>
+                                <PlusIcon size={15}/>
                                 {t("settings.add_filter_list")}
                             </GhostButton>
                             <GhostButton type="button" disabled={filtersBusy || filterLists.length === 0}
                                          onClick={handleCheckFilterUpdates}>
+                                <RefreshIcon size={15}/>
                                 {filtersBusy ? t("settings.filter_updating") : t("settings.check_filter_updates")}
                             </GhostButton>
                         </ButtonRow>
@@ -2470,19 +2535,23 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" disabled={updateBusy} onClick={handleCheckUpdate}>
+                                <RefreshIcon size={15}/>
                                 {updateBusy ? t("settings.update_checking") : t("settings.check_updates")}
                             </GhostButton>
                             {updateResult?.available && (
                                 <GhostButton type="button" onClick={handleOpenRelease}>
+                                    <ExternalLinkIcon size={15}/>
                                     {t("settings.open_release")}
                                 </GhostButton>
                             )}
                             {updateResult?.available && isWindows && (
                                 <GhostButton type="button" onClick={handleStartUpdate}>
+                                    <DownloadIcon size={15}/>
                                     {t("settings.update_download_install")}
                                 </GhostButton>
                             )}
                             <GhostButton type="button" onClick={handleOpenLogs}>
+                                <FolderIcon size={15}/>
                                 {t("settings.open_logs")}
                             </GhostButton>
                         </ButtonRow>
@@ -2507,16 +2576,21 @@ export const SettingsPage: React.FC = () => {
                 </SettingsSections>
 
                 <SettingsNav>
-                    {SECTIONS.map((key) => (
-                        <NavItem
-                            key={key}
-                            $active={activeSection === anchorId(key)}
-                            onClick={() => jumpTo(anchorId(key))}
-                            type="button"
-                        >
-                            {t(key)}
-                        </NavItem>
-                    ))}
+                    {SECTIONS.map((key) => {
+                        const Icon = SECTION_ICONS[key];
+
+                        return (
+                            <NavItem
+                                key={key}
+                                $active={activeSection === anchorId(key)}
+                                onClick={() => jumpTo(anchorId(key))}
+                                type="button"
+                            >
+                                <Icon size={14}/>
+                                {t(key)}
+                            </NavItem>
+                        );
+                    })}
                 </SettingsNav>
             </SettingsBody>
 
@@ -2526,17 +2600,21 @@ export const SettingsPage: React.FC = () => {
             </FileInfo>
 
             <AttributionLink type="button" onClick={() => setAttributionOpen(true)}>
+                <LinkIcon size={14}/>
                 {t("attribution.title")}
             </AttributionLink>
 
             <ActionRow>
                 <SaveButton onClick={handleSave} disabled={busy}>
+                    <SaveIcon size={16}/>
                     {loading ? t("settings.loading") : saving ? t("settings.saving") : t("settings.save")}
                 </SaveButton>
                 <DiscardButton $visible={unsaved} type="button" onClick={handleDiscard} disabled={busy}>
+                    <UndoIcon size={16}/>
                     {t("settings.discard")}
                 </DiscardButton>
                 <ResetButton onClick={handleReset} disabled={busy}>
+                    <RefreshIcon size={16}/>
                     {t("settings.reset")}
                 </ResetButton>
                 {saved && (
@@ -2589,11 +2667,13 @@ export const SettingsPage: React.FC = () => {
                         <ButtonRow>
                             {(updatePhase === "error" || updatePhase === "cancelled") && (
                                 <GhostButton type="button" onClick={closeUpdateDialog}>
+                                    <XIcon size={15}/>
                                     {t("settings.update_close")}
                                 </GhostButton>
                             )}
                             {(updatePhase === "changelog" || updatePhase === "downloading") && (
                                 <GhostButton type="button" onClick={handleCancelUpdate}>
+                                    <XIcon size={15}/>
                                     {t("settings.update_cancel")}
                                 </GhostButton>
                             )}
@@ -2609,9 +2689,11 @@ export const SettingsPage: React.FC = () => {
 
                         <Tabs>
                             <Tab type="button" $active={addTab === "catalog"} onClick={() => setAddTab("catalog")}>
+                                <LayersIcon size={15}/>
                                 {t("settings.filter_add_from_catalog")}
                             </Tab>
                             <Tab type="button" $active={addTab === "custom"} onClick={() => setAddTab("custom")}>
+                                <EditIcon size={15}/>
                                 {t("settings.filter_add_custom")}
                             </Tab>
                         </Tabs>
@@ -2630,6 +2712,7 @@ export const SettingsPage: React.FC = () => {
                                             ) : (
                                                 <GhostButton type="button" disabled={adding}
                                                              onClick={() => handleAddFilterList(entry.name, entry.url)}>
+                                                    <PlusIcon size={15}/>
                                                     {adding ? t("settings.filter_adding") : t("settings.filter_add")}
                                                 </GhostButton>
                                             )}
@@ -2661,6 +2744,7 @@ export const SettingsPage: React.FC = () => {
                                         <GhostButton type="button"
                                                      disabled={adding || !newFilterName.trim() || !newFilterUrl.trim()}
                                                      onClick={() => handleAddFilterList(newFilterName, newFilterUrl)}>
+                                            <PlusIcon size={15}/>
                                             {adding ? t("settings.filter_adding") : t("settings.filter_add")}
                                         </GhostButton>
                                     )}
@@ -2675,6 +2759,7 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" disabled={adding} onClick={() => setAddOpen(false)}>
+                                <XIcon size={15}/>
                                 {t("settings.filter_cancel")}
                             </GhostButton>
                         </ButtonRow>
@@ -2698,6 +2783,7 @@ export const SettingsPage: React.FC = () => {
                                             <CatalogName>{device.name || device.host}</CatalogName>
                                             <GhostButton type="button"
                                                          onClick={() => handlePair(device.host, device.port)}>
+                                                <LinkIcon size={15}/>
                                                 {t("settings.forward_pair")}
                                             </GhostButton>
                                         </CatalogItemHead>
@@ -2709,6 +2795,7 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" onClick={handleSearchClose}>
+                                <XIcon size={15}/>
                                 {t("settings.filter_cancel")}
                             </GhostButton>
                         </ButtonRow>
@@ -2738,6 +2825,7 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <GhostButton type="button" onClick={() => setPairing(null)}>
+                                <XIcon size={15}/>
                                 {t("settings.filter_cancel")}
                             </GhostButton>
                         </ButtonRow>
@@ -2757,9 +2845,11 @@ export const SettingsPage: React.FC = () => {
 
                         <ButtonRow>
                             <DangerGhostButton type="button" onClick={() => handlePairRespond(false)}>
+                                <XIcon size={15}/>
                                 {t("settings.forward_reject")}
                             </DangerGhostButton>
                             <SaveButton type="button" onClick={() => handlePairRespond(true)}>
+                                <CheckIcon size={16}/>
                                 {t("settings.forward_accept")}
                             </SaveButton>
                         </ButtonRow>
