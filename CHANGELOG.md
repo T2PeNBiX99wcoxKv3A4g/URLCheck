@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.17.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.16.2..v1.17.0) - 2026-11-14
+
+### ⛰️  Features
+
+- *(popup)* Share the inspected URL through the Windows share sheet - ([8e6fc41](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8e6fc4159e0008c3fa53baae9d0cadc39b65c4e6))
+
+### 🎨 Styling
+
+- *(popup)* Split the footer actions and browser button into centred rows - ([32052e6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/32052e64ccf04b9e345b3ed23764f3ddccae66ba))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update PhotinoNetUtils bridge to version 0.28.3 - ([6a91c42](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6a91c42fdbee8d3c15c6e46de39eca4ac53d8357))
+- Update PhotinoNetUtils bridge to version 0.28.2 - ([802433d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/802433de99047ae6383a6b03a1069bc52d8f0c90))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([ca1850c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ca1850c6de23f933f31346e02638201b00f693bb))
+
+
 ## [1.16.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.16.1..v1.16.2) - 2026-11-14
 
 ### ⚙️ Miscellaneous Tasks
