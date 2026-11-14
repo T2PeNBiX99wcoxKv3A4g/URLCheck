@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.17.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.0..v1.17.1) - 2026-11-14
+
+### 🎨 Styling
+
+- *(settings)* Add icons to every action and navigation button - ([ee057c0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ee057c06b939765891b2000ac2bd4a557578d3e5))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([cf5e60b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cf5e60b2190950fdaea8695ac54d4132a1721abd))
+
+
 ## [1.17.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.16.2..v1.17.0) - 2026-11-14
 
 ### ⛰️  Features
