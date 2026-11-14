@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.16.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.16.1..v1.16.2) - 2026-11-14
+
+### ⚙️ Miscellaneous Tasks
+
+- Update PhotinoNetUtils bridge to version 0.27.0 - ([ae0fb37](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/ae0fb3787a68858df3a0f6a2cd76ba2144280995))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([c110332](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/c110332df762cd120456069585ca95e56a324194))
+
+
 ## [1.16.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.16.0..v1.16.1) - 2026-11-13
 
 ### ⚙️ Miscellaneous Tasks
