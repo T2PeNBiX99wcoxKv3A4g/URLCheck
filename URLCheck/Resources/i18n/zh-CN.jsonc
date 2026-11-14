@@ -237,6 +237,8 @@
   "popup.choose_browser": "选择浏览器",
   "popup.copy": "复制",
   "popup.copied": "已复制！",
+  "popup.share": "分享",
+  "popup.share_tooltip": "用其他应用分享这个网址",
   "popup.send_to": "发送至",
   "popup.send_to_tooltip": "把这个网址转发给另一台设备",
   "popup.sent": "已发送！",
@@ -309,5 +311,6 @@
   "error.invalid_address": "这不是有效的地址。",
   "error.update_check_failed": "无法读取已发布的版本。",
   "error.open_logs_failed": "无法打开日志文件夹。",
-  "error.open_failed": "无法用系统默认处理程序打开此 URL。"
+  "error.open_failed": "无法用系统默认处理程序打开此 URL。",
+  "error.share_failed": "无法打开系统分享界面。"
 }

@@ -169,6 +169,35 @@ internal partial class WindowManager
                 CloseWindow(context.Window);
                 return null;
 
+            case "share.url":
+            {
+#if WINDOWS
+                var share = context.Payload<ShareUrlRequest>();
+                if (string.IsNullOrWhiteSpace(share?.Url))
+                    return context.Fail("share.url.result", "error.missing_url");
+
+                if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 10240))
+                    return context.Fail("share.url.result", "error.unsupported");
+
+                if (context.Window is not { } shareWindow)
+                    return context.Fail("share.url.result", "error.unsupported");
+
+                try
+                {
+                    WindowsShare.Show(shareWindow.WindowHandle, share.Url, share.Title);
+                }
+                catch (Exception exception)
+                {
+                    Log.Warning(exception, "Failed to open the Windows share sheet");
+                    return context.Fail("share.url.result", "error.share_failed");
+                }
+
+                return context.Reply("share.url.result", new OkPayload());
+#else
+                return context.Fail("share.url.result", "error.unsupported");
+#endif
+            }
+
             case "selection.hide":
                 HideSelectionButton();
                 return null;

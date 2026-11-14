@@ -8,6 +8,8 @@
         <Nullable>enable</Nullable>
         <!-- Required by the [LibraryImport] source generator -->
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <!-- WinRT interop goes through built-in COM; trimming disables it unless asked. -->
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <!-- Generate embedded file manifest when using the Photino.NET StaticFileServer -->
         <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
         <RootNamespace>URLCheck</RootNamespace>
@@ -46,6 +48,24 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows')) And ('$(RuntimeIdentifier)' == '' Or $([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win')))">
+        <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows')) And ('$(RuntimeIdentifier)' == '' Or $([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win')))">
+        <!-- The Windows share sheet lives in the WinRT projections. They are not part of the
+             target framework, so reference the SDK assemblies directly and ship them with the app. -->
+        <PackageDownload Include="Microsoft.Windows.SDK.NET.Ref" Version="[10.0.28000.87]" />
+        <Reference Include="Microsoft.Windows.SDK.NET">
+            <HintPath>$(NuGetPackageRoot)microsoft.windows.sdk.net.ref\10.0.28000.87\lib\net9.0\Microsoft.Windows.SDK.NET.dll</HintPath>
+            <Private>true</Private>
+        </Reference>
+        <Reference Include="WinRT.Runtime">
+            <HintPath>$(NuGetPackageRoot)microsoft.windows.sdk.net.ref\10.0.28000.87\lib\net9.0\WinRT.Runtime.dll</HintPath>
+            <Private>true</Private>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>

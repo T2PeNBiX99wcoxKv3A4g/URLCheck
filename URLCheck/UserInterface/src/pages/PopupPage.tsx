@@ -5,7 +5,7 @@ import {loadSettings} from "../api/settings";
 import {openWithBrowser} from "../api/browsers";
 import {type DevicePresence, forwardUrl, getDevicePresence} from "../api/forward";
 import {checkStatus, type StatusResult} from "../api/inspect";
-import {closePopup, resizePopup} from "../api/system";
+import {closePopup, getAppInfo, resizePopup, shareUrl} from "../api/system";
 import {loadFilterRules} from "../api/filters";
 import {type CompiledRules, compileRules, stripTrackingParams, trackingParamKeys} from "../data/filterRules";
 import {type LocalizationKey, Native, useTranslation} from "@photino-net-utils/bridge";
@@ -16,6 +16,7 @@ import {
     LockIcon,
     PlusIcon,
     SendIcon,
+    ShareIcon,
     ShieldCheckIcon,
     TrashIcon,
     XCircleIcon,
@@ -687,6 +688,8 @@ export const PopupPage: React.FC = () => {
             ? stripTrackingParams(value, rules)
             : value;
     const [error, setError] = useState<string | null>(null);
+    const [canShare, setCanShare] = useState(false);
+    const [sharing, setSharing] = useState(false);
     const [open, setOpen] = useState<SectionState>({domain: false, parameters: false, fragment: false});
 
     const contentRef = useRef<HTMLDivElement>(null);
@@ -814,6 +817,21 @@ export const PopupPage: React.FC = () => {
     /* The backend holds the URL back when it is too long for the start URL, and sends it once we are listening. */
     useEffect(() => {
         Native.send({type: "popup.ready"});
+    }, []);
+
+    /* The system share sheet only exists on Windows; elsewhere the button is simply not shown. */
+    useEffect(() => {
+        let cancelled = false;
+
+        getAppInfo()
+            .then((info) => {
+                if (!cancelled) setCanShare(info.platform === "windows");
+            })
+            .catch(() => undefined);
+
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
     /* the device list can change while the popup is open, since the settings live in another window */
@@ -1010,6 +1028,20 @@ export const PopupPage: React.FC = () => {
             setTimeout(() => setForwardedTo(null), 1500);
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
+        }
+    };
+
+    const handleShare = async () => {
+        if (!parsed) return;
+
+        setError(null);
+        setSharing(true);
+        try {
+            await shareUrl(url, parsed.host);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : String(err));
+        } finally {
+            setSharing(false);
         }
     };
 
@@ -1351,6 +1383,14 @@ export const PopupPage: React.FC = () => {
                                 </DropdownMenu>
                             )}
                         </ForwardGroup>
+                    )}
+
+                    {canShare && (
+                        <GhostButton onClick={handleShare} disabled={!parsed || sharing}
+                                     title={t("popup.share_tooltip")}>
+                            <ShareIcon size={13}/>
+                            {t("popup.share")}
+                        </GhostButton>
                     )}
 
                     <GhostButton onClick={handleCopy} disabled={!parsed}>

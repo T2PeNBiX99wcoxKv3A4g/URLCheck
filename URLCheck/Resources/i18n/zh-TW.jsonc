@@ -237,6 +237,8 @@
   "popup.choose_browser": "選擇瀏覽器",
   "popup.copy": "複製",
   "popup.copied": "已複製！",
+  "popup.share": "分享",
+  "popup.share_tooltip": "用其他應用程式分享這個網址",
   "popup.send_to": "傳送至",
   "popup.send_to_tooltip": "把這個網址轉傳給另一台裝置",
   "popup.sent": "已送出！",
@@ -309,5 +311,6 @@
   "error.invalid_address": "這不是有效的位址。",
   "error.update_check_failed": "無法讀取已發佈的版本。",
   "error.open_logs_failed": "無法開啟日誌資料夾。",
-  "error.open_failed": "無法用系統預設處理程式開啟此 URL。"
+  "error.open_failed": "無法用系統預設處理程式開啟此 URL。",
+  "error.share_failed": "無法開啟系統分享畫面。"
 }

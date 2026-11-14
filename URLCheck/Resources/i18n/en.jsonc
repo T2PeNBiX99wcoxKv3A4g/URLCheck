@@ -246,6 +246,8 @@
   "popup.choose_browser": "Choose browser",
   "popup.copy": "Copy",
   "popup.copied": "Copied!",
+  "popup.share": "Share",
+  "popup.share_tooltip": "Share this URL with another app",
   "popup.send_to": "Send to",
   "popup.send_to_tooltip": "Forward this URL to another device",
   "popup.sent": "Sent!",
@@ -322,5 +324,6 @@
   "error.invalid_address": "That is not a valid address.",
   "error.update_check_failed": "Could not read the published version.",
   "error.open_logs_failed": "Could not open the log folder.",
-  "error.open_failed": "Could not open the URL with the system default handler."
+  "error.open_failed": "Could not open the URL with the system default handler.",
+  "error.share_failed": "The system share sheet could not be opened."
 }

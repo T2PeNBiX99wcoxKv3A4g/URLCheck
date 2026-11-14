@@ -63,6 +63,11 @@ export function hideSelectionButton(): void {
     Native.send({type: "selection.hide"});
 }
 
+/** Hands a link to the system share sheet. Windows-only; the interface hides the button elsewhere. */
+export async function shareUrl(url: string, title?: string): Promise<void> {
+    await Native.request("share.url", {url, title});
+}
+
 /** Registers URLCheck as a candidate browser for http/https. */
 export async function registerProtocols(): Promise<{ executablePath: string }> {
     return await Native.request<{ executablePath: string }>("app.registerProtocols");

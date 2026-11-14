@@ -31,6 +31,7 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(PopupShowRequest))]
 [JsonSerializable(typeof(PopupOpenRequest))]
 [JsonSerializable(typeof(PopupResizeRequest))]
+[JsonSerializable(typeof(ShareUrlRequest))]
 [JsonSerializable(typeof(InspectRequest))]
 [JsonSerializable(typeof(LocaleRequest))]
 [JsonSerializable(typeof(OkPayload))]

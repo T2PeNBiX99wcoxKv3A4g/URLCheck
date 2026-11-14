@@ -17,6 +17,9 @@ internal sealed record PopupOpenRequest(string Url, string? BrowserId, bool Priv
 /// <summary>Payload for <c>popup.resize</c>.</summary>
 internal sealed record PopupResizeRequest(int Height);
 
+/// <summary>Payload for <c>share.url</c>: the link to hand to the system share sheet.</summary>
+internal sealed record ShareUrlRequest(string Url, string? Title = null);
+
 /// <summary>Payload for <c>forward.send</c>: the URL to forward and the target device.</summary>
 internal sealed record ForwardSendRequest(string Url, string? DeviceId);
 

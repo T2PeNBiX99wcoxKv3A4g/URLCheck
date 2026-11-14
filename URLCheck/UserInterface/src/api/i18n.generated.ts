@@ -41,6 +41,7 @@ declare module "@photino-net-utils/bridge"
         "error.script_update_no_version": true;
         "error.script_update_older": true;
         "error.script_update_too_large": true;
+        "error.share_failed": true;
         "error.timeout": true;
         "error.unknown": true;
         "error.unsupported": true;
@@ -104,6 +105,8 @@ declare module "@photino-net-utils/bridge"
         "popup.send_to": true;
         "popup.send_to_tooltip": true;
         "popup.sent": true;
+        "popup.share": true;
+        "popup.share_tooltip": true;
         "popup.tracking": true;
         "popup.user_agent_tooltip": true;
         "popup.use_https": true;

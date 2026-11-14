@@ -237,6 +237,8 @@
   "popup.choose_browser": "ブラウザを選択",
   "popup.copy": "コピー",
   "popup.copied": "コピーしました！",
+  "popup.share": "共有",
+  "popup.share_tooltip": "この URL を別のアプリで共有",
   "popup.send_to": "送信先",
   "popup.send_to_tooltip": "この URL を別のデバイスに転送",
   "popup.sent": "送信しました！",
@@ -309,5 +311,6 @@
   "error.invalid_address": "有効なアドレスではありません。",
   "error.update_check_failed": "公開されているバージョンを読み取れませんでした。",
   "error.open_logs_failed": "ログフォルダーを開けませんでした。",
-  "error.open_failed": "システムの既定のハンドラーで URL を開けませんでした。"
+  "error.open_failed": "システムの既定のハンドラーで URL を開けませんでした。",
+  "error.share_failed": "システムの共有画面を開けませんでした。"
 }
