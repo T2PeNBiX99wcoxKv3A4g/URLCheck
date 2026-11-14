@@ -538,10 +538,20 @@ const RemoveParam = styled.button`
 const Footer = styled.div`
     position: relative;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+`;
+
+/** One centred row of footer actions; wraps instead of squeezing a narrow popup. */
+const FooterRow = styled.div`
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: 7px;
-    margin-top: 2px;
+    width: 100%;
 `;
 
 const SplitButton = styled.div`
@@ -1332,71 +1342,75 @@ export const PopupPage: React.FC = () => {
                 )}
 
                 <Footer>
-                    <SplitButton ref={browserAnchor}>
-                        <OpenButton disabled={!canOpen} onClick={() => handleOpen()}>
-                            <ShieldCheckIcon size={14}/>
-                            <span>{t("popup.open", {browser: defaultBrowser?.name ?? t("popup.open_fallback")})}</span>
-                        </OpenButton>
-                        <ArrowButton
-                            disabled={browsers.length === 0}
-                            onClick={() => setBrowserMenuOpen((open) => !open)}
-                            title={t("popup.choose_browser")}
-                        >
-                            ▾
-                        </ArrowButton>
-                        {browserMenuOpen && (
-                            <DropdownMenu $up style={browserMenuStyle}>
-                                {browsers.map((browser) => (
-                                    <DropdownItem key={browser.id} onClick={() => handleOpen(browser.id)}>
-                                        {browser.name}
-                                    </DropdownItem>
-                                ))}
-                            </DropdownMenu>
+                    <FooterRow>
+                        <GhostButton $active={privateMode} onClick={() => setPrivateMode((value) => !value)}
+                                     title={t("popup.private_tooltip")}>
+                            <LockIcon size={13}/>
+                            {t("popup.private")}
+                        </GhostButton>
+
+                        {sendableDevices.length > 0 && (
+                            <ForwardGroup ref={forwardAnchor}>
+                                <GhostButton onClick={() => setForwardMenuOpen((open) => !open)}
+                                             disabled={!parsed}
+                                             title={t("popup.send_to_tooltip")}>
+                                    <SendIcon size={13}/>
+                                    {t("popup.send_to")}
+                                    <Caret $open={forwardMenuOpen}>▾</Caret>
+                                </GhostButton>
+                                {forwardMenuOpen && (
+                                    <DropdownMenu $up
+                                                  style={{...forwardMenuStyle, left: "auto", right: 0, maxWidth: 280}}>
+                                        {sendableDevices.map((device) => (
+                                            <DropdownItem key={device.id} onClick={() => handleForward(device.id)}>
+                                                {forwardedTo === device.id
+                                                    ? t("popup.sent")
+                                                    : device.name || device.host}
+                                            </DropdownItem>
+                                        ))}
+                                    </DropdownMenu>
+                                )}
+                            </ForwardGroup>
                         )}
-                    </SplitButton>
 
-                    <GhostButton $active={privateMode} onClick={() => setPrivateMode((value) => !value)}
-                                 title={t("popup.private_tooltip")}>
-                        <LockIcon size={13}/>
-                        {t("popup.private")}
-                    </GhostButton>
-
-                    {sendableDevices.length > 0 && (
-                        <ForwardGroup ref={forwardAnchor}>
-                            <GhostButton onClick={() => setForwardMenuOpen((open) => !open)}
-                                         disabled={!parsed}
-                                         title={t("popup.send_to_tooltip")}>
-                                <SendIcon size={13}/>
-                                {t("popup.send_to")}
-                                <Caret $open={forwardMenuOpen}>▾</Caret>
+                        {canShare && (
+                            <GhostButton onClick={handleShare} disabled={!parsed || sharing}
+                                         title={t("popup.share_tooltip")}>
+                                <ShareIcon size={13}/>
+                                {t("popup.share")}
                             </GhostButton>
-                            {forwardMenuOpen && (
-                                <DropdownMenu $up
-                                              style={{...forwardMenuStyle, left: "auto", right: 0, maxWidth: 280}}>
-                                    {sendableDevices.map((device) => (
-                                        <DropdownItem key={device.id} onClick={() => handleForward(device.id)}>
-                                            {forwardedTo === device.id
-                                                ? t("popup.sent")
-                                                : device.name || device.host}
+                        )}
+
+                        <GhostButton onClick={handleCopy} disabled={!parsed}>
+                            <CopyIcon size={13}/>
+                            {copied ? t("popup.copied") : t("popup.copy")}
+                        </GhostButton>
+                    </FooterRow>
+
+                    <FooterRow>
+                        <SplitButton ref={browserAnchor}>
+                            <OpenButton disabled={!canOpen} onClick={() => handleOpen()}>
+                                <ShieldCheckIcon size={14}/>
+                                <span>{t("popup.open", {browser: defaultBrowser?.name ?? t("popup.open_fallback")})}</span>
+                            </OpenButton>
+                            <ArrowButton
+                                disabled={browsers.length === 0}
+                                onClick={() => setBrowserMenuOpen((open) => !open)}
+                                title={t("popup.choose_browser")}
+                            >
+                                ▾
+                            </ArrowButton>
+                            {browserMenuOpen && (
+                                <DropdownMenu $up style={browserMenuStyle}>
+                                    {browsers.map((browser) => (
+                                        <DropdownItem key={browser.id} onClick={() => handleOpen(browser.id)}>
+                                            {browser.name}
                                         </DropdownItem>
                                     ))}
                                 </DropdownMenu>
                             )}
-                        </ForwardGroup>
-                    )}
-
-                    {canShare && (
-                        <GhostButton onClick={handleShare} disabled={!parsed || sharing}
-                                     title={t("popup.share_tooltip")}>
-                            <ShareIcon size={13}/>
-                            {t("popup.share")}
-                        </GhostButton>
-                    )}
-
-                    <GhostButton onClick={handleCopy} disabled={!parsed}>
-                        <CopyIcon size={13}/>
-                        {copied ? t("popup.copied") : t("popup.copy")}
-                    </GhostButton>
+                        </SplitButton>
+                    </FooterRow>
                 </Footer>
             </Content>
         </Root>
