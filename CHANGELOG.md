@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.17.4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.3..v1.17.4) - 2026-11-15
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([611ecaf](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/611ecaf9d3958b4d5bcf0b702f70e54cfb375a36))
+
+### Build
+
+- Pick up PhotinoNETUtils 0.29.2 - ([cf39cff](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cf39cff8ddb6d1ac18e1ed1f7181acea72686fab))
+
+
 ## [1.17.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.2..v1.17.3) - 2026-11-15
 
 ### Action
