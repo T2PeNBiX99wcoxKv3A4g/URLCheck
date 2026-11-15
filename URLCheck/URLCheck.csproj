@@ -50,11 +50,11 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64' Or ('$(RuntimeIdentifier)' == '' And '$(NETCoreSdkPortableRuntimeIdentifier)' == 'win-x64')">
+    <PropertyGroup Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And $([System.String]::Copy('$(NETCoreSdkPortableRuntimeIdentifier)').StartsWith('win')))">
         <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64' Or ('$(RuntimeIdentifier)' == '' And '$(NETCoreSdkPortableRuntimeIdentifier)' == 'win-x64')">
+    <ItemGroup Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And $([System.String]::Copy('$(NETCoreSdkPortableRuntimeIdentifier)').StartsWith('win')))">
         <!-- The Windows share sheet lives in the WinRT projections. They are not part of the
              target framework, so reference the SDK assemblies directly and ship them with the app. -->
         <PackageDownload Include="Microsoft.Windows.SDK.NET.Ref" Version="[10.0.28000.87]" />
