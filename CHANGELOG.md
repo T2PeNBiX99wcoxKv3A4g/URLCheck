@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.17.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.2..v1.17.3) - 2026-11-15
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([30f30f0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/30f30f0c7b475e1e8fd86d658ac20ac4c68ff4e9))
+
+### Build
+
+- Treat every Windows runtime identifier as Windows - ([c298f97](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/c298f972a55707065bdf236d69f8830ead32360b))
+- Follow the runtime identifier for the Windows projection - ([b606333](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b60633384d5ebac4c9cc9b8a220c39d4fd109526))
+
+
 ## [1.17.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.1..v1.17.2) - 2026-11-14
 
 ### ⚙️ Miscellaneous Tasks
