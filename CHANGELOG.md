@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.18.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.8..v1.18.0) - 2026-11-16
+
+### ⛰️  Features
+
+- *(site)* One install panel, split by system - ([541c586](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/541c586e28fa3184d9897ef75dd4ec29c7d78aa6))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([173d1a5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/173d1a5cd8a18c448790e9c9f3d9679c0e028278))
+
+
 ## [1.17.8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.7..v1.17.8) - 2026-11-16
 
 ### 📚 Documentation
