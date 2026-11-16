@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.17.7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.6..v1.17.7) - 2026-11-16
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([68d3b38](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/68d3b382898d49870f9a5489076d3dabfde5f7ee))
+
+### Build
+
+- *(site)* Take the shared site with the phone header fix - ([48111e6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/48111e671d9aca423ec4a32c1dcfb09f19b4f00c))
+
+
 ## [1.17.6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.5..v1.17.6) - 2026-11-16
 
 ### 🚜 Refactor
