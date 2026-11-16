@@ -47,9 +47,7 @@
       }
     ],
     "installTitle": "インストール",
-    "installBefore": "自己完結したビルドです。.NET ランタイムを同梱しているので、ほかに何もインストールする必要はありません。Windows では WebView2 ランタイム、Linux では WebKitGTK と AppIndicator ライブラリも必要です（",
     "readme": "README",
-    "installAfter": " を参照）。お使いのシステムを選ぶと最新リリースが開くので、対応するファイルをダウンロードしてください。",
     "platforms": [
       {
         "name": "Windows",
@@ -68,7 +66,8 @@
         "note": "x86_64（.pkg.tar.zst）"
       }
     ],
-    "webView2Note": "Windows 11 には WebView2 ランタイムが含まれます。Windows 10 にはないため、起動前に {link} からインストールしてください。"
+    "installWindows": "ビルドは自己完結型で、.NET ランタイムを同梱しています。Windows 11 には WebView2 ランタイムが含まれています。Windows 10 では {link} から先にインストールしてください。",
+    "installLinux": "ビルドは自己完結型で、.NET ランタイムを同梱しています。Linux では WebKitGTK と AppIndicator ライブラリ が必要で、パッケージが自動的に導入します。"
   },
   "scripts": {
     "title": "スクリプト",

@@ -47,9 +47,7 @@
       }
     ],
     "installTitle": "Install",
-    "installBefore": "Self-contained builds: the .NET runtime is bundled, so nothing else needs to be installed. Linux needs WebKitGTK and the AppIndicator library (see the",
     "readme": "README",
-    "installAfter": "). Pick your system to open the latest release and download the matching file.",
     "platforms": [
       {
         "name": "Windows",
@@ -68,7 +66,8 @@
         "note": "x86_64 (.pkg.tar.zst)"
       }
     ],
-    "webView2Note": "Windows 11 includes the WebView2 runtime. Windows 10 does not: install it from {link} before the first launch."
+    "installWindows": "The build is self-contained: the .NET runtime is bundled. Windows 11 includes the WebView2 runtime; Windows 10 needs it installed first, from {link}.",
+    "installLinux": "The build is self-contained: the .NET runtime is bundled. Linux needs WebKitGTK and the AppIndicator library, which the packages pull in."
   },
   "scripts": {
     "title": "Scripts",

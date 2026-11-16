@@ -47,9 +47,7 @@
       }
     ],
     "installTitle": "安装",
-    "installBefore": "自包含构建：已内置 .NET 运行时，不需要另外安装。Linux 需要 WebKitGTK 和 AppIndicator 库（见",
     "readme": "README",
-    "installAfter": "）。选择你的系统会打开最新版本页面，下载对应的文件即可。",
     "platforms": [
       {
         "name": "Windows",
@@ -68,7 +66,8 @@
         "note": "x86_64（.pkg.tar.zst）"
       }
     ],
-    "webView2Note": "Windows 11 已内置 WebView2 运行时；Windows 10 没有，请先从 {link} 安装后再启动。"
+    "installWindows": "构建版本是自包含的：.NET 运行时已一并打包。Windows 11 已内置 WebView2 运行时；Windows 10 需要先安装，请从 {link} 获取。",
+    "installLinux": "构建版本是自包含的：.NET 运行时已一并打包。Linux 需要 WebKitGTK 和 AppIndicator 库，安装包会自动带上。"
   },
   "scripts": {
     "title": "脚本",
