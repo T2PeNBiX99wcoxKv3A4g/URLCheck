@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.17.6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.5..v1.17.6) - 2026-11-16
+
+### 🚜 Refactor
+
+- *(site)* Build the site from the shared package - ([d9ed439](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d9ed439bf1add5e71e84a36cae575bdfb3eb1e09))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([98dddf7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/98dddf72672c6b6c42c1edffe3a9ffc83d581006))
+
+
 ## [1.17.5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.4..v1.17.5) - 2026-11-16
 
 ### Action
