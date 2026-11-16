@@ -67,7 +67,8 @@
         "name": "Arch Linux",
         "note": "x86_64（.pkg.tar.zst）"
       }
-    ]
+    ],
+    "webView2Note": "Windows 11 には WebView2 ランタイムが含まれます。Windows 10 にはないため、起動前に {link} からインストールしてください。"
   },
   "scripts": {
     "title": "スクリプト",

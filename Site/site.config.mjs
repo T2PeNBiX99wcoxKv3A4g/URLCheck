@@ -8,6 +8,7 @@ export const site = {
     description: "URLCheck shows where a link really goes before it opens in your browser.",
     url: "https://t2penbix99wcoxkv3a4g.github.io/URLCheck/",
     icon: "https://raw.githubusercontent.com/T2PeNBiX99wcoxKv3A4g/URLCheck/master/icon.svg",
+    webView2Url: "https://developer.microsoft.com/microsoft-edge/webview2/",
     repository: "https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck",
     languages: ["en", "ja", "zh-CN", "zh-TW"],
     docs: [

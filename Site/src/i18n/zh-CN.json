@@ -47,7 +47,7 @@
       }
     ],
     "installTitle": "安装",
-    "installBefore": "自包含构建：已内置 .NET 运行时，不需要另外安装。Windows 还需要 WebView2 运行时；Linux 需要 WebKitGTK 和 AppIndicator 库（见 ",
+    "installBefore": "自包含构建：已内置 .NET 运行时，不需要另外安装。Linux 需要 WebKitGTK 和 AppIndicator 库（见",
     "readme": "README",
     "installAfter": "）。选择你的系统会打开最新版本页面，下载对应的文件即可。",
     "platforms": [
@@ -67,7 +67,8 @@
         "name": "Arch Linux",
         "note": "x86_64（.pkg.tar.zst）"
       }
-    ]
+    ],
+    "webView2Note": "Windows 11 已内置 WebView2 运行时；Windows 10 没有，请先从 {link} 安装后再启动。"
   },
   "scripts": {
     "title": "脚本",

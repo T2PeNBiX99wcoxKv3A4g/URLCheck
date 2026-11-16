@@ -94,8 +94,8 @@ URL を確認せずにリンクを開くのは危険です。このソフトウ�
 
 ### Windows
 
-1. Microsoft Edge の **WebView2 Runtime**。Windows 11 以外を使っている場合は必要です。
-   [Microsoft のページ](https://developer.microsoft.com/microsoft-edge/webview2/)。
+1. Microsoft Edge の **WebView2 ランタイム**。Windows 11 には含まれています。Windows 10 では別途インストールが必要です。
+   [Microsoft のページ](https://developer.microsoft.com/microsoft-edge/webview2/) から入手してください。
 2. Windows 11 より前のバージョンは公式にはサポートされません。
    問題が発生した場合は、ご自身で解決する必要があります。
 3. タイル型ウィンドウ マネージャーには、フローティング ボタンを対象外にするよう設定する必要が

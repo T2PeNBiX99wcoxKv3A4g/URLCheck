@@ -86,8 +86,8 @@ URLCheck 會將自己註冊為連結處理程式，因此點擊 `http`/`https` �
 
 ### Windows
 
-1. Microsoft Edge **WebView2 Runtime**。如果你不是使用 Windows 11，就需要它。
-   [Microsoft 的頁面](https://developer.microsoft.com/microsoft-edge/webview2/)。
+1. Microsoft Edge **WebView2 執行階段**。Windows 11 已內建；Windows 10 需要先安裝，請從
+   [Microsoft 的頁面](https://developer.microsoft.com/microsoft-edge/webview2/) 取得。
 2. 任何低於 11 的 Windows 版本都不在官方支援範圍內。
    若遇到任何問題，你需要自行解決。
 3. 必須告訴平鋪式視窗管理員不要干預浮動按鈕：它的 web view 需要視窗短暫可見才能啟動，

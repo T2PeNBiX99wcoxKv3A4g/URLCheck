@@ -77,8 +77,8 @@ URLCheck 会把自身注册为链接处理器，因此点击 `http`/`https` 链�
 
 ### Windows
 
-1. Microsoft Edge **WebView2 运行时**。如果你用的不是 Windows 11，就需要它。
-   参见[微软页面](https://developer.microsoft.com/microsoft-edge/webview2/)。
+1. Microsoft Edge **WebView2 运行时**。Windows 11 已内置；Windows 10 需要安装，请从
+   [Microsoft 的页面](https://developer.microsoft.com/microsoft-edge/webview2/) 获取。
 2. 低于 Windows 11 的任何版本均不受官方支持。
    如果遇到任何问题，你需要自行解决。
 3. 平铺式窗口管理器需要被告知不要接管浮动按钮：它的 Web 视图需要窗口短暂可见才能启动，因此会平铺它的窗口管理器

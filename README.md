@@ -92,7 +92,7 @@ Four package formats are published beside the plain archives:
 
 ### Windows
 
-1. The Microsoft Edge **WebView2 Runtime**. If you are not using Windows 11, you need it.
+1. The Microsoft Edge **WebView2 Runtime**. Windows 11 includes it; Windows 10 needs it, from
    [Microsoft's page](https://developer.microsoft.com/microsoft-edge/webview2/).
 2. Any Windows version lower than 11 is not officially supported.
    If you have any issues, You need to fix by yourself.
