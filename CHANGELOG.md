@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.17.5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.4..v1.17.5) - 2026-11-16
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([c863f76](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/c863f763f435539360a817189193aed79371e079))
+
+### Build
+
+- *(ui)* Take the build scripts from the shared bridge - ([2728d49](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/2728d4999cc84800b4154fd353e4c686fc4c75df))
+
+
 ## [1.17.4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.3..v1.17.4) - 2026-11-15
 
 ### Action
