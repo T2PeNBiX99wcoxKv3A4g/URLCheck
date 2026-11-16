@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.17.8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.7..v1.17.8) - 2026-11-16
+
+### 📚 Documentation
+
+- Correct what Windows 10 needs before the first launch - ([cd30dea](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cd30dea9a018cf2fce833ffe43655d834585caea))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([585065a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/585065ad8587b29f324af2cfc14d1a8c83f4c2d8))
+
+
 ## [1.17.7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.17.6..v1.17.7) - 2026-11-16
 
 ### Action
