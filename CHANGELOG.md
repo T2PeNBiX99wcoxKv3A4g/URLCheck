@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.18.1..v1.18.2) - 2026-11-20
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([8c524e8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/8c524e8aa046f503fa89de12305be142b28bf5d4))
+
+
 ## [1.18.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.18.0..v1.18.1) - 2026-11-20
 
 ### Action
