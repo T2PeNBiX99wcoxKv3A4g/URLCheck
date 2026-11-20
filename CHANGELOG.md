@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.18.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.18.2..v1.18.3) - 2026-11-20
+
+### ⚙️ Miscellaneous Tasks
+
+- *(libs)* Update the shared bridge to 0.39.1 - ([b3252e9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b3252e9087c724db9d509b8a02c6e552e5c50c74))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([d2a78e6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d2a78e6a11eb0f9c20e9ce6dc1566370ae92290a))
+
+
 ## [1.18.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.18.1..v1.18.2) - 2026-11-20
 
 ### Action
