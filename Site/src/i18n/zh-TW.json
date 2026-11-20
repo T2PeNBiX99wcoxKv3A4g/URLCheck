@@ -78,6 +78,7 @@
   },
   "docs": {
     "scripting": "腳本",
-    "libraries": "函式庫"
+    "libraries": "函式庫",
+    "history": "更新紀錄"
   }
 }

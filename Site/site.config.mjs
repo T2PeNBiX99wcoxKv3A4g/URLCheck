@@ -47,6 +47,11 @@ export const site = {
         {
             "slug": "bit32",
             "group": "libraries"
+        },
+        {
+            "slug": "Changelog",
+            "group": "history",
+            "source": "../CHANGELOG.md"
         }
     ],
     theme: {

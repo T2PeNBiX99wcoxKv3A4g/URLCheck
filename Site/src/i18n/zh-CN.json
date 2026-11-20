@@ -78,6 +78,7 @@
   },
   "docs": {
     "scripting": "脚本",
-    "libraries": "函数库"
+    "libraries": "函数库",
+    "history": "更新记录"
   }
 }
