@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.19.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.18.3..v1.19.0) - 2026-11-20
+
+### ⛰️  Features
+
+- *(site)* Read the changelog from GitHub first - ([0846efc](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0846efc0263af3e3894563db6d8d322dd73978a2))
+- *(site)* Add a changelog page - ([669a3ed](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/669a3eda0e8ac5590a535c9e0f2d131b2a184257))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([75aa0fa](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/75aa0fa9b78b8f40bb8c8c57365a38428c81bf10))
+
+
 ## [1.18.3](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.18.2..v1.18.3) - 2026-11-20
 
 ### ⚙️ Miscellaneous Tasks
