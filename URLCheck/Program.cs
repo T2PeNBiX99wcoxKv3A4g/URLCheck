@@ -75,7 +75,9 @@ internal static class Program
             // Kestrel binds to an OS-assigned port, so several Photino apps can run side by side
             // without racing for the default 8000. The content root is a folder we own, which keeps
             // the web root out of the executable's directory.
-            using var staticServer = StaticServer.Start(Constants.DataDirectory);
+            using var staticServer = StaticServer.Start(Constants.DataDirectory,
+                map: (app, token) => DataRoutes.Map(app, token));
+            DataPlaneService.DataUrl = staticServer.DataUrl;
             var appUrl = $"{staticServer.BaseUrl}/index.html?v={AppIdentity.BuildToken}";
 #else
             const string appUrl = "http://127.0.0.1:3000";

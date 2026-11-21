@@ -78,21 +78,28 @@ internal partial class HistoryService
         _ => Task.FromResult<NativeResponse?>(null)
     };
 
-    private async Task<NativeResponse?> ListAsync(NativeContext context)
+    private async Task<NativeResponse?> ListAsync(NativeContext context) =>
+        context.Reply("history.list.result", new HistoryListPayload(await DataEntriesAsync()));
+
+    /// <summary>The newest entries, for the binary data route.</summary>
+    public async Task<IReadOnlyList<HistoryItemPayload>> DataEntriesAsync(int limit = 500,
+        CancellationToken cancellationToken = default)
     {
-        await _gate.WaitAsync();
+        await _gate.WaitAsync(cancellationToken);
         try
         {
             await using var connection = await OpenAsync();
             await using var command = connection.CreateCommand();
-            command.CommandText = "SELECT Id, Url, Timestamp FROM History ORDER BY Timestamp DESC LIMIT 500";
+            command.CommandText =
+                "SELECT Id, Url, Timestamp FROM History ORDER BY Timestamp DESC LIMIT $limit";
+            command.Parameters.AddWithValue("$limit", limit);
 
             var entries = new List<HistoryItemPayload>();
-            await using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            while (await reader.ReadAsync(cancellationToken))
                 entries.Add(new(reader.GetInt32(0), reader.GetString(1), reader.GetInt64(2)));
 
-            return context.Reply("history.list.result", new HistoryListPayload(entries));
+            return entries;
         }
         finally
         {

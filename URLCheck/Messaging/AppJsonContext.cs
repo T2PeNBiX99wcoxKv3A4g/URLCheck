@@ -8,6 +8,7 @@ using PhotinoNetUtils.Updates;
 using URLCheck.Filters;
 using URLCheck.Forward;
 using URLCheck.Models;
+using URLCheck.Services;
 
 namespace URLCheck.Messaging;
 
@@ -70,6 +71,7 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(StartupRequest))]
 [JsonSerializable(typeof(LocalePayload))]
 [JsonSerializable(typeof(HistoryListPayload))]
+[JsonSerializable(typeof(DataBasePayload))]
 [JsonSerializable(typeof(InspectStatusPayload))]
 [JsonSerializable(typeof(FilterListEntry))]
 [JsonSerializable(typeof(List<FilterListEntry>))]

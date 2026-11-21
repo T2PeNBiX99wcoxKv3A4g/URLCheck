@@ -291,6 +291,21 @@ internal partial class FilterService
         }
     }
 
+    /// <summary>The effective rules, for the binary data route.</summary>
+    public async Task<IReadOnlyList<RemoveParamRule>> DataRulesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        await _gate.WaitAsync(cancellationToken);
+        try
+        {
+            return await EffectiveRulesAsync();
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
     /// <summary>The built-in rules plus every enabled list. Callers hold the gate.</summary>
     private async Task<List<RemoveParamRule>> EffectiveRulesAsync()
     {

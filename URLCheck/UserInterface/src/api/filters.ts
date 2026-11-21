@@ -1,4 +1,5 @@
 import {Native} from "@photino-net-utils/bridge";
+import {data} from "./data";
 
 export interface FilterListEntry {
     id: string;
@@ -67,7 +68,30 @@ export async function updateFilterLists(id?: string): Promise<FilterListsPayload
 /** Every rule the popup should apply: the built-in list plus every enabled installed list. */
 export async function loadFilterRules(): Promise<RemoveParamRule[]> {
     if (!Native.available) return [];
-    return (await Native.request<FilterRulesPayload>("filters.rules")).rules;
+
+    try {
+        const page = await data.readBlock("/filter-rules");
+        return page.rows.map((row) => ({
+            pattern: String(row.pattern),
+            regex: Number(row.regex) !== 0,
+            urlPattern: text(row.urlPattern) || null,
+            include: list(row.include),
+            exclude: list(row.exclude),
+            urlExceptions: list(row.urlExceptions),
+        }));
+    } catch {
+        // The Vite dev server has no data plane; keep the bridge as the fallback.
+        return (await Native.request<FilterRulesPayload>("filters.rules")).rules;
+    }
+}
+
+function text(value: string | number | undefined): string {
+    return typeof value === "string" ? value : "";
+}
+
+function list(value: string | number | undefined): string[] | null {
+    const joined = text(value);
+    return joined.length > 0 ? joined.split("\u001f") : null;
 }
 
 interface FilterRulesPayload {
