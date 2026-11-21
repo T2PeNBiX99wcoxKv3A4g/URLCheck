@@ -531,7 +531,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     opacity: 0.75;
     transition: transform 0.18s ease;
     transform: rotate(${e=>e.$open?`180deg`:`0`});
-`,Nl=({value:e,options:t,onChange:n,variant:r=`compact`,up:i,disabled:a,title:o})=>{let[s,c]=(0,_.useState)(!1),l=(0,_.useRef)(null),u=(0,_.useRef)(null),[d,f]=(0,_.useState)({});(0,_.useLayoutEffect)(()=>{if(!s)return;let e=()=>{let e=l.current?.getBoundingClientRect();if(!e)return;let t=u.current?.offsetWidth??Math.max(200,e.width),n=Math.max(8,Math.min(e.left,window.innerWidth-t-8)),r=i?e.top-8:window.innerHeight-e.bottom-8;f({position:`fixed`,left:n,zIndex:50,maxHeight:Math.max(120,Math.floor(r-5)),...i?{bottom:window.innerHeight-e.top+5}:{top:e.bottom+5}})};return e(),window.addEventListener(`resize`,e),window.addEventListener(`scroll`,e,!0),()=>{window.removeEventListener(`resize`,e),window.removeEventListener(`scroll`,e,!0)}},[s,i]),(0,_.useEffect)(()=>{if(!s)return;let e=e=>{let t=e.target;!l.current?.contains(t)&&!u.current?.contains(t)&&c(!1)},t=e=>{e.key===`Escape`&&c(!1)},n=()=>c(!1);return document.addEventListener(`mousedown`,e),document.addEventListener(`keydown`,t),window.addEventListener(`blur`,n),()=>{document.removeEventListener(`mousedown`,e),document.removeEventListener(`keydown`,t),window.removeEventListener(`blur`,n)}},[s]);let p=t.find(t=>t.value===e)?.label??e;return(0,F.jsxs)(Ol,{ref:l,children:[(0,F.jsxs)(Al,{type:`button`,$variant:r,disabled:a,title:o,"aria-haspopup":`listbox`,"aria-expanded":s,onClick:()=>c(e=>!e),children:[(0,F.jsx)(jl,{children:p}),(0,F.jsx)(Ml,{$open:s,children:`▾`})]}),s&&(0,Cl.createPortal)((0,F.jsx)(El,{$up:i,role:`listbox`,ref:u,style:d,children:t.map(t=>(0,F.jsx)(Dl,{type:`button`,role:`option`,"aria-selected":t.value===e,$active:t.value===e,onClick:()=>{c(!1),n(t.value)},children:t.label},t.value))}),document.body)]})},Pl={requestTimeoutMs:5e3,userAgents:[],browsers:[],language:`system`,theme:`system`,borderlessPopup:!0,autoStripTrackingParams:!0,autoRedirectHosts:[],hideOnLaunch:!1,showUrlButton:!0,allowScriptNetwork:!1,selectedUserAgentId:`default`,deviceName:``,deviceId:``,forwardingEnabled:!1,forwardPort:45454,filterAutoUpdate:!1,filterAutoUpdateMinutes:1440,devices:[]},Fl=`urlcheck.settings`;function Il(e,t,n){return Math.min(Math.max(e,t),n)}function Ll(e){return e===-1?-1:e===void 0||!Number.isFinite(e)?Pl.filterAutoUpdateMinutes:Il(e,1,10080)}function Rl(e){let t=Array.isArray(e.userAgents)?e.userAgents:Pl.userAgents;return{...e,requestTimeoutMs:Il(e.requestTimeoutMs,1e3,15e3),userAgents:t,selectedUserAgentId:t.some(t=>t.id===e.selectedUserAgentId)?e.selectedUserAgentId:t[0].id,browsers:(Array.isArray(e.browsers)?e.browsers:[]).map(e=>({...e,arguments:e.arguments??``,useCount:e.useCount??0})),language:e.language||Pl.language,theme:e.theme===`light`||e.theme===`dark`?e.theme:Pl.theme,borderlessPopup:e.borderlessPopup??Pl.borderlessPopup,autoStripTrackingParams:e.autoStripTrackingParams??Pl.autoStripTrackingParams,autoRedirectHosts:(Array.isArray(e.autoRedirectHosts)?e.autoRedirectHosts:[]).map(e=>e.trim().toLowerCase()).filter(e=>e.length>0),hideOnLaunch:e.hideOnLaunch??Pl.hideOnLaunch,showUrlButton:e.showUrlButton??Pl.showUrlButton,allowScriptNetwork:e.allowScriptNetwork??Pl.allowScriptNetwork,deviceName:e.deviceName??Pl.deviceName,deviceId:e.deviceId??Pl.deviceId,forwardingEnabled:e.forwardingEnabled??Pl.forwardingEnabled,forwardPort:e.forwardPort??Pl.forwardPort,filterAutoUpdate:e.filterAutoUpdate??Pl.filterAutoUpdate,filterAutoUpdateMinutes:Ll(e.filterAutoUpdateMinutes),devices:(Array.isArray(e.devices)?e.devices:[]).map(e=>({...e,host:e.host??``,port:e.port??Pl.forwardPort,publicKey:e.publicKey??``,addresses:Array.isArray(e.addresses)?e.addresses:[]}))}}function zl(){try{let e=window.localStorage.getItem(Fl);if(e)return Rl({...Pl,...JSON.parse(e)})}catch(e){console.warn(`[settings] Failed to read local settings:`,e)}return{...Pl}}async function Bl(){return L.available?await L.request(`settings.get`):{settings:zl(),settingsFilePath:`(browser localStorage)`}}async function Vl(e){let t=Rl(e);return L.available?await L.request(`settings.save`,t):(window.localStorage.setItem(Fl,JSON.stringify(t)),{settings:t,settingsFilePath:`(browser localStorage)`})}async function Hl(){return L.available?await L.request(`settings.reset`):(window.localStorage.removeItem(Fl),{settings:{...Pl},settingsFilePath:`(browser localStorage)`})}async function Ul(e){L.available&&await L.request(`settings.add_auto_redirect`,{url:e})}async function Wl(){return L.available?(await L.request(`browsers.detect`)).browsers??[]:[]}async function Gl(e,t,n=!1){L.available?await L.request(`popup.open`,{url:e,browserId:t,private:n}):window.open(e,`_blank`,`noopener,noreferrer`)}var Kl={deviceId:``,deviceName:``,port:0,addresses:[],enabled:!1,listening:!1,publicKey:``};async function ql(){return L.available?await L.request(`forward.info`):Kl}async function Jl(e,t){await L.request(`forward.send`,{url:e,deviceId:t})}async function Yl(){if(!L.available)return new Set;let e=await L.request(`forward.presence`);return new Set(e.online??[])}function Xl(){L.send({type:`forward.discoverStart`})}function Zl(){L.send({type:`forward.discoverStop`})}function Ql(e,t){L.send({type:`forward.pair`,payload:{host:e,port:t}})}function $l(e,t){L.send({type:`forward.pairRespond`,payload:{requestId:e,accept:t}})}async function eu(){return L.available?await L.request(`forward.pendingPairing`)??null:null}function tu(e){L.send({type:`forward.remove`,payload:{deviceId:e}})}async function nu(e,t){await L.request(`forward.addAddress`,{deviceId:e,address:t})}function ru(e,t){L.send({type:`forward.removeAddress`,payload:{deviceId:e,address:t}})}var iu={lists:[],builtinRuleCount:0};async function au(){return L.available?await L.request(`filters.get`):iu}async function ou(e,t){return await L.request(`filters.add`,{name:e,url:t})}async function su(e){return await L.request(`filters.remove`,{id:e})}async function cu(e,t){return await L.request(`filters.setEnabled`,{id:e,enabled:t})}async function lu(e){return await L.request(`filters.update`,{id:e??``})}async function uu(){if(!L.available)return[];try{return(await Mc.readBlock(`/filter-rules`)).rows.map(e=>({pattern:String(e.pattern),regex:Number(e.regex)!==0,urlPattern:du(e.urlPattern)||null,include:fu(e.include),exclude:fu(e.exclude),urlExceptions:fu(e.urlExceptions)}))}catch{return(await L.request(`filters.rules`)).rules}}function du(e){return typeof e==`string`?e:``}function fu(e){let t=du(e);return t.length>0?t.split(``):null}var pu=[{name:`AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_17_TrackParam/filter.txt`,descriptionKey:`filters.catalog.adguard_url_tracking`},{name:`uBlock Origin – AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt`,descriptionKey:`filters.catalog.ubo_url_tracking`},{name:`ClearURLs`,url:`https://rules1.clearurls.xyz/data.minify.json`,descriptionKey:`filters.catalog.clear_urls`},{name:`Firefox – Query Parameter Stripping`,url:`https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/query-stripping/records`,descriptionKey:`filters.catalog.firefox`}],mu=`modulepreload`,hu=function(e){return`/`+e},gu={},_u=function(e){return e.pathname.endsWith(`.css`)},vu=function(e,t,n){if(t in e)return e[t];let r=n();if(!r){e[t]=void 0;return}let i=r.then(()=>{e[t]=void 0},n=>{throw e[t]=void 0,n});return e[t]=i,i},yu=function(e,t,n){let r=Promise.resolve();if(t&&t.length>0){let e,i=document.querySelector(`meta[property=csp-nonce]`),a=i?.nonce||i?.getAttribute(`nonce`);function o(e){return Promise.all(e.map(e=>Promise.resolve(e).then(e=>({status:`fulfilled`,value:e}),e=>({status:`rejected`,reason:e}))))}function s(e){return import.meta.resolve?new URL(import.meta.resolve(e)):new URL(e,import.meta.url)}r=o(t.map(t=>{t=hu(t,n);let r=s(t),i=_u(r);return vu(gu,r.href,()=>{if(e===void 0){e={all:new Set,styles:new Set};let t=document.getElementsByTagName(`link`);for(let n=t.length-1;n>=0;n--){let r=t[n];e.all.add(r.href),r.rel===`stylesheet`&&e.styles.add(r.href)}}if((i?e.styles:e.all).has(r.href))return;let t=document.createElement(`link`);if(t.rel=i?`stylesheet`:mu,i||(t.as=`script`),t.crossOrigin=``,t.href=r.href,a&&t.setAttribute(`nonce`,a),document.head.appendChild(t),i)return new Promise((e,n)=>{let i=a=>{t.removeEventListener(`load`,i),t.removeEventListener(`error`,i),a.type===`error`?n(Error(`Unable to preload CSS for ${r}`)):e(a)};t.addEventListener(`load`,i),t.addEventListener(`error`,i)})})}).filter(e=>e!==void 0))}function i(e){let t=new Event(`vite:preloadError`,{cancelable:!0});if(t.payload=e,window.dispatchEvent(t),!t.defaultPrevented)throw e}return r.then(t=>{for(let e of t||[])e.status===`rejected`&&i(e.reason);return e().catch(i)})},bu=_.lazy(()=>yu(()=>import(`./AttributionPage-CkEiCIeL.js`).then(e=>({default:e.AttributionPage})),[])),xu=P.div`
+`,Nl=({value:e,options:t,onChange:n,variant:r=`compact`,up:i,disabled:a,title:o})=>{let[s,c]=(0,_.useState)(!1),l=(0,_.useRef)(null),u=(0,_.useRef)(null),[d,f]=(0,_.useState)({});(0,_.useLayoutEffect)(()=>{if(!s)return;let e=()=>{let e=l.current?.getBoundingClientRect();if(!e)return;let t=u.current?.offsetWidth??Math.max(200,e.width),n=Math.max(8,Math.min(e.left,window.innerWidth-t-8)),r=i?e.top-8:window.innerHeight-e.bottom-8;f({position:`fixed`,left:n,zIndex:50,maxHeight:Math.max(120,Math.floor(r-5)),...i?{bottom:window.innerHeight-e.top+5}:{top:e.bottom+5}})};return e(),window.addEventListener(`resize`,e),window.addEventListener(`scroll`,e,!0),()=>{window.removeEventListener(`resize`,e),window.removeEventListener(`scroll`,e,!0)}},[s,i]),(0,_.useEffect)(()=>{if(!s)return;let e=e=>{let t=e.target;!l.current?.contains(t)&&!u.current?.contains(t)&&c(!1)},t=e=>{e.key===`Escape`&&c(!1)},n=()=>c(!1);return document.addEventListener(`mousedown`,e),document.addEventListener(`keydown`,t),window.addEventListener(`blur`,n),()=>{document.removeEventListener(`mousedown`,e),document.removeEventListener(`keydown`,t),window.removeEventListener(`blur`,n)}},[s]);let p=t.find(t=>t.value===e)?.label??e;return(0,F.jsxs)(Ol,{ref:l,children:[(0,F.jsxs)(Al,{type:`button`,$variant:r,disabled:a,title:o,"aria-haspopup":`listbox`,"aria-expanded":s,onClick:()=>c(e=>!e),children:[(0,F.jsx)(jl,{children:p}),(0,F.jsx)(Ml,{$open:s,children:`▾`})]}),s&&(0,Cl.createPortal)((0,F.jsx)(El,{$up:i,role:`listbox`,ref:u,style:d,children:t.map(t=>(0,F.jsx)(Dl,{type:`button`,role:`option`,"aria-selected":t.value===e,$active:t.value===e,onClick:()=>{c(!1),n(t.value)},children:t.label},t.value))}),document.body)]})},Pl={requestTimeoutMs:5e3,userAgents:[],browsers:[],language:`system`,theme:`system`,borderlessPopup:!0,autoStripTrackingParams:!0,autoRedirectHosts:[],hideOnLaunch:!1,showUrlButton:!0,allowScriptNetwork:!1,selectedUserAgentId:`default`,deviceName:``,deviceId:``,forwardingEnabled:!1,forwardPort:45454,filterAutoUpdate:!1,filterAutoUpdateMinutes:1440,devices:[]},Fl=`urlcheck.settings`;function Il(e,t,n){return Math.min(Math.max(e,t),n)}function Ll(e){return e===-1?-1:e===void 0||!Number.isFinite(e)?Pl.filterAutoUpdateMinutes:Il(e,1,10080)}function Rl(e){let t=Array.isArray(e.userAgents)?e.userAgents:Pl.userAgents;return{...e,requestTimeoutMs:Il(e.requestTimeoutMs,1e3,15e3),userAgents:t,selectedUserAgentId:t.some(t=>t.id===e.selectedUserAgentId)?e.selectedUserAgentId:t[0].id,browsers:(Array.isArray(e.browsers)?e.browsers:[]).map(e=>({...e,arguments:e.arguments??``,useCount:e.useCount??0})),language:e.language||Pl.language,theme:e.theme===`light`||e.theme===`dark`?e.theme:Pl.theme,borderlessPopup:e.borderlessPopup??Pl.borderlessPopup,autoStripTrackingParams:e.autoStripTrackingParams??Pl.autoStripTrackingParams,autoRedirectHosts:(Array.isArray(e.autoRedirectHosts)?e.autoRedirectHosts:[]).map(e=>e.trim().toLowerCase()).filter(e=>e.length>0),hideOnLaunch:e.hideOnLaunch??Pl.hideOnLaunch,showUrlButton:e.showUrlButton??Pl.showUrlButton,allowScriptNetwork:e.allowScriptNetwork??Pl.allowScriptNetwork,deviceName:e.deviceName??Pl.deviceName,deviceId:e.deviceId??Pl.deviceId,forwardingEnabled:e.forwardingEnabled??Pl.forwardingEnabled,forwardPort:e.forwardPort??Pl.forwardPort,filterAutoUpdate:e.filterAutoUpdate??Pl.filterAutoUpdate,filterAutoUpdateMinutes:Ll(e.filterAutoUpdateMinutes),devices:(Array.isArray(e.devices)?e.devices:[]).map(e=>({...e,host:e.host??``,port:e.port??Pl.forwardPort,publicKey:e.publicKey??``,addresses:Array.isArray(e.addresses)?e.addresses:[]}))}}function zl(){try{let e=window.localStorage.getItem(Fl);if(e)return Rl({...Pl,...JSON.parse(e)})}catch(e){console.warn(`[settings] Failed to read local settings:`,e)}return{...Pl}}async function Bl(){return L.available?await L.request(`settings.get`):{settings:zl(),settingsFilePath:`(browser localStorage)`}}async function Vl(e){let t=Rl(e);return L.available?await L.request(`settings.save`,t):(window.localStorage.setItem(Fl,JSON.stringify(t)),{settings:t,settingsFilePath:`(browser localStorage)`})}async function Hl(){return L.available?await L.request(`settings.reset`):(window.localStorage.removeItem(Fl),{settings:{...Pl},settingsFilePath:`(browser localStorage)`})}async function Ul(e){L.available&&await L.request(`settings.add_auto_redirect`,{url:e})}async function Wl(){return L.available?(await L.request(`browsers.detect`)).browsers??[]:[]}async function Gl(e,t,n=!1){L.available?await L.request(`popup.open`,{url:e,browserId:t,private:n}):window.open(e,`_blank`,`noopener,noreferrer`)}var Kl={deviceId:``,deviceName:``,port:0,addresses:[],enabled:!1,listening:!1,publicKey:``};async function ql(){return L.available?await L.request(`forward.info`):Kl}async function Jl(e,t){await L.request(`forward.send`,{url:e,deviceId:t})}async function Yl(){if(!L.available)return new Set;let e=await L.request(`forward.presence`);return new Set(e.online??[])}function Xl(){L.send({type:`forward.discoverStart`})}function Zl(){L.send({type:`forward.discoverStop`})}function Ql(e,t){L.send({type:`forward.pair`,payload:{host:e,port:t}})}function $l(e,t){L.send({type:`forward.pairRespond`,payload:{requestId:e,accept:t}})}async function eu(){return L.available?await L.request(`forward.pendingPairing`)??null:null}function tu(e){L.send({type:`forward.remove`,payload:{deviceId:e}})}async function nu(e,t){await L.request(`forward.addAddress`,{deviceId:e,address:t})}function ru(e,t){L.send({type:`forward.removeAddress`,payload:{deviceId:e,address:t}})}var iu={lists:[],builtinRuleCount:0};async function au(){return L.available?await L.request(`filters.get`):iu}async function ou(e,t){return await L.request(`filters.add`,{name:e,url:t})}async function su(e){return await L.request(`filters.remove`,{id:e})}async function cu(e,t){return await L.request(`filters.setEnabled`,{id:e,enabled:t})}async function lu(e){return await L.request(`filters.update`,{id:e??``})}async function uu(){if(!L.available)return[];try{return(await Mc.readBlock(`/filter-rules`)).rows.map(e=>({pattern:String(e.pattern),regex:Number(e.regex)!==0,urlPattern:du(e.urlPattern)||null,include:fu(e.include),exclude:fu(e.exclude),urlExceptions:fu(e.urlExceptions)}))}catch{return(await L.request(`filters.rules`)).rules}}function du(e){return typeof e==`string`?e:``}function fu(e){let t=du(e);return t.length>0?t.split(``):null}var pu=[{name:`AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_17_TrackParam/filter.txt`,descriptionKey:`filters.catalog.adguard_url_tracking`},{name:`uBlock Origin – AdGuard URL Tracking Protection`,url:`https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt`,descriptionKey:`filters.catalog.ubo_url_tracking`},{name:`ClearURLs`,url:`https://rules1.clearurls.xyz/data.minify.json`,descriptionKey:`filters.catalog.clear_urls`},{name:`Firefox – Query Parameter Stripping`,url:`https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/query-stripping/records`,descriptionKey:`filters.catalog.firefox`}],mu=`modulepreload`,hu=function(e){return`/`+e},gu={},_u=function(e){return e.pathname.endsWith(`.css`)},vu=function(e,t,n){if(t in e)return e[t];let r=n();if(!r){e[t]=void 0;return}let i=r.then(()=>{e[t]=void 0},n=>{throw e[t]=void 0,n});return e[t]=i,i},yu=function(e,t,n){let r=Promise.resolve();if(t&&t.length>0){let e,i=document.querySelector(`meta[property=csp-nonce]`),a=i?.nonce||i?.getAttribute(`nonce`);function o(e){return Promise.all(e.map(e=>Promise.resolve(e).then(e=>({status:`fulfilled`,value:e}),e=>({status:`rejected`,reason:e}))))}function s(e){return import.meta.resolve?new URL(import.meta.resolve(e)):new URL(e,import.meta.url)}r=o(t.map(t=>{t=hu(t,n);let r=s(t),i=_u(r);return vu(gu,r.href,()=>{if(e===void 0){e={all:new Set,styles:new Set};let t=document.getElementsByTagName(`link`);for(let n=t.length-1;n>=0;n--){let r=t[n];e.all.add(r.href),r.rel===`stylesheet`&&e.styles.add(r.href)}}if((i?e.styles:e.all).has(r.href))return;let t=document.createElement(`link`);if(t.rel=i?`stylesheet`:mu,i||(t.as=`script`),t.crossOrigin=``,t.href=r.href,a&&t.setAttribute(`nonce`,a),document.head.appendChild(t),i)return new Promise((e,n)=>{let i=a=>{t.removeEventListener(`load`,i),t.removeEventListener(`error`,i),a.type===`error`?n(Error(`Unable to preload CSS for ${r}`)):e(a)};t.addEventListener(`load`,i),t.addEventListener(`error`,i)})})}).filter(e=>e!==void 0))}function i(e){let t=new Event(`vite:preloadError`,{cancelable:!0});if(t.payload=e,window.dispatchEvent(t),!t.defaultPrevented)throw e}return r.then(t=>{for(let e of t||[])e.status===`rejected`&&i(e.reason);return e().catch(i)})},bu=_.lazy(()=>yu(()=>import(`./AttributionPage-BL3A17Bu.js`).then(e=>({default:e.AttributionPage})),[])),xu=P.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1367,16 +1367,16 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     flex: 1;
     min-height: 0;
     overflow: hidden;
-`,VD=({value:e,onChange:t})=>{let n=Mi(),r=(0,_.useRef)(null),i=(0,_.useRef)(null),a=(0,_.useRef)(e),o=(0,_.useRef)(t),s=(0,_.useRef)(()=>mp.create({doc:``}));return a.current=e,o.current=t,(0,_.useEffect)(()=>{let e=r.current;if(!e)return;let t=[Lb(),Vb(),Hy(),XS(),rw(),Ey(),kS(),nC(RD),mC(),Yy(),TE(),rb(),IE({top:!0}),mp.phrases.of(ID(n)),LD,mp.tabSize.of(4),sy.of([...uE,...hD,...Sw,dE]),X.contentAttributes.of({spellcheck:`false`,autocorrect:`off`,autocomplete:`off`}),X.updateListener.of(e=>{e.docChanged&&o.current(e.state.doc.toString())}),zD],c=e=>mp.create({doc:e,extensions:t});s.current=c;let l=new X({parent:e,state:c(a.current)});return i.current=l,()=>{l.destroy(),i.current=null}},[n]),(0,_.useEffect)(()=>{let t=i.current;t&&t.state.doc.toString()!==e&&t.setState(s.current(e))},[e]),(0,F.jsx)(BD,{ref:r})};async function HD(e,t){try{let n=await L.request(e,t);return n.ok?null:n.error??`error.unknown`}catch(e){return e instanceof Error?e.message:String(e)}}async function UD(){if(!L.available)return{scripts:[],directory:``};let e=await L.request(`scripts.list`);return{...e,scripts:e.scripts.map(e=>({...e,version:e.version??null,updateUrl:e.updateUrl??null}))}}async function WD(e){return(await L.request(`scripts.read`,{name:e})).content}async function GD(e,t){return await HD(`scripts.save`,{name:e,content:t})}async function KD(e){return await HD(`scripts.create`,{name:e})}async function qD(e){return await HD(`scripts.delete`,{name:e})}async function JD(e,t){return await HD(`scripts.rename`,{name:e,newName:t})}async function YD(){return await HD(`scripts.import`)}async function XD(e){return await HD(`scripts.download`,{url:e})}async function ZD(e){return await HD(`scripts.open`,{name:e})}async function QD(e,t,n){let r=await L.request(`scripts.test`,{name:e,url:t,content:n});return{url:r.url??t,error:r.error??null}}async function $D(){return L.available?(await L.request(`scripts.logs`)).entries:[]}async function eO(){await HD(`scripts.clear_logs`)}async function tO(){return L.available?((await L.request(`scripts.check_updates`)).updates??[]).map(e=>({...e,installed:e.installed??null,latest:e.latest??null,available:e.available??!1,changed:e.changed??!1,error:e.error??null})):[]}async function nO(e,t=!1){return await HD(`scripts.update`,{name:e,force:t})}async function rO(){if(!L.available)return{ok:!0,updated:0,failed:0,error:null};let e=await L.request(`scripts.updateAll`);return{ok:e.ok??!1,updated:e.updated??0,failed:e.failed??0,error:e.error??null}}var iO=e=>{let t=e.split(/[\\/]/).pop()??e;return/\.lua$/i.test(t)?t:`${t}.lua`},aO=()=>{let e=ji(),[t,n]=(0,_.useState)([]),[r,i]=(0,_.useState)(``),[a,o]=(0,_.useState)(null),[s,c]=(0,_.useState)(``),[l,u]=(0,_.useState)(``),[d,f]=(0,_.useState)(null),[p,m]=(0,_.useState)(!1),[h,g]=(0,_.useState)(`idle`),[v,y]=(0,_.useState)(``),[b,x]=(0,_.useState)(!1),[S,C]=(0,_.useState)([]),[ee,w]=(0,_.useState)(``),[te,T]=(0,_.useState)(null),[ne,re]=(0,_.useState)(!1),[ie,ae]=(0,_.useState)(!1),[oe,se]=(0,_.useState)(``),[ce,E]=(0,_.useState)({}),[le,D]=(0,_.useState)(!1),[ue,de]=(0,_.useState)(null),[fe,pe]=(0,_.useState)(null),O=(0,_.useRef)(null),me=(0,_.useRef)(async()=>void 0),he=(0,_.useRef)({name:null,dirty:!1}),ge=s!==l,_e=a!==null&&!t.some(e=>e.name===a),ve=Object.values(ce).filter(e=>e.available),ye=a===null?void 0:ce[a],be=ye!==void 0&&(ye.available||ye.changed),xe=a===null?void 0:t.find(e=>e.name===a);(0,_.useEffect)(()=>{he.current={name:a,dirty:ge}});let k=()=>{o(null),c(``),u(``),x(!1),pe(null),T(null),ae(!1)},A=async e=>{f(null),x(!1),pe(null),T(null),ae(!1);try{let t=await WD(e);o(e),c(t),u(t)}catch(e){f(e instanceof Error?e.message:String(e))}},Se=async e=>{let t=await UD();n(t.scripts),i(t.directory);let r=he.current.name,a=e??r,o=t.scripts.find(e=>e.name===a)?.name;if(o){o!==r&&await A(o);return}if(r!==null&&he.current.dirty)return;let s=t.scripts[0];s?await A(s.name):k()},j=async(e=!1)=>{D(!0);try{let e=await tO();E(Object.fromEntries(e.map(e=>[e.name,e])))}catch(t){e||f(t instanceof Error?t.message:String(t))}finally{D(!1)}},Ce=async e=>{if((e.changed||he.current.name===e.name&&he.current.dirty)&&fe!==e.name){pe(e.name);return}de(e.name),f(null);let t=await nO(e.name,e.changed);de(null),pe(null),t?f(t):(await Se(e.name),he.current.name===e.name&&await A(e.name),await j(!0))},M=async()=>{if(ge&&fe!==`all`){pe(`all`);return}let t=he.current.name;de(`all`),f(null);let n=await rO();de(null),pe(null),n.failed>0&&f(e(`scripts.update_all_failed`,{failed:n.failed})),await Se(),t&&await A(t),await j(!0)};(0,_.useEffect)(()=>(Se(),j(!0),$D().then(C).catch(()=>C([])),L.on(e=>{if(e.type===`scripts.log`){let t=e.data;t&&C(e=>[...e.slice(-199),t])}else e.type===`scripts.changed`&&Se()})),[]),(0,_.useEffect)(()=>{let e=O.current;e&&(e.scrollTop=e.scrollHeight)},[S.length]);let we=async()=>{if(!a)return;m(!0),f(null);let e=await GD(a,s);m(!1),e?f(e):(u(s),await Se())},N=async()=>{let e=v.trim();if(e.length===0)return;let t=iO(e);m(!0),f(null);let n=await KD(t);m(!1),n?f(n):(g(`idle`),y(``),await Se(t))},Te=async()=>{let e=v.trim();if(e.length===0)return;m(!0),f(null);let t=await XD(e);m(!1),t?f(t):(g(`idle`),y(``),await Se())},Ee=async()=>{if(!a)return;if(!b){x(!0);return}m(!0);let e=await qD(a);m(!1),e?f(e):(k(),await Se())},De=async()=>{m(!0),f(null);let e=await YD();m(!1),e&&f(e),await Se()},Oe=()=>{a&&(ae(!0),se(a))},ke=async()=>{if(!a)return;let e=oe.trim(),t=e.length===0?``:iO(e);if(t.length===0||t===a){ae(!1);return}m(!0),f(null);let n=await JD(a,t);m(!1),n?f(n):(ae(!1),o(t),he.current={name:t,dirty:he.current.dirty},await Se(t))},Ae=()=>void(h===`new`?N():Te()),je=async()=>{if(!a)return;let e=await ZD(a);e&&f(e)},Me=async()=>{if(!a)return;let e=ee.trim();if(e.length!==0){re(!0),f(null);try{T(await QD(a,e,s))}catch(e){f(e instanceof Error?e.message:String(e))}finally{re(!1)}}};return(0,_.useEffect)(()=>{me.current=we}),(0,_.useEffect)(()=>{let e=e=>{(e.ctrlKey||e.metaKey)&&e.key.toLowerCase()===`s`&&(e.preventDefault(),me.current())};return window.addEventListener(`keydown`,e),()=>window.removeEventListener(`keydown`,e)},[]),(0,F.jsxs)(oO,{$maxWidth:1180,children:[d&&(0,F.jsxs)(IO,{children:[(0,F.jsx)(Fr,{size:16}),(0,F.jsx)(`span`,{children:e(d)})]}),(0,F.jsxs)(sO,{children:[(0,F.jsxs)(cO,{children:[(0,F.jsxs)(lO,{children:[(0,F.jsx)(`span`,{children:e(`tabs.scripts.label`)}),(0,F.jsx)(uO,{children:t.length}),(0,F.jsx)(dO,{}),(0,F.jsx)(fO,{title:r,children:r.split(/[\\/]/).pop()})]}),(0,F.jsxs)(pO,{children:[t.length===0&&(0,F.jsx)(UO,{children:e(`scripts.empty`)}),t.map(t=>(0,F.jsxs)(mO,{$active:t.name===a,onClick:()=>void A(t.name),title:t.name,type:`button`,children:[(0,F.jsx)(gO,{children:t.name}),t.version&&(0,F.jsxs)(_O,{children:[`v`,t.version]}),ce[t.name]?.available&&(0,F.jsx)(vO,{title:e(`scripts.update_available`)}),ce[t.name]?.changed&&(0,F.jsx)(vO,{$changed:!0,title:e(`scripts.update_changed`)}),t.error&&(0,F.jsx)(hO,{title:e(t.error),children:(0,F.jsx)(Fr,{size:14})})]},t.name))]}),(0,F.jsx)(yO,{children:h===`idle`?(0,F.jsxs)(bO,{children:[(0,F.jsxs)(WO,{disabled:p,onClick:()=>{g(`new`),y(``),f(null)},type:`button`,children:[(0,F.jsx)(Hr,{size:16}),e(`scripts.new`)]}),(0,F.jsxs)(xO,{children:[(0,F.jsx)(KO,{disabled:p,onClick:()=>void De(),type:`button`,children:e(`scripts.import`)}),(0,F.jsx)(KO,{disabled:p,onClick:()=>{g(`download`),y(``),f(null)},type:`button`,children:e(`scripts.download`)})]}),(0,F.jsxs)(xO,{children:[(0,F.jsx)(KO,{disabled:p||le,onClick:()=>void j(),type:`button`,children:e(le?`scripts.checking_updates`:`scripts.check_updates`)}),ve.length>0&&(0,F.jsx)(KO,{disabled:p||ue!==null,onClick:()=>void M(),type:`button`,children:fe===`all`?e(`scripts.update_overwrite`):e(`scripts.update_all_count`,{count:ve.length})})]})]}):(0,F.jsxs)(bO,{children:[(0,F.jsx)(LO,{autoFocus:!0,onChange:e=>y(e.target.value),onKeyDown:e=>{e.key===`Enter`&&Ae(),e.key===`Escape`&&g(`idle`)},placeholder:e(h===`new`?`scripts.name_placeholder`:`scripts.download_placeholder`),value:v}),(0,F.jsxs)(xO,{children:[(0,F.jsx)(WO,{disabled:p||v.trim().length===0,onClick:Ae,type:`button`,children:e(h===`new`?`scripts.create`:`scripts.download`)}),(0,F.jsx)(GO,{onClick:()=>g(`idle`),type:`button`,children:e(`scripts.cancel`)})]})]})})]}),(0,F.jsxs)(SO,{children:[(0,F.jsx)(CO,{children:a?(0,F.jsxs)(F.Fragment,{children:[(0,F.jsxs)(wO,{children:[(0,F.jsx)(Nr,{size:16}),ie?(0,F.jsx)(EO,{autoFocus:!0,onBlur:()=>ae(!1),onChange:e=>se(e.target.value),onKeyDown:e=>{e.key===`Enter`&&ke(),e.key===`Escape`&&ae(!1)},spellCheck:!1,value:oe}):(0,F.jsx)(TO,{children:a}),xe?.version&&(0,F.jsxs)(_O,{children:[`v`,xe.version]}),_e&&(0,F.jsx)(DO,{title:e(`scripts.file_gone`),children:(0,F.jsx)(Fr,{size:14})}),ge&&(0,F.jsx)(OO,{title:e(`settings.unsaved`)}),(0,F.jsx)(GO,{disabled:p,onClick:Oe,title:e(`scripts.rename`),type:`button`,children:(0,F.jsx)(oi,{size:15})}),(0,F.jsx)(GO,{disabled:p,onClick:()=>void je(),title:e(`scripts.open_external`),type:`button`,children:(0,F.jsx)(ai,{size:15})}),be&&ye&&(0,F.jsx)(GO,{disabled:p||ue!==null,onClick:()=>void Ce(ye),title:ye.changed?e(`scripts.update_changed`):e(`scripts.update_available`),type:`button`,children:e(fe===a?`scripts.update_overwrite`:`scripts.update`)}),(0,F.jsx)(GO,{disabled:!ge||p,onClick:()=>void we(),title:`Ctrl+S`,type:`button`,children:e(ge?`scripts.save`:`scripts.saved`)}),(0,F.jsx)(qO,{$armed:b,disabled:p,onClick:()=>void Ee(),type:`button`,children:b?e(`scripts.delete_confirm`):(0,F.jsx)(Ur,{size:15})})]}),(0,F.jsxs)(kO,{children:[(0,F.jsx)(AO,{onChange:e=>w(e.target.value),onKeyDown:e=>{e.key===`Enter`&&Me()},placeholder:e(`scripts.test_placeholder`),spellCheck:!1,value:ee}),(0,F.jsxs)(WO,{disabled:ne||p||ee.trim().length===0,onClick:()=>void Me(),type:`button`,children:[(0,F.jsx)(Wr,{size:14}),e(`scripts.test`)]})]}),te&&(0,F.jsx)(jO,{$error:te.error!==null,children:te.error===null?(0,F.jsxs)(MO,{children:[(0,F.jsx)(NO,{children:e(`scripts.test_final_url`)}),(0,F.jsx)(PO,{children:te.url})]}):(0,F.jsx)(PO,{$error:!0,children:te.error})}),(0,F.jsx)(VD,{onChange:c,value:s})]}):(0,F.jsxs)(FO,{children:[(0,F.jsx)(Nr,{size:30}),(0,F.jsx)(`span`,{children:e(`scripts.no_script`)})]})}),(0,F.jsxs)(RO,{children:[(0,F.jsxs)(zO,{children:[(0,F.jsx)(`span`,{children:e(`scripts.logs`)}),(0,F.jsx)(GO,{onClick:()=>void eO().then(()=>C([])),type:`button`,children:e(`scripts.clear_logs`)})]}),(0,F.jsxs)(BO,{ref:O,children:[S.length===0&&(0,F.jsx)(UO,{children:e(`scripts.logs_empty`)}),S.map((e,t)=>(0,F.jsxs)(HO,{$error:e.level===`error`,children:[(0,F.jsx)(`time`,{children:e.time}),(0,F.jsx)(VO,{children:e.script}),(0,F.jsx)(`span`,{children:e.message})]},`${e.time}-${t}`))]})]})]})]})]})},oO=P(si)`
+`,VD=({value:e,onChange:t})=>{let n=Mi(),r=(0,_.useRef)(null),i=(0,_.useRef)(null),a=(0,_.useRef)(e),o=(0,_.useRef)(t),s=(0,_.useRef)(()=>mp.create({doc:``}));return a.current=e,o.current=t,(0,_.useEffect)(()=>{let e=r.current;if(!e)return;let t=[Lb(),Vb(),Hy(),XS(),rw(),Ey(),kS(),nC(RD),mC(),Yy(),TE(),rb(),IE({top:!0}),mp.phrases.of(ID(n)),LD,mp.tabSize.of(4),sy.of([...uE,...hD,...Sw,dE]),X.contentAttributes.of({spellcheck:`false`,autocorrect:`off`,autocomplete:`off`}),X.updateListener.of(e=>{e.docChanged&&o.current(e.state.doc.toString())}),zD],c=e=>mp.create({doc:e,extensions:t});s.current=c;let l=new X({parent:e,state:c(a.current)});return i.current=l,()=>{l.destroy(),i.current=null}},[n]),(0,_.useEffect)(()=>{let t=i.current;t&&t.state.doc.toString()!==e&&t.setState(s.current(e))},[e]),(0,F.jsx)(BD,{ref:r})};async function HD(e,t){try{let n=await L.request(e,t);return n.ok?null:n.error??`error.unknown`}catch(e){return e instanceof Error?e.message:String(e)}}async function UD(){if(!L.available)return{scripts:[],directory:``};try{let e=await Mc.readBlock(`/scripts`);return{directory:e.meta.directory??``,scripts:e.rows.map(e=>({name:String(e.name),size:Number(e.size),modified:String(e.modified),error:eO(e.error)||null,version:eO(e.version)||null,updateUrl:eO(e.updateUrl)||null}))}}catch{let e=await L.request(`scripts.list`);return{...e,scripts:e.scripts.map(e=>({...e,version:e.version??null,updateUrl:e.updateUrl??null}))}}}async function WD(e){return(await L.request(`scripts.read`,{name:e})).content}async function GD(e,t){return await HD(`scripts.save`,{name:e,content:t})}async function KD(e){return await HD(`scripts.create`,{name:e})}async function qD(e){return await HD(`scripts.delete`,{name:e})}async function JD(e,t){return await HD(`scripts.rename`,{name:e,newName:t})}async function YD(){return await HD(`scripts.import`)}async function XD(e){return await HD(`scripts.download`,{url:e})}async function ZD(e){return await HD(`scripts.open`,{name:e})}async function QD(e,t,n){let r=await L.request(`scripts.test`,{name:e,url:t,content:n});return{url:r.url??t,error:r.error??null}}async function $D(){if(!L.available)return[];try{return(await Mc.readBlock(`/script-logs`)).rows.map(e=>({time:String(e.time),level:String(e.level),script:String(e.script),message:String(e.message)}))}catch{return(await L.request(`scripts.logs`)).entries}}function eO(e){return typeof e==`string`?e:``}async function tO(){await HD(`scripts.clear_logs`)}async function nO(){return L.available?((await L.request(`scripts.check_updates`)).updates??[]).map(e=>({...e,installed:e.installed??null,latest:e.latest??null,available:e.available??!1,changed:e.changed??!1,error:e.error??null})):[]}async function rO(e,t=!1){return await HD(`scripts.update`,{name:e,force:t})}async function iO(){if(!L.available)return{ok:!0,updated:0,failed:0,error:null};let e=await L.request(`scripts.updateAll`);return{ok:e.ok??!1,updated:e.updated??0,failed:e.failed??0,error:e.error??null}}var aO=e=>{let t=e.split(/[\\/]/).pop()??e;return/\.lua$/i.test(t)?t:`${t}.lua`},oO=()=>{let e=ji(),[t,n]=(0,_.useState)([]),[r,i]=(0,_.useState)(``),[a,o]=(0,_.useState)(null),[s,c]=(0,_.useState)(``),[l,u]=(0,_.useState)(``),[d,f]=(0,_.useState)(null),[p,m]=(0,_.useState)(!1),[h,g]=(0,_.useState)(`idle`),[v,y]=(0,_.useState)(``),[b,x]=(0,_.useState)(!1),[S,C]=(0,_.useState)([]),[ee,w]=(0,_.useState)(``),[te,T]=(0,_.useState)(null),[ne,re]=(0,_.useState)(!1),[ie,ae]=(0,_.useState)(!1),[oe,se]=(0,_.useState)(``),[ce,E]=(0,_.useState)({}),[le,D]=(0,_.useState)(!1),[ue,de]=(0,_.useState)(null),[fe,pe]=(0,_.useState)(null),O=(0,_.useRef)(null),me=(0,_.useRef)(async()=>void 0),he=(0,_.useRef)({name:null,dirty:!1}),ge=s!==l,_e=a!==null&&!t.some(e=>e.name===a),ve=Object.values(ce).filter(e=>e.available),ye=a===null?void 0:ce[a],be=ye!==void 0&&(ye.available||ye.changed),xe=a===null?void 0:t.find(e=>e.name===a);(0,_.useEffect)(()=>{he.current={name:a,dirty:ge}});let k=()=>{o(null),c(``),u(``),x(!1),pe(null),T(null),ae(!1)},A=async e=>{f(null),x(!1),pe(null),T(null),ae(!1);try{let t=await WD(e);o(e),c(t),u(t)}catch(e){f(e instanceof Error?e.message:String(e))}},Se=async e=>{let t=await UD();n(t.scripts),i(t.directory);let r=he.current.name,a=e??r,o=t.scripts.find(e=>e.name===a)?.name;if(o){o!==r&&await A(o);return}if(r!==null&&he.current.dirty)return;let s=t.scripts[0];s?await A(s.name):k()},j=async(e=!1)=>{D(!0);try{let e=await nO();E(Object.fromEntries(e.map(e=>[e.name,e])))}catch(t){e||f(t instanceof Error?t.message:String(t))}finally{D(!1)}},Ce=async e=>{if((e.changed||he.current.name===e.name&&he.current.dirty)&&fe!==e.name){pe(e.name);return}de(e.name),f(null);let t=await rO(e.name,e.changed);de(null),pe(null),t?f(t):(await Se(e.name),he.current.name===e.name&&await A(e.name),await j(!0))},M=async()=>{if(ge&&fe!==`all`){pe(`all`);return}let t=he.current.name;de(`all`),f(null);let n=await iO();de(null),pe(null),n.failed>0&&f(e(`scripts.update_all_failed`,{failed:n.failed})),await Se(),t&&await A(t),await j(!0)};(0,_.useEffect)(()=>(Se(),j(!0),$D().then(C).catch(()=>C([])),L.on(e=>{if(e.type===`scripts.log`){let t=e.data;t&&C(e=>[...e.slice(-199),t])}else e.type===`scripts.changed`&&Se()})),[]),(0,_.useEffect)(()=>{let e=O.current;e&&(e.scrollTop=e.scrollHeight)},[S.length]);let we=async()=>{if(!a)return;m(!0),f(null);let e=await GD(a,s);m(!1),e?f(e):(u(s),await Se())},N=async()=>{let e=v.trim();if(e.length===0)return;let t=aO(e);m(!0),f(null);let n=await KD(t);m(!1),n?f(n):(g(`idle`),y(``),await Se(t))},Te=async()=>{let e=v.trim();if(e.length===0)return;m(!0),f(null);let t=await XD(e);m(!1),t?f(t):(g(`idle`),y(``),await Se())},Ee=async()=>{if(!a)return;if(!b){x(!0);return}m(!0);let e=await qD(a);m(!1),e?f(e):(k(),await Se())},De=async()=>{m(!0),f(null);let e=await YD();m(!1),e&&f(e),await Se()},Oe=()=>{a&&(ae(!0),se(a))},ke=async()=>{if(!a)return;let e=oe.trim(),t=e.length===0?``:aO(e);if(t.length===0||t===a){ae(!1);return}m(!0),f(null);let n=await JD(a,t);m(!1),n?f(n):(ae(!1),o(t),he.current={name:t,dirty:he.current.dirty},await Se(t))},Ae=()=>void(h===`new`?N():Te()),je=async()=>{if(!a)return;let e=await ZD(a);e&&f(e)},Me=async()=>{if(!a)return;let e=ee.trim();if(e.length!==0){re(!0),f(null);try{T(await QD(a,e,s))}catch(e){f(e instanceof Error?e.message:String(e))}finally{re(!1)}}};return(0,_.useEffect)(()=>{me.current=we}),(0,_.useEffect)(()=>{let e=e=>{(e.ctrlKey||e.metaKey)&&e.key.toLowerCase()===`s`&&(e.preventDefault(),me.current())};return window.addEventListener(`keydown`,e),()=>window.removeEventListener(`keydown`,e)},[]),(0,F.jsxs)(sO,{$maxWidth:1180,children:[d&&(0,F.jsxs)(LO,{children:[(0,F.jsx)(Fr,{size:16}),(0,F.jsx)(`span`,{children:e(d)})]}),(0,F.jsxs)(cO,{children:[(0,F.jsxs)(lO,{children:[(0,F.jsxs)(uO,{children:[(0,F.jsx)(`span`,{children:e(`tabs.scripts.label`)}),(0,F.jsx)(dO,{children:t.length}),(0,F.jsx)(fO,{}),(0,F.jsx)(pO,{title:r,children:r.split(/[\\/]/).pop()})]}),(0,F.jsxs)(mO,{children:[t.length===0&&(0,F.jsx)(WO,{children:e(`scripts.empty`)}),t.map(t=>(0,F.jsxs)(hO,{$active:t.name===a,onClick:()=>void A(t.name),title:t.name,type:`button`,children:[(0,F.jsx)(_O,{children:t.name}),t.version&&(0,F.jsxs)(vO,{children:[`v`,t.version]}),ce[t.name]?.available&&(0,F.jsx)(yO,{title:e(`scripts.update_available`)}),ce[t.name]?.changed&&(0,F.jsx)(yO,{$changed:!0,title:e(`scripts.update_changed`)}),t.error&&(0,F.jsx)(gO,{title:e(t.error),children:(0,F.jsx)(Fr,{size:14})})]},t.name))]}),(0,F.jsx)(bO,{children:h===`idle`?(0,F.jsxs)(xO,{children:[(0,F.jsxs)(GO,{disabled:p,onClick:()=>{g(`new`),y(``),f(null)},type:`button`,children:[(0,F.jsx)(Hr,{size:16}),e(`scripts.new`)]}),(0,F.jsxs)(SO,{children:[(0,F.jsx)(qO,{disabled:p,onClick:()=>void De(),type:`button`,children:e(`scripts.import`)}),(0,F.jsx)(qO,{disabled:p,onClick:()=>{g(`download`),y(``),f(null)},type:`button`,children:e(`scripts.download`)})]}),(0,F.jsxs)(SO,{children:[(0,F.jsx)(qO,{disabled:p||le,onClick:()=>void j(),type:`button`,children:e(le?`scripts.checking_updates`:`scripts.check_updates`)}),ve.length>0&&(0,F.jsx)(qO,{disabled:p||ue!==null,onClick:()=>void M(),type:`button`,children:fe===`all`?e(`scripts.update_overwrite`):e(`scripts.update_all_count`,{count:ve.length})})]})]}):(0,F.jsxs)(xO,{children:[(0,F.jsx)(RO,{autoFocus:!0,onChange:e=>y(e.target.value),onKeyDown:e=>{e.key===`Enter`&&Ae(),e.key===`Escape`&&g(`idle`)},placeholder:e(h===`new`?`scripts.name_placeholder`:`scripts.download_placeholder`),value:v}),(0,F.jsxs)(SO,{children:[(0,F.jsx)(GO,{disabled:p||v.trim().length===0,onClick:Ae,type:`button`,children:e(h===`new`?`scripts.create`:`scripts.download`)}),(0,F.jsx)(KO,{onClick:()=>g(`idle`),type:`button`,children:e(`scripts.cancel`)})]})]})})]}),(0,F.jsxs)(CO,{children:[(0,F.jsx)(wO,{children:a?(0,F.jsxs)(F.Fragment,{children:[(0,F.jsxs)(TO,{children:[(0,F.jsx)(Nr,{size:16}),ie?(0,F.jsx)(DO,{autoFocus:!0,onBlur:()=>ae(!1),onChange:e=>se(e.target.value),onKeyDown:e=>{e.key===`Enter`&&ke(),e.key===`Escape`&&ae(!1)},spellCheck:!1,value:oe}):(0,F.jsx)(EO,{children:a}),xe?.version&&(0,F.jsxs)(vO,{children:[`v`,xe.version]}),_e&&(0,F.jsx)(OO,{title:e(`scripts.file_gone`),children:(0,F.jsx)(Fr,{size:14})}),ge&&(0,F.jsx)(kO,{title:e(`settings.unsaved`)}),(0,F.jsx)(KO,{disabled:p,onClick:Oe,title:e(`scripts.rename`),type:`button`,children:(0,F.jsx)(oi,{size:15})}),(0,F.jsx)(KO,{disabled:p,onClick:()=>void je(),title:e(`scripts.open_external`),type:`button`,children:(0,F.jsx)(ai,{size:15})}),be&&ye&&(0,F.jsx)(KO,{disabled:p||ue!==null,onClick:()=>void Ce(ye),title:ye.changed?e(`scripts.update_changed`):e(`scripts.update_available`),type:`button`,children:e(fe===a?`scripts.update_overwrite`:`scripts.update`)}),(0,F.jsx)(KO,{disabled:!ge||p,onClick:()=>void we(),title:`Ctrl+S`,type:`button`,children:e(ge?`scripts.save`:`scripts.saved`)}),(0,F.jsx)(JO,{$armed:b,disabled:p,onClick:()=>void Ee(),type:`button`,children:b?e(`scripts.delete_confirm`):(0,F.jsx)(Ur,{size:15})})]}),(0,F.jsxs)(AO,{children:[(0,F.jsx)(jO,{onChange:e=>w(e.target.value),onKeyDown:e=>{e.key===`Enter`&&Me()},placeholder:e(`scripts.test_placeholder`),spellCheck:!1,value:ee}),(0,F.jsxs)(GO,{disabled:ne||p||ee.trim().length===0,onClick:()=>void Me(),type:`button`,children:[(0,F.jsx)(Wr,{size:14}),e(`scripts.test`)]})]}),te&&(0,F.jsx)(MO,{$error:te.error!==null,children:te.error===null?(0,F.jsxs)(NO,{children:[(0,F.jsx)(PO,{children:e(`scripts.test_final_url`)}),(0,F.jsx)(FO,{children:te.url})]}):(0,F.jsx)(FO,{$error:!0,children:te.error})}),(0,F.jsx)(VD,{onChange:c,value:s})]}):(0,F.jsxs)(IO,{children:[(0,F.jsx)(Nr,{size:30}),(0,F.jsx)(`span`,{children:e(`scripts.no_script`)})]})}),(0,F.jsxs)(zO,{children:[(0,F.jsxs)(BO,{children:[(0,F.jsx)(`span`,{children:e(`scripts.logs`)}),(0,F.jsx)(KO,{onClick:()=>void tO().then(()=>C([])),type:`button`,children:e(`scripts.clear_logs`)})]}),(0,F.jsxs)(VO,{ref:O,children:[S.length===0&&(0,F.jsx)(WO,{children:e(`scripts.logs_empty`)}),S.map((e,t)=>(0,F.jsxs)(UO,{$error:e.level===`error`,children:[(0,F.jsx)(`time`,{children:e.time}),(0,F.jsx)(HO,{children:e.script}),(0,F.jsx)(`span`,{children:e.message})]},`${e.time}-${t}`))]})]})]})]})]})},sO=P(si)`
     height: 100%;
     min-height: 420px;
     gap: 16px;
-`,sO=P.div`
+`,cO=P.div`
     display: flex;
     flex: 1;
     gap: 16px;
     min-height: 0;
-`,cO=P.section`
+`,lO=P.section`
     position: relative;
     display: flex;
     flex-direction: column;
@@ -1386,7 +1386,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     border-radius: 12px;
     background: var(--panel);
     overflow: hidden;
-`,lO=P.div`
+`,uO=P.div`
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1398,15 +1398,15 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     text-transform: uppercase;
     color: var(--text-secondary);
     flex-shrink: 0;
-`,uO=P.span`
+`,dO=P.span`
     padding: 1px 7px;
     border-radius: 999px;
     background: var(--border);
     font-size: 0.7rem;
     color: var(--text-secondary);
-`,dO=P.div`
+`,fO=P.div`
     flex: 1;
-`,fO=P.span`
+`,pO=P.span`
     font-family: var(--font-mono);
     font-size: 0.68rem;
     font-weight: 400;
@@ -1417,7 +1417,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 110px;
-`,pO=P.div`
+`,mO=P.div`
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -1441,7 +1441,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     &::-webkit-scrollbar-thumb:hover {
         background: var(--scrollbar-hover);
     }
-`,mO=P.button`
+`,hO=P.button`
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1467,29 +1467,29 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         background: var(--border-faint);
         color: var(--text-primary);
     }
-`,hO=P.span`
+`,gO=P.span`
     display: grid;
     place-items: center;
     color: var(--warning);
     flex-shrink: 0;
-`,gO=P.span`
+`,_O=P.span`
     flex: 1;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-`,_O=P.span`
+`,vO=P.span`
     flex-shrink: 0;
     font-family: var(--font-mono);
     font-size: 0.66rem;
     color: var(--text-muted);
-`,vO=P.span`
+`,yO=P.span`
     width: 7px;
     height: 7px;
     border-radius: 50%;
     flex-shrink: 0;
     background: ${e=>e.$changed?`var(--warning)`:`var(--success)`};
-`,yO=P.div`
+`,bO=P.div`
     position: absolute;
     left: 10px;
     right: 10px;
@@ -1500,21 +1500,21 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     background: var(--panel-strong);
     backdrop-filter: blur(14px);
     box-shadow: 0 12px 28px var(--shadow);
-`,bO=P.div`
+`,xO=P.div`
     display: flex;
     flex-direction: column;
     gap: 8px;
-`,xO=P.div`
+`,SO=P.div`
     display: flex;
     gap: 8px;
-`,SO=P.div`
+`,CO=P.div`
     display: flex;
     flex-direction: column;
     flex: 1;
     gap: 12px;
     min-width: 0;
     min-height: 0;
-`,CO=P.section`
+`,wO=P.section`
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -1523,7 +1523,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     border-radius: 12px;
     background: var(--panel);
     overflow: hidden;
-`,wO=P.div`
+`,TO=P.div`
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1531,14 +1531,14 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     border-bottom: 1px solid var(--border);
     color: var(--text-secondary);
     flex-shrink: 0;
-`,TO=P.strong`
+`,EO=P.strong`
     flex: 1;
     font-size: 0.85rem;
     color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-`,EO=P.input`
+`,DO=P.input`
     flex: 1;
     min-width: 0;
     padding: 4px 8px;
@@ -1554,24 +1554,24 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
-`,DO=P.span`
+`,OO=P.span`
     display: grid;
     place-items: center;
     color: var(--warning);
     flex-shrink: 0;
-`,OO=P.span`
+`,kO=P.span`
     width: 7px;
     height: 7px;
     border-radius: 50%;
     background: var(--warning);
     flex-shrink: 0;
-`,kO=P.div`
+`,AO=P.div`
     display: flex;
     gap: 8px;
     padding: 10px 14px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
-`,AO=P.input`
+`,jO=P.input`
     flex: 1;
     min-width: 0;
     padding: 7px 10px;
@@ -1590,7 +1590,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     &::placeholder {
         color: var(--text-muted);
     }
-`,jO=P.div`
+`,MO=P.div`
     display: flex;
     flex-direction: column;
     gap: 3px;
@@ -1602,17 +1602,17 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     background: ${e=>e.$error?`rgba(239, 68, 68, 0.1)`:`var(--surface-dim)`};
     font-family: var(--font-mono);
     font-size: 0.75rem;
-`,MO=P.div`
+`,NO=P.div`
     display: flex;
     gap: 8px;
     align-items: baseline;
-`,NO=P.span`
+`,PO=P.span`
     color: var(--text-muted);
     flex-shrink: 0;
-`,PO=P.span`
+`,FO=P.span`
     color: ${e=>e.$error?`var(--danger)`:`var(--accent-soft)`};
     overflow-wrap: anywhere;
-`,FO=P.div`
+`,IO=P.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1623,7 +1623,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     color: var(--text-muted);
     font-size: 0.85rem;
     text-align: center;
-`,IO=P.div`
+`,LO=P.div`
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1634,7 +1634,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     color: var(--danger);
     font-size: 0.85rem;
     flex-shrink: 0;
-`,LO=P.input`
+`,RO=P.input`
     width: 100%;
     padding: 8px 10px;
     border-radius: 8px;
@@ -1652,7 +1652,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     &::placeholder {
         color: var(--text-muted);
     }
-`,RO=P.section`
+`,zO=P.section`
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
@@ -1660,7 +1660,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     border-radius: 12px;
     background: var(--panel);
     overflow: hidden;
-`,zO=P.div`
+`,BO=P.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1669,7 +1669,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-primary);
-`,BO=P.div`
+`,VO=P.div`
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -1678,7 +1678,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     overflow-y: auto;
     font-family: var(--font-mono);
     font-size: 0.76rem;
-`,VO=P.span``,HO=P.div`
+`,HO=P.span``,UO=P.div`
     display: flex;
     gap: 10px;
     padding: 2px 14px;
@@ -1689,7 +1689,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         flex-shrink: 0;
     }
 
-    ${VO} {
+    ${HO} {
         color: var(--accent-soft);
         flex-shrink: 0;
     }
@@ -1697,11 +1697,11 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     span {
         overflow-wrap: anywhere;
     }
-`,UO=P.p`
+`,WO=P.p`
     padding: 16px;
     color: var(--text-muted);
     font-size: 0.82rem;
-`,WO=P.button`
+`,GO=P.button`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1725,7 +1725,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         opacity: 0.5;
         cursor: not-allowed;
     }
-`,GO=P.button`
+`,KO=P.button`
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1747,16 +1747,16 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         opacity: 0.5;
         cursor: not-allowed;
     }
-`,KO=P(GO)`
+`,qO=P(KO)`
     flex: 1;
-`,qO=P(GO)`
+`,JO=P(KO)`
     display: grid;
     place-items: center;
     min-width: 34px;
     color: ${e=>e.$armed?`var(--danger)`:`var(--text-secondary)`};
     border-color: ${e=>e.$armed?`rgba(239, 68, 68, 0.6)`:`var(--border-strong)`};
     background: ${e=>e.$armed?`rgba(239, 68, 68, 0.18)`:`transparent`};
-`,JO=[{id:`home`,labelKey:`tabs.home.label`,titleKey:`tabs.home.title`,subtitleKey:`tabs.home.subtitle`,icon:kr,page:Sl},{id:`history`,labelKey:`tabs.history.label`,titleKey:`tabs.history.title`,subtitleKey:`tabs.history.subtitle`,icon:jr,page:rl},{id:`scripts`,labelKey:`tabs.scripts.label`,titleKey:`tabs.scripts.title`,subtitleKey:`tabs.scripts.subtitle`,icon:Nr,page:aO},{id:`settings`,labelKey:`tabs.settings.label`,titleKey:`tabs.settings.title`,subtitleKey:`tabs.settings.subtitle`,icon:Mr,page:Ld}],YO=JO[0].id;function XO(e){return JO.find(t=>t.id===e)??JO[0]}var ZO=P.aside`
+`,YO=[{id:`home`,labelKey:`tabs.home.label`,titleKey:`tabs.home.title`,subtitleKey:`tabs.home.subtitle`,icon:kr,page:Sl},{id:`history`,labelKey:`tabs.history.label`,titleKey:`tabs.history.title`,subtitleKey:`tabs.history.subtitle`,icon:jr,page:rl},{id:`scripts`,labelKey:`tabs.scripts.label`,titleKey:`tabs.scripts.title`,subtitleKey:`tabs.scripts.subtitle`,icon:Nr,page:oO},{id:`settings`,labelKey:`tabs.settings.label`,titleKey:`tabs.settings.title`,subtitleKey:`tabs.settings.subtitle`,icon:Mr,page:Ld}],XO=YO[0].id;function ZO(e){return YO.find(t=>t.id===e)??YO[0]}var QO=P.aside`
     width: 260px;
     background: var(--panel-strong);
     backdrop-filter: blur(16px);
@@ -1766,13 +1766,13 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     height: 100%;
     flex-shrink: 0;
     user-select: none;
-`,QO=P.nav`
+`,$O=P.nav`
     padding: 18px 12px 16px;
     display: flex;
     flex-direction: column;
     gap: 6px;
     flex: 1;
-`,$O=P.button`
+`,ek=P.button`
     display: flex;
     align-items: center;
     gap: 12px;
@@ -1802,17 +1802,17 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     &:hover svg {
         stroke: ${e=>e.$active?`var(--accent-soft)`:`var(--text-primary)`};
     }
-`,ek=P.div`
+`,tk=P.div`
     padding: 16px 20px;
     border-top: 1px solid var(--border-faint);
     display: flex;
     align-items: center;
     gap: 8px;
-`,tk=P.span`
+`,nk=P.span`
     font-size: 0.75rem;
     color: var(--text-muted);
     font-family: var(--font-mono);
-`,nk=P.span`
+`,rk=P.span`
     padding: 1px 5px;
     border: 1px solid rgba(251, 191, 36, 0.45);
     border-radius: 4px;
@@ -1823,14 +1823,14 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     font-weight: 700;
     letter-spacing: 0.08em;
     line-height: 1.3;
-`,rk=Wn`
+`,ik=Wn`
     0%, 100% {
         box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.5);
     }
     50% {
         box-shadow: 0 0 0 4px rgba(251, 191, 36, 0);
     }
-`,ik=P.button`
+`,ak=P.button`
     width: 8px;
     height: 8px;
     padding: 0;
@@ -1838,13 +1838,13 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     border-radius: 50%;
     background: var(--warning);
     cursor: pointer;
-    animation: ${rk} 2s ease-in-out infinite;
+    animation: ${ik} 2s ease-in-out infinite;
     transition: background 0.15s ease;
 
     &:hover {
         background: var(--warning);
     }
-`,ak=({currentTab:e,onSelectTab:t})=>{let n=ji(),[r,i]=(0,_.useState)(null),[a,o]=(0,_.useState)(!1),[s,c]=(0,_.useState)(null);return(0,_.useEffect)(()=>{bc().then(e=>{i(e.version),o(e.debug===!0)}).catch(()=>{i(null),o(!1)})},[]),(0,_.useEffect)(()=>(Ec().then(c).catch(()=>c(null)),L.on(e=>{let t=e;t.type===`update.checked`&&t.data&&c(t.data)})),[]),(0,F.jsxs)(ZO,{children:[(0,F.jsx)(QO,{children:JO.map(r=>{let i=r.icon;return(0,F.jsxs)($O,{$active:e===r.id,onClick:()=>t(r.id),children:[(0,F.jsx)(i,{size:18}),(0,F.jsx)(`span`,{children:n(r.labelKey)})]},r.id)})}),(0,F.jsxs)(ek,{children:[(0,F.jsx)(tk,{children:r?`v${r}`:`…`}),a&&(0,F.jsx)(nk,{title:`Debug build`,children:`DEBUG`}),s?.available&&(0,F.jsx)(ik,{type:`button`,title:n(`app.update_available`,{version:s.latest}),onClick:()=>void Tc(`https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/releases/latest`).catch(()=>void 0)})]})]})},ok=P.header`
+`,ok=({currentTab:e,onSelectTab:t})=>{let n=ji(),[r,i]=(0,_.useState)(null),[a,o]=(0,_.useState)(!1),[s,c]=(0,_.useState)(null);return(0,_.useEffect)(()=>{bc().then(e=>{i(e.version),o(e.debug===!0)}).catch(()=>{i(null),o(!1)})},[]),(0,_.useEffect)(()=>(Ec().then(c).catch(()=>c(null)),L.on(e=>{let t=e;t.type===`update.checked`&&t.data&&c(t.data)})),[]),(0,F.jsxs)(QO,{children:[(0,F.jsx)($O,{children:YO.map(r=>{let i=r.icon;return(0,F.jsxs)(ek,{$active:e===r.id,onClick:()=>t(r.id),children:[(0,F.jsx)(i,{size:18}),(0,F.jsx)(`span`,{children:n(r.labelKey)})]},r.id)})}),(0,F.jsxs)(tk,{children:[(0,F.jsx)(nk,{children:r?`v${r}`:`…`}),a&&(0,F.jsx)(rk,{title:`Debug build`,children:`DEBUG`}),s?.available&&(0,F.jsx)(ak,{type:`button`,title:n(`app.update_available`,{version:s.latest}),onClick:()=>void Tc(`https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/releases/latest`).catch(()=>void 0)})]})]})},sk=P.header`
     height: 64px;
     background: var(--panel);
     backdrop-filter: blur(16px);
@@ -1854,7 +1854,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     justify-content: space-between;
     padding: 0 32px;
     flex-shrink: 0;
-`,sk=P.div`
+`,ck=P.div`
     display: flex;
     flex-direction: column;
     animation: headerEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1);
@@ -1869,15 +1869,15 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
             transform: translateY(0);
         }
     }
-`,ck=P.h1`
+`,lk=P.h1`
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.01em;
-`,lk=P.span`
+`,uk=P.span`
     font-size: 0.8rem;
     color: var(--text-secondary);
-`,uk=({currentTab:e})=>{let t=ji(),n=XO(e);return(0,F.jsx)(ok,{children:(0,F.jsxs)(sk,{children:[(0,F.jsx)(ck,{children:t(n.titleKey)}),(0,F.jsx)(lk,{children:t(n.subtitleKey)})]},e)})},dk=()=>{let e=ji(),t=Fi(),n=Ii();return(0,F.jsxs)(fk,{children:[(0,F.jsxs)(pk,{...n,children:[(0,F.jsx)(mk,{children:(0,F.jsx)(Or,{size:17})}),(0,F.jsx)(hk,{children:`URLCheck`}),(0,F.jsx)(gk,{children:e(`app.tagline`)})]}),(0,F.jsx)(_k,{...n}),(0,F.jsxs)(vk,{children:[(0,F.jsx)(yk,{onClick:t.minimize,title:e(`window.minimize`),type:`button`,children:(0,F.jsx)(`svg`,{"aria-hidden":`true`,viewBox:`0 0 10 10`,children:(0,F.jsx)(`path`,{d:`M2 5h6`})})}),(0,F.jsx)(yk,{onClick:t.toggleMaximize,title:e(t.maximized?`window.restore`:`window.maximize`),type:`button`,children:t.maximized?(0,F.jsxs)(`svg`,{"aria-hidden":`true`,viewBox:`0 0 10 10`,children:[(0,F.jsx)(`rect`,{height:`6`,width:`6`,x:`3`,y:`1`}),(0,F.jsx)(`rect`,{height:`6`,width:`6`,x:`1`,y:`3`})]}):(0,F.jsx)(`svg`,{"aria-hidden":`true`,viewBox:`0 0 10 10`,children:(0,F.jsx)(`rect`,{height:`6`,width:`6`,x:`2`,y:`2`})})}),(0,F.jsx)(bk,{onClick:t.close,title:e(`window.close`),type:`button`,children:(0,F.jsx)(`svg`,{"aria-hidden":`true`,viewBox:`0 0 10 10`,children:(0,F.jsx)(`path`,{d:`m2 2 6 6M8 2 2 8`})})})]})]})},fk=P.header`
+`,dk=({currentTab:e})=>{let t=ji(),n=ZO(e);return(0,F.jsx)(sk,{children:(0,F.jsxs)(ck,{children:[(0,F.jsx)(lk,{children:t(n.titleKey)}),(0,F.jsx)(uk,{children:t(n.subtitleKey)})]},e)})},fk=()=>{let e=ji(),t=Fi(),n=Ii();return(0,F.jsxs)(pk,{children:[(0,F.jsxs)(mk,{...n,children:[(0,F.jsx)(hk,{children:(0,F.jsx)(Or,{size:17})}),(0,F.jsx)(gk,{children:`URLCheck`}),(0,F.jsx)(_k,{children:e(`app.tagline`)})]}),(0,F.jsx)(vk,{...n}),(0,F.jsxs)(yk,{children:[(0,F.jsx)(bk,{onClick:t.minimize,title:e(`window.minimize`),type:`button`,children:(0,F.jsx)(`svg`,{"aria-hidden":`true`,viewBox:`0 0 10 10`,children:(0,F.jsx)(`path`,{d:`M2 5h6`})})}),(0,F.jsx)(bk,{onClick:t.toggleMaximize,title:e(t.maximized?`window.restore`:`window.maximize`),type:`button`,children:t.maximized?(0,F.jsxs)(`svg`,{"aria-hidden":`true`,viewBox:`0 0 10 10`,children:[(0,F.jsx)(`rect`,{height:`6`,width:`6`,x:`3`,y:`1`}),(0,F.jsx)(`rect`,{height:`6`,width:`6`,x:`1`,y:`3`})]}):(0,F.jsx)(`svg`,{"aria-hidden":`true`,viewBox:`0 0 10 10`,children:(0,F.jsx)(`rect`,{height:`6`,width:`6`,x:`2`,y:`2`})})}),(0,F.jsx)(xk,{onClick:t.close,title:e(`window.close`),type:`button`,children:(0,F.jsx)(`svg`,{"aria-hidden":`true`,viewBox:`0 0 10 10`,children:(0,F.jsx)(`path`,{d:`m2 2 6 6M8 2 2 8`})})})]})]})},pk=P.header`
     display: flex;
     align-items: stretch;
     height: 40px;
@@ -1887,13 +1887,13 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     border-bottom: 1px solid var(--border);
     user-select: none;
     -webkit-user-select: none;
-`,pk=P.div`
+`,mk=P.div`
     display: flex;
     align-items: center;
     gap: 9px;
     padding: 0 14px 0 12px;
     flex-shrink: 0;
-`,mk=P.span`
+`,hk=P.span`
     display: grid;
     place-items: center;
     width: 24px;
@@ -1902,12 +1902,12 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
     color: #ffffff;
     box-shadow: 0 0 12px rgba(99, 102, 241, 0.35);
-`,hk=P.strong`
+`,gk=P.strong`
     font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: -0.01em;
     color: var(--text-primary);
-`,gk=P.span`
+`,_k=P.span`
     font-size: 0.7rem;
     color: var(--text-muted);
 
@@ -1915,13 +1915,13 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     @media (max-width: 640px) {
         display: none;
     }
-`,_k=P.div`
+`,vk=P.div`
     flex: 1;
     min-width: 24px;
-`,vk=P.div`
+`,yk=P.div`
     display: flex;
     flex-shrink: 0;
-`,yk=P.button`
+`,bk=P.button`
     display: grid;
     place-items: center;
     width: 46px;
@@ -1949,12 +1949,12 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         outline: 2px solid rgba(59, 130, 246, 0.6);
         outline-offset: -2px;
     }
-`,bk=P(yk)`
+`,xk=P(bk)`
     &:hover {
         background: #e81123;
         color: #ffffff;
     }
-`,xk=P.div`
+`,Sk=P.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1966,7 +1966,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     background: rgba(239, 68, 68, 0.08);
     color: var(--danger);
     font-size: 0.9rem;
-`,Sk=()=>{let e=ji();return(0,F.jsxs)(xk,{children:[(0,F.jsx)(Fr,{size:28}),(0,F.jsx)(`span`,{children:e(`error.unknown`)})]})},Ck=class extends _.Component{state={failed:!1};static getDerivedStateFromError(){return{failed:!0}}componentDidCatch(e){console.error(`Page crashed`,e)}render(){return this.state.failed?(0,F.jsx)(Sk,{}):this.props.children}},wk=P.div`
+`,Ck=()=>{let e=ji();return(0,F.jsxs)(Sk,{children:[(0,F.jsx)(Fr,{size:28}),(0,F.jsx)(`span`,{children:e(`error.unknown`)})]})},wk=class extends _.Component{state={failed:!1};static getDerivedStateFromError(){return{failed:!0}}componentDidCatch(e){console.error(`Page crashed`,e)}render(){return this.state.failed?(0,F.jsx)(Ck,{}):this.props.children}},Tk=P.div`
     display: flex;
     flex-direction: column;
     width: 100vw;
@@ -1980,22 +1980,22 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
        here; the window itself is transparent behind them. */
     border-radius: ${e=>e.$rounded?`10px`:`0`};
     box-shadow: ${e=>e.$rounded?`inset 0 0 0 1px var(--border-soft)`:`none`};
-`,Tk=P.div`
+`,Ek=P.div`
     display: flex;
     flex: 1;
     min-height: 0;
     overflow: hidden;
-`,Ek=P.div`
+`,Dk=P.div`
     display: flex;
     flex-direction: column;
     flex: 1;
     min-width: 0;
     overflow: hidden;
-`,Dk=P.main`
+`,Ok=P.main`
     flex: 1;
     padding: 28px 32px 40px;
     overflow-y: auto;
-`;function Ok(){let[e,t]=(0,_.useState)(YO),n=Li();(0,_.useEffect)(()=>L.on(e=>{let n=e;n.type===`app.navigate`&&n.data?.tab&&t(n.data.tab)}),[]),(0,_.useEffect)(()=>{let e=window.setTimeout(()=>L.send({type:`app.ready`}),250);return()=>window.clearTimeout(e)},[]);let r=XO(e).page;return(0,F.jsxs)(wk,{$rounded:n,children:[(0,F.jsx)(dk,{}),(0,F.jsxs)(Tk,{children:[(0,F.jsx)(ak,{currentTab:e,onSelectTab:t}),(0,F.jsxs)(Ek,{children:[(0,F.jsx)(uk,{currentTab:e}),(0,F.jsx)(Dk,{children:(0,F.jsx)(il.Provider,{value:t,children:(0,F.jsx)(Ck,{children:(0,F.jsx)(r,{})},e)})})]})]}),(0,F.jsx)(zi,{})]})}var kk=new Set([`button`,`checkbox`,`color`,`file`,`hidden`,`image`,`radio`,`range`,`reset`,`submit`]),Ak=P.div`
+`;function kk(){let[e,t]=(0,_.useState)(XO),n=Li();(0,_.useEffect)(()=>L.on(e=>{let n=e;n.type===`app.navigate`&&n.data?.tab&&t(n.data.tab)}),[]),(0,_.useEffect)(()=>{let e=window.setTimeout(()=>L.send({type:`app.ready`}),250);return()=>window.clearTimeout(e)},[]);let r=ZO(e).page;return(0,F.jsxs)(Tk,{$rounded:n,children:[(0,F.jsx)(fk,{}),(0,F.jsxs)(Ek,{children:[(0,F.jsx)(ok,{currentTab:e,onSelectTab:t}),(0,F.jsxs)(Dk,{children:[(0,F.jsx)(dk,{currentTab:e}),(0,F.jsx)(Ok,{children:(0,F.jsx)(il.Provider,{value:t,children:(0,F.jsx)(wk,{children:(0,F.jsx)(r,{})},e)})})]})]}),(0,F.jsx)(zi,{})]})}var Ak=new Set([`button`,`checkbox`,`color`,`file`,`hidden`,`image`,`radio`,`range`,`reset`,`submit`]),jk=P.div`
     position: fixed;
     z-index: 2000;
     min-width: 200px;
@@ -2005,7 +2005,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     background: var(--input-focus);
     box-shadow: 0 16px 40px var(--shadow);
     backdrop-filter: blur(12px);
-`,jk=P.button`
+`,Mk=P.button`
     display: block;
     width: 100%;
     padding: 8px 10px;
@@ -2022,7 +2022,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         background: rgba(59, 130, 246, 0.18);
         color: var(--text-primary);
     }
-`,Mk=P.div`
+`,Nk=P.div`
     position: fixed;
     left: 50%;
     bottom: 24px;
@@ -2035,7 +2035,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     color: var(--success);
     font-size: 0.8rem;
     pointer-events: none;
-`;function Nk(e){return e?e instanceof HTMLTextAreaElement?!0:e instanceof HTMLInputElement?!kk.has(e.type):e instanceof HTMLElement&&e.isContentEditable:!1}function Pk(e){for(let t=e;t;t=t.parentElement)if(Nk(t))return t;return null}function Fk(e,t){let n=e instanceof HTMLTextAreaElement?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(n,`value`)?.set?.call(e,t)}function Ik(e,t){if(e.focus(),e.isContentEditable){document.execCommand(`insertText`,!1,t);return}let n=e,r=n.selectionStart??n.value.length,i=n.selectionEnd??r;Fk(n,n.value.slice(0,r)+t+n.value.slice(i)),n.dispatchEvent(new Event(`input`,{bubbles:!0})),n.setSelectionRange(r+t.length,r+t.length)}var Lk=()=>{let e=ji(),[t,n]=(0,_.useState)(null),[r,i]=(0,_.useState)(null),a=(0,_.useRef)(void 0),o=e=>{i(e),window.clearTimeout(a.current),a.current=window.setTimeout(()=>i(null),1800)};(0,_.useEffect)(()=>{let e=e=>{let t=e.target instanceof Element?e.target:null,r=window.getSelection()?.toString().trim()??``,i=t?.closest(`[data-history-url]`)?.dataset.historyUrl??null,a=Pk(t)??Pk(document.activeElement instanceof Element?document.activeElement:null);!r&&!i&&!a?n(null):(e.preventDefault(),n({x:Math.max(8,Math.min(e.clientX,window.innerWidth-220)),y:Math.max(8,Math.min(e.clientY,window.innerHeight-240)),selection:r,url:i,editable:a}))};return document.addEventListener(`contextmenu`,e),()=>document.removeEventListener(`contextmenu`,e)},[]),(0,_.useEffect)(()=>{if(!t)return;let e=()=>n(null),r=e=>{e.key===`Escape`&&n(null)};return window.addEventListener(`click`,e),window.addEventListener(`scroll`,e,!0),window.addEventListener(`resize`,e),window.addEventListener(`keydown`,r),()=>{window.removeEventListener(`click`,e),window.removeEventListener(`scroll`,e,!0),window.removeEventListener(`resize`,e),window.removeEventListener(`keydown`,r)}},[t]),(0,_.useEffect)(()=>()=>window.clearTimeout(a.current),[]);let s=async t=>{n(null);try{await navigator.clipboard.writeText(t),o(e(`popup.copied`))}catch{}},c=async e=>{n(null);try{let t=await Lc();t&&Ik(e,t)}catch{}},l=async t=>{n(null);try{await Ul(t),o(e(`history.auto_redirect_added`))}catch{}};return(0,F.jsxs)(F.Fragment,{children:[t&&(0,F.jsxs)(Ak,{style:{left:t.x,top:t.y},children:[t.selection&&(0,F.jsx)(jk,{type:`button`,onClick:()=>s(t.selection),children:e(`popup.copy`)}),t.url&&(0,F.jsx)(jk,{type:`button`,onClick:()=>s(t.url),children:e(`context.copy_url`)}),t.editable&&(0,F.jsx)(jk,{type:`button`,onClick:()=>c(t.editable),children:e(`context.paste`)}),t.url&&(0,F.jsx)(jk,{type:`button`,onClick:()=>l(t.url),children:e(`history.add_auto_redirect`)})]}),r&&(0,F.jsx)(Mk,{children:r})]})},Rk=e=>e===`light`||e===`dark`?e:`system`,zk=({children:e})=>{let[t,n]=(0,_.useState)(`system`);return(0,_.useEffect)(()=>{let e=!1;Bl().then(t=>{e||n(Rk(t.settings.theme))}).catch(()=>void 0);let t=L.on(e=>{e.type===`settings.changed`&&n(Rk(e.data?.settings.theme))});return()=>{e=!0,t()}},[]),Ui(t),(0,F.jsx)(F.Fragment,{children:e})};async function Bk(e,t){return await L.request(`inspect.status`,{url:e,userAgentId:t})}function Vk(e){return e.replace(/[.*+?^${}()|[\]\\]/g,`\\$&`)}function Hk(e){let t=Vk(e.toLowerCase()).replace(/\\\*/g,`.*`);return RegExp(`(^|\\.)${t}$`)}function Uk(e){let t={globalLiterals:new Set,globalRegex:[],scopes:[]};for(let n of e)if(!n.urlPattern&&!n.include?.length&&!n.exclude?.length&&!n.urlExceptions?.length)n.regex?t.globalRegex.push(new RegExp(n.pattern,`i`)):t.globalLiterals.add(n.pattern.toLowerCase());else for(let e of n.include?.length?n.include:[null])t.scopes.push({host:e?Hk(e):null,url:n.urlPattern?new RegExp(n.urlPattern,`i`):null,exclude:n.exclude?.map(Hk)??null,urlExceptions:n.urlExceptions?.map(e=>new RegExp(e,`i`))??null,literals:n.regex?new Set:new Set([n.pattern.toLowerCase()]),regex:n.regex?[new RegExp(n.pattern,`i`)]:[]});return t}function Wk(e,t,n,r){let i=e.toLowerCase();if(t.globalLiterals.has(i)||t.globalRegex.some(t=>t.test(e)))return!0;for(let a of t.scopes)if((!a.host||a.host.test(n))&&(!a.url||a.url.test(r))&&!a.exclude?.some(e=>e.test(n))&&!a.urlExceptions?.some(e=>e.test(r))&&(a.literals.has(i)||a.regex.some(t=>t.test(e))))return!0;return!1}function Gk(e){try{return new URL(e)}catch{return null}}function Kk(e,t){let n=Gk(e);return n?[...n.searchParams.keys()].filter(r=>Wk(r,t,n.hostname,e)):[]}function qk(e,t){let n=Gk(e);if(!n)return e;for(let r of[...n.searchParams.keys()])Wk(r,t,n.hostname,e)&&n.searchParams.delete(r);return n.toString()}function Jk(e,t){if(e.entries[e.index]===t)return{...e,editing:!1};let n=[...e.entries.slice(0,e.index+1),t];return{entries:n,index:n.length-1,editing:!1}}function Yk(e,t){switch(t.type){case`edit`:if(e.editing){let n=[...e.entries];return n[e.index]=t.value,{...e,entries:n}}return{...Jk(e,t.value),editing:!0};case`commit`:return Jk(e,t.value);case`jump`:return{...e,index:Math.max(0,Math.min(t.index,e.entries.length-1)),editing:!1}}}function Xk(){let e=window.location.hash,t=e.indexOf(`?`);return t<0?``:new URLSearchParams(e.slice(t+1)).get(`url`)??``}function Zk(e){let t=window.location.hash,n=t.indexOf(`?`);return n<0||new URLSearchParams(t.slice(n+1)).get(e)!==`0`}function Qk(e){try{return decodeURIComponent(e)}catch{return e}}function $k(e){let t=window.location.hash,n=t.indexOf(`?`);if(n<0)return null;let r=new URLSearchParams(t.slice(n+1)).get(e);return r?Qk(r):null}function eA(e){return e?Qk(e.pathname).replace(/^\//,``):``}var tA=Wn`
+`;function Pk(e){return e?e instanceof HTMLTextAreaElement?!0:e instanceof HTMLInputElement?!Ak.has(e.type):e instanceof HTMLElement&&e.isContentEditable:!1}function Fk(e){for(let t=e;t;t=t.parentElement)if(Pk(t))return t;return null}function Ik(e,t){let n=e instanceof HTMLTextAreaElement?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(n,`value`)?.set?.call(e,t)}function Lk(e,t){if(e.focus(),e.isContentEditable){document.execCommand(`insertText`,!1,t);return}let n=e,r=n.selectionStart??n.value.length,i=n.selectionEnd??r;Ik(n,n.value.slice(0,r)+t+n.value.slice(i)),n.dispatchEvent(new Event(`input`,{bubbles:!0})),n.setSelectionRange(r+t.length,r+t.length)}var Rk=()=>{let e=ji(),[t,n]=(0,_.useState)(null),[r,i]=(0,_.useState)(null),a=(0,_.useRef)(void 0),o=e=>{i(e),window.clearTimeout(a.current),a.current=window.setTimeout(()=>i(null),1800)};(0,_.useEffect)(()=>{let e=e=>{let t=e.target instanceof Element?e.target:null,r=window.getSelection()?.toString().trim()??``,i=t?.closest(`[data-history-url]`)?.dataset.historyUrl??null,a=Fk(t)??Fk(document.activeElement instanceof Element?document.activeElement:null);!r&&!i&&!a?n(null):(e.preventDefault(),n({x:Math.max(8,Math.min(e.clientX,window.innerWidth-220)),y:Math.max(8,Math.min(e.clientY,window.innerHeight-240)),selection:r,url:i,editable:a}))};return document.addEventListener(`contextmenu`,e),()=>document.removeEventListener(`contextmenu`,e)},[]),(0,_.useEffect)(()=>{if(!t)return;let e=()=>n(null),r=e=>{e.key===`Escape`&&n(null)};return window.addEventListener(`click`,e),window.addEventListener(`scroll`,e,!0),window.addEventListener(`resize`,e),window.addEventListener(`keydown`,r),()=>{window.removeEventListener(`click`,e),window.removeEventListener(`scroll`,e,!0),window.removeEventListener(`resize`,e),window.removeEventListener(`keydown`,r)}},[t]),(0,_.useEffect)(()=>()=>window.clearTimeout(a.current),[]);let s=async t=>{n(null);try{await navigator.clipboard.writeText(t),o(e(`popup.copied`))}catch{}},c=async e=>{n(null);try{let t=await Lc();t&&Lk(e,t)}catch{}},l=async t=>{n(null);try{await Ul(t),o(e(`history.auto_redirect_added`))}catch{}};return(0,F.jsxs)(F.Fragment,{children:[t&&(0,F.jsxs)(jk,{style:{left:t.x,top:t.y},children:[t.selection&&(0,F.jsx)(Mk,{type:`button`,onClick:()=>s(t.selection),children:e(`popup.copy`)}),t.url&&(0,F.jsx)(Mk,{type:`button`,onClick:()=>s(t.url),children:e(`context.copy_url`)}),t.editable&&(0,F.jsx)(Mk,{type:`button`,onClick:()=>c(t.editable),children:e(`context.paste`)}),t.url&&(0,F.jsx)(Mk,{type:`button`,onClick:()=>l(t.url),children:e(`history.add_auto_redirect`)})]}),r&&(0,F.jsx)(Nk,{children:r})]})},zk=e=>e===`light`||e===`dark`?e:`system`,Bk=({children:e})=>{let[t,n]=(0,_.useState)(`system`);return(0,_.useEffect)(()=>{let e=!1;Bl().then(t=>{e||n(zk(t.settings.theme))}).catch(()=>void 0);let t=L.on(e=>{e.type===`settings.changed`&&n(zk(e.data?.settings.theme))});return()=>{e=!0,t()}},[]),Ui(t),(0,F.jsx)(F.Fragment,{children:e})};async function Vk(e,t){return await L.request(`inspect.status`,{url:e,userAgentId:t})}function Hk(e){return e.replace(/[.*+?^${}()|[\]\\]/g,`\\$&`)}function Uk(e){let t=Hk(e.toLowerCase()).replace(/\\\*/g,`.*`);return RegExp(`(^|\\.)${t}$`)}function Wk(e){let t={globalLiterals:new Set,globalRegex:[],scopes:[]};for(let n of e)if(!n.urlPattern&&!n.include?.length&&!n.exclude?.length&&!n.urlExceptions?.length)n.regex?t.globalRegex.push(new RegExp(n.pattern,`i`)):t.globalLiterals.add(n.pattern.toLowerCase());else for(let e of n.include?.length?n.include:[null])t.scopes.push({host:e?Uk(e):null,url:n.urlPattern?new RegExp(n.urlPattern,`i`):null,exclude:n.exclude?.map(Uk)??null,urlExceptions:n.urlExceptions?.map(e=>new RegExp(e,`i`))??null,literals:n.regex?new Set:new Set([n.pattern.toLowerCase()]),regex:n.regex?[new RegExp(n.pattern,`i`)]:[]});return t}function Gk(e,t,n,r){let i=e.toLowerCase();if(t.globalLiterals.has(i)||t.globalRegex.some(t=>t.test(e)))return!0;for(let a of t.scopes)if((!a.host||a.host.test(n))&&(!a.url||a.url.test(r))&&!a.exclude?.some(e=>e.test(n))&&!a.urlExceptions?.some(e=>e.test(r))&&(a.literals.has(i)||a.regex.some(t=>t.test(e))))return!0;return!1}function Kk(e){try{return new URL(e)}catch{return null}}function qk(e,t){let n=Kk(e);return n?[...n.searchParams.keys()].filter(r=>Gk(r,t,n.hostname,e)):[]}function Jk(e,t){let n=Kk(e);if(!n)return e;for(let r of[...n.searchParams.keys()])Gk(r,t,n.hostname,e)&&n.searchParams.delete(r);return n.toString()}function Yk(e,t){if(e.entries[e.index]===t)return{...e,editing:!1};let n=[...e.entries.slice(0,e.index+1),t];return{entries:n,index:n.length-1,editing:!1}}function Xk(e,t){switch(t.type){case`edit`:if(e.editing){let n=[...e.entries];return n[e.index]=t.value,{...e,entries:n}}return{...Yk(e,t.value),editing:!0};case`commit`:return Yk(e,t.value);case`jump`:return{...e,index:Math.max(0,Math.min(t.index,e.entries.length-1)),editing:!1}}}function Zk(){let e=window.location.hash,t=e.indexOf(`?`);return t<0?``:new URLSearchParams(e.slice(t+1)).get(`url`)??``}function Qk(e){let t=window.location.hash,n=t.indexOf(`?`);return n<0||new URLSearchParams(t.slice(n+1)).get(e)!==`0`}function $k(e){try{return decodeURIComponent(e)}catch{return e}}function eA(e){let t=window.location.hash,n=t.indexOf(`?`);if(n<0)return null;let r=new URLSearchParams(t.slice(n+1)).get(e);return r?$k(r):null}function tA(e){return e?$k(e.pathname).replace(/^\//,``):``}var nA=Wn`
     from {
         opacity: 0;
         transform: translateY(-4px);
@@ -2044,7 +2044,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         opacity: 1;
         transform: translateY(0);
     }
-`,nA=P.div`
+`,rA=P.div`
     min-height: 100vh;
     background-color: var(--bg-primary);
     background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 70%);
@@ -2052,14 +2052,14 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     border-radius: ${e=>e.$borderless?`8px`:`0`};
     box-shadow: ${e=>e.$borderless?`inset 0 0 0 1px var(--border-strong)`:`none`};
     overflow: hidden;
-    animation: ${tA} 0.24s cubic-bezier(0.22, 1, 0.36, 1);
-`,rA=P.div`
+    animation: ${nA} 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+`,iA=P.div`
     height: 24px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     padding: 0 2px 0 6px;
-`,iA=P.button`
+`,aA=P.button`
     width: 24px;
     height: 20px;
     border-radius: 6px;
@@ -2075,12 +2075,12 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         background: rgba(239, 68, 68, 0.15);
         color: var(--danger);
     }
-`,aA=P.div`
+`,oA=P.div`
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding: 0 12px 12px;
-`,oA=P.input`
+`,sA=P.input`
     width: 100%;
     height: 34px;
     padding: 0 11px;
@@ -2097,15 +2097,15 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         border-color: ${e=>e.$warn?`var(--warning-strong)`:`#3b82f6`};
         box-shadow: 0 0 0 3px ${e=>e.$warn?`rgba(245, 158, 11, 0.25)`:`rgba(59, 130, 246, 0.25)`};
     }
-`,sA=P.div`
+`,cA=P.div`
     display: flex;
     align-items: center;
     gap: 6px;
     margin-top: -4px;
     color: var(--warning);
     font-size: 0.74rem;
-    animation: ${tA} 0.15s ease;
-`,cA=P.div`
+    animation: ${nA} 0.15s ease;
+`,lA=P.div`
     display: flex;
     align-items: flex-start;
     gap: 6px;
@@ -2116,7 +2116,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     color: var(--danger);
     font-size: 0.74rem;
     line-height: 1.35;
-    animation: ${tA} 0.15s ease;
+    animation: ${nA} 0.15s ease;
 
     span {
         flex: 1;
@@ -2131,13 +2131,13 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         cursor: pointer;
         padding: 0 2px;
     }
-`,lA=P.div`
+`,uA=P.div`
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 5px;
-`,uA=P.button`
+`,dA=P.button`
     min-width: 28px;
     height: 24px;
     padding: 0 6px;
@@ -2163,7 +2163,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         opacity: 0.35;
         cursor: not-allowed;
     }
-`,dA=P.button`
+`,fA=P.button`
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -2190,13 +2190,13 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     border: 1px solid ${e=>e.$tone===`ok`?`rgba(16, 185, 129, 0.3)`:e.$tone===`info`?`rgba(59, 130, 246, 0.3)`:e.$tone===`error`?`rgba(239, 68, 68, 0.3)`:`var(--border-soft)`};
     background: ${e=>e.$tone===`ok`?`rgba(16, 185, 129, 0.12)`:e.$tone===`info`?`rgba(59, 130, 246, 0.12)`:e.$tone===`error`?`rgba(239, 68, 68, 0.12)`:`var(--border-faint)`};
     color: ${e=>e.$tone===`ok`?`var(--success)`:e.$tone===`info`?`var(--link)`:e.$tone===`error`?`var(--danger)`:`var(--text-secondary)`};
-`,fA=P.div`
+`,pA=P.div`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: 6px;
-`,pA=P.button`
+`,mA=P.button`
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2229,17 +2229,17 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         opacity: 0.4;
         cursor: not-allowed;
     }
-`,mA=P.div`
+`,hA=P.div`
     border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
     background: var(--surface-dim);
-`,hA=P.div`
+`,gA=P.div`
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 4px 6px 4px 10px;
-`,gA=P.button`
+`,_A=P.button`
     display: flex;
     align-items: center;
     gap: 7px;
@@ -2258,7 +2258,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     &:hover {
         color: var(--text-primary);
     }
-`,_A=P.button`
+`,vA=P.button`
     display: flex;
     align-items: center;
     flex-shrink: 0;
@@ -2279,17 +2279,17 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         opacity: 0.35;
         cursor: not-allowed;
     }
-`,vA=P(_A)`
+`,yA=P(vA)`
     &:hover:not(:disabled) {
         color: var(--danger);
         background: rgba(239, 68, 68, 0.12);
     }
-`,yA=P.span`
+`,bA=P.span`
     display: inline-block;
     transition: transform 0.15s ease;
     transform: rotate(${e=>e.$open?`90deg`:`0deg`});
     font-size: 0.65rem;
-`,bA=P.span`
+`,xA=P.span`
     background: var(--border);
     color: var(--text-soft);
     border-radius: 9999px;
@@ -2297,34 +2297,34 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     font-size: 0.68rem;
     font-weight: 600;
     flex-shrink: 0;
-`,xA=P.span`
+`,SA=P.span`
     padding: 6px 2px;
     color: var(--text-muted);
     font-size: 0.76rem;
-`,SA=P.div`
+`,CA=P.div`
     display: flex;
     flex-direction: column;
     padding: 0 10px 7px;
-    animation: ${tA} 0.15s ease;
-`,CA=P.div`
+    animation: ${nA} 0.15s ease;
+`,wA=P.div`
     display: flex;
     gap: 10px;
     padding: 4px 0;
     border-top: 1px solid var(--border-faint);
     font-family: var(--font-mono);
     font-size: 0.75rem;
-`,wA=P.span`
+`,TA=P.span`
     color: var(--link);
     flex-shrink: 0;
     min-width: 78px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-`,TA=P.span`
+`,EA=P.span`
     color: var(--text-soft);
     flex: 1;
     word-break: break-all;
-`,EA=P.button`
+`,DA=P.button`
     background: none;
     border: none;
     padding: 0;
@@ -2339,7 +2339,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     &:hover {
         color: var(--accent-soft);
     }
-`,DA=P.input`
+`,OA=P.input`
     background: transparent;
     border: 1px solid transparent;
     border-radius: 5px;
@@ -2369,7 +2369,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         border-color: #3b82f6;
         background: var(--surface);
     }
-`,OA=P.button`
+`,kA=P.button`
     background: none;
     border: none;
     color: var(--text-muted);
@@ -2381,27 +2381,27 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     &:hover {
         color: var(--danger);
     }
-`,kA=P.div`
+`,AA=P.div`
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
     margin-top: 4px;
-`,AA=P.div`
+`,jA=P.div`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: 7px;
     width: 100%;
-`,jA=P.div`
-    position: relative;
-    display: flex;
 `,MA=P.div`
     position: relative;
     display: flex;
-`,NA=P.button`
+`,NA=P.div`
+    position: relative;
+    display: flex;
+`,PA=P.button`
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -2433,7 +2433,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         cursor: not-allowed;
         box-shadow: none;
     }
-`,PA=P.button`
+`,FA=P.button`
     width: 30px;
     border: none;
     border-left: 1px solid var(--border-hover);
@@ -2451,7 +2451,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         opacity: 0.55;
         cursor: not-allowed;
     }
-`,FA=P(pA)`
+`,IA=P(mA)`
     height: 32px;
     border-color: ${e=>e.$active?`rgba(99, 102, 241, 0.5)`:`var(--border-soft)`};
     background: ${e=>e.$active?`rgba(99, 102, 241, 0.22)`:`var(--border-faint)`};
@@ -2465,7 +2465,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         background: ${e=>e.$active?`rgba(99, 102, 241, 0.34)`:`var(--border-strong)`};
         color: ${e=>e.$active?`var(--accent-soft)`:`var(--text-primary)`};
     }
-`,IA=P.div`
+`,LA=P.div`
     display: flex;
     align-items: center;
     gap: 7px;
@@ -2475,7 +2475,7 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     background: ${e=>e.$tone===`error`?`rgba(239, 68, 68, 0.12)`:`rgba(16, 185, 129, 0.12)`};
     border: 1px solid ${e=>e.$tone===`error`?`rgba(239, 68, 68, 0.3)`:`rgba(16, 185, 129, 0.3)`};
     color: ${e=>e.$tone===`error`?`var(--danger)`:`var(--success)`};
-`,LA=()=>{let e=ji(),t=(0,_.useMemo)(Xk,[]),[n,r]=(0,_.useReducer)(Yk,{entries:[t],index:0,editing:!1}),i=n.entries[n.index],[a,o]=(0,_.useState)([]),[s,c]=(0,_.useState)([]),[l,u]=(0,_.useState)([]),[d,f]=(0,_.useState)(()=>new Set),[p,m]=(0,_.useState)(``),[h,g]=(0,_.useState)(null),[v,y]=(0,_.useState)(!1),[b,x]=(0,_.useState)(!1),[S,C]=(0,_.useState)(!1),[ee,w]=(0,_.useState)(!1),[te,T]=(0,_.useState)(null),[ne,re]=(0,_.useState)(!1),[ie,ae]=(0,_.useState)(!1),[oe]=(0,_.useState)(()=>Zk(`borderless`)),[se]=(0,_.useState)(()=>Zk(`strip`)),[ce,E]=(0,_.useState)(()=>$k(`scriptError`)),[le,D]=(0,_.useState)(null),ue=e=>se&&le&&Kk(e,le).length>0?qk(e,le):e,[de,fe]=(0,_.useState)(null),[pe,O]=(0,_.useState)(!1),[me,he]=(0,_.useState)(!1),[ge,_e]=(0,_.useState)({domain:!1,parameters:!1,fragment:!1}),ve=(0,_.useRef)(null),ye=(0,_.useRef)(0),be=(0,_.useRef)(void 0),xe=(0,_.useRef)(null),k=(0,_.useRef)(null),A=(0,_.useRef)(null),Se=kl(S,!1,xe),j=kl(b,!0,k),Ce=kl(ee,!0,A);(0,_.useEffect)(()=>{if(!S&&!b&&!ee)return;let e=()=>{C(!1),x(!1),w(!1)},t=e=>{let t=e.target;S&&!xe.current?.contains(t)&&C(!1),b&&!k.current?.contains(t)&&x(!1),ee&&!A.current?.contains(t)&&w(!1)},n=t=>{t.key===`Escape`&&e()};return document.addEventListener(`mousedown`,t),document.addEventListener(`keydown`,n),window.addEventListener(`blur`,e),()=>{document.removeEventListener(`mousedown`,t),document.removeEventListener(`keydown`,n),window.removeEventListener(`blur`,e)}},[S,b,ee]);let M=(0,_.useMemo)(()=>{try{return new URL(i)}catch{return null}},[i]),[we,N]=(0,_.useState)(()=>eA(M));(0,_.useEffect)(()=>{N(eA(M))},[M]);let Te=(0,_.useMemo)(()=>M?[...M.searchParams.entries()].map(([e,t])=>({key:e,value:t})):[],[M]),Ee=Qk(M?.hash.replace(/^#/,``)??``),De=M?.protocol===`http:`,Oe=a[0],ke=!!M&&a.length>0,Ae=le?Kk(i,le).length:0;(0,_.useEffect)(()=>{let e=!1;return(async()=>{try{let t=await Bl();if(e)return;o(t.settings.browsers),c(t.settings.userAgents),m(t.settings.selectedUserAgentId),u(t.settings.devices??[])}catch{}})(),()=>{e=!0}},[]),(0,_.useEffect)(()=>{let e=!1;return uu().then(t=>{e||D(Uk(t))}).catch(()=>void 0),()=>{e=!0}},[]),(0,_.useEffect)(()=>(document.documentElement.classList.toggle(`popup-transparent`,oe),()=>document.documentElement.classList.remove(`popup-transparent`)),[oe]),(0,_.useEffect)(()=>L.on(e=>{let t=e;t.type===`popup.navigate`&&t.data?.url&&(r({type:`commit`,value:t.data.url}),g(null),fe(null),E(t.data.scriptError??null))}),[]),(0,_.useEffect)(()=>{L.send({type:`popup.ready`})},[]),(0,_.useEffect)(()=>{let e=!1;return bc().then(t=>{e||O(t.platform===`windows`)}).catch(()=>void 0),()=>{e=!0}},[]),(0,_.useEffect)(()=>L.on(e=>{let t=e;t.type===`settings.changed`&&t.data?.settings&&u(t.data.settings.devices??[])}),[]),(0,_.useEffect)(()=>{let e=!1;Yl().then(t=>{e||f(t)}).catch(()=>void 0);let t=L.on(e=>{let t=e;t.type===`forward.presence`&&f(new Set(t.data?.online??[]))});return()=>{e=!0,t()}},[]);let je=l.filter(e=>d.has(e.id));(0,_.useEffect)(()=>{je.length===0&&w(!1)},[je.length]),(0,_.useEffect)(()=>{let e=ue(t);e!==t&&r({type:`commit`,value:e})},[t,se,le]),(0,_.useEffect)(()=>{let e=ve.current;if(!e)return;let t=()=>{window.clearTimeout(be.current),be.current=window.setTimeout(()=>{let t=Math.ceil(e.offsetHeight)+24;Math.abs(t-ye.current)<2||(ye.current=t,Gc(t))},60)},n=new ResizeObserver(t);return n.observe(e),window.addEventListener(`resize`,t),()=>{window.clearTimeout(be.current),n.disconnect(),window.removeEventListener(`resize`,t)}},[]);let Me=e=>{r({type:`commit`,value:e}),g(null)},Ne=e=>{r({type:`edit`,value:e}),g(null)},Pe=e=>{e.key===`Enter`&&e.currentTarget.blur()},Fe=()=>{if(!M)return;let e=new URL(i);e.pathname=`/${we}`;let t=e.toString();Me(t),N(eA(new URL(t)))},Ie=(e,t)=>{if(!M)return;let n=[...M.searchParams.entries()].map(([n,r],i)=>i===e?{key:t.key??n,value:t.value??r}:{key:n,value:r}),r=new URL(i);r.search=``;for(let e of n)r.searchParams.append(e.key,e.value);Ne(r.toString())},Le=e=>{if(!M)return;let t=new URL(i);t.hash=e,Ne(t.toString())},Re=()=>{if(!M)return;let e=new URL(i);e.searchParams.append(``,``),Me(e.toString())},ze=()=>{if(!M)return;let e=new URL(i);e.hash=``,Me(e.toString())},Be=()=>{M&&Me(`${M.origin}/`)},Ve=async()=>{y(!0),fe(null);try{let e=await Bk(i,p);if(e.location){r({type:`commit`,value:e.location});let t=ue(e.location);t!==e.location&&r({type:`commit`,value:t})}g(e)}catch(e){fe(e instanceof Error?e.message:String(e))}finally{y(!1)}},He=async e=>{x(!1),fe(null);try{await Gl(i,e,ne),Rc()}catch(e){fe(e instanceof Error?e.message:String(e))}},Ue=async()=>{fe(null);try{await navigator.clipboard.writeText(i),ae(!0),setTimeout(()=>ae(!1),1500)}catch(e){fe(e instanceof Error?e.message:String(e))}},We=async e=>{w(!1),fe(null);try{await Jl(i,e),T(e),setTimeout(()=>T(null),1500)}catch(e){fe(e instanceof Error?e.message:String(e))}},Ge=async()=>{if(M){fe(null),he(!0);try{await Bc(i,M.host)}catch(e){fe(e instanceof Error?e.message:String(e))}finally{he(!1)}}},Ke=(e,t)=>{if(!M)return;let n=new URL(i),r=[...n.searchParams.entries()];n.search=``;for(let[i,a]of r)(i!==e||a!==t)&&n.searchParams.append(i,a);Me(n.toString())},qe=()=>{if(!M)return;let e=new URL(i);e.search=``,Me(e.toString())},Je=()=>{if(!M)return;let e=new URL(i);e.protocol=`https:`,Me(e.toString())},Ye=e=>_e(t=>({...t,[e]:!t[e]})),Xe=h?h.ok?`ok`:h.statusCode>=300&&h.statusCode<400?`info`:`error`:`idle`,Ze=h?.location?e(`popup.redirected`):h?.statusText===`error.timeout`?e(`error.timeout`):h?.statusText,Qe=v?e(`popup.checking`):h?`${h.statusCode||`!`} ${Ze??``}`.trim():e(`popup.check_status`),$e=Xe===`ok`?Pr:Xe===`error`?Ir:Fr;return(0,F.jsxs)(nA,{$borderless:oe,children:[(0,F.jsx)(rA,{children:(0,F.jsx)(iA,{onClick:Rc,title:e(`popup.close`),children:`✕`})}),ce&&(0,F.jsxs)(cA,{children:[(0,F.jsx)(Fr,{size:13}),(0,F.jsx)(`span`,{children:e(`popup.script_error`,{error:ce})}),(0,F.jsx)(`button`,{onClick:()=>E(null),title:e(`popup.close`),type:`button`,children:`×`})]}),(0,F.jsxs)(aA,{ref:ve,children:[(0,F.jsx)(oA,{type:`text`,value:i,spellCheck:!1,$warn:De,onChange:e=>Ne(e.target.value),onBlur:()=>r({type:`commit`,value:i}),placeholder:`https://example.com/path?key=value`}),De&&(0,F.jsxs)(sA,{children:[(0,F.jsx)(Fr,{size:13}),(0,F.jsx)(`span`,{children:e(`popup.http_warning`)})]}),n.entries.length>1&&(0,F.jsxs)(lA,{ref:xe,children:[(0,F.jsx)(uA,{onClick:()=>r({type:`jump`,index:0}),disabled:n.index===0,title:e(`popup.first`),children:`|◀`}),(0,F.jsx)(uA,{onClick:()=>r({type:`jump`,index:n.index-1}),disabled:n.index===0,title:e(`popup.back`),children:`◀`}),(0,F.jsx)(uA,{onClick:()=>C(e=>!e),title:e(`popup.history`),children:`▾`}),(0,F.jsx)(uA,{onClick:()=>r({type:`jump`,index:n.index+1}),disabled:n.index>=n.entries.length-1,title:e(`popup.forward`),children:`▶`}),(0,F.jsx)(uA,{onClick:()=>r({type:`jump`,index:n.entries.length-1}),disabled:n.index>=n.entries.length-1,title:e(`popup.last`),children:`▶|`}),S&&(0,F.jsx)(El,{$stretch:!0,style:Se,children:n.entries.map((e,t)=>(0,F.jsx)(Dl,{$mono:!0,$active:t===n.index,onClick:()=>{r({type:`jump`,index:t}),C(!1)},children:e},`${t}-${e}`))})]}),(0,F.jsxs)(fA,{children:[s.length>0&&(0,F.jsx)(Nl,{value:p,disabled:v,options:s.map(e=>({value:e.id,label:e.name})),onChange:m,title:e(`popup.user_agent_tooltip`)}),(0,F.jsxs)(dA,{$tone:Xe,onClick:Ve,disabled:v,title:e(`popup.check_status`),children:[(0,F.jsx)($e,{size:13}),(0,F.jsx)(`span`,{children:Qe})]}),(0,F.jsxs)(pA,{onClick:()=>le&&Me(qk(i,le)),disabled:!M||!le,title:e(`popup.remove_tracking_tooltip`),children:[(0,F.jsx)(Ur,{size:13}),e(`popup.tracking`),Ae>0?` (${Ae})`:``]}),De&&(0,F.jsx)(pA,{$accent:!0,onClick:Je,children:e(`popup.use_https`)})]}),(0,F.jsxs)(mA,{children:[(0,F.jsx)(hA,{children:(0,F.jsxs)(gA,{onClick:()=>Ye(`domain`),children:[(0,F.jsx)(yA,{$open:ge.domain,children:`▶`}),(0,F.jsx)(`span`,{children:e(`popup.domain`)})]})}),ge.domain&&(0,F.jsxs)(SA,{children:[(0,F.jsxs)(CA,{children:[(0,F.jsx)(wA,{children:e(`popup.scheme`)}),(0,F.jsx)(TA,{children:M?.protocol.replace(/:$/,``)??`(none)`})]}),(0,F.jsxs)(CA,{children:[(0,F.jsx)(wA,{children:e(`popup.host`)}),(0,F.jsx)(TA,{children:M?(0,F.jsx)(EA,{onClick:Be,title:e(`popup.host_tooltip`),children:Qk(M.host)}):`(none)`})]}),(0,F.jsxs)(CA,{children:[(0,F.jsx)(wA,{children:e(`popup.path`)}),(0,F.jsx)(DA,{className:`value`,spellCheck:!1,placeholder:e(`popup.empty`),value:we,disabled:!M,onChange:e=>N(e.target.value),onBlur:Fe,onKeyDown:Pe})]})]})]}),(0,F.jsxs)(mA,{children:[(0,F.jsxs)(hA,{children:[(0,F.jsxs)(gA,{onClick:()=>Ye(`parameters`),children:[(0,F.jsx)(yA,{$open:ge.parameters,children:`▶`}),(0,F.jsx)(`span`,{children:e(`popup.parameters`)})]}),(0,F.jsx)(bA,{children:Te.length}),(0,F.jsx)(_A,{title:e(`popup.add_parameter`),onClick:Re,disabled:!M,children:(0,F.jsx)(Hr,{size:14})}),(0,F.jsx)(vA,{title:e(`popup.remove_all_parameters`),onClick:qe,disabled:!M||Te.length===0,children:(0,F.jsx)(Ur,{size:13})})]}),ge.parameters&&(0,F.jsxs)(SA,{children:[Te.length===0&&(0,F.jsx)(xA,{children:e(`popup.no_parameters`)}),Te.map((t,n)=>(0,F.jsxs)(CA,{children:[(0,F.jsx)(DA,{className:`key`,title:e(`popup.parameter_name`),value:t.key,onChange:e=>Ie(n,{key:e.target.value})}),(0,F.jsx)(DA,{className:`value`,title:e(`popup.parameter_value`),placeholder:e(`popup.empty`),value:t.value,onChange:e=>Ie(n,{value:e.target.value})}),(0,F.jsx)(OA,{title:e(`popup.remove_parameter`),onClick:()=>Ke(t.key,t.value),children:(0,F.jsx)(Ur,{size:12})})]},n))]})]}),(0,F.jsxs)(mA,{children:[(0,F.jsxs)(hA,{children:[(0,F.jsxs)(gA,{onClick:()=>Ye(`fragment`),children:[(0,F.jsx)(yA,{$open:ge.fragment,children:`▶`}),(0,F.jsx)(`span`,{children:e(`popup.fragment`)})]}),(0,F.jsx)(vA,{title:e(`popup.remove_fragment`),onClick:ze,disabled:!M||Ee.length===0,children:(0,F.jsx)(Ur,{size:13})})]}),ge.fragment&&(0,F.jsx)(SA,{children:(0,F.jsxs)(CA,{children:[(0,F.jsx)(wA,{children:`#`}),(0,F.jsx)(DA,{className:`value`,title:e(`popup.fragment_tooltip`),placeholder:e(`popup.empty`),value:Ee,onChange:e=>Le(e.target.value)})]})})]}),de&&(0,F.jsxs)(IA,{$tone:`error`,children:[(0,F.jsx)(Fr,{size:13}),(0,F.jsx)(`span`,{children:e(de)})]}),(0,F.jsxs)(kA,{children:[(0,F.jsxs)(AA,{children:[(0,F.jsxs)(FA,{$active:ne,onClick:()=>re(e=>!e),title:e(`popup.private_tooltip`),children:[(0,F.jsx)(zr,{size:13}),e(`popup.private`)]}),je.length>0&&(0,F.jsxs)(MA,{ref:A,children:[(0,F.jsxs)(FA,{onClick:()=>w(e=>!e),disabled:!M,title:e(`popup.send_to_tooltip`),children:[(0,F.jsx)(Gr,{size:13}),e(`popup.send_to`),(0,F.jsx)(Ml,{$open:ee,children:`▾`})]}),ee&&(0,F.jsx)(El,{$up:!0,style:{...Ce,left:`auto`,right:0,maxWidth:280},children:je.map(t=>(0,F.jsx)(Dl,{onClick:()=>We(t.id),children:te===t.id?e(`popup.sent`):t.name||t.host},t.id))})]}),pe&&(0,F.jsxs)(FA,{onClick:Ge,disabled:!M||me,title:e(`popup.share_tooltip`),children:[(0,F.jsx)(Kr,{size:13}),e(`popup.share`)]}),(0,F.jsxs)(FA,{onClick:Ue,disabled:!M,children:[(0,F.jsx)(Br,{size:13}),e(ie?`popup.copied`:`popup.copy`)]})]}),(0,F.jsx)(AA,{children:(0,F.jsxs)(jA,{ref:k,children:[(0,F.jsxs)(NA,{disabled:!ke,onClick:()=>He(),children:[(0,F.jsx)(Rr,{size:14}),(0,F.jsx)(`span`,{children:e(`popup.open`,{browser:Oe?.name??e(`popup.open_fallback`)})})]}),(0,F.jsx)(PA,{disabled:a.length===0,onClick:()=>x(e=>!e),title:e(`popup.choose_browser`),children:`▾`}),b&&(0,F.jsx)(El,{$up:!0,style:j,children:a.map(e=>(0,F.jsx)(Dl,{onClick:()=>He(e.id),children:e.name},e.id))})]})})]})]})]})},RA=Wn`
+`,RA=()=>{let e=ji(),t=(0,_.useMemo)(Zk,[]),[n,r]=(0,_.useReducer)(Xk,{entries:[t],index:0,editing:!1}),i=n.entries[n.index],[a,o]=(0,_.useState)([]),[s,c]=(0,_.useState)([]),[l,u]=(0,_.useState)([]),[d,f]=(0,_.useState)(()=>new Set),[p,m]=(0,_.useState)(``),[h,g]=(0,_.useState)(null),[v,y]=(0,_.useState)(!1),[b,x]=(0,_.useState)(!1),[S,C]=(0,_.useState)(!1),[ee,w]=(0,_.useState)(!1),[te,T]=(0,_.useState)(null),[ne,re]=(0,_.useState)(!1),[ie,ae]=(0,_.useState)(!1),[oe]=(0,_.useState)(()=>Qk(`borderless`)),[se]=(0,_.useState)(()=>Qk(`strip`)),[ce,E]=(0,_.useState)(()=>eA(`scriptError`)),[le,D]=(0,_.useState)(null),ue=e=>se&&le&&qk(e,le).length>0?Jk(e,le):e,[de,fe]=(0,_.useState)(null),[pe,O]=(0,_.useState)(!1),[me,he]=(0,_.useState)(!1),[ge,_e]=(0,_.useState)({domain:!1,parameters:!1,fragment:!1}),ve=(0,_.useRef)(null),ye=(0,_.useRef)(0),be=(0,_.useRef)(void 0),xe=(0,_.useRef)(null),k=(0,_.useRef)(null),A=(0,_.useRef)(null),Se=kl(S,!1,xe),j=kl(b,!0,k),Ce=kl(ee,!0,A);(0,_.useEffect)(()=>{if(!S&&!b&&!ee)return;let e=()=>{C(!1),x(!1),w(!1)},t=e=>{let t=e.target;S&&!xe.current?.contains(t)&&C(!1),b&&!k.current?.contains(t)&&x(!1),ee&&!A.current?.contains(t)&&w(!1)},n=t=>{t.key===`Escape`&&e()};return document.addEventListener(`mousedown`,t),document.addEventListener(`keydown`,n),window.addEventListener(`blur`,e),()=>{document.removeEventListener(`mousedown`,t),document.removeEventListener(`keydown`,n),window.removeEventListener(`blur`,e)}},[S,b,ee]);let M=(0,_.useMemo)(()=>{try{return new URL(i)}catch{return null}},[i]),[we,N]=(0,_.useState)(()=>tA(M));(0,_.useEffect)(()=>{N(tA(M))},[M]);let Te=(0,_.useMemo)(()=>M?[...M.searchParams.entries()].map(([e,t])=>({key:e,value:t})):[],[M]),Ee=$k(M?.hash.replace(/^#/,``)??``),De=M?.protocol===`http:`,Oe=a[0],ke=!!M&&a.length>0,Ae=le?qk(i,le).length:0;(0,_.useEffect)(()=>{let e=!1;return(async()=>{try{let t=await Bl();if(e)return;o(t.settings.browsers),c(t.settings.userAgents),m(t.settings.selectedUserAgentId),u(t.settings.devices??[])}catch{}})(),()=>{e=!0}},[]),(0,_.useEffect)(()=>{let e=!1;return uu().then(t=>{e||D(Wk(t))}).catch(()=>void 0),()=>{e=!0}},[]),(0,_.useEffect)(()=>(document.documentElement.classList.toggle(`popup-transparent`,oe),()=>document.documentElement.classList.remove(`popup-transparent`)),[oe]),(0,_.useEffect)(()=>L.on(e=>{let t=e;t.type===`popup.navigate`&&t.data?.url&&(r({type:`commit`,value:t.data.url}),g(null),fe(null),E(t.data.scriptError??null))}),[]),(0,_.useEffect)(()=>{L.send({type:`popup.ready`})},[]),(0,_.useEffect)(()=>{let e=!1;return bc().then(t=>{e||O(t.platform===`windows`)}).catch(()=>void 0),()=>{e=!0}},[]),(0,_.useEffect)(()=>L.on(e=>{let t=e;t.type===`settings.changed`&&t.data?.settings&&u(t.data.settings.devices??[])}),[]),(0,_.useEffect)(()=>{let e=!1;Yl().then(t=>{e||f(t)}).catch(()=>void 0);let t=L.on(e=>{let t=e;t.type===`forward.presence`&&f(new Set(t.data?.online??[]))});return()=>{e=!0,t()}},[]);let je=l.filter(e=>d.has(e.id));(0,_.useEffect)(()=>{je.length===0&&w(!1)},[je.length]),(0,_.useEffect)(()=>{let e=ue(t);e!==t&&r({type:`commit`,value:e})},[t,se,le]),(0,_.useEffect)(()=>{let e=ve.current;if(!e)return;let t=()=>{window.clearTimeout(be.current),be.current=window.setTimeout(()=>{let t=Math.ceil(e.offsetHeight)+24;Math.abs(t-ye.current)<2||(ye.current=t,Gc(t))},60)},n=new ResizeObserver(t);return n.observe(e),window.addEventListener(`resize`,t),()=>{window.clearTimeout(be.current),n.disconnect(),window.removeEventListener(`resize`,t)}},[]);let Me=e=>{r({type:`commit`,value:e}),g(null)},Ne=e=>{r({type:`edit`,value:e}),g(null)},Pe=e=>{e.key===`Enter`&&e.currentTarget.blur()},Fe=()=>{if(!M)return;let e=new URL(i);e.pathname=`/${we}`;let t=e.toString();Me(t),N(tA(new URL(t)))},Ie=(e,t)=>{if(!M)return;let n=[...M.searchParams.entries()].map(([n,r],i)=>i===e?{key:t.key??n,value:t.value??r}:{key:n,value:r}),r=new URL(i);r.search=``;for(let e of n)r.searchParams.append(e.key,e.value);Ne(r.toString())},Le=e=>{if(!M)return;let t=new URL(i);t.hash=e,Ne(t.toString())},Re=()=>{if(!M)return;let e=new URL(i);e.searchParams.append(``,``),Me(e.toString())},ze=()=>{if(!M)return;let e=new URL(i);e.hash=``,Me(e.toString())},Be=()=>{M&&Me(`${M.origin}/`)},Ve=async()=>{y(!0),fe(null);try{let e=await Vk(i,p);if(e.location){r({type:`commit`,value:e.location});let t=ue(e.location);t!==e.location&&r({type:`commit`,value:t})}g(e)}catch(e){fe(e instanceof Error?e.message:String(e))}finally{y(!1)}},He=async e=>{x(!1),fe(null);try{await Gl(i,e,ne),Rc()}catch(e){fe(e instanceof Error?e.message:String(e))}},Ue=async()=>{fe(null);try{await navigator.clipboard.writeText(i),ae(!0),setTimeout(()=>ae(!1),1500)}catch(e){fe(e instanceof Error?e.message:String(e))}},We=async e=>{w(!1),fe(null);try{await Jl(i,e),T(e),setTimeout(()=>T(null),1500)}catch(e){fe(e instanceof Error?e.message:String(e))}},Ge=async()=>{if(M){fe(null),he(!0);try{await Bc(i,M.host)}catch(e){fe(e instanceof Error?e.message:String(e))}finally{he(!1)}}},Ke=(e,t)=>{if(!M)return;let n=new URL(i),r=[...n.searchParams.entries()];n.search=``;for(let[i,a]of r)(i!==e||a!==t)&&n.searchParams.append(i,a);Me(n.toString())},qe=()=>{if(!M)return;let e=new URL(i);e.search=``,Me(e.toString())},Je=()=>{if(!M)return;let e=new URL(i);e.protocol=`https:`,Me(e.toString())},Ye=e=>_e(t=>({...t,[e]:!t[e]})),Xe=h?h.ok?`ok`:h.statusCode>=300&&h.statusCode<400?`info`:`error`:`idle`,Ze=h?.location?e(`popup.redirected`):h?.statusText===`error.timeout`?e(`error.timeout`):h?.statusText,Qe=v?e(`popup.checking`):h?`${h.statusCode||`!`} ${Ze??``}`.trim():e(`popup.check_status`),$e=Xe===`ok`?Pr:Xe===`error`?Ir:Fr;return(0,F.jsxs)(rA,{$borderless:oe,children:[(0,F.jsx)(iA,{children:(0,F.jsx)(aA,{onClick:Rc,title:e(`popup.close`),children:`✕`})}),ce&&(0,F.jsxs)(lA,{children:[(0,F.jsx)(Fr,{size:13}),(0,F.jsx)(`span`,{children:e(`popup.script_error`,{error:ce})}),(0,F.jsx)(`button`,{onClick:()=>E(null),title:e(`popup.close`),type:`button`,children:`×`})]}),(0,F.jsxs)(oA,{ref:ve,children:[(0,F.jsx)(sA,{type:`text`,value:i,spellCheck:!1,$warn:De,onChange:e=>Ne(e.target.value),onBlur:()=>r({type:`commit`,value:i}),placeholder:`https://example.com/path?key=value`}),De&&(0,F.jsxs)(cA,{children:[(0,F.jsx)(Fr,{size:13}),(0,F.jsx)(`span`,{children:e(`popup.http_warning`)})]}),n.entries.length>1&&(0,F.jsxs)(uA,{ref:xe,children:[(0,F.jsx)(dA,{onClick:()=>r({type:`jump`,index:0}),disabled:n.index===0,title:e(`popup.first`),children:`|◀`}),(0,F.jsx)(dA,{onClick:()=>r({type:`jump`,index:n.index-1}),disabled:n.index===0,title:e(`popup.back`),children:`◀`}),(0,F.jsx)(dA,{onClick:()=>C(e=>!e),title:e(`popup.history`),children:`▾`}),(0,F.jsx)(dA,{onClick:()=>r({type:`jump`,index:n.index+1}),disabled:n.index>=n.entries.length-1,title:e(`popup.forward`),children:`▶`}),(0,F.jsx)(dA,{onClick:()=>r({type:`jump`,index:n.entries.length-1}),disabled:n.index>=n.entries.length-1,title:e(`popup.last`),children:`▶|`}),S&&(0,F.jsx)(El,{$stretch:!0,style:Se,children:n.entries.map((e,t)=>(0,F.jsx)(Dl,{$mono:!0,$active:t===n.index,onClick:()=>{r({type:`jump`,index:t}),C(!1)},children:e},`${t}-${e}`))})]}),(0,F.jsxs)(pA,{children:[s.length>0&&(0,F.jsx)(Nl,{value:p,disabled:v,options:s.map(e=>({value:e.id,label:e.name})),onChange:m,title:e(`popup.user_agent_tooltip`)}),(0,F.jsxs)(fA,{$tone:Xe,onClick:Ve,disabled:v,title:e(`popup.check_status`),children:[(0,F.jsx)($e,{size:13}),(0,F.jsx)(`span`,{children:Qe})]}),(0,F.jsxs)(mA,{onClick:()=>le&&Me(Jk(i,le)),disabled:!M||!le,title:e(`popup.remove_tracking_tooltip`),children:[(0,F.jsx)(Ur,{size:13}),e(`popup.tracking`),Ae>0?` (${Ae})`:``]}),De&&(0,F.jsx)(mA,{$accent:!0,onClick:Je,children:e(`popup.use_https`)})]}),(0,F.jsxs)(hA,{children:[(0,F.jsx)(gA,{children:(0,F.jsxs)(_A,{onClick:()=>Ye(`domain`),children:[(0,F.jsx)(bA,{$open:ge.domain,children:`▶`}),(0,F.jsx)(`span`,{children:e(`popup.domain`)})]})}),ge.domain&&(0,F.jsxs)(CA,{children:[(0,F.jsxs)(wA,{children:[(0,F.jsx)(TA,{children:e(`popup.scheme`)}),(0,F.jsx)(EA,{children:M?.protocol.replace(/:$/,``)??`(none)`})]}),(0,F.jsxs)(wA,{children:[(0,F.jsx)(TA,{children:e(`popup.host`)}),(0,F.jsx)(EA,{children:M?(0,F.jsx)(DA,{onClick:Be,title:e(`popup.host_tooltip`),children:$k(M.host)}):`(none)`})]}),(0,F.jsxs)(wA,{children:[(0,F.jsx)(TA,{children:e(`popup.path`)}),(0,F.jsx)(OA,{className:`value`,spellCheck:!1,placeholder:e(`popup.empty`),value:we,disabled:!M,onChange:e=>N(e.target.value),onBlur:Fe,onKeyDown:Pe})]})]})]}),(0,F.jsxs)(hA,{children:[(0,F.jsxs)(gA,{children:[(0,F.jsxs)(_A,{onClick:()=>Ye(`parameters`),children:[(0,F.jsx)(bA,{$open:ge.parameters,children:`▶`}),(0,F.jsx)(`span`,{children:e(`popup.parameters`)})]}),(0,F.jsx)(xA,{children:Te.length}),(0,F.jsx)(vA,{title:e(`popup.add_parameter`),onClick:Re,disabled:!M,children:(0,F.jsx)(Hr,{size:14})}),(0,F.jsx)(yA,{title:e(`popup.remove_all_parameters`),onClick:qe,disabled:!M||Te.length===0,children:(0,F.jsx)(Ur,{size:13})})]}),ge.parameters&&(0,F.jsxs)(CA,{children:[Te.length===0&&(0,F.jsx)(SA,{children:e(`popup.no_parameters`)}),Te.map((t,n)=>(0,F.jsxs)(wA,{children:[(0,F.jsx)(OA,{className:`key`,title:e(`popup.parameter_name`),value:t.key,onChange:e=>Ie(n,{key:e.target.value})}),(0,F.jsx)(OA,{className:`value`,title:e(`popup.parameter_value`),placeholder:e(`popup.empty`),value:t.value,onChange:e=>Ie(n,{value:e.target.value})}),(0,F.jsx)(kA,{title:e(`popup.remove_parameter`),onClick:()=>Ke(t.key,t.value),children:(0,F.jsx)(Ur,{size:12})})]},n))]})]}),(0,F.jsxs)(hA,{children:[(0,F.jsxs)(gA,{children:[(0,F.jsxs)(_A,{onClick:()=>Ye(`fragment`),children:[(0,F.jsx)(bA,{$open:ge.fragment,children:`▶`}),(0,F.jsx)(`span`,{children:e(`popup.fragment`)})]}),(0,F.jsx)(yA,{title:e(`popup.remove_fragment`),onClick:ze,disabled:!M||Ee.length===0,children:(0,F.jsx)(Ur,{size:13})})]}),ge.fragment&&(0,F.jsx)(CA,{children:(0,F.jsxs)(wA,{children:[(0,F.jsx)(TA,{children:`#`}),(0,F.jsx)(OA,{className:`value`,title:e(`popup.fragment_tooltip`),placeholder:e(`popup.empty`),value:Ee,onChange:e=>Le(e.target.value)})]})})]}),de&&(0,F.jsxs)(LA,{$tone:`error`,children:[(0,F.jsx)(Fr,{size:13}),(0,F.jsx)(`span`,{children:e(de)})]}),(0,F.jsxs)(AA,{children:[(0,F.jsxs)(jA,{children:[(0,F.jsxs)(IA,{$active:ne,onClick:()=>re(e=>!e),title:e(`popup.private_tooltip`),children:[(0,F.jsx)(zr,{size:13}),e(`popup.private`)]}),je.length>0&&(0,F.jsxs)(NA,{ref:A,children:[(0,F.jsxs)(IA,{onClick:()=>w(e=>!e),disabled:!M,title:e(`popup.send_to_tooltip`),children:[(0,F.jsx)(Gr,{size:13}),e(`popup.send_to`),(0,F.jsx)(Ml,{$open:ee,children:`▾`})]}),ee&&(0,F.jsx)(El,{$up:!0,style:{...Ce,left:`auto`,right:0,maxWidth:280},children:je.map(t=>(0,F.jsx)(Dl,{onClick:()=>We(t.id),children:te===t.id?e(`popup.sent`):t.name||t.host},t.id))})]}),pe&&(0,F.jsxs)(IA,{onClick:Ge,disabled:!M||me,title:e(`popup.share_tooltip`),children:[(0,F.jsx)(Kr,{size:13}),e(`popup.share`)]}),(0,F.jsxs)(IA,{onClick:Ue,disabled:!M,children:[(0,F.jsx)(Br,{size:13}),e(ie?`popup.copied`:`popup.copy`)]})]}),(0,F.jsx)(jA,{children:(0,F.jsxs)(MA,{ref:k,children:[(0,F.jsxs)(PA,{disabled:!ke,onClick:()=>He(),children:[(0,F.jsx)(Rr,{size:14}),(0,F.jsx)(`span`,{children:e(`popup.open`,{browser:Oe?.name??e(`popup.open_fallback`)})})]}),(0,F.jsx)(FA,{disabled:a.length===0,onClick:()=>x(e=>!e),title:e(`popup.choose_browser`),children:`▾`}),b&&(0,F.jsx)(El,{$up:!0,style:j,children:a.map(e=>(0,F.jsx)(Dl,{onClick:()=>He(e.id),children:e.name},e.id))})]})})]})]})]})},zA=Wn`
     from {
         opacity: 0;
         transform: scale(0.85);
@@ -2484,14 +2484,14 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
         opacity: 1;
         transform: scale(1);
     }
-`,zA=P.div`
+`,BA=P.div`
     display: flex;
     width: 100%;
     height: 100%;
     align-items: center;
     justify-content: center;
     background: transparent;
-`,BA=P.button`
+`,VA=P.button`
     display: flex;
     box-sizing: border-box;
     width: calc(100% - 8px);
@@ -2504,10 +2504,10 @@ Please report this to https://github.com/markedjs/marked.`,e){let e=`<p>An error
     background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
     cursor: pointer;
     box-shadow: 0 0 5px var(--shadow);
-    animation: ${RA} 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: ${zA} 0.16s cubic-bezier(0.22, 1, 0.36, 1);
     transition: filter 0.15s ease;
 
     &:hover {
         filter: brightness(1.15);
     }
-`;function VA(){let e=window.location.hash.indexOf(`?`);return e<0?``:new URLSearchParams(window.location.hash.slice(e+1)).get(`url`)??``}var HA=()=>{let e=ji(),[t,n]=(0,_.useState)(()=>VA()||null);return(0,_.useEffect)(()=>L.on(e=>{let t=e,r=t.data?.url;t.type===`selection.show`&&r&&n(r)}),[]),(0,_.useEffect)(()=>{L.send({type:`selection.ready`})},[]),(0,_.useEffect)(()=>(document.documentElement.classList.add(`selection-transparent`),()=>document.documentElement.classList.remove(`selection-transparent`)),[]),t?(0,F.jsx)(zA,{children:(0,F.jsx)(BA,{type:`button`,title:e(`selection.open`),onMouseDown:()=>{Ic(t),zc(),n(null)},children:(0,F.jsx)(Or,{size:26})})}):null},UA=document.getElementById(`root`);if(UA){let e=window.location.hash,t=e.startsWith(`#popup`)?(0,F.jsx)(LA,{}):e.startsWith(`#selection`)?(0,F.jsx)(HA,{}):(0,F.jsx)(Ok,{});(0,v.createRoot)(UA).render((0,F.jsx)(_.StrictMode,{children:(0,F.jsx)(Ni,{children:(0,F.jsxs)(zk,{children:[t,(0,F.jsx)(Lk,{})]})})}))}export{c as a,u as i,Kn as n,P as r,ji as t};
+`;function HA(){let e=window.location.hash.indexOf(`?`);return e<0?``:new URLSearchParams(window.location.hash.slice(e+1)).get(`url`)??``}var UA=()=>{let e=ji(),[t,n]=(0,_.useState)(()=>HA()||null);return(0,_.useEffect)(()=>L.on(e=>{let t=e,r=t.data?.url;t.type===`selection.show`&&r&&n(r)}),[]),(0,_.useEffect)(()=>{L.send({type:`selection.ready`})},[]),(0,_.useEffect)(()=>(document.documentElement.classList.add(`selection-transparent`),()=>document.documentElement.classList.remove(`selection-transparent`)),[]),t?(0,F.jsx)(BA,{children:(0,F.jsx)(VA,{type:`button`,title:e(`selection.open`),onMouseDown:()=>{Ic(t),zc(),n(null)},children:(0,F.jsx)(Or,{size:26})})}):null},WA=document.getElementById(`root`);if(WA){let e=window.location.hash,t=e.startsWith(`#popup`)?(0,F.jsx)(RA,{}):e.startsWith(`#selection`)?(0,F.jsx)(UA,{}):(0,F.jsx)(kk,{});(0,v.createRoot)(WA).render((0,F.jsx)(_.StrictMode,{children:(0,F.jsx)(Ni,{children:(0,F.jsxs)(Bk,{children:[t,(0,F.jsx)(Rk,{})]})})}))}export{c as a,u as i,Kn as n,P as r,ji as t};

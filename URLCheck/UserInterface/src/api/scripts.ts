@@ -1,4 +1,5 @@
 import {Native} from "@photino-net-utils/bridge";
+import {data} from "./data";
 
 /** One installed script, as the scripts page lists it. */
 export interface ScriptEntry {
@@ -41,16 +42,31 @@ async function result(type: string, payload?: unknown): Promise<string | null> {
 export async function listScripts(): Promise<ScriptList> {
     if (!Native.available) return {scripts: [], directory: ""};
 
-    const answer = await Native.request<ScriptList>("scripts.list");
+    try {
+        const page = await data.readBlock("/scripts");
+        return {
+            directory: page.meta.directory ?? "",
+            scripts: page.rows.map((row) => ({
+                name: String(row.name),
+                size: Number(row.size),
+                modified: String(row.modified),
+                error: text(row.error) || null,
+                version: text(row.version) || null,
+                updateUrl: text(row.updateUrl) || null,
+            })),
+        };
+    } catch {
+        const answer = await Native.request<ScriptList>("scripts.list");
 
-    return {
-        ...answer,
-        scripts: answer.scripts.map((script) => ({
-            ...script,
-            version: script.version ?? null,
-            updateUrl: script.updateUrl ?? null,
-        })),
-    };
+        return {
+            ...answer,
+            scripts: answer.scripts.map((script) => ({
+                ...script,
+                version: script.version ?? null,
+                updateUrl: script.updateUrl ?? null,
+            })),
+        };
+    }
 }
 
 /** The source of one script. */
@@ -117,8 +133,22 @@ export async function testScript(name: string, url: string, content: string): Pr
 export async function scriptLogs(): Promise<ScriptLogEntry[]> {
     if (!Native.available) return [];
 
-    const answer = await Native.request<{ entries: ScriptLogEntry[] }>("scripts.logs");
-    return answer.entries;
+    try {
+        const page = await data.readBlock("/script-logs");
+        return page.rows.map((row) => ({
+            time: String(row.time),
+            level: String(row.level),
+            script: String(row.script),
+            message: String(row.message),
+        }));
+    } catch {
+        const answer = await Native.request<{ entries: ScriptLogEntry[] }>("scripts.logs");
+        return answer.entries;
+    }
+}
+
+function text(value: string | number | undefined): string {
+    return typeof value === "string" ? value : "";
 }
 
 export async function clearScriptLogs(): Promise<void> {

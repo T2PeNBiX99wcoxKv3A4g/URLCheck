@@ -4,6 +4,7 @@ using PhotinoNetUtils.Hosting;
 using PhotinoNetUtils.Messaging;
 using URLCheck.Filters;
 using URLCheck.Messaging;
+using URLCheck.Scripting;
 
 namespace URLCheck.Services;
 
@@ -15,6 +16,8 @@ internal static class DataRoutes
 {
     public const ushort HistoryKind = 1;
     public const ushort FilterRulesKind = 2;
+    public const ushort ScriptsKind = 3;
+    public const ushort ScriptLogsKind = 4;
 
     public static void Map(WebApplication app, string token)
     {
@@ -55,6 +58,53 @@ internal static class DataRoutes
                         Join(rule.UrlExceptions)
                     ],
                     rule.Regex ? 1 : 0);
+
+            return DataBlockResults.Block(block);
+        }));
+
+        app.MapGet($"/data/{token}/scripts", (Delegate)(async (HttpContext _) =>
+        {
+            await ScriptEngine.Instance.ReloadIfChangedAsync();
+
+            var block = new DataBlock(ScriptsKind)
+                .Meta("directory", ScriptEngine.ScriptsDirectory)
+                .Text("name")
+                .Text("modified")
+                .Text("error")
+                .Text("version")
+                .Text("updateUrl")
+                .Number("size");
+
+            foreach (var script in ScriptEngine.Instance.List())
+                block.Row(
+                    [
+                        script.Name,
+                        script.Modified.ToString("O"),
+                        script.Error ?? "",
+                        script.Version ?? "",
+                        script.UpdateUrl ?? ""
+                    ],
+                    script.Size);
+
+            return DataBlockResults.Block(block);
+        }));
+
+        app.MapGet($"/data/{token}/script-logs", (Delegate)((HttpContext _) =>
+        {
+            var block = new DataBlock(ScriptLogsKind)
+                .Text("time")
+                .Text("level")
+                .Text("script")
+                .Text("message");
+
+            foreach (var entry in ScriptEngine.Instance.Logs)
+                block.Row(
+                    [
+                        entry.Time.ToString("HH:mm:ss"),
+                        entry.Level,
+                        entry.Script,
+                        entry.Message
+                    ]);
 
             return DataBlockResults.Block(block);
         }));
