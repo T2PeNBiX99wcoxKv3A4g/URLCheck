@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.19.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.19.0..v1.19.1) - 2026-11-21
+
+### 🐛 Bug Fixes
+
+- *(site)* Pin the gfm autolink package npm cannot download - ([0a7a83a](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/0a7a83a69248039cce8007bfdfc80b2cbae4f64c))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([b53880c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b53880c9a9157536f682639330a6e509f1d43176))
+
+
 ## [1.19.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.18.3..v1.19.0) - 2026-11-20
 
 ### ⛰️  Features
