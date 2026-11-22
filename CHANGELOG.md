@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.20.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.20.0..v1.20.1) - 2026-11-22
+
+### 🎨 Styling
+
+- *(settings)* Let the page fill the whole window - ([4f754b6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/4f754b603e1cb36d9ce8d3ff7f802bd12b3dba8c))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([9a570be](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/9a570be0ecf060181c628390ed6a7324266be08a))
+
+
 ## [1.20.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.19.1..v1.20.0) - 2026-11-22
 
 ### ⛰️  Features
