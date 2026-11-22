@@ -310,7 +310,6 @@ const SettingsSections = styled.div`
     gap: 24px;
     flex: 1;
     min-width: 0;
-    max-width: 800px;
 `;
 
 /**
@@ -1847,7 +1846,7 @@ export const SettingsPage: React.FC = () => {
     })();
 
     return (
-        <PageContainer $maxWidth={964}>
+        <PageContainer>
             <SettingsBody>
                 <SettingsSections>
                     <UnsavedBanner $visible={unsaved}>
