@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.20.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.19.1..v1.20.0) - 2026-11-22
+
+### ⛰️  Features
+
+- *(data)* Serve script lists and logs as binary blocks - ([9823024](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/9823024b25a77175b9f4de87c265482a71a2add6))
+- *(data)* Serve history and filter rules as binary blocks - ([d61b7e8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d61b7e8d0bdbd46340224911e4c803075be80a6e))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update the shared bridge and build - ([82dc0a2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/82dc0a2cd86af46d0a9a965329d376ae5d6b14bb))
+- Update the shared bridge and build - ([6dad646](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/6dad646423d02a3833cff0636fe33a14128364d5))
+- Update the shared bridge and build - ([1d49618](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/1d496188efba7fb7d8788a57467f8e40f8433a23))
+- Update the shared PhotinoNETUtils build - ([a8e6e4d](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/a8e6e4ddc7384cdfd164205f439d1be99d53fb5d))
+- Update the shared PhotinoNETUtils build - ([179ffb5](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/179ffb555d809e5840a5cf3077ca111f0961aabe))
+- No release for a site package update - ([bcd4322](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/bcd4322b049f4f9a60d431ee6935e7097df46a8c))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([7aee7d8](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/7aee7d81415de939aa0ded3528175b3f7afd0a83))
+
+### Build
+
+- *(ui)* Rebuild the bundle for the shared bridge 0.44.2 - ([724ee75](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/724ee753537ce5f8cd0fc1cc7b6e86e41dec36d3))
+
+
 ## [1.19.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.19.0..v1.19.1) - 2026-11-21
 
 ### 🐛 Bug Fixes
