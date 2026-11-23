@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.20.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.20.1..v1.20.2) - 2026-11-23
+
+### 📚 Documentation
+
+- Refresh the main window and popup screenshots - ([d4afd7b](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d4afd7b2e85f74cd848442f36ef4d538cfe047ce))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([cbfa5dc](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/cbfa5dc38e5b1dd19a2e7cdb487c4a30597c3a07))
+
+
 ## [1.20.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.20.0..v1.20.1) - 2026-11-22
 
 ### 🎨 Styling
