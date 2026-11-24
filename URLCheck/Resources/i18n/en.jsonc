@@ -231,6 +231,7 @@
   "popup.scheme": "scheme",
   "popup.host": "host",
   "popup.path": "path",
+  "popup.clear_path": "Clear the path",
   "popup.host_tooltip": "Replace the URL with just this host",
   "popup.parameters": "Parameters",
   "popup.no_parameters": "No parameters",

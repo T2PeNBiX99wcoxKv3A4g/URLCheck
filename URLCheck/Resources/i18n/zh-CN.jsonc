@@ -221,6 +221,7 @@
   "popup.scheme": "协议",
   "popup.host": "主机",
   "popup.path": "路径",
+  "popup.clear_path": "清除路径",
   "popup.host_tooltip": "把网址换成只剩这个主机",
   "popup.parameters": "参数",
   "popup.no_parameters": "没有参数",

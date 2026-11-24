@@ -221,6 +221,7 @@
   "popup.scheme": "スキーム",
   "popup.host": "ホスト",
   "popup.path": "パス",
+  "popup.clear_path": "パスを消去",
   "popup.host_tooltip": "URL をこのホストだけにする",
   "popup.parameters": "パラメータ",
   "popup.no_parameters": "パラメータはありません",

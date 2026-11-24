@@ -9,6 +9,7 @@ import {closePopup, getAppInfo, resizePopup, shareUrl} from "../api/system";
 import {loadFilterRules} from "../api/filters";
 import {type CompiledRules, compileRules, stripTrackingParams, trackingParamKeys} from "../data/filterRules";
 import {type HostWarning, hostWarnings} from "../data/linkCheck";
+import {readableHost} from "../data/punycode";
 import {type LocalizationKey, Native, useTranslation} from "@photino-net-utils/bridge";
 import {
     AlertTriangleIcon,
@@ -549,8 +550,13 @@ const RemoveParam = styled.button`
     flex-shrink: 0;
     transition: color 0.15s ease, background 0.15s ease;
 
-    &:hover {
+    &:hover:not(:disabled) {
         color: var(--danger);
+    }
+
+    &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
     }
 `;
 
@@ -973,6 +979,15 @@ export const PopupPage: React.FC = () => {
         setPathDraft(pathFrom(new URL(result)));
     };
 
+    /* Clearing the path leaves the URL pointing at the host itself. */
+    const handleClearPath = () => {
+        if (!parsed) return;
+
+        const next = new URL(url);
+        next.pathname = "/";
+        commit(next.toString());
+    };
+
     const updateParamAt = (index: number, patch: { key?: string; value?: string }) => {
         if (!parsed) return;
 
@@ -1276,7 +1291,7 @@ export const PopupPage: React.FC = () => {
                                 <RowValue>
                                     {parsed ? (
                                         <HostLink onClick={useOrigin} title={t("popup.host_tooltip")}>
-                                            {decode(parsed.host)}
+                                            {readableHost(parsed.host)}
                                         </HostLink>
                                     ) : (
                                         "(none)"
@@ -1295,6 +1310,13 @@ export const PopupPage: React.FC = () => {
                                     onBlur={applyPath}
                                     onKeyDown={enterBlurs}
                                 />
+                                <RemoveParam
+                                    title={t("popup.clear_path")}
+                                    onClick={handleClearPath}
+                                    disabled={!parsed || pathDraft.length === 0}
+                                >
+                                    <TrashIcon size={12}/>
+                                </RemoveParam>
                             </Row>
                         </SectionBody>
                     )}

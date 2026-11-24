@@ -221,6 +221,7 @@
   "popup.scheme": "協定",
   "popup.host": "主機",
   "popup.path": "路徑",
+  "popup.clear_path": "清除路徑",
   "popup.host_tooltip": "把網址換成只剩這個主機",
   "popup.parameters": "參數",
   "popup.no_parameters": "沒有參數",

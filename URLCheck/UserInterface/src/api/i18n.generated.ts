@@ -72,6 +72,7 @@ declare module "@photino-net-utils/bridge"
         "popup.checking": true;
         "popup.check_status": true;
         "popup.choose_browser": true;
+        "popup.clear_path": true;
         "popup.close": true;
         "popup.copied": true;
         "popup.copy": true;
