@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.21.0..v1.21.1) - 2026-11-24
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([3a29cb6](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/3a29cb65799cbab5fb9d0ba50900646df5086c75))
+
+
 ## [1.21.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.20.2..v1.21.0) - 2026-11-24
 
 ### ⛰️  Features
