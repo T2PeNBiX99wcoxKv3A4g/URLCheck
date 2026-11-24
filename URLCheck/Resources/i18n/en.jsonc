@@ -316,7 +316,8 @@
   "error.missing_url": "Missing URL.",
   "error.no_browser": "No browser configured. Add one in Settings.",
   "error.missing_settings": "Missing settings payload.",
-  "error.invalid_json": "Invalid JSON payload.",
+  "error.invalidjson": "Invalid JSON payload.",
+  "error.invalidsettings": "The settings could not be read - open the settings again.",
   "error.unsupported": "Unsupported message type.",
   "error.timeout": "Request timed out",
   "error.forward_no_device": "No device is configured to forward to.",
@@ -327,7 +328,7 @@
   "error.forward_pair_rejected": "The pairing was rejected, or the codes did not match.",
   "error.forward_busy": "Another pairing request is already waiting for confirmation.",
   "error.invalid_address": "That is not a valid address.",
-  "error.update_check_failed": "Could not read the published version.",
+  "error.updatecheckfailed": "Could not read the published version.",
   "error.open_logs_failed": "Could not open the log folder.",
   "error.open_failed": "Could not open the URL with the system default handler.",
   "error.share_failed": "The system share sheet could not be opened."

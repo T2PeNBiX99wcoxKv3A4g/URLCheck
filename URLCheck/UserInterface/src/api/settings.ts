@@ -1,4 +1,4 @@
-import {loadSettingDefaults, loadSettings as load, Native, resetSettings as reset, saveSettings as save} from "@photino-net-utils/bridge";
+import {loadSettings as load, loadSettingsDefaults, Native, resetSettings as reset, saveSettings as save} from "@photino-net-utils/bridge";
 import type {AppSettings} from "../types";
 
 /**
@@ -61,7 +61,7 @@ export async function resetSettings(): Promise<SettingsPayload> {
 }
 
 /** The defaults themselves, for anything that needs a single value back rather than a whole reset. */
-export {loadSettingDefaults};
+export {loadSettingsDefaults};
 
 /** Adds a URL's host to the auto-redirect list. Idempotent. */
 export async function addAutoRedirect(url: string): Promise<void> {

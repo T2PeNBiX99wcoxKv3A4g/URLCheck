@@ -302,7 +302,8 @@
   "error.missing_url": "缺少网址。",
   "error.no_browser": "尚未设置浏览器。请在设置中添加。",
   "error.missing_settings": "缺少设置内容。",
-  "error.invalid_json": "无效的 JSON。",
+  "error.invalidjson": "无效的 JSON。",
+  "error.invalidsettings": "无法读取设置，请重新打开设置页面。",
   "error.unsupported": "不支持的消息类型。",
   "error.timeout": "请求超时",
   "error.forward_no_device": "尚未设置可转发的设备。",
@@ -313,7 +314,7 @@
   "error.forward_pair_rejected": "配对被拒绝，或验证码不一致。",
   "error.forward_busy": "已有另一个配对请求正在等待确认。",
   "error.invalid_address": "这不是有效的地址。",
-  "error.update_check_failed": "无法读取已发布的版本。",
+  "error.updatecheckfailed": "无法读取已发布的版本。",
   "error.open_logs_failed": "无法打开日志文件夹。",
   "error.open_failed": "无法用系统默认处理程序打开此 URL。",
   "error.share_failed": "无法打开系统分享界面。"

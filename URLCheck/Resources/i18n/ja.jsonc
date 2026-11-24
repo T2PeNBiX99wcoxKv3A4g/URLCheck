@@ -302,7 +302,8 @@
   "error.missing_url": "URL がありません。",
   "error.no_browser": "ブラウザが設定されていません。設定で追加してください。",
   "error.missing_settings": "設定の内容がありません。",
-  "error.invalid_json": "無効な JSON です。",
+  "error.invalidjson": "無効な JSON です。",
+  "error.invalidsettings": "設定を読み取れませんでした。設定を開き直してください。",
   "error.unsupported": "未対応のメッセージ種別です。",
   "error.timeout": "リクエストがタイムアウトしました",
   "error.forward_no_device": "転送先のデバイスが設定されていません。",
@@ -313,7 +314,7 @@
   "error.forward_pair_rejected": "ペアリングが拒否されたか、コードが一致しませんでした。",
   "error.forward_busy": "別のペアリング要求がすでに確認待ちです。",
   "error.invalid_address": "有効なアドレスではありません。",
-  "error.update_check_failed": "公開されているバージョンを読み取れませんでした。",
+  "error.updatecheckfailed": "公開されているバージョンを読み取れませんでした。",
   "error.open_logs_failed": "ログフォルダーを開けませんでした。",
   "error.open_failed": "システムの既定のハンドラーで URL を開けませんでした。",
   "error.share_failed": "システムの共有画面を開けませんでした。"

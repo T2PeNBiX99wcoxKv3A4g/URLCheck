@@ -21,9 +21,10 @@ declare module "@photino-net-utils/bridge"
         "error.forward_rejected": true;
         "error.forward_stale": true;
         "error.forward_unpaired": true;
+        "error.invalidjson": true;
+        "error.invalidsettings": true;
         "error.invalid_address": true;
         "error.invalid_filter": true;
-        "error.invalid_json": true;
         "error.invalid_script": true;
         "error.missing_settings": true;
         "error.missing_url": true;
@@ -45,7 +46,7 @@ declare module "@photino-net-utils/bridge"
         "error.timeout": true;
         "error.unknown": true;
         "error.unsupported": true;
-        "error.update_check_failed": true;
+        "error.updatecheckfailed": true;
         "filters.catalog.adguard_url_tracking": true;
         "filters.catalog.clear_urls": true;
         "filters.catalog.firefox": true;

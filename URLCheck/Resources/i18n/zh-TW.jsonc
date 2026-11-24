@@ -302,7 +302,8 @@
   "error.missing_url": "缺少網址。",
   "error.no_browser": "尚未設定瀏覽器。請在設定中新增。",
   "error.missing_settings": "缺少設定內容。",
-  "error.invalid_json": "無效的 JSON。",
+  "error.invalidjson": "無效的 JSON。",
+  "error.invalidsettings": "無法讀取設定，請重新開啟設定頁面。",
   "error.unsupported": "不支援的訊息類型。",
   "error.timeout": "請求逾時",
   "error.forward_no_device": "尚未設定可轉傳的裝置。",
@@ -313,7 +314,7 @@
   "error.forward_pair_rejected": "配對被拒絕，或驗證碼不一致。",
   "error.forward_busy": "已有另一個配對請求正在等待確認。",
   "error.invalid_address": "這不是有效的位址。",
-  "error.update_check_failed": "無法讀取已發佈的版本。",
+  "error.updatecheckfailed": "無法讀取已發佈的版本。",
   "error.open_logs_failed": "無法開啟日誌資料夾。",
   "error.open_failed": "無法用系統預設處理程式開啟此 URL。",
   "error.share_failed": "無法開啟系統分享畫面。"
