@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.21.0](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.20.2..v1.21.0) - 2026-11-24
+
+### ⛰️  Features
+
+- *(popup)* Show hosts decoded and add a clear-path button - ([524310c](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/524310cd0decb3fd4aa6d9d39dbcdf1a18b43c6b))
+- *(popup)* Warn about look-alike and non-Latin hosts - ([635370e](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/635370eae137d88abd518d02fbc85ae92048d030))
+
+### 🚜 Refactor
+
+- *(settings)* Take reset, defaults and the bridge from the shared base - ([b4c85d7](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/b4c85d7c500f61e0ba60970ad601bad508b6aab5))
+- *(settings)* Let the backend own every default and bound - ([d7978c4](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d7978c46830e496747b46b3362731b3dda298ead))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(site)* Bump sharp to 0.35.5 - ([d14cfdb](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/d14cfdbe2414b9a45e399c173551d43a54d6cd9f))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([f0189c2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f0189c2c8b714ca280965855cf7958f5f18f4609))
+
+
 ## [1.20.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.20.1..v1.20.2) - 2026-11-23
 
 ### 📚 Documentation
