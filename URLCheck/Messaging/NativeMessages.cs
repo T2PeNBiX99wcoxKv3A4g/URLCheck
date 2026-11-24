@@ -6,7 +6,13 @@ namespace URLCheck.Messaging;
 // this app defines live here.
 
 /// <summary>Body returned for every settings message.</summary>
-internal sealed record SettingsPayload(AppSettings Settings, string SettingsFilePath);
+internal sealed record SettingsPayload(AppSettings Settings, string SettingsFilePath, SettingsLimits Limits);
+
+/// <summary>
+///     The bounds the backend keeps the settings in. They travel with every settings payload so the
+///     interface can size its inputs without keeping a second copy of the numbers.
+/// </summary>
+internal sealed record SettingsLimits(int TimeoutMinMs, int TimeoutMaxMs, int FilterMinutesMax);
 
 /// <summary>Payload for <c>popup.show</c>.</summary>
 internal sealed record PopupShowRequest(string Url);

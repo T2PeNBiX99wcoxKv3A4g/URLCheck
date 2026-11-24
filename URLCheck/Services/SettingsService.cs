@@ -15,10 +15,7 @@ namespace URLCheck.Services;
 internal sealed class SettingsService() : SettingsServiceBase<SettingsService, AppSettings, SettingsPayload>(
     new TomlSettingsStore<AppSettings>(
         Path.Combine(Constants.SettingsDirectory, "settings.toml"),
-        new()
-        {
-            Browsers = [.. PlatformServices.BrowserLocator.Detect()]
-        },
+        Defaults(),
         AppTomlContext.Default.AppSettings,
         json => JsonSerializer.Deserialize(json, AppJsonContext.Default.AppSettings),
         LegacySettingsPath,
@@ -28,18 +25,26 @@ internal sealed class SettingsService() : SettingsServiceBase<SettingsService, A
     private const string Header =
         "# URLCheck settings. Rewritten when settings are saved; comments are not preserved.";
 
+    /// <summary>
+    ///     What a first run and a reset both start from: the model's own defaults, plus the browsers
+    ///     that are really installed. Both paths go through here, so they cannot drift apart.
+    /// </summary>
+    private static AppSettings Defaults() => new()
+    {
+        Browsers = [.. PlatformServices.BrowserLocator.Detect()]
+    };
+
     /// <summary>The old JSON file, read once when the TOML file does not exist yet.</summary>
     private static readonly string? LegacySettingsPath = new[]
     {
         Path.Combine(Constants.SettingsDirectory, "settings.json"), Path.Combine(Constants.DataDirectory, "settings.json")
     }.FirstOrDefault(File.Exists);
 
-    private readonly IBrowserLocator _browserLocator = PlatformServices.BrowserLocator;
-
     /// <summary>The language from the loaded settings.</summary>
     public string Language => Current.Language;
 
-    protected override SettingsPayload Payload() => new(Current, FilePath);
+    protected override SettingsPayload Payload() => new(Current, FilePath, new(
+        AppSettings.TimeoutMinMs, AppSettings.TimeoutMaxMs, AppSettings.FilterAutoUpdateMaxMinutes));
 
     protected override AppSettings Normalize(AppSettings settings)
     {
@@ -87,10 +92,7 @@ internal sealed class SettingsService() : SettingsServiceBase<SettingsService, A
     /// <summary>Restores defaults, re-detecting the installed browsers.</summary>
     private async Task<NativeResponse?> ResetAsync(NativeContext context)
     {
-        await SaveAsync(new AppSettings
-        {
-            Browsers = [.. _browserLocator.Detect()]
-        });
+        await SaveAsync(Defaults());
 
         return context.Reply("settings.reset.result", Payload());
     }

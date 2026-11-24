@@ -21,6 +21,12 @@ internal sealed class AppSettings
     /// <summary>Port the device-forwarding listener uses unless the user picks another one.</summary>
     public const int DefaultForwardPort = 45_454;
 
+    /// <summary>Lowest forwarding port accepted for this device or a paired one.</summary>
+    public const int ForwardPortMin = 1_024;
+
+    /// <summary>Highest forwarding port accepted for this device or a paired one.</summary>
+    public const int ForwardPortMax = 65_535;
+
     /// <summary>Minutes between filter list refreshes unless the user picks another interval (one day).</summary>
     public const int DefaultFilterAutoUpdateMinutes = 1_440;
 
@@ -210,7 +216,7 @@ internal sealed class AppSettings
         if (string.IsNullOrWhiteSpace(DeviceName))
             DeviceName = Environment.MachineName;
 
-        ForwardPort = Math.Clamp(ForwardPort, 1_024, 65_535);
+        ForwardPort = Math.Clamp(ForwardPort, ForwardPortMin, ForwardPortMax);
 
         // -1 means "startup only"; every other value is a usable interval.
         if (FilterAutoUpdateMinutes != -1)
@@ -237,7 +243,7 @@ internal sealed class AppSettings
             if (string.IsNullOrWhiteSpace(device.Name))
                 device.Name = device.Host;
 
-            device.Port = Math.Clamp(device.Port, 1_024, 65_535);
+            device.Port = Math.Clamp(device.Port, ForwardPortMin, ForwardPortMax);
 
             // Extra fallback addresses: trimmed, without blanks or repeats, and never the primary host.
             device.Addresses ??= [];

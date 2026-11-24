@@ -29,6 +29,7 @@ namespace URLCheck.Messaging;
 [JsonSerializable(typeof(NativeEvent))]
 [JsonSerializable(typeof(AppSettings))]
 [JsonSerializable(typeof(SettingsPayload))]
+[JsonSerializable(typeof(SettingsLimits))]
 [JsonSerializable(typeof(PopupShowRequest))]
 [JsonSerializable(typeof(PopupOpenRequest))]
 [JsonSerializable(typeof(PopupResizeRequest))]

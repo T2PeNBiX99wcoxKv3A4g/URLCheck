@@ -31,7 +31,14 @@ import {PageContainer, SectionTitle, StackCard} from "../components/Layout";
 import {Dropdown} from "../components/Dropdown";
 import {type LocalizationKey, loadStrings, Markdown, Native, type Translate, useLocale, useTranslation} from "@photino-net-utils/bridge";
 import {AppSettings, BrowserEntry, DeviceEntry, UserAgentEntry} from "../types";
-import {DEFAULT_SETTINGS, loadSettings, resetSettings, saveSettings, type SettingsPayload} from "../api/settings";
+import {
+    emptySettings,
+    loadSettings,
+    resetSettings,
+    saveSettings,
+    type SettingsLimits,
+    type SettingsPayload
+} from "../api/settings";
 import {detectBrowsers} from "../api/browsers";
 import {
     addDeviceAddress,
@@ -1155,9 +1162,11 @@ export const SettingsPage: React.FC = () => {
     const t = useTranslation();
     const locale = useLocale();
     const [activeSection, setActiveSection] = useState<LocalizationKey>(SECTIONS[0]);
-    const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+    const [settings, setSettings] = useState<AppSettings>(emptySettings);
     /** Last persisted snapshot; the form is "dirty" while it differs from this. */
-    const [baseline, setBaseline] = useState<AppSettings>(DEFAULT_SETTINGS);
+    const [baseline, setBaseline] = useState<AppSettings>(emptySettings);
+    /** The backend's bounds for the two numeric inputs; null until the first payload. */
+    const [limits, setLimits] = useState<SettingsLimits | null>(null);
     const [settingsFilePath, setSettingsFilePath] = useState("");
     const [locales, setLocales] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
@@ -1212,7 +1221,7 @@ export const SettingsPage: React.FC = () => {
     /** A pairing request from another device, waiting for this user to accept or reject it. */
     const [incoming, setIncoming] = useState<PairRequestEvent | null>(null);
     const [manualHost, setManualHost] = useState("");
-    const [manualPort, setManualPort] = useState(DEFAULT_SETTINGS.forwardPort);
+    const [manualPort, setManualPort] = useState<number | null>(null);
     /** Draft fallback address per paired device, keyed by device id. */
     const [addressInputs, setAddressInputs] = useState<Record<string, string>>({});
     /** Draft host for the auto-redirect list. */
@@ -1388,6 +1397,7 @@ export const SettingsPage: React.FC = () => {
     const applyPayload = (payload: SettingsPayload) => {
         setSettings(payload.settings);
         setBaseline(payload.settings);
+        setLimits(payload.limits);
         setSettingsFilePath(payload.settingsFilePath);
     };
 
@@ -1794,7 +1804,7 @@ export const SettingsPage: React.FC = () => {
     };
 
     const handleManualPair = () => {
-        if (manualHost.trim()) handlePair(manualHost.trim(), manualPort);
+        if (manualHost.trim()) handlePair(manualHost.trim(), manualPort ?? settings.forwardPort);
     };
 
     const handlePairRespond = (accept: boolean) => {
@@ -1894,8 +1904,8 @@ export const SettingsPage: React.FC = () => {
                             <StyledRange>
                                 <input
                                     type="range"
-                                    min="1000"
-                                    max="15000"
+                                    min={limits?.timeoutMinMs}
+                                    max={limits?.timeoutMaxMs}
                                     step="500"
                                     disabled={busy}
                                     value={settings.requestTimeoutMs}
@@ -2260,7 +2270,7 @@ export const SettingsPage: React.FC = () => {
                                     className="port"
                                     type="number"
                                     disabled={!forwardingActive}
-                                    value={String(manualPort)}
+                                    value={String(manualPort ?? settings.forwardPort)}
                                     onChange={(event) => setManualPort(Number(event.target.value) || 0)}
                                 />
                                 <GhostButton
@@ -2408,7 +2418,7 @@ export const SettingsPage: React.FC = () => {
                                 className="port"
                                 type="number"
                                 min={-1}
-                                max={10080}
+                                max={limits?.filterMinutesMax}
                                 disabled={busy || !settings.filterAutoUpdate}
                                 value={minutesDraft ?? String(settings.filterAutoUpdateMinutes)}
                                 onChange={(event) => {
