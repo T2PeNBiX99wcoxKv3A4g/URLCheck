@@ -221,6 +221,10 @@
   "popup.redirected": "Redirected",
   "popup.tracking": "Tracking",
   "popup.remove_tracking_tooltip": "Remove tracking parameters",
+  // --------------------------------------------------------------- phishing
+  "popup.host_non_ascii": "This host contains characters that are not plain English letters, so it can be made to look like another site.",
+  "popup.host_punycode": "This host is written in an encoded form (xn--), which hides the letters it really uses.",
+  "popup.host_lookalike": "This host looks like {brand}, but {brand} lives at {domain}.",
   "popup.http_warning": "Insecure http:// — switch to https",
   "popup.use_https": "Use https",
   "popup.domain": "Domain",

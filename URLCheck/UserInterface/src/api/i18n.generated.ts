@@ -83,6 +83,9 @@ declare module "@photino-net-utils/bridge"
         "popup.fragment_tooltip": true;
         "popup.history": true;
         "popup.host": true;
+        "popup.host_lookalike": true;
+        "popup.host_non_ascii": true;
+        "popup.host_punycode": true;
         "popup.host_tooltip": true;
         "popup.http_warning": true;
         "popup.last": true;

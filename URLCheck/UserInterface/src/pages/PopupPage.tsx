@@ -8,6 +8,7 @@ import {checkStatus, type StatusResult} from "../api/inspect";
 import {closePopup, getAppInfo, resizePopup, shareUrl} from "../api/system";
 import {loadFilterRules} from "../api/filters";
 import {type CompiledRules, compileRules, stripTrackingParams, trackingParamKeys} from "../data/filterRules";
+import {type HostWarning, hostWarnings} from "../data/linkCheck";
 import {type LocalizationKey, Native, useTranslation} from "@photino-net-utils/bridge";
 import {
     AlertTriangleIcon,
@@ -185,14 +186,32 @@ const UrlInput = styled.input<{ $warn?: boolean }>`
     }
 `;
 
-const HttpWarning = styled.div`
+/** Everything that is wrong with this URL, one line each. */
+const WarningList = styled.div`
     display: flex;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
+    gap: 4px;
     margin-top: -4px;
+`;
+
+const Warning = styled.div`
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
     color: var(--warning);
     font-size: 0.74rem;
+    line-height: 1.35;
     animation: ${fadeIn} 0.15s ease;
+
+    svg {
+        flex: none;
+        margin-top: 1px;
+    }
+
+    span {
+        flex: 1;
+        overflow-wrap: anywhere;
+    }
 `;
 
 /** A script failed on this URL; the popup shows it rather than pretending the URL was handled. */
@@ -771,6 +790,20 @@ export const PopupPage: React.FC = () => {
     const canOpen = Boolean(parsed) && browsers.length > 0;
     const trackingCount = rules ? trackingParamKeys(url, rules).length : 0;
 
+    /* A phishing check runs on every edit, so the warning follows what the URL now says. */
+    const warnings = useMemo(() => hostWarnings(url), [url]);
+
+    const warningText = (warning: HostWarning) => {
+        switch (warning.kind) {
+            case "nonAscii":
+                return t("popup.host_non_ascii");
+            case "punycode":
+                return t("popup.host_punycode");
+            case "lookalike":
+                return t("popup.host_lookalike", {brand: warning.brand, domain: warning.domain});
+        }
+    };
+
     /* load the browser and User-Agent lists */
     useEffect(() => {
         let cancelled = false;
@@ -1131,17 +1164,28 @@ export const PopupPage: React.FC = () => {
                     type="text"
                     value={url}
                     spellCheck={false}
-                    $warn={isHttp}
+                    $warn={isHttp || warnings.length > 0}
                     onChange={(e) => applyEdit(e.target.value)}
                     onBlur={() => dispatch({type: "commit", value: url})}
                     placeholder="https://example.com/path?key=value"
                 />
 
-                {isHttp && (
-                    <HttpWarning>
-                        <AlertTriangleIcon size={13}/>
-                        <span>{t("popup.http_warning")}</span>
-                    </HttpWarning>
+                {(warnings.length > 0 || isHttp) && (
+                    <WarningList>
+                        {warnings.map((warning) => (
+                            <Warning key={warning.kind}>
+                                <AlertTriangleIcon size={13}/>
+                                <span>{warningText(warning)}</span>
+                            </Warning>
+                        ))}
+
+                        {isHttp && (
+                            <Warning>
+                                <AlertTriangleIcon size={13}/>
+                                <span>{t("popup.http_warning")}</span>
+                            </Warning>
+                        )}
+                    </WarningList>
                 )}
 
                 {history.entries.length > 1 && (
