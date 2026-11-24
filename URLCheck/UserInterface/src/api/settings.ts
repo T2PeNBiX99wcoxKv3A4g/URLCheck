@@ -1,4 +1,4 @@
-import {Native} from "@photino-net-utils/bridge";
+import {loadSettingDefaults, loadSettings as load, Native, resetSettings as reset, saveSettings as save} from "@photino-net-utils/bridge";
 import type {AppSettings} from "../types";
 
 /**
@@ -47,18 +47,21 @@ export function emptySettings(): AppSettings {
 
 /** Loads the settings; the backend has already normalized them and their bounds come with them. */
 export async function loadSettings(): Promise<SettingsPayload> {
-    return await Native.request<SettingsPayload>("settings.get");
+    return await load<SettingsPayload>();
 }
 
 /** Saves them as they are: the backend clamps whatever is out of range and returns the result. */
 export async function saveSettings(settings: AppSettings): Promise<SettingsPayload> {
-    return await Native.request<SettingsPayload>("settings.save", settings);
+    return await save<SettingsPayload>(settings);
 }
 
 /** Restores the backend's defaults, which is also the only place they exist. */
 export async function resetSettings(): Promise<SettingsPayload> {
-    return await Native.request<SettingsPayload>("settings.reset");
+    return await reset<SettingsPayload>();
 }
+
+/** The defaults themselves, for anything that needs a single value back rather than a whole reset. */
+export {loadSettingDefaults};
 
 /** Adds a URL's host to the auto-redirect list. Idempotent. */
 export async function addAutoRedirect(url: string): Promise<void> {

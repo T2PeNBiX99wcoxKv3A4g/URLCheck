@@ -10,7 +10,7 @@ namespace URLCheck.Services;
 
 /// <summary>
 ///     Owns the TOML settings file and its standard bridge messages. The shared base handles
-///     loading, saving, JSON-to-TOML migration and the change notification.
+///     loading, saving, resetting, the defaults, JSON-to-TOML migration and the change notification.
 /// </summary>
 internal sealed class SettingsService() : SettingsServiceBase<SettingsService, AppSettings, SettingsPayload>(
     new TomlSettingsStore<AppSettings>(
@@ -43,8 +43,11 @@ internal sealed class SettingsService() : SettingsServiceBase<SettingsService, A
     /// <summary>The language from the loaded settings.</summary>
     public string Language => Current.Language;
 
-    protected override SettingsPayload Payload() => new(Current, FilePath, new(
+    protected override SettingsPayload Payload(AppSettings settings) => new(settings, FilePath, new(
         AppSettings.TimeoutMinMs, AppSettings.TimeoutMaxMs, AppSettings.FilterAutoUpdateMaxMinutes));
+
+    /// <summary>A reset re-detects the browsers instead of reusing the ones found at startup.</summary>
+    protected override AppSettings CreateDefaults() => Defaults();
 
     protected override AppSettings Normalize(AppSettings settings)
     {
@@ -53,20 +56,10 @@ internal sealed class SettingsService() : SettingsServiceBase<SettingsService, A
         return settings;
     }
 
-    protected override async Task<NativeResponse?> HandleExtraAsync(NativeContext context)
-    {
-        switch (context.Request.Type)
-        {
-            case "settings.addAutoRedirect":
-                return await AddAutoRedirectAsync(context);
-
-            case "settings.reset":
-                return await ResetAsync(context);
-
-            default:
-                return await base.HandleExtraAsync(context);
-        }
-    }
+    protected override Task<NativeResponse?> HandleExtraAsync(NativeContext context) =>
+        context.Request.Type == "settings.addAutoRedirect"
+            ? AddAutoRedirectAsync(context)
+            : base.HandleExtraAsync(context);
 
     /// <summary>Adds a URL's host to the auto-redirect list, keeping the list unique.</summary>
     private async Task<NativeResponse?> AddAutoRedirectAsync(NativeContext context)
@@ -87,13 +80,5 @@ internal sealed class SettingsService() : SettingsServiceBase<SettingsService, A
         }
 
         return context.Reply("settings.addAutoRedirect.result", new OkPayload());
-    }
-
-    /// <summary>Restores defaults, re-detecting the installed browsers.</summary>
-    private async Task<NativeResponse?> ResetAsync(NativeContext context)
-    {
-        await SaveAsync(Defaults());
-
-        return context.Reply("settings.reset.result", Payload());
     }
 }
