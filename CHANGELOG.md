@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.21.2](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.21.1..v1.21.2) - 2026-11-28
+
+### 🚜 Refactor
+
+- Maximize through PhotinoWindow - ([dcd5cfc](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/dcd5cfc681507ae57af9b2e5e71e34b72432c9bc))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(site)* Drop the mdast-util-gfm-autolink-literal override - ([f7553e9](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/f7553e94f5a554a8ee239a44bd61583df3d17ff7))
+- Build and deploy the site through the shared Pages workflow - ([24b44bc](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/24b44bc0e141460bc3e7b610ac7e14852bc60cbd))
+
+### Action
+
+- Update version and update `CHANGELOG.md` - ([5b40738](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/commit/5b407386643d0e0c1c6feed587e377f6ddbe8534))
+
+
 ## [1.21.1](https://github.com/T2PeNBiX99wcoxKv3A4g/URLCheck/compare/v1.21.0..v1.21.1) - 2026-11-24
 
 ### Action
