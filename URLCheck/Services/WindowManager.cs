@@ -882,14 +882,6 @@ internal partial class WindowManager
     /// <summary>Maximizes or restores through the platform, then tells the interface which it did.</summary>
     private void ToggleMaximize(PhotinoWindow window)
     {
-        if (OperatingSystem.IsWindows())
-        {
-            if (window.WindowHandle != IntPtr.Zero)
-                NotifyWindowState(WindowZoom.Toggle(window.WindowHandle));
-
-            return;
-        }
-
         if (OperatingSystem.IsLinux())
         {
             NotifyWindowState(LinuxWindow.ToggleMaximize(window.Title));
